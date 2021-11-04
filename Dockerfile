@@ -1,5 +1,9 @@
-FROM opensuse/leap:15.3 AS build
+FROM opensuse/leap:15.3 as base
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
+    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
 RUN zypper ref
+
+FROM base AS build
 RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
 RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.6/luet-0.20.6-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet && \
@@ -50,9 +54,7 @@ COPY framework/files/ /
 RUN ["/usr/bin/busybox", "rm", "-rf", "/var", "/etc/ssl", "/usr/bin/busybox"]
 
 # Make OS image
-FROM opensuse/leap:15.3 as os
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
-RUN zypper ref
+FROM base as os
 RUN zypper dup -y
 RUN zypper in -y -- \
     apparmor-parser \
