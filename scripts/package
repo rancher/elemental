@@ -19,7 +19,7 @@ if [ "$PUSH" = "true" ]; then
     make push-framework
 fi
 
-if [ "$PUSH" = "true" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ]; then
+if [ "$PUSH" = "true" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "${DRONE_TAG}" ]; then
     IMAGE_TARGETS="${IMAGE_TARGETS} all-amis"
 fi
 

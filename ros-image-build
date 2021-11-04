@@ -178,7 +178,6 @@ ARG NAME=RancherOS-Image-dev
 ARG VERSION=1
 ARG GIT_COMMIT=HEAD
 RUN packer build \
-    -var "root_password=ros" \
     -var "cos_version=${VERSION}" \
     -var "git_sha=${GIT_COMMIT}" \
     -var 'aws_source_ami_filter_owners=["053594193760"]' \
