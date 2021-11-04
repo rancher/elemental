@@ -16,6 +16,10 @@ steps:
       from_secret: docker_password
     DOCKER_USERNAME:
       from_secret: docker_username
+    AWS_ACCESS_KEY_ID:
+      from_secret: AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: AWS_SECRET_ACCESS_KEY
     ARCH: "amd64"
   volumes:
   - name: docker
