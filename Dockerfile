@@ -115,6 +115,7 @@ RUN zypper in -y -- \
     pigz \
     procps \
     psmisc \
+    python-azure-agent \
     qemu-guest-agent \
     rsync \
     squashfs \
