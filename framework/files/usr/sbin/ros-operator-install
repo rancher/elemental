@@ -32,6 +32,7 @@ helm upgrade \
     --install \
     --create-namespace \
     -n cattle-rancheros-operator-system \
+    --set hostbin=true \
     --set image.repository=${IMAGE_REPO} \
     --set image.tag=${IMAGE_TAG} \
     --set image.imagePullPolicy=${PULL_POLICY} \

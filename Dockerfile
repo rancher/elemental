@@ -1,6 +1,5 @@
 FROM opensuse/leap:15.3 as base
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
-    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 
 FROM base AS build
@@ -72,6 +71,7 @@ RUN zypper in -y -- \
     findutils \
     gawk \
     gptfdisk \
+    glibc-locale-base \
     grub2-i386-pc \
     grub2-x86_64-efi \
     haveged \

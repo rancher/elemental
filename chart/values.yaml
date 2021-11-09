@@ -1,4 +1,5 @@
 image:
+  empty: rancher/pause:3.1
   repository: rancher/os2
   tag: dev
   imagePullPolicy: IfNotPresent
@@ -12,6 +13,9 @@ noProxy: 127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local
 global:
   cattle:
     systemDefaultRegistry: ""
+
+# Use ros-operator binary from the host
+hostbin: false
 
 nodeSelector:
   kubernetes.io/os: linux

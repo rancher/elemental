@@ -1,4 +1,5 @@
 FROM opensuse/leap:15.3
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 RUN zypper install -y socat net-tools-deprecated libtasn1-devel gnutls-devel libseccomp-devel json-glib-devel system-user-tss git
 RUN zypper install -y autoconf
@@ -22,6 +23,19 @@ RUN cd /usr/src/swtpm && \
     sudo make -j4 && \
     sudo make install
 RUN zypper install -y qemu-x86 qemu-arm qemu-tools
+RUN zypper in -y curl
+RUN zypper in -y git
+RUN cd /usr/src && \
+    git clone git://git.ipxe.org/ipxe.git
+RUN zypper in -y xz-devel
+RUN zypper in -y syslinux
+RUN zypper in -y mkisofs
+RUN cd /usr/src/ipxe/src && \
+    sed -i 's/undef\tDOWNLOAD_PROTO_HTTPS/define\tDOWNLOAD_PROTO_HTTPS/' config/general.h && \
+    sed -i 's/define OCSP_CHECK/undef\tOCSP_CHECK/' config/crypto.h && \
+    make DEBUG=httpcore:3 bin/ipxe.iso && \
+    mkdir -p /usr/share/ipxe/ && \
+    cp bin/ipxe.iso /usr/share/ipxe/
 
 COPY scripts/qemu-in-container /usr/bin/
 ENTRYPOINT ["/usr/bin/qemu-in-container"]

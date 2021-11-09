@@ -79,16 +79,7 @@ root password set.
 
 ## iPXE Installation
 
-Use the following script to install RancherOS using iPXE
-
-```
-#!ipxe
-set config http://example.com/machine-cloud-confg
-set version v0.0.1-test1
-set arch amd64
-set cmdline "sample.extra.cmdline.param=1"
-chain https://github.com/rancher/os2/releases/download/${version}/rancheros-${version}-${arch}.ipxe
-```
+Download the latest ipxe script from [current release](https://github.com/rancher/os2/releases/latest)
 
 ## Partition Table
 

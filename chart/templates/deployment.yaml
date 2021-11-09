@@ -21,11 +21,25 @@ spec:
         - name: NO_PROXY
           value: {{ .Values.noProxy }}
         {{- end }}
+        {{- if .Values.hostbin }}
+        image: '{{ template "system_default_registry" . }}{{ .Values.image.empty }}'
+        volumeMounts:
+          - mountPath: /usr/sbin/ros-operator
+            name: sbin
+        {{- else }}
         image: '{{ template "system_default_registry" . }}{{ .Values.image.repository }}:{{ .Values.image.tag }}'
+        {{- end }}
         name: rancheros-operator
         imagePullPolicy: "{{ .Values.image.imagePullPolicy }}"
         command:
         - /usr/sbin/ros-operator
+      {{- if .Values.hostbin }}
+      volumes:
+        - name: sbin
+          hostPath:
+            type: File
+            path: /usr/sbin/ros-operator
+      {{- end }}
       serviceAccountName: rancheros-operator
       {{- with .Values.tolerations }}
       tolerations:

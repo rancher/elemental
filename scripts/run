@@ -24,7 +24,7 @@ if [ "$1" = "pxe" ]; then
             cp ../dist/artifacts/rancheros-dev.ipxe ipxe.cfg
         fi
     fi
-    BOOT="-boot cn"
+    set -- /usr/share/ipxe/ipxe.iso
 
     if [ ! -e dev ]; then
         rm -f dev

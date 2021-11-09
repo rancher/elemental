@@ -36,6 +36,7 @@ build:
 		--build-arg CACHEBUST=${CACHEBUST} \
 		--build-arg IMAGE_TAG=${TAG} \
 		--build-arg IMAGE_REPO=${REPO} \
+		--target $$([ ${TAG} = dev ] && echo os || echo default) \
 		-t ${IMAGE} .
 
 .PHONY: push
