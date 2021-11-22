@@ -38,11 +38,6 @@ stages:
       datasource:
         providers: ["cdrom"]
         path: "/oem"
-  fs.before:
-    - name: "Pull data from provider (local)"
-      datasource:
-        providers: ["aws", "gcp", "openstack", "cdrom"]
-        path: "/oem"
   rootfs.after:
     - if: '[ ! -f /run/cos/recovery_mode ] && [ ! -f /run/cos/live_mode ]'
       name: "Grow persistent"
@@ -51,8 +46,14 @@ stages:
           label: COS_PERSISTENT
         expand_partition:
           size: 0
+  network:
+    - name: "Pull data from provider (local)"
+      datasource:
+        providers: ["aws", "gcp", "openstack", "cdrom"]
+        path: "/oem"
   fs.before:
     - if: '[ ! -f "/run/cos/recovery_mode" ] && [ ! -f /run/cos/live_mode ]'
       name: "Grow persistent fs"
       commands:
-      - resize2fs $(blkid -L COS_PERSISTENT)
+      - /usr/sbin/partprobe
+      - /usr/sbin/resize2fs $(/usr/sbin/blkid -L COS_PERSISTENT)

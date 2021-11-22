@@ -13,7 +13,7 @@ ARG IMAGE=rancher/os2:dev
 
 FROM ${IMAGE} AS os
 
-FROM opensuse/leap:15.3 AS tools
+FROM ${IMAGE} AS tools
 RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
     sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
 RUN zypper ref
@@ -29,7 +29,7 @@ RUN cd /usr/sbin && \
     rm tmp
 RUN cd /usr/src && \
     git clone https://github.com/rancher-sandbox/cOS-toolkit
-RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.6/luet-0.20.6-linux-$(go env GOARCH) && \
+RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet
 RUN mkdir -p /iso/iso-overlay/boot/grub2 /etc/luet
 RUN echo -e \
@@ -149,6 +149,7 @@ RUN SUFFIX= && \
     echo '#!/bin/bash' > /usr/bin/image && \
     echo 'set -e -x' >> /usr/bin/image && \
     echo PACKER_LOG=1 packer build \
+    -var "aws_temporary_security_group_source_cidr=$(curl -sf https://api.ipify.org)/32" \
     -var "root_password=ros" \
     -var "firmware=${FIRMWARE}" \
     -var "memory=1024" \
@@ -182,8 +183,9 @@ ARG GIT_COMMIT=HEAD
 RUN packer build \
     -var "cos_version=${VERSION}" \
     -var "git_sha=${GIT_COMMIT}" \
+    -var 'aws_instance_type=t3.medium' \
     -var 'aws_source_ami_filter_owners=["053594193760"]' \
-    -var "aws_cos_deploy_args=cos-deploy --no-verify --docker-image ${IMAGE}" \
+    -var "aws_cos_deploy_args=cos-deploy --no-verify --no-cosign --docker-image ${IMAGE}" \
     -var "name=${NAME}" \
     -only amazon-ebs.cos .
 
@@ -252,6 +254,7 @@ IMAGE=$1
 OUTPUT=$2
 CONFIG=$3
 VERSION=${IMAGE##*:}
+GIT_COMMIT=${GIT_COMMIT:-HEAD}
 NAME=${IMAGE%%:${VERSION}}
 NAME=${NAME//[^a-zA-Z0-9-@.\/_]/-}
 

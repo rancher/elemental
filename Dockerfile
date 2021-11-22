@@ -4,7 +4,7 @@ RUN zypper ref
 
 FROM base AS build
 RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
-RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.6/luet-0.20.6-linux-$(go env GOARCH) && \
+RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet && \
     upx /usr/bin/luet
 RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha11/rancherd-$(go env GOARCH) && \
@@ -38,7 +38,6 @@ COPY --from=build /etc/ssl/certs /etc/ssl/certs
 
 ARG CACHEBUST
 ENV LUET_NOLOCK=true
-RUN ["/usr/bin/busybox", "sh", "-c", "if [ -e /etc/luet/luet.yaml.$(busybox uname -m) ]; then busybox mv -f /etc/luet/luet.yaml.$(busybox uname -m) /etc/luet/luet.yaml; fi && busybox rm -f /etc/luet/luet.yaml.*"]
 RUN ["luet", \
     "install", "--no-spinner", "-d", "-y", \
     "selinux/k3s", \

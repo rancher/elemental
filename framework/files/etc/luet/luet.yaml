@@ -9,13 +9,13 @@ repositories:
   type: "docker"
   enable: true
   arch: amd64
-  reference: 20211108175222-repository.yaml
+  reference: 20211122110919-repository.yaml
   urls:
   - "quay.io/costoolkit/releases-green"
 - name: "cos-toolkit-green-arm64"
   type: "docker"
   enable: true
   arch: arm64
-  reference: 20211108162314-repository.yaml
+  reference: 20211122103533-repository.yaml
   urls:
   - "quay.io/costoolkit/releases-green-arm64"
