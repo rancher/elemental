@@ -1,6 +1,3 @@
-rancherValues:
-  rancherImage: ibuildthecloud/rancher
-  rancherImageTag: dev
 postInstructions:
 - command: /usr/sbin/ros-operator-install
   saveOutput: true
