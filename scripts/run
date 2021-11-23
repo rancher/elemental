@@ -30,6 +30,15 @@ if [ "$1" = "pxe" ]; then
         rm -f dev
         ln -s ../dist/artifacts dev
     fi
+
+    if [ -e user-data ] && [ ! -s user-data ]; then
+        cat > user-data <<EOF
+#cloud-config
+users:
+- name: root
+  passwd: root
+EOF
+    fi
 fi
 
 
