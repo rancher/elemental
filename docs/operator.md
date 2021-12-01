@@ -1,4 +1,4 @@
-# RancherOS Operator
+# Operator
 
 The RancherOS operator is responsible for managing the RancherOS versions
 and maintaining a machine inventory to assist with edge or baremetal installations.
