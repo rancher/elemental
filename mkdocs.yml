@@ -43,7 +43,6 @@ markdown_extensions:
     permalink: true
 
 nav:
-  - index.md
   - Overview:
     - architecture.md
     - clusters.md
