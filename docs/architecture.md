@@ -3,7 +3,7 @@
 RancherOS v2 is an immutable Linux distribution built to run Rancher and
 it's corresponding Kubernetes distributions [RKE2](https://rke2.io) 
 and [k3s](https://k3s.io). It is built using the [cOS-toolkit](https://rancher-sandbox.github.io/cos-toolkit-docs/docs/)
-and based on openSUSE. Initial node configurations is done using only a
+and based on openSUSE. Initial node configurations is done using a
 cloud-init style approach and all further maintenance is done using
 Kubernetes operators.
 
@@ -18,7 +18,7 @@ or centrally with Rancher Multi-Cluster Manager.
 
 ## OCI Image based
 
-RancherOS v2 is an A/B style image based distribution. One first runs
+RancherOS v2 is an image based distribution with an A/B style update mechanism. One first runs
 on a read-only image A and to do an upgrade pulls a new read only image
 B and then reboots the system to run on B. What is unique about
 RancherOS v2 is that the runtime images come from OCI Images. Not an
@@ -46,12 +46,12 @@ a generic Linux distribution.
 ## RancherOS Operator
 
 RancherOS v2 includes an operator that is responsible for managing OS upgrades
-and assiting with secure device onboarding (SDO).
+and managing a secure device inventory to assist with zero touch provisioning.
 
 
 ## openSUSE Leap
 
-RancherOS v2 is based off of openSUSE Leap.  There is no specific tie in to
+RancherOS v2 is based off of openSUSE Leap.  There is no specific dependency on
 openSUSE beyond that RancherOS assumes the underlying distribution is
 based on systemd. We choose openSUSE for obvious reasons, but beyond
 that openSUSE Leap provides a stable layer to build upon that is well

@@ -43,12 +43,15 @@ markdown_extensions:
     permalink: true
 
 nav:
-  - architecture.md
-  - clusters.md
-  - installation.md
-  - upgrade.md
-  - configuration.md
-  - customizing.md
-  - dashboard.md
+  - Overview:
+    - architecture.md
+    - clusters.md
+  - Install/Upgrade:
+    - installation.md
+    - upgrade.md
+    - customizing.md
+    - dashboard.md
+  - Reference:
+    - configuration.md
+    - versions.md
   - operator.md
-  - versions.md

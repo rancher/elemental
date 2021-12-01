@@ -106,10 +106,6 @@ rancherd:
   # Advanced: The system agent installer image used for Rancher
   rancherInstallerImage: ...
 
-  ###########################################
-  # The below parameters apply to all roles #
-  ###########################################
-
   # Generic commands to run before bootstrapping the node.
   preInstructions:
     - name: something
@@ -140,6 +136,10 @@ rancherd:
         - arg2
       command: /bin/dosomething
       saveOutput: false
+
+  ###########################################
+  # The below parameters apply to all roles #
+  ###########################################
 
   # The URL to Rancher to join a node. If you have disabled the hostPort and configured
   # TLS then this will be the server you have setup.
@@ -182,8 +182,4 @@ rancherd:
   # Labels to apply to this node upon creation
   labels:
     - key=value
-
-  # Advanced: Arbitrary configuration that will be placed in /etc/rancher/k3s/config.yaml.d/40-rancherd.yaml
-  # or /etc/rancher/rke2/config.yaml.d/40-rancherd.yaml
-  extraConfig: {}
 ```

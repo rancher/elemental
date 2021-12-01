@@ -17,7 +17,7 @@ RancherOS is upgraded with the RancherOS operator. Refer to the
 TL;DR is
 
 ```bash
-kubectl edit -n fleet-local defautl-os-image
+kubectl edit -n fleet-local default-os-image
 ```
 ```yaml
 apiVersion: rancheros.cattle.io/v1
@@ -39,8 +39,7 @@ versions of RancherOS.
 
 ## Rancher
 Rancher is installed as a helm chart following the standard procedure. You can upgrade
-Rancher with the standard procedure documented at
-https://rancher.com/docs/rancher/v2.6/en/installation/install-rancher-on-k8s/upgrades/.
+Rancher with the [standard procedure documented](https://rancher.com/docs/rancher/v2.6/en/installation/install-rancher-on-k8s/upgrades/).
 
 ## Kubernetes
 To upgrade Kubernetes you will use Rancher to orchestrate the upgrade. This is a matter of changing

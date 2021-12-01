@@ -1,6 +1,6 @@
 # Installation
 
-## Building Images
+## Overview
 
 The design of RancherOS is that you boot from a vanilla image and through cloud-init and Kubernetes mechanisms
 the node will be configured. Installation of RancherOS is really the process of building an image from which
@@ -9,7 +9,7 @@ image.
 
 ## Installation Configuration
 
-The installation process is driven by a config file. The configuration file contains the installation directives and
+The installation process is driven by a single config file. The configuration file contains the installation directives and
 the OEM configuration for the image.
 
 The installation configuration should be hosted on an HTTP or TFTP server. A simple approach is to use a
@@ -40,7 +40,7 @@ rancheros:
     # used to install grub.
     device: /dev/vda
     # If the system has the path /sys/firmware/efi it will be treated as a
-    # UEFI system. If you are created an UEFI image on a non-EFI platform
+    # UEFI system. If you are creating an UEFI image on a non-EFI platform
     # then this flag will force the installer to use UEFI even if not detected.
     forceEFI: false
     # If true then it is assumed that the disk is already formatted with the standard
@@ -50,7 +50,7 @@ rancheros:
     # After installation the system will reboot by default.  If you wish to instead
     # power off the system set this to true.
     powerOff: false
-    # The installed image will setup the default console to the current TTY value
+    # The installed image will set the default console to the current TTY value
     # used during the installation.  To force the installation to use a different TTY
     # then set that value here.
     tty: ttyS0
@@ -61,8 +61,8 @@ rancheros:
 
 ## ISO Installation
 
-When booting from the ISO you will immediately be presented with the shell. The root password is hard coded to `root/ros`
-if needed. An SSH server will be running so realize that __because of the hard coded password this is an insecure
+When booting from the ISO you will immediately be presented with the shell. The root password is hard coded to `ros`
+if needed. A SSH server will be running so realize that because of the __hard coded password this is an insecure
 system__ to be running on a public network.
 
 From the shell run the below where `${LOCATION}` should be a path to a local file or `http://`, `https://`, or
