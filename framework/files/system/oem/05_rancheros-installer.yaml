@@ -1,10 +1,6 @@
 name: "RancherOS Installer"
 stages:
   initramfs:
-  - commands:
-    - |
-      source /usr/lib/rancheros-release
-      echo COS_IMAGE=${IMAGE} > /etc/cos-upgrade-image
   - if: '[ -f /run/cos/live_mode ]'
     files:
     - path: /etc/motd

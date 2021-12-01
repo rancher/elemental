@@ -1,5 +1,6 @@
 FROM opensuse/leap:15.3
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
+    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
 RUN zypper ref
 RUN zypper install -y socat net-tools-deprecated libtasn1-devel gnutls-devel libseccomp-devel json-glib-devel system-user-tss git
 RUN zypper install -y autoconf
@@ -13,6 +14,7 @@ RUN zypper install -y gcc-c++
 RUN zypper install -y make
 RUN zypper install -y expect
 RUN zypper install -y sudo
+RUN zypper install -y bridge-utils
 RUN cd /usr/src/libtpms && \
     ./autogen.sh --with-openssl --with-tpm2 && \
     make -j4 && \
@@ -37,8 +39,16 @@ RUN cd /usr/src/ipxe/src && \
     mkdir -p /usr/share/ipxe/ && \
     cp bin/ipxe.iso /usr/share/ipxe/
 
+RUN zypper in -y iproute2
+RUN zypper in -y dnsmasq
+RUN zypper in -y bind-utils
+
 COPY scripts/qemu-in-container /usr/bin/
+COPY scripts/startvm /usr/bin/
 ENTRYPOINT ["/usr/bin/qemu-in-container"]
 
 RUN chmod +s /usr/lib/qemu-bridge-helper
 RUN echo 'allow all' > /etc/qemu/bridge.conf
+
+VOLUME /tmp/emulated_tpm
+VOLUME /image

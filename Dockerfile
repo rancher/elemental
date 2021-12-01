@@ -1,5 +1,6 @@
 FROM opensuse/leap:15.3 as base
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
+    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
 RUN zypper ref
 
 FROM base AS build
@@ -7,7 +8,7 @@ RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
 RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet && \
     upx /usr/bin/luet
-RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha11/rancherd-$(go env GOARCH) && \
+RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha13/rancherd-$(go env GOARCH) && \
     chmod +x /usr/bin/rancherd && \
     upx /usr/bin/rancherd
 RUN curl -L https://get.helm.sh/helm-v3.7.1-linux-$(go env GOARCH).tar.gz | tar xzf - -C /usr/bin --strip-components=1 && \
