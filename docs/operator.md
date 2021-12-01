@@ -26,7 +26,7 @@ running on each node. The simplest example of this type would be to change
 the version of the local nodes.
 
 ```bash
-kubectl edit -n fleet-local defautl-os-image
+kubectl edit -n fleet-local default-os-image
 ```
 ```yaml
 apiVersion: rancheros.cattle.io/v1
@@ -114,6 +114,8 @@ metadata:
   # assigned to the clusters.provisioning.cattle.io resource
   namespace: fleet-default
 spec:
+  # The cluster that this machine is assigned to
+  clusterName: some-cluster
   # The hash of the TPM EK public key. This is used if you are
   # using TPM2 to identifiy nodes.  You can obtain the TPM by
   # running `rancherd get-tpm-hash` on the node. Or nodes can
