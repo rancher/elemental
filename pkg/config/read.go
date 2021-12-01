@@ -171,9 +171,11 @@ func readConfigMap(cfg string, includeCmdline bool) (map[string]interface{}, err
 	registrationURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationUrl"))
 	registrationCA := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationCaCert"))
 	if registrationURL != "" {
+		isoURL := values.GetValueN(data, "rancheros", "install", "isoUrl")
 		for {
 			newData, err := returnRegistrationData(registrationURL, registrationCA)
 			if err == nil {
+				values.PutValue(data, isoURL, "rancheros", "install", "isoUrl")
 				return newData, nil
 			}
 			logrus.Errorf("failed to read registration URL %s, retrying: %v", registrationURL, err)
