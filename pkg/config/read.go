@@ -179,9 +179,8 @@ func readConfigMap(cfg string, includeCmdline bool) (map[string]interface{}, err
 				if newISOURL == "" {
 					if isoURL == "" {
 						return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or MachineRegistration")
-					} else {
-						values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
 					}
+					values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
 				}
 				return newData, nil
 			}
