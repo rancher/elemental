@@ -5,7 +5,7 @@ site_url: https://rancher.github.io/os2
 # Repository
 repo_name: rancher/os2
 repo_url: https://github.com/rancher/os2
-edit_uri: https://github.com/rancher/os2/edit/main/docs/
+edit_uri: https://github.com/rancher/os2/edit/master/docs/
 
 theme:
   name: material
@@ -51,6 +51,7 @@ nav:
     - upgrade.md
     - customizing.md
     - dashboard.md
+    - mcm.md
   - Reference:
     - configuration.md
     - versions.md
