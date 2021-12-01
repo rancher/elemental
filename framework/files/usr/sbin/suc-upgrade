@@ -6,12 +6,16 @@ CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
 
 function config()
 {
-    if [ ! -e $CONF_FILE ]; then
+    if [ ! -s $CONF_FILE ]; then
+        if [ -e ${HOST_DIR}/oem/90_operator.yaml ]; then
+            rm -f ${HOST_DIR}/oem/90_operator.yaml
+            $REBOOT
+        fi
         return 0
     fi
 
-    if [ ! -e ${HOST}/oem/90_operator.yaml ] || ! diff $CONF_FILE ${HOST}/oem/90_operator.yaml >/dev/null; then
-        cp -f $CONF_FILE ${HOST}/oem/90_operator.yaml
+    if [ ! -e ${HOST_DIR}/oem/90_operator.yaml ] || ! diff $CONF_FILE ${HOST_DIR}/oem/90_operator.yaml >/dev/null; then
+        cp -f $CONF_FILE ${HOST_DIR}/oem/90_operator.yaml
         $REBOOT
     fi
 }
@@ -21,7 +25,7 @@ if [ "$FORCE" != "true" ]; then
         echo Update to date with
         cat ${RELEASE_FILE}
 
-        #REBOOT="nsenter -i -m -t 1 -- reboot"
+        REBOOT="nsenter -i -m -t 1 -- reboot"
         config
         exit 0
     fi

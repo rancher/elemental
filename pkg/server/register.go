@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"path"
@@ -125,6 +126,9 @@ func (i *InventoryServer) buildResponse(req *http.Request) (*v1.MachineInventory
 	if apierrors.IsNotFound(err) || len(machineRegisters) != 1 {
 		if len(machineRegisters) > 1 {
 			logrus.Errorf("Multiple MachineRegistrations have the same token %s: %v", token, machineRegisters)
+		}
+		if err == nil && len(machineRegisters) == 0 {
+			err = fmt.Errorf("MachineRegistration does not exist")
 		}
 		return nil, nil, nil, err
 	}

@@ -9,6 +9,8 @@ name: "Default network configuration"
 stages:
    initramfs:
      - name: "Setup network"
+       commands:
+       - rm -f /etc/resolv.conf
        files:
        - path: /etc/sysconfig/network/ifcfg-eth0
          content: |

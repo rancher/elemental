@@ -171,11 +171,18 @@ func readConfigMap(cfg string, includeCmdline bool) (map[string]interface{}, err
 	registrationURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationUrl"))
 	registrationCA := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationCaCert"))
 	if registrationURL != "" {
-		isoURL := values.GetValueN(data, "rancheros", "install", "isoUrl")
+		isoURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "isoUrl"))
 		for {
 			newData, err := returnRegistrationData(registrationURL, registrationCA)
 			if err == nil {
-				values.PutValue(data, isoURL, "rancheros", "install", "isoUrl")
+				newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
+				if newISOURL == "" {
+					if isoURL == "" {
+						return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or MachineRegistration")
+					} else {
+						values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
+					}
+				}
 				return newData, nil
 			}
 			logrus.Errorf("failed to read registration URL %s, retrying: %v", registrationURL, err)
