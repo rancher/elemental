@@ -10,8 +10,8 @@ function config()
         return 0
     fi
 
-    if [ ! -e ${HOST}/oem/90_operator.yaml ] || ! diff $CONF_FILE ${HOST}/oem/90/operator.yaml >/dev/null; then
-        cp -f $CONF_FILE ${HOST}/oem/90/operator.yaml
+    if [ ! -e ${HOST}/oem/90_operator.yaml ] || ! diff $CONF_FILE ${HOST}/oem/90_operator.yaml >/dev/null; then
+        cp -f $CONF_FILE ${HOST}/oem/90_operator.yaml
         $REBOOT
     fi
 }
