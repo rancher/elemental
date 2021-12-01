@@ -3,6 +3,16 @@
 The RancherOS operator is responsible for managing the RancherOS versions
 and maintaining a machine inventory to assist with edge or baremetal installations.
 
+## Installation
+
+The RancherOS operator can be added to a cluster running Rancher Multi Cluster
+Management server.  It is a helm chart and can be installed as follows:
+
+```bash
+helm -n cattle-rancheros-operator-system install --create-namespace rancheros-operator https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-operator-0.1.0-alpha12-amd64.tgz
+```
+
+
 ## Managing Upgrades
 
 The RancherOS operator will manage the upgrade of the local cluster where the operator
@@ -86,14 +96,14 @@ spec:
   targets: []
 ```
 
-# Inventory Management
+## Inventory Management
 
 The RancherOS operator can hold an inventory of machines and
 the mapping of the machine to it's configuration and assigned cluster.
 
-## MachineInventory
+### MachineInventory
 
-### Reference
+#### Reference
 
 ```yaml
 apiVersion: rancheros.cattle.io/v1
@@ -123,9 +133,9 @@ spec:
     role: server
 ```
 
-## MachineRegistration
+### MachineRegistration
 
-### Reference
+#### Reference
 
 ```yaml
 kind: MachineRegistration
