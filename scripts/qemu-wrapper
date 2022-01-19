@@ -1,6 +1,17 @@
 #!/bin/bash
 set -x -e
 
+BACKGROUND=${BACKGROUND:-false}
+
 BASE=$(dirname $0)/..
-docker build -t ros-qemu -f ${BASE}/Dockerfile.kvm ${BASE}
+docker buildx build --load -t ros-qemu -f ${BASE}/Dockerfile.kvm ${BASE}
+
+if [ "${BACKGROUND}" = "true" ]; then
+
+exec docker run --rm --net=host -v $(dirname $(pwd)):$(dirname $(pwd)) -w $(pwd) --privileged ros-qemu "$@"
+
+else
+
 exec docker run -it --rm --net=host -v $(dirname $(pwd)):$(dirname $(pwd)) -w $(pwd) --privileged ros-qemu "$@"
+
+fi

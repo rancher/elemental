@@ -1,4 +1,7 @@
 #!/bin/bash
+# Note: ros-image-build requires the input image to be pushed 
+# due to buildx usage.
+
 set -e
 
 build()

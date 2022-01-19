@@ -5,14 +5,15 @@ source $(dirname $0)/version
 
 cd $(dirname $0)/..
 
+if [ -n "$DOCKER_PASSWORD" ]; then
+    echo "Logging to registry $DOCKER_REGISTRY"
+    echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin $DOCKER_REGISTRY
+    PUSH=true
+fi
+
 export TAG
 make build
 make iso
-
-if [ -n "$DOCKER_PASSWORD" ]; then
-    docker login -u "$DOCKER_USERNAME" -p "${DOCKER_PASSWORD}"
-    PUSH=true
-fi
 
 if [ "$PUSH" = "true" ]; then
     make push

@@ -1,0 +1,22 @@
+name: Build images
+on:
+  workflow_dispatch:
+concurrency:
+  group: images-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REPO: quay.io/costoolkit/os2
+    steps:
+      - uses: actions/checkout@v2
+      -
+        name: Login to Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+      - run: |
+              make build build-framework push push-framework

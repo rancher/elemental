@@ -1,0 +1,51 @@
+name: Manual Integration tests
+on:
+  workflow_dispatch:
+    inputs:
+      box-image:
+        required: true
+        default: https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-v0.1.0-alpha12-amd64.box
+        type: string
+        description: QEMU .box image to test
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+            go-version: '^1.17'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get remove -y apparmor*
+          sudo apt-get install -y qemu-system-x86 make libvirt-daemon-system bridge-utils ovmf curl
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install vagrant
+          sudo apt-get install -y qemu libvirt-daemon-system libvirt-clients ebtables dnsmasq-base
+          sudo apt-get install -y libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev
+          sudo apt-get install -y libguestfs-tools
+          vagrant plugin install vagrant-libvirt
+
+      - name: Prepare libvirt
+        run: |
+          # Create bridge conf
+          sudo mkdir -p /etc/qemu/
+          echo "allow all" | sudo tee -a /etc/qemu/bridge.conf
+          sudo chmod u+r /etc/qemu/bridge.conf
+          sudo chmod u+s $(find /usr/ -name qemu-bridge-helper -print -quit|xargs)
+          # Set a static ip for our VM
+          sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='jojo' ip='192.168.122.50' />" --live --config
+      - name: Start VM
+        env:
+          BOX_URL: ${{ github.event.inputs.box-image }}
+        run: |
+          curl -L ${BOX_URL:-https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-v0.1.0-alpha12-amd64.box} -o ros.box
+          vagrant box add --force os2 ros.box
+          make prepare-oem-iso
+          export CLOUD_INIT_ISO=$PWD/build/seed.iso
+          cd tests && vagrant up os2
+      - run: |
+          make COS_HOST=192.168.122.50:22 COS_TIMEOUT=360 deps integration-tests

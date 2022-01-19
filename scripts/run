@@ -50,9 +50,7 @@ fi
 
 ../scripts/qemu-wrapper qemu-system-x86_64 \
     $BOOT \
-    -enable-kvm \
     -m ${MEMORY:=4096} \
-    -machine accel=${ACCEL:="kvm"} \
     -smp cores=4 \
     -nographic \
     -serial mon:stdio \

@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := package
-REPO?=rancher/os2
+REPO?=quay.io/costoolkit/os2
 TAG?=dev
 IMAGE=${REPO}:${TAG}
 
@@ -98,3 +98,13 @@ all-amis: \
 	#ami-sa-east-1 \
 	#ami-us-east-1 \
 	#ami-us-east-2 \
+
+deps: 
+	go get github.com/onsi/ginkgo/v2/ginkgo
+	go get github.com/onsi/gomega/...
+
+integration-tests:
+	COS_USER=root COS_PASS=ros ginkgo -r ./tests/smoke
+
+prepare-oem-iso:
+	./scripts/prepare_oem_iso

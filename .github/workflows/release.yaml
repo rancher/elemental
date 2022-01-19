@@ -1,0 +1,23 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+      DOCKER_REGISTRY: quay.io
+      REPO: quay.io/costoolkit/os2
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+              make ci
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/artifacts/*
