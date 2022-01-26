@@ -1,21 +1,23 @@
-logging:
-  color: false
-  enable_emoji: false
-general:
-   debug: false
-   spinner_charset: 9
 repositories:
-- name: "cos-toolkit-green-amd64"
+- &cos
+  name: "cos"
+  description: "cOS official"
+  # Repository type
   type: "docker"
-  enable: true
-  arch: amd64
+  # Repository cache
+  cached: true
+  # Repository priority
+  priority: 1
+  # Repository architecture
+  arch: "amd64"
+  # Enable/disable Docker notary checks
+  # 
   reference: 20211122110919-repository.yaml
+  verify: false
   urls:
   - "quay.io/costoolkit/releases-green"
-- name: "cos-toolkit-green-arm64"
-  type: "docker"
-  enable: true
-  arch: arm64
+- <<: *cos
+  arch: "arm64"
   reference: 20211122103533-repository.yaml
   urls:
   - "quay.io/costoolkit/releases-green-arm64"
