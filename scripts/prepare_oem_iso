@@ -39,4 +39,4 @@ name: "Setup for the vagrant user"
 EOF
 
 rm -f seed.iso
-mkisofs -output seed.iso -volid cidata -joliet -rock user-data meta-data
+mkisofs -output seed.iso -volid cidata -joliet user-data meta-data
