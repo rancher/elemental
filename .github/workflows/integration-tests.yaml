@@ -27,11 +27,6 @@ jobs:
           name: artifacts
           path: dist
           if-no-files-found: error
-      - name: Upload results
-        uses: actions/upload-artifact@v2
-        with:
-          name: build
-          path: build
 
   tests:
     runs-on: ubuntu-latest
@@ -42,7 +37,7 @@ jobs:
         uses: actions/setup-go@v2
         with:
             go-version: '^1.16'
-      - name: Download iso
+      - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
           name: artifacts
@@ -71,13 +66,7 @@ jobs:
           sudo chmod u+s $(find /usr/ -name qemu-bridge-helper -print -quit|xargs)
           # Set a static ip for our VM
           sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='jojo' ip='192.168.122.50' />" --live --config
-      - name: Start VM
-        env:
-          BOX_URL: ${{ github.event.inputs.box-image }}
+      - name: Run tests
         run: |
           vagrant box add --force os2 ros.box
-          make prepare-oem-iso
-          export CLOUD_INIT_ISO=$PWD/build/seed.iso
-          cd tests && vagrant up os2
-      - run: |
-          make COS_HOST=192.168.122.50:22 COS_TIMEOUT=360 deps integration-tests
+          make integration-tests

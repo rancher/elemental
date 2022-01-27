@@ -103,8 +103,5 @@ deps:
 	go get github.com/onsi/ginkgo/v2/ginkgo
 	go get github.com/onsi/gomega/...
 
-integration-tests:
-	COS_USER=root COS_PASS=ros ginkgo -r ./tests/smoke
-
-prepare-oem-iso:
-	./scripts/prepare_oem_iso
+integration-tests: 
+	$(MAKE) -C tests/ integration-tests

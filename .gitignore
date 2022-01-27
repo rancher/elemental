@@ -5,3 +5,5 @@
 /build
 *.swp
 .idea
+/tests/build
+/tests/.vagrant

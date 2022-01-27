@@ -38,5 +38,5 @@ stages:
 name: "Setup for the vagrant user"
 EOF
 
-rm -f seed.iso
-mkisofs -output seed.iso -volid cidata -joliet user-data meta-data
+rm -f ci.iso
+mkisofs -output ci.iso -volid cidata -joliet user-data meta-data

@@ -2,6 +2,8 @@ package smoke_test
 
 import (
 	"fmt"
+	"time"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/os2/tests/sut"
@@ -29,8 +31,8 @@ var _ = Describe("os2 Smoke tests", func() {
 		}
 	})
 
-	Context("After install", func() {
-		for _, unit := range []string{"ros-installer", "rancherd"} {
+	Context("First boot", func() {
+		for _, unit := range []string{"ros-installer", "rancherd", "cos-setup-rootfs"} {
 			It(fmt.Sprintf("starts successfully %s on boot", unit), func() {
 				systemdUnitIsStarted(unit, s)
 			})
@@ -52,12 +54,27 @@ var _ = Describe("os2 Smoke tests", func() {
 			))
 		})
 
-		It("correctly starts cos services", func() {
+		// This test is flaky as it relies on dmesg output
+		PIt("correctly starts cos services", func() {
 			out, _ := s.Command("dmesg | grep cos")
 			Expect(out).To(And(
 				ContainSubstring("cos-immutable-rootfs.service: Succeeded"),
 				ContainSubstring("cos-setup-rootfs.service: Succeeded"),
 			))
+		})
+	})
+
+	Context("rancherd", func() {
+		It("starts a single-node cluster", func() {
+			err := s.SendFile("../assets/rancherd.yaml", "/oem/99_custom.yaml", "0770")
+			Expect(err).ToNot(HaveOccurred())
+			s.Command("systemctl restart --no-block rancherd")
+			Eventually(func() string {
+				out, _ := s.Command("ps aux")
+				return out
+			}, 230*time.Second, 1*time.Second).Should(ContainSubstring("k3s server"))
+
+			systemdUnitIsStarted("k3s", s)
 		})
 	})
 })
