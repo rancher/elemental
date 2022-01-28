@@ -19,8 +19,8 @@ limitations under the License.
 package fleet
 
 import (
+	v1alpha1 "github.com/rancher-sandbox/os2/pkg/generated/controllers/fleet.cattle.io/v1alpha1"
 	"github.com/rancher/lasso/pkg/controller"
-	v1alpha1 "github.com/rancher/os2/pkg/generated/controllers/fleet.cattle.io/v1alpha1"
 )
 
 type Interface interface {

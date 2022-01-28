@@ -79,7 +79,7 @@ root password set.
 
 ## iPXE Installation
 
-Download the latest ipxe script from [current release](https://github.com/rancher/os2/releases/latest)
+Download the latest ipxe script from [current release](https://github.com/rancher-sandbox/os2/releases/latest)
 
 ## Partition Table
 

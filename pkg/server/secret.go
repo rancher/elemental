@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"strings"
 
-	v1 "github.com/rancher/os2/pkg/apis/rancheros.cattle.io/v1"
-	"github.com/rancher/os2/pkg/clients"
-	roscontrollers "github.com/rancher/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
+	v1 "github.com/rancher-sandbox/os2/pkg/apis/rancheros.cattle.io/v1"
+	"github.com/rancher-sandbox/os2/pkg/clients"
+	roscontrollers "github.com/rancher-sandbox/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
 	corecontrollers "github.com/rancher/wrangler/pkg/generated/controllers/core/v1"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"

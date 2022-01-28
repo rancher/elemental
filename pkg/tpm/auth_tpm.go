@@ -14,7 +14,7 @@ import (
 	"github.com/google/certificate-transparency-go/x509"
 	"github.com/google/go-attestation/attest"
 	"github.com/gorilla/websocket"
-	v1 "github.com/rancher/os2/pkg/apis/rancheros.cattle.io/v1"
+	v1 "github.com/rancher-sandbox/os2/pkg/apis/rancheros.cattle.io/v1"
 	"github.com/rancher/wrangler/pkg/merr"
 	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"

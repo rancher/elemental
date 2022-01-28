@@ -4,8 +4,8 @@ site_url: https://rancher.github.io/os2
 
 # Repository
 repo_name: rancher/os2
-repo_url: https://github.com/rancher/os2
-edit_uri: https://github.com/rancher/os2/edit/master/docs/
+repo_url: https://github.com/rancher-sandbox/os2
+edit_uri: https://github.com/rancher-sandbox/os2/edit/master/docs/
 
 theme:
   name: material

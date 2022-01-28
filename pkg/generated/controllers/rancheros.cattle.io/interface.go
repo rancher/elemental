@@ -19,8 +19,8 @@ limitations under the License.
 package rancheros
 
 import (
+	v1 "github.com/rancher-sandbox/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
 	"github.com/rancher/lasso/pkg/controller"
-	v1 "github.com/rancher/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
 )
 
 type Interface interface {

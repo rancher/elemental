@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	v1 "github.com/rancher/os2/pkg/apis/rancheros.cattle.io/v1"
-	"github.com/rancher/os2/pkg/clients"
-	ranchercontrollers "github.com/rancher/os2/pkg/generated/controllers/management.cattle.io/v3"
-	roscontrollers "github.com/rancher/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
+	v1 "github.com/rancher-sandbox/os2/pkg/apis/rancheros.cattle.io/v1"
+	"github.com/rancher-sandbox/os2/pkg/clients"
+	ranchercontrollers "github.com/rancher-sandbox/os2/pkg/generated/controllers/management.cattle.io/v3"
+	roscontrollers "github.com/rancher-sandbox/os2/pkg/generated/controllers/rancheros.cattle.io/v1"
 	"github.com/rancher/wrangler/pkg/randomtoken"
 )
 

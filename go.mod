@@ -1,4 +1,4 @@
-module github.com/rancher/os2
+module github.com/rancher-sandbox/os2
 
 go 1.16
 

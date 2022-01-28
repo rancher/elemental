@@ -22,9 +22,9 @@ import (
 	"context"
 	"time"
 
+	v1 "github.com/rancher-sandbox/os2/pkg/apis/rancheros.cattle.io/v1"
 	"github.com/rancher/lasso/pkg/client"
 	"github.com/rancher/lasso/pkg/controller"
-	v1 "github.com/rancher/os2/pkg/apis/rancheros.cattle.io/v1"
 	"github.com/rancher/wrangler/pkg/apply"
 	"github.com/rancher/wrangler/pkg/condition"
 	"github.com/rancher/wrangler/pkg/generic"

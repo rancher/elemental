@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rancher/os2/pkg/dmidecode"
+	"github.com/rancher-sandbox/os2/pkg/dmidecode"
 	"github.com/rancher/rancherd/pkg/tpm"
 	values "github.com/rancher/wrangler/pkg/data"
 	"github.com/rancher/wrangler/pkg/data/convert"
