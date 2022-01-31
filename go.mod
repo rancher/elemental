@@ -36,6 +36,8 @@ require (
 	github.com/google/go-attestation v0.3.2
 	github.com/gorilla/websocket v1.4.2
 	github.com/mattn/go-isatty v0.0.12
+	github.com/onsi/ginkgo/v2 v2.1.1
+	github.com/onsi/gomega v1.18.1
 	github.com/pin/tftp v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rancher/fleet/pkg/apis v0.0.0-20210927195558-4aaa778d23dd

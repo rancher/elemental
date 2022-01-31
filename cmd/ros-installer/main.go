@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"os"
 
@@ -21,7 +22,7 @@ var (
 func main() {
 	flag.Parse()
 	if *printConfig {
-		cfg, err := config.ReadConfig(*configFile, *automatic)
+		cfg, err := config.ReadConfig(context.Background(), *configFile, *automatic)
 		if err != nil {
 			logrus.Fatal(err)
 		}

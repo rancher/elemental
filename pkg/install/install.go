@@ -1,6 +1,7 @@
 package install
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,7 +13,7 @@ import (
 )
 
 func Run(automatic bool, configFile string, powerOff bool, silent bool) error {
-	cfg, err := config.ReadConfig(configFile, automatic)
+	cfg, err := config.ReadConfig(context.Background(), configFile, automatic)
 	if err != nil {
 		return err
 	}

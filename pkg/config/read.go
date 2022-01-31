@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -36,6 +37,10 @@ var (
 	schema = schemas.Schema("config")
 )
 
+// ToEnv converts the config into a slice env.
+// The configuration fields are prefixed with "_COS"
+// to allow installation parameters to be set in the cos.sh script:
+// e.g. https://github.com/rancher-sandbox/cOS-toolkit/blob/affc831b76d50298bbbbe637f31c81c52c5489b8/packages/backports/installer/cos.sh#L698
 func ToEnv(cfg Config) ([]string, error) {
 	data, err := convert.EncodeToMap(&cfg)
 	if err != nil {
@@ -49,7 +54,7 @@ func mapToEnv(prefix string, data map[string]interface{}) []string {
 	var result []string
 	for k, v := range data {
 		keyName := strings.ToUpper(prefix + convert.ToYAMLKey(k))
-		keyName = strings.ReplaceAll(keyName, "RANCHEROS_", "COS_")
+		keyName = strings.ReplaceAll(keyName, "RANCHEROS_", "_COS_")
 		if data, ok := v.(map[string]interface{}); ok {
 			subResult := mapToEnv(keyName+"_", data)
 			result = append(result, subResult...)
@@ -146,7 +151,7 @@ func merge(readers ...reader) (map[string]interface{}, error) {
 	return d, nil
 }
 
-func readConfigMap(cfg string, includeCmdline bool) (map[string]interface{}, error) {
+func readConfigMap(ctx context.Context, cfg string, includeCmdline bool) (map[string]interface{}, error) {
 	var (
 		data map[string]interface{}
 		err  error
@@ -173,19 +178,24 @@ func readConfigMap(cfg string, includeCmdline bool) (map[string]interface{}, err
 	if registrationURL != "" {
 		isoURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "isoUrl"))
 		for {
-			newData, err := returnRegistrationData(registrationURL, registrationCA)
-			if err == nil {
-				newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
-				if newISOURL == "" {
-					if isoURL == "" {
-						return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or MachineRegistration")
+			select {
+			case <-ctx.Done():
+				return data, nil
+			default:
+				newData, err := returnRegistrationData(registrationURL, registrationCA)
+				if err == nil {
+					newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
+					if newISOURL == "" {
+						if isoURL == "" {
+							return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or MachineRegistration")
+						}
+						values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
 					}
-					values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
+					return newData, nil
 				}
-				return newData, nil
+				logrus.Errorf("failed to read registration URL %s, retrying: %v", registrationURL, err)
+				time.Sleep(15 * time.Second)
 			}
-			logrus.Errorf("failed to read registration URL %s, retrying: %v", registrationURL, err)
-			time.Sleep(15 * time.Second)
 		}
 	}
 
@@ -223,8 +233,8 @@ func ToBytes(cfg Config) ([]byte, error) {
 	return append([]byte("#cloud-config\n"), bytes...), nil
 }
 
-func ReadConfig(cfg string, includeCmdline bool) (result Config, err error) {
-	data, err := readConfigMap(cfg, includeCmdline)
+func ReadConfig(ctx context.Context, cfg string, includeCmdline bool) (result Config, err error) {
+	data, err := readConfigMap(ctx, cfg, includeCmdline)
 	if err != nil {
 		return result, err
 	}

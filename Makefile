@@ -2,6 +2,7 @@
 REPO?=quay.io/costoolkit/os2
 TAG?=dev
 IMAGE=${REPO}:${TAG}
+ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 .dapper:
 	@echo Downloading dapper
