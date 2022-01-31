@@ -31,7 +31,8 @@ RUN cd /usr/sbin && \
     unzip tmp && \
     rm tmp
 RUN cd /usr/src && \
-    git clone https://github.com/rancher-sandbox/cOS-toolkit
+    git clone https://github.com/rancher-sandbox/cOS-toolkit && \
+    cd cOS-toolkit && git checkout 0385bdfa14d0c175b30ba288f72afe1bd55567f7 -b build
 RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet
 RUN mkdir -p /iso/iso-overlay/boot/grub2 /etc/luet
