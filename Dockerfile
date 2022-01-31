@@ -5,12 +5,9 @@ RUN zypper ref
 
 FROM base AS build
 RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
-RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
-    chmod +x /usr/bin/luet && \
-    upx /usr/bin/luet
-RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha13/rancherd-$(go env GOARCH) && \
-    chmod +x /usr/bin/rancherd && \
-    upx /usr/bin/rancherd
+#RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha13/rancherd-$(go env GOARCH) && \
+#    chmod +x /usr/bin/rancherd && \
+#    upx /usr/bin/rancherd
 RUN curl -L https://get.helm.sh/helm-v3.7.1-linux-$(go env GOARCH).tar.gz | tar xzf - -C /usr/bin --strip-components=1 && \
     upx /usr/bin/helm
 COPY go.mod go.sum /usr/src/
@@ -28,29 +25,37 @@ RUN cd /usr/src && \
     CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-installer ./cmd/ros-installer && \
     upx /usr/sbin/ros-installer
 
+FROM quay.io/luet/base:latest as luet
+FROM quay.io/luet/base:latest AS framework-build
+
+COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
+ARG CACHEBUST
+ENV LUET_NOLOCK=true
+ENV USER=root
+
+# We set the shell to /usr/bin/luet, as the base image doesn't have busybox, just luet
+# and certificates to be able to correctly handle TLS requests.
+SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
+
+# Each package we want to install needs a new line here
+RUN meta/cos-minimal
+RUN meta/cos-verify
+RUN utils/k9s
+RUN utils/nerdctl
+RUN selinux/rancher
+RUN selinux/k3s
+RUN utils/rancherd@0.0.1-alpha13-3
+
 FROM scratch AS framework
+COPY --from=framework-build /framework /
 COPY --from=build /usr/bin/busybox-static /usr/bin/busybox
-COPY --from=build /usr/bin/rancherd /usr/bin/rancherd
-COPY --from=build /usr/bin/luet /usr/bin/luet
+#COPY --from=build /usr/bin/rancherd /usr/bin/rancherd
 COPY --from=build /usr/bin/helm /usr/bin/helm
 COPY --from=build /usr/src/dist/rancheros-operator-chart.tgz /usr/share/rancher/os2/
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
-COPY --from=build /etc/ssl/certs /etc/ssl/certs
-
-ARG CACHEBUST
-ENV LUET_NOLOCK=true
-RUN ["luet", \
-    "install", "--no-spinner", "-d", "-y", \
-    "selinux/k3s", \
-    "selinux/rancher", \
-    "meta/cos-minimal", \
-    "utils/k9s", \
-    "utils/nerdctl"]
-
 COPY --from=build /usr/sbin/ros-installer /usr/sbin/ros-installer
 COPY --from=build /usr/sbin/ros-operator /usr/sbin/ros-operator
 COPY framework/files/ /
-RUN ["/usr/bin/busybox", "rm", "-rf", "/var", "/etc/ssl", "/usr/bin/busybox"]
 
 # Make OS image
 FROM base as os
