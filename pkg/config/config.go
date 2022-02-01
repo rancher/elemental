@@ -23,7 +23,7 @@ type Install struct {
 }
 
 type Config struct {
-	SSHAuthorizedKeys []string               `json:"sshAuthorizedKeys,omitempty"`
+	SSHAuthorizedKeys []string               `json:"ssh_authorized_keys,omitempty"`
 	RancherOS         RancherOS              `json:"rancheros,omitempty"`
 	Data              map[string]interface{} `json:"-"`
 }

@@ -57,7 +57,7 @@ var _ = Describe("os2 config unit tests", func() {
 		})
 	})
 
-	It("Converts to env slice installation parameters", func() {
+	It("Reads config file", func() {
 		f, err := ioutil.TempFile("", "xxxxtest")
 		Expect(err).ToNot(HaveOccurred())
 		defer os.Remove(f.Name())
@@ -73,5 +73,59 @@ rancheros:
 		c, err := ReadConfig(ctx, f.Name(), false)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(c.RancherOS.Install.RegistrationURL).To(Equal("foobaz"))
+	})
+
+	It("Writes config to cloud-init format file - if data is present, takes over", func() {
+		c = Config{
+			Data: map[string]interface{}{
+				"users": []struct {
+					User string `json:"user"`
+					Pass string `json:"pass"`
+				}{{"foo", "Bar"}},
+			},
+			SSHAuthorizedKeys: []string{"github:mudler"},
+			RancherOS: RancherOS{
+				Install: Install{
+					Automatic:       true,
+					ForceEFI:        true,
+					RegistrationURL: "Foo",
+					ISOURL:          "http://foo.bar",
+				},
+			},
+		}
+
+		f, err := ioutil.TempFile("", "xxxxtest")
+		Expect(err).ToNot(HaveOccurred())
+		defer os.Remove(f.Name())
+
+		err = ToFile(c, f.Name())
+		Expect(err).ToNot(HaveOccurred())
+
+		ff, _ := ioutil.ReadFile(f.Name())
+		Expect(string(ff)).To(Equal("#cloud-config\nusers:\n- pass: Bar\n  user: foo\n"))
+	})
+
+	It("Writes config to cloud-init format file", func() {
+		c = Config{
+			SSHAuthorizedKeys: []string{"github:mudler"},
+			RancherOS: RancherOS{
+				Install: Install{
+					Automatic:       true,
+					ForceEFI:        true,
+					RegistrationURL: "Foo",
+					ISOURL:          "http://foo.bar",
+				},
+			},
+		}
+
+		f, err := ioutil.TempFile("", "xxxxtest")
+		Expect(err).ToNot(HaveOccurred())
+		defer os.Remove(f.Name())
+
+		err = ToFile(c, f.Name())
+		Expect(err).ToNot(HaveOccurred())
+
+		ff, _ := ioutil.ReadFile(f.Name())
+		Expect(string(ff)).To(Equal("#cloud-config\nrancheros: {}\nssh_authorized_keys:\n- github:mudler\n"))
 	})
 })
