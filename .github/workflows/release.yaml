@@ -16,8 +16,8 @@ jobs:
       - run: |
               make ci
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: fnkr/github-action-ghr@v1
         if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            build/artifacts/*
+        env:
+          GHR_PATH: dist/artifacts/
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
