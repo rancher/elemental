@@ -3,13 +3,15 @@ RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/
     sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
 RUN zypper ref
 
+FROM quay.io/luet/base:0.22.7-1 as luet
+
 FROM base AS build
+ENV LUET_NOLOCK=true
+ENV USER=root
 RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
-#RUN curl -Lo /usr/bin/rancherd https://github.com/rancher/rancherd/releases/download/v0.0.1-alpha13/rancherd-$(go env GOARCH) && \
-#    chmod +x /usr/bin/rancherd && \
-#    upx /usr/bin/rancherd
-RUN curl -L https://get.helm.sh/helm-v3.7.1-linux-$(go env GOARCH).tar.gz | tar xzf - -C /usr/bin --strip-components=1 && \
-    upx /usr/bin/helm
+COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
+COPY --from=luet /usr/bin/luet /usr/bin/luet
+RUN luet install -y utils/helm
 COPY go.mod go.sum /usr/src/
 COPY cmd /usr/src/cmd
 COPY pkg /usr/src/pkg
@@ -25,9 +27,7 @@ RUN cd /usr/src && \
     CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-installer ./cmd/ros-installer && \
     upx /usr/sbin/ros-installer
 
-FROM quay.io/luet/base:latest as luet
-FROM quay.io/luet/base:latest AS framework-build
-
+FROM quay.io/luet/base:0.22.7-1 AS framework-build
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 ARG CACHEBUST
 ENV LUET_NOLOCK=true
@@ -45,12 +45,10 @@ RUN utils/nerdctl
 RUN selinux/rancher
 RUN selinux/k3s
 RUN utils/rancherd@0.0.1-alpha13-3
+RUN utils/helm
 
 FROM scratch AS framework
 COPY --from=framework-build /framework /
-COPY --from=build /usr/bin/busybox-static /usr/bin/busybox
-#COPY --from=build /usr/bin/rancherd /usr/bin/rancherd
-COPY --from=build /usr/bin/helm /usr/bin/helm
 COPY --from=build /usr/src/dist/rancheros-operator-chart.tgz /usr/share/rancher/os2/
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 COPY --from=build /usr/sbin/ros-installer /usr/sbin/ros-installer
