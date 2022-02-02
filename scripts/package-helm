@@ -21,4 +21,8 @@ sed -i \
     -e 's/tag:.*/tag: '${HELM_TAG}'/' \
     build/chart/values.yaml
 
+sed -i \
+    -e 's|repository:.*|repository: '${REPO}'|' \
+    build/chart/values.yaml
+
 helm package -d ./dist/artifacts ./build/chart

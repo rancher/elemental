@@ -18,7 +18,8 @@ COPY pkg /usr/src/pkg
 COPY scripts /usr/src/scripts
 COPY chart /usr/src/chart
 ARG IMAGE_TAG=latest
-RUN TAG=${IMAGE_TAG} /usr/src/scripts/package-helm && \
+ARG IMAGE_REPO=norepo
+RUN TAG=${IMAGE_TAG} REPO=${IMAGE_REPO} /usr/src/scripts/package-helm && \
     cp /usr/src/dist/artifacts/rancheros-operator-*.tgz /usr/src/dist/rancheros-operator-chart.tgz
 RUN cd /usr/src && \
     CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-operator ./cmd/ros-operator && \
