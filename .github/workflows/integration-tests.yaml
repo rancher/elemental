@@ -45,6 +45,7 @@ jobs:
               ls -liah
               ls -liah artifacts
               mv artifacts/*.box ros.box
+              mv artifacts/*.tgz ros-operator.tgz
       - name: Install deps
         run: |
           sudo apt-get update
@@ -69,4 +70,5 @@ jobs:
       - name: Run tests
         run: |
           vagrant box add --force os2 ros.box
+          export ROS_CHART=$PWD/ros-operator.tgz
           make integration-tests

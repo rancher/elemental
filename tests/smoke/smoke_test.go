@@ -2,11 +2,11 @@ package smoke_test
 
 import (
 	"fmt"
-	"time"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/os2/tests/sut"
+	"os"
+	"time"
 )
 
 func systemdUnitIsStarted(s string, st *sut.SUT) {
@@ -75,6 +75,56 @@ var _ = Describe("os2 Smoke tests", func() {
 			}, 230*time.Second, 1*time.Second).Should(ContainSubstring("k3s server"))
 
 			systemdUnitIsStarted("k3s", s)
+
+			Eventually(func() string {
+				out, _ := s.Command("k3s kubectl get nodes -o wide")
+				return out
+			}, 230*time.Second, 1*time.Second).Should(ContainSubstring("Ready"))
+		})
+	})
+
+	Context("ros-operator", func() {
+		It("installs and create a machine registration resource", func() {
+			chart := os.Getenv("ROS_CHART")
+			if chart == "" {
+				Skip("No chart provided, skipping tests")
+			}
+			err := s.SendFile(chart, "/usr/local/ros.tgz", "0770")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = s.SendFile("../assets/machineregistration.yaml", "/usr/local/machine.yaml", "0770")
+			Expect(err).ToNot(HaveOccurred())
+
+			err = s.SendFile("../assets/external_charts.yaml", "/usr/local/charts.yaml", "0770")
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() string {
+				out, _ := s.Command("k3s kubectl get pods --all-namespaces")
+				return out
+			}, 960*time.Second, 1*time.Second).Should(ContainSubstring("Running"))
+
+			s.Command(`k3s kubectl apply -f /usr/local/charts.yaml`)
+
+			Eventually(func() string {
+				out, _ := s.Command("k3s kubectl get pods --all-namespaces")
+				return out
+			}, 960*time.Second, 1*time.Second).Should(ContainSubstring("cattle-cluster-agent-"))
+
+			out, err := s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm -n cattle-rancheros-operator-system install --create-namespace rancheros-operator /usr/local/ros.tgz")
+			Expect(out).To(ContainSubstring("STATUS: DEPLOYED"))
+			Expect(err).ToNot(HaveOccurred())
+
+			Eventually(func() string {
+				out, _ := s.Command("k3s kubectl get pods --all-namespaces")
+				return out
+			}, 960*time.Second, 1*time.Second).Should(ContainSubstring("rancheros-operator-"))
+
+			s.Command("k3s kubectl apply -f /usr/local/machine.yaml")
+
+			Eventually(func() string {
+				out, _ := s.Command("k3s kubectl get machineregistration -n fleet-default machine-registration -o json | jq '.status.registrationURL' -r")
+				return out
+			}, 960*time.Second, 1*time.Second).Should(ContainSubstring("http"))
 		})
 	})
 })
