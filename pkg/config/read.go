@@ -173,6 +173,10 @@ func readConfigMap(ctx context.Context, cfg string, includeCmdline bool) (map[st
 		values.PutValue(data, cfg, "rancheros", "install", "configUrl")
 	}
 
+	return updateData(ctx, data)
+}
+
+func updateData(ctx context.Context, data map[string]interface{}) (map[string]interface{}, error) {
 	registrationURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationUrl"))
 	registrationCA := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationCaCert"))
 	if registrationURL != "" {
@@ -187,7 +191,7 @@ func readConfigMap(ctx context.Context, cfg string, includeCmdline bool) (map[st
 					newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
 					if newISOURL == "" {
 						if isoURL == "" {
-							return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or MachineRegistration")
+							return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or in MachineRegistration in .spec.cloudConfig.rancheros.install.isoUrl")
 						}
 						values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
 					}

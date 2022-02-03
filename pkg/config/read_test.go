@@ -19,15 +19,15 @@ var _ = Describe("os2 config unit tests", func() {
 		c = Config{}
 	})
 
-	Context("Convert to environment configuration", func() {
-		It("Handle empty config", func() {
+	Context("convert to environment configuration", func() {
+		It("handle empty config", func() {
 			c = Config{}
 			e, err := ToEnv(c)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(e).To(BeEmpty())
 		})
 
-		It("Converts to env slice installation parameters", func() {
+		It("converts to env slice installation parameters", func() {
 			c = Config{
 				Data: map[string]interface{}{
 					"random": "data",
@@ -57,75 +57,134 @@ var _ = Describe("os2 config unit tests", func() {
 		})
 	})
 
-	It("Reads config file", func() {
-		f, err := ioutil.TempFile("", "xxxxtest")
-		Expect(err).ToNot(HaveOccurred())
-		defer os.Remove(f.Name())
+	Context("reading config file", func() {
+		It("reads iso_url and registrationUrl", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
 
-		ioutil.WriteFile(f.Name(), []byte(`
+			ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
- install:
-   registrationUrl: "foobaz"
+  install:
+    registrationUrl: "foobaz"
+    iso_url: "foo_bar"
 `), os.ModePerm)
 
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		defer cancel()
-		c, err := ReadConfig(ctx, f.Name(), false)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(c.RancherOS.Install.RegistrationURL).To(Equal("foobaz"))
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.RegistrationURL).To(Equal("foobaz"))
+			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo_bar"))
+		})
+
+		It("reads iso_url only, without contacting a registrationUrl server", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  install:
+    iso_url: "foo_bar"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo_bar"))
+		})
+
+		It("reads isoUrl instead of iso_url", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  install:
+    isoUrl: "foo_bar"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo_bar"))
+		})
+
+		It("reads ssh_authorized_keys", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+ssh_authorized_keys:
+- foo
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.SSHAuthorizedKeys).To(Equal([]string{"foo"}))
+		})
 	})
 
-	It("Writes config to cloud-init format file - if data is present, takes over", func() {
-		c = Config{
-			Data: map[string]interface{}{
-				"users": []struct {
-					User string `json:"user"`
-					Pass string `json:"pass"`
-				}{{"foo", "Bar"}},
-			},
-			SSHAuthorizedKeys: []string{"github:mudler"},
-			RancherOS: RancherOS{
-				Install: Install{
-					Automatic:       true,
-					ForceEFI:        true,
-					RegistrationURL: "Foo",
-					ISOURL:          "http://foo.bar",
+	Context("writing config", func() {
+		It("uses cloud-init format, but if data is present, takes over", func() {
+			c = Config{
+				Data: map[string]interface{}{
+					"users": []struct {
+						User string `json:"user"`
+						Pass string `json:"pass"`
+					}{{"foo", "Bar"}},
 				},
-			},
-		}
-
-		f, err := ioutil.TempFile("", "xxxxtest")
-		Expect(err).ToNot(HaveOccurred())
-		defer os.Remove(f.Name())
-
-		err = ToFile(c, f.Name())
-		Expect(err).ToNot(HaveOccurred())
-
-		ff, _ := ioutil.ReadFile(f.Name())
-		Expect(string(ff)).To(Equal("#cloud-config\nusers:\n- pass: Bar\n  user: foo\n"))
-	})
-
-	It("Writes config to cloud-init format file", func() {
-		c = Config{
-			SSHAuthorizedKeys: []string{"github:mudler"},
-			RancherOS: RancherOS{
-				Install: Install{
-					Automatic:       true,
-					ForceEFI:        true,
-					RegistrationURL: "Foo",
-					ISOURL:          "http://foo.bar",
+				SSHAuthorizedKeys: []string{"github:mudler"},
+				RancherOS: RancherOS{
+					Install: Install{
+						Automatic:       true,
+						ForceEFI:        true,
+						RegistrationURL: "Foo",
+						ISOURL:          "http://foo.bar",
+					},
 				},
-			},
-		}
+			}
 
-		f, err := ioutil.TempFile("", "xxxxtest")
-		Expect(err).ToNot(HaveOccurred())
-		defer os.Remove(f.Name())
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
 
-		err = ToFile(c, f.Name())
-		Expect(err).ToNot(HaveOccurred())
+			err = ToFile(c, f.Name())
+			Expect(err).ToNot(HaveOccurred())
 
-		ff, _ := ioutil.ReadFile(f.Name())
-		Expect(string(ff)).To(Equal("#cloud-config\nrancheros: {}\nssh_authorized_keys:\n- github:mudler\n"))
+			ff, _ := ioutil.ReadFile(f.Name())
+			Expect(string(ff)).To(Equal("#cloud-config\nusers:\n- pass: Bar\n  user: foo\n"))
+		})
+
+		It("writes cloud-init files", func() {
+			c = Config{
+				SSHAuthorizedKeys: []string{"github:mudler"},
+				RancherOS: RancherOS{
+					Install: Install{
+						Automatic:       true,
+						ForceEFI:        true,
+						RegistrationURL: "Foo",
+						ISOURL:          "http://foo.bar",
+					},
+				},
+			}
+
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			err = ToFile(c, f.Name())
+			Expect(err).ToNot(HaveOccurred())
+
+			ff, _ := ioutil.ReadFile(f.Name())
+			Expect(string(ff)).To(Equal("#cloud-config\nrancheros: {}\nssh_authorized_keys:\n- github:mudler\n"))
+		})
 	})
 })
