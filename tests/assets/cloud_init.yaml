@@ -1,0 +1,30 @@
+# Note: This cloud-init doesn't use the standard cloud-init config probably due to: https://github.com/rancher/os2/issues/7
+# As a workaround, use the internal extended syntax
+stages:
+   network:
+     - name: "Setup users"
+       ensure_entities:
+       - path: /etc/passwd
+         entity: |
+            kind: "user"
+            username: "vagrant"
+            password: "x"
+            homedir: "/run/tmp/vagrant"
+            shell: "/bin/bash"
+       - path: /etc/shadow
+         entity: |
+            kind: "shadow"
+            username: "vagrant"
+            password: ""
+       - path: /etc/shadow
+         entity: |
+            kind: "shadow"
+            username: "root"
+            password: "ros"
+       commands:
+       - mkdir -p /run/tmp/vagrant
+     - name: "Setup pubkey"
+       authorized_keys:
+        vagrant:
+        - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
+name: "Setup for the vagrant user"

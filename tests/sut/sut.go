@@ -296,23 +296,7 @@ func (s *SUT) connectToHost(timeout bool) (*ssh.Client, error) {
 }
 
 // GatherAllLogs will try to gather as much info from the system as possible, including services, dmesg and os related info
-func (s SUT) GatherAllLogs() {
-	services := []string{
-		"cos-setup-boot",
-		"cos-setup-fs",
-		"cos-setup-initramfs",
-		"cos-setup-network",
-		"cos-setup-reconcile",
-		"cos-setup-rootfs",
-	}
-
-	logFiles := []string{
-		"/tmp/image-mtree-check.log",
-		"/tmp/luet_mtree_failures.log",
-		"/tmp/luet_mtree.log",
-		"/tmp/luet.log",
-	}
-
+func (s SUT) GatherAllLogs(services []string,logFiles []string) {
 	// services
 	for _, ser := range services {
 		out, err := s.command(fmt.Sprintf("journalctl -u %s -o short-iso >> /tmp/%s.log", ser, ser), true)

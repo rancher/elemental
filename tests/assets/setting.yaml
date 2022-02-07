@@ -1,0 +1,7 @@
+---
+apiVersion: management.cattle.io/v3
+kind: Setting
+metadata:
+  name: server-url
+source: "env"
+value: "test.nip.io"

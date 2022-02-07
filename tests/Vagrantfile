@@ -33,8 +33,8 @@ Vagrant.configure("2") do |config|
             libvirt.management_network_mac = "52:54:00:00:00:01"
             libvirt.storage :file, :device => :cdrom, :bus => :ide, :type => :raw, :path => ENV['CLOUD_INIT_ISO']
             libvirt.inputs = [] # override the inputs otherwise it tries to insert a ps2 mouse lmao
-            libvirt.memory = ENV['VAGRANT_MEMORY'] || "7096"
-            libvirt.cpus = ENV['VAGRANT_CPU'] || "3"
+            libvirt.memory = ENV['VAGRANT_MEMORY'] || "8096"
+            libvirt.cpus = ENV['VAGRANT_CPU'] || "4"
             libvirt.graphics_type = "none" # we dont need no stinking graphics
         end
     end

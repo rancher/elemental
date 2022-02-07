@@ -19,7 +19,8 @@ metadata:
   name: rancher
   namespace: cattle-system
 spec:
-    chart: https://releases.rancher.com/server-charts/latest/rancher-2.6.0.tgz
+    chart: https://releases.rancher.com/server-charts/stable/rancher-2.6.3.tgz
     set:
       hostname: "test.nip.io"
       bootstrapPassword: "admin"
+      replicas: 1

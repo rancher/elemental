@@ -1,7 +1,6 @@
 name: Integration tests
 on:
   push:
-  pull_request:
 concurrency:
   group: integration-tests=full-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
@@ -12,7 +11,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
       DOCKER_REGISTRY: quay.io
       REPO: quay.io/costoolkit/os2-ci
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       -
@@ -27,7 +26,50 @@ jobs:
           name: artifacts
           path: dist
           if-no-files-found: error
-
+      - name: Release space from worker ♻
+        if: always()
+        run: |
+          sudo rm -rf build || true
+          sudo rm -rf bin || true
+          sudo rm -rf dist || true
+          docker system prune -f -a --volumes || true
+  tests-vbox:
+    runs-on: macos-10.15
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+            go-version: '^1.17'
+      - name: Install deps
+        run: |
+          brew install cdrtools jq
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+      - run: |
+              ls -liah
+              ls -liah artifacts
+              mv artifacts/*.box ros.box
+              mv artifacts/*.iso ros.iso
+              mv artifacts/*.tgz ros-operator.tgz
+      - name: Run tests
+        env:
+          BOX_URL: ${{ github.event.inputs.box-image }}
+        run: |
+          export COS_HOST=127.0.0.1:2222
+          export ROS_CHART=$PWD/ros-operator.tgz
+          export ISO=$PWD/ros.iso
+          make deps
+          cd tests && make vbox-tests
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: ros-vbox.logs.zip
+          path: tests/**/logs/*
+          if-no-files-found: warn
   tests:
     runs-on: ubuntu-latest
     needs: build
@@ -45,7 +87,6 @@ jobs:
               ls -liah
               ls -liah artifacts
               mv artifacts/*.box ros.box
-              mv artifacts/*.tgz ros-operator.tgz
       - name: Install deps
         run: |
           sudo apt-get update
@@ -56,7 +97,7 @@ jobs:
           sudo apt-get update && sudo apt-get install vagrant
           sudo apt-get install -y qemu libvirt-daemon-system libvirt-clients ebtables dnsmasq-base
           sudo apt-get install -y libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev
-          sudo apt-get install -y libguestfs-tools
+          sudo apt-get install -y libguestfs-tools gcc
           vagrant plugin install vagrant-libvirt
       - name: Prepare libvirt
         run: |
@@ -65,10 +106,26 @@ jobs:
           echo "allow all" | sudo tee -a /etc/qemu/bridge.conf
           sudo chmod u+r /etc/qemu/bridge.conf
           sudo chmod u+s $(find /usr/ -name qemu-bridge-helper -print -quit|xargs)
+
+          # sudo /usr/sbin/libvirtd &
+          # sleep 5
           # Set a static ip for our VM
-          sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='jojo' ip='192.168.122.50' />" --live --config
+          sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='jojo' ip='192.168.122.50' />" --live --config || true
       - name: Run tests
         run: |
-          vagrant box add --force os2 ros.box
-          export ROS_CHART=$PWD/ros-operator.tgz
+          export BOX=$PWD/ros.box
           make integration-tests
+      - name: Release space from worker ♻
+        if: always()
+        run: |
+          sudo rm -rf build || true
+          sudo rm -rf bin || true
+          sudo rm -rf dist || true
+          cd tests && make clean || true
+          docker system prune -f -a --volumes || true
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: ros-libvirt.logs.zip
+          path: tests/**/logs/*
+          if-no-files-found: warn

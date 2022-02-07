@@ -16,7 +16,7 @@ spec:
       device: /dev/vda
     rancheros:
       install:
-        isoUrl: https://something
+        isoUrl: https://something.example.com
     users:
     - name: root
       passwd: root

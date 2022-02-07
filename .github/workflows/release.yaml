@@ -21,3 +21,10 @@ jobs:
         env:
           GHR_PATH: dist/artifacts/
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release space from worker ♻
+        if: always()
+        run: |
+          sudo rm -rf build || true
+          sudo rm -rf bin || true
+          sudo rm -rf dist || true
+          docker system prune -f -a --volumes || true
