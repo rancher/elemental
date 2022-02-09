@@ -52,9 +52,9 @@ jobs:
       - run: |
               ls -liah
               ls -liah artifacts
-              mv artifacts/*.box ros.box
               mv artifacts/*.iso ros.iso
               mv artifacts/*.tgz ros-operator.tgz
+              rm -rf artifacts
       - name: Run tests
         env:
           BOX_URL: ${{ github.event.inputs.box-image }}
