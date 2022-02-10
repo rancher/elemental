@@ -14,7 +14,7 @@ import (
 var (
 	automatic   = flag.Bool("automatic", false, "Check for and run automatic installation")
 	printConfig = flag.Bool("print-config", false, "Print effective configuration and exit")
-	configFile  = flag.String("config-file", "", "Config file to use, local file or http/tftp URL")
+	configFile  = flag.String("config-file", "/oem/userdata", "Config file to use, local file or http/tftp URL")
 	powerOff    = flag.Bool("power-off", false, "Power off after installation")
 	yes         = flag.Bool("y", false, "Do not prompt for questions")
 )
