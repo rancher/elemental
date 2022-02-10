@@ -34,10 +34,17 @@ stages:
           /var/lib/cni
         PERSISTENT_STATE_BIND: "true"
   rootfs.before:
-    - name: "Pull data from provider"
+    - &datasource
+      name: "Pull data from provider"
       datasource:
-        providers: ["cdrom"]
+        providers: ["cdrom", "gcp", "openstack", "aws", "azure", "hetzner", "packet", "scaleway", "vultr", "digitalocean", "metaldata" ]
         path: "/oem"
+    # Ensures that if no userdata is found at this stage,
+    # we retry later and run the boot hook
+    # This is relevant only on first-boot
+    - if: '[ ! -f /oem/userdata ]'
+      files:
+      - path: /oem/userdata_load
   rootfs.after:
     - if: '[ ! -f /run/cos/recovery_mode ] && [ ! -f /run/cos/live_mode ]'
       name: "Grow persistent"
@@ -47,10 +54,15 @@ stages:
         expand_partition:
           size: 0
   network:
-    - name: "Pull data from provider (local)"
-      datasource:
-        providers: ["aws", "gcp", "openstack", "cdrom"]
-        path: "/oem"
+    - <<: *datasource
+    # Trigger /oem/userdata if was fetched late
+    # when network was available
+    # This is relevant only on first-boot
+    - if: '[ -f /oem/userdata ] && [ -f /oem/userdata_load ]'
+      commands:
+      - elemental cloud-init -s initramfs /oem/userdata
+      - elemental cloud-init -s boot /oem/userdata
+      - rm -rf /oem/userdata_load
   fs.before:
     - if: '[ ! -f "/run/cos/recovery_mode" ] && [ ! -f /run/cos/live_mode ]'
       name: "Grow persistent fs"
