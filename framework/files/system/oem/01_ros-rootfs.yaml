@@ -52,7 +52,6 @@ stages:
         device:
           label: COS_PERSISTENT
         expand_partition:
-          size: 0
   network:
     - <<: *datasource
     # Trigger /oem/userdata if was fetched late
