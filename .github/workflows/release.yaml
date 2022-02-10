@@ -2,12 +2,12 @@ name: Release
 
 on:
   push:
-    tags:
+   tags:
       - 'v*'
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
@@ -22,11 +22,12 @@ jobs:
       - run: |
               make ci
       - name: Release
-        uses: fnkr/github-action-ghr@v1
+        uses: rancher-sandbox/github-action-ghr@v1
         if: startsWith(github.ref, 'refs/tags/')
         env:
           GHR_PATH: dist/artifacts/
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GHR_PARALLELISM: "1"
       - name: Release space from worker ♻
         if: always()
         run: |
