@@ -12,6 +12,8 @@ users:
 - name: "bar"
   passwd: "foo"
   groups: "users"
+  homedir: "/home/foo"
+  shell: "/bin/bash"
   ssh_authorized_keys:
   - faaapploo
 
