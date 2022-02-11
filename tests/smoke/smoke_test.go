@@ -153,7 +153,7 @@ var _ = Describe("os2 Smoke tests", func() {
 				Eventually(func() string {
 					out, _ := s.Command("k3s kubectl apply -f /usr/local/setting.yaml")
 					return out
-				}, 6*time.Minute, 30*time.Second).Should(
+				}, 15*time.Minute, 30*time.Second).Should(
 					Or(
 						ContainSubstring("unchanged"),
 						ContainSubstring("configured"),
@@ -163,12 +163,12 @@ var _ = Describe("os2 Smoke tests", func() {
 				Eventually(func() string {
 					out, _ := s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm -n cattle-rancheros-operator-system install --create-namespace rancheros-operator /usr/local/ros.tgz")
 					return out
-				}, 6*time.Minute, 2*time.Second).Should(ContainSubstring("STATUS: deployed"))
+				}, 15*time.Minute, 2*time.Second).Should(ContainSubstring("STATUS: deployed"))
 
 				Eventually(func() string {
 					out, _ := s.Command("k3s kubectl get pods --all-namespaces")
 					return out
-				}, 6*time.Minute, 2*time.Second).Should(ContainSubstring("rancheros-operator-"))
+				}, 15*time.Minute, 2*time.Second).Should(ContainSubstring("rancheros-operator-"))
 			})
 
 			By("adding a machine registration", func() {
