@@ -6,9 +6,19 @@ users:
   passwd: "ros"
   ssh_authorized_keys:
   - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
-- name: "vagrant"
-  passwd: "vagrant"
-  shell: "/bin/bash"
-  homedir: "/run/vagrant"
-  ssh_authorized_keys:
-  - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
+# - name: "vagrant"
+#   passwd: "vagrant"
+#   shell: "/bin/bash"
+#   homedir: "/run/vagrant"
+#   ssh_authorized_keys:
+#   - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
+
+# Temp workaround for https://github.com/rancher-sandbox/os2/issues/15. 
+# Uncomment the lines commented before and drop runcmd when it is closed.
+runcmd:
+- systemctl start wicked
+#- useradd -d /run/vagrant -U -s /bin/bash -m vagrant
+- mkdir /root/.ssh
+- curl -L https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub -o /root/.ssh/authorized_keys
+- chmod 700 /root/.ssh
+- chmod 600 /root/.ssh/authorized_keys

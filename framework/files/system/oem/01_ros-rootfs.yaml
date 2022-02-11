@@ -34,6 +34,9 @@ stages:
           /var/lib/cni
         PERSISTENT_STATE_BIND: "true"
   rootfs.before:
+    # Try to get network before trying to fetch datasource from the net
+    - commands:
+      - wicked ifup eth0
     - &datasource
       name: "Pull data from provider"
       datasource:

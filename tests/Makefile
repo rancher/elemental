@@ -15,7 +15,7 @@ export CLOUD_INIT_ISO?=$(ROOT_DIR)/build/ci.iso
 clean: clean_vm_from_iso
 	(vagrant destroy -f) 2> /dev/null || true
 	(vagrant box remove $(BOX_IMAGE)) 2> /dev/null || true
-	rm -rf build-box || true
+	rm -rf build-box build || true
 
 add:
 	vagrant box add --force $(BOX_IMAGE) $(BOX)
