@@ -8,5 +8,7 @@ users:
   - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
 - name: "vagrant"
   passwd: "vagrant"
+  shell: "/bin/bash"
+  homedir: "/run/vagrant"
   ssh_authorized_keys:
   - https://raw.githubusercontent.com/hashicorp/vagrant/main/keys/vagrant.pub
