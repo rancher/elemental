@@ -42,6 +42,9 @@ stages:
     # Ensures that if no userdata is found at this stage,
     # we retry later and run the boot hook
     # This is relevant only on first-boot
+    # Mind that userdata can be in the standard cloud-init syntax.
+    # If we don't find any userdata at this stage (because no network is present)
+    # We source the respective fields afterwards
     - if: '[ ! -f /oem/userdata ]'
       files:
       - path: /oem/userdata_load
