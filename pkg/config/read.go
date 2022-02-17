@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rancher-sandbox/go-tpm"
 	"github.com/rancher-sandbox/os2/pkg/dmidecode"
-	"github.com/rancher/rancherd/pkg/tpm"
 	values "github.com/rancher/wrangler/pkg/data"
 	"github.com/rancher/wrangler/pkg/data/convert"
 	schemas2 "github.com/rancher/wrangler/pkg/schemas"
@@ -256,7 +256,7 @@ func returnRegistrationData(url, ca string) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	data, err := tpm.Get([]byte(ca), url, smbios)
+	data, err := tpm.Get(url, tpm.WithCAs([]byte(ca)), tpm.WithHeader(smbios))
 	if err != nil {
 		return nil, err
 	}

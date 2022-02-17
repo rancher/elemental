@@ -1,9 +1,6 @@
 package tpm
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -13,6 +10,9 @@ import (
 
 	"github.com/google/certificate-transparency-go/x509"
 	"github.com/google/go-attestation/attest"
+
+	gotpm "github.com/rancher-sandbox/go-tpm"
+
 	"github.com/gorilla/websocket"
 	v1 "github.com/rancher-sandbox/os2/pkg/apis/rancheros.cattle.io/v1"
 	"github.com/rancher/wrangler/pkg/merr"
@@ -37,39 +37,8 @@ func (a *AuthServer) verifyChain(ek *attest.EK, namespace string) error {
 	return err
 }
 
-func (a *AuthServer) generateChallenge(ek *attest.EK, attestationData *AttestationData) ([]byte, []byte, error) {
-	ap := attest.ActivationParameters{
-		TPMVersion: attest.TPMVersion20,
-		EK:         ek.Public,
-		AK:         *attestationData.AK,
-	}
-
-	secret, ec, err := ap.Generate()
-	if err != nil {
-		return nil, nil, fmt.Errorf("generating challenge: %w", err)
-	}
-
-	challengeBytes, err := json.Marshal(Challenge{EC: ec})
-	if err != nil {
-		return nil, nil, fmt.Errorf("marshalling challenge: %w", err)
-	}
-
-	return secret, challengeBytes, nil
-}
-
-func (a *AuthServer) validateChallenge(secret, resp []byte) error {
-	var response ChallengeResponse
-	if err := json.Unmarshal(resp, &response); err != nil {
-		return fmt.Errorf("unmarshalling challenge response: %w", err)
-	}
-	if !bytes.Equal(secret, response.Secret) {
-		return fmt.Errorf("invalid challenge response")
-	}
-	return nil
-}
-
 func (a *AuthServer) validHash(ek *attest.EK, registerNamespace string) (*v1.MachineInventory, error) {
-	hashEncoded, err := GetPubHash(ek)
+	hashEncoded, err := gotpm.DecodePubHash(ek)
 	if err != nil {
 		return nil, fmt.Errorf("tpm: could not get public key hash: %v", err)
 	}
@@ -141,32 +110,13 @@ func upgrade(resp http.ResponseWriter, req *http.Request) (*websocket.Conn, erro
 	return conn, err
 }
 
-func (a *AuthServer) getAttestationData(header string) (*attest.EK, *AttestationData, error) {
-	tpmBytes, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(header, "Bearer TPM"))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var attestationData AttestationData
-	if err := json.Unmarshal(tpmBytes, &attestationData); err != nil {
-		return nil, nil, err
-	}
-
-	ek, err := DecodeEK(attestationData.EK)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return ek, &attestationData, nil
-}
-
 func (a *AuthServer) Authenticate(resp http.ResponseWriter, req *http.Request, registerNamespace string) (*v1.MachineInventory, bool, io.WriteCloser, error) {
 	header := req.Header.Get("Authorization")
 	if !strings.HasPrefix(header, "Bearer TPM") {
 		return nil, true, nil, nil
 	}
 
-	ek, attestationData, err := a.getAttestationData(header)
+	ek, attestationData, err := gotpm.GetAttestationData(header)
 	if err != nil {
 		return nil, false, nil, err
 	}
@@ -176,7 +126,7 @@ func (a *AuthServer) Authenticate(resp http.ResponseWriter, req *http.Request, r
 		return nil, false, nil, err
 	}
 
-	secret, challenge, err := a.generateChallenge(ek, attestationData)
+	secret, challenge, err := gotpm.GenerateChallenge(ek, attestationData)
 	if err != nil {
 		return nil, false, nil, err
 	}
@@ -191,7 +141,7 @@ func (a *AuthServer) Authenticate(resp http.ResponseWriter, req *http.Request, r
 		return nil, false, nil, err
 	}
 
-	if err := a.validateChallenge(secret, challResp); err != nil {
+	if err := gotpm.ValidateChallenge(secret, challResp); err != nil {
 		return nil, false, nil, err
 	}
 

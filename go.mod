@@ -33,17 +33,17 @@ replace (
 
 require (
 	github.com/google/certificate-transparency-go v1.1.2
-	github.com/google/go-attestation v0.3.2
-	github.com/gorilla/websocket v1.4.2
+	github.com/google/go-attestation v0.4.3
+	github.com/gorilla/websocket v1.5.0
 	github.com/mattn/go-isatty v0.0.12
-	github.com/onsi/ginkgo/v2 v2.1.1
+	github.com/onsi/ginkgo/v2 v2.1.3
 	github.com/onsi/gomega v1.18.1
 	github.com/pin/tftp v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/rancher-sandbox/go-tpm v0.0.0-20220217133323-a7b15ad1f8f7
 	github.com/rancher/fleet/pkg/apis v0.0.0-20210927195558-4aaa778d23dd
 	github.com/rancher/lasso v0.0.0-20210709145333-6c6cd7fd6607
 	github.com/rancher/rancher/pkg/apis v0.0.0-20211013185633-a636bda2a00e
-	github.com/rancher/rancherd v0.0.1-alpha9.0.20211028172625-bdf5642d62d5
 	github.com/rancher/steve v0.0.0-20210922195510-7224dc21013d
 	github.com/rancher/system-upgrade-controller/pkg/apis v0.0.0-20210929162341-5e6e996d9486
 	github.com/rancher/wrangler v0.8.7
