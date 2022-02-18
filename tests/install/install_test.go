@@ -15,12 +15,11 @@ var _ = Describe("os2 install tests", func() {
 
 	Context("First boot", func() {
 		It("can install", func() {
-			// err := s.SendFile("../assets/cloud_init.yaml", "/tmp/install.yaml", "0770")
-			// Expect(err).ToNot(HaveOccurred())
-
-			out, err := s.Command("cos-installer /dev/sda && sync")
+			out, err := s.Command("ELEMENTAL_TARGET=/dev/sda cos-installer && sync")
 			Expect(out).To(And(
-				ContainSubstring("Deployment done, now you might want to reboot"),
+				ContainSubstring("Unmounting disk partitions"),
+				ContainSubstring("Mounting disk partitions"),
+				ContainSubstring("Copying Passive image..."),
 			))
 			Expect(err).ToNot(HaveOccurred())
 		})
