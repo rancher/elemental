@@ -15,7 +15,7 @@ var _ = Describe("os2 install tests", func() {
 
 	Context("First boot", func() {
 		It("can install", func() {
-			out, err := s.Command("ELEMENTAL_TARGET=/dev/sda cos-installer && sync")
+			out, err := s.Command("ELEMENTAL_TARGET=/dev/sda elemental install && sync")
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
