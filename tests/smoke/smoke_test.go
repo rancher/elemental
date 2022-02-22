@@ -74,6 +74,12 @@ var _ = Describe("os2 Smoke tests", func() {
 				ContainSubstring("cos-setup-rootfs.service: Succeeded"),
 			))
 		})
+
+		// Added user via cloud-init is functional
+		It("has the user added via cloud-init", func() {
+			out, _ := s.Command(`sudo su - vagrant -c 'id -un'`)
+			Expect(out).To(Equal("vagrant"))
+		})
 	})
 
 	Context("rancherd", func() {
