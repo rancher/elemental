@@ -8,6 +8,17 @@ stages:
           echo rancher-${RANDOM} > /usr/local/etc/hostname
         fi
         ln -sf /usr/local/etc/hostname /etc/hostname
+    - if: '[ ! -f "/run/cos/recovery_mode" ]'
+      name: "Persist /etc/machine-id"
+      commands:
+      - |
+        # persist machine-id
+        if [ -s /usr/local/etc/machine-id ]; then
+          cat /usr/local/etc/machine-id > /etc/machine-id
+        else
+          mkdir -p /usr/local/etc
+          cp /etc/machine-id /usr/local/etc
+        fi
   rootfs:
     - if: '[ ! -f "/run/cos/recovery_mode" ]'
       name: "Layout configuration"
@@ -33,6 +44,13 @@ stages:
           /var/lib/longhorn
           /var/lib/cni
         PERSISTENT_STATE_BIND: "true"
+    - if: '[ -f "/run/cos/recovery_mode" ]'
+      # omit the persistent partition on recovery mode
+      name: "Layout configuration"
+      environment_file: /run/cos/cos-layout.env
+      environment:
+        VOLUMES: "LABEL=COS_OEM:/oem"
+        OVERLAY: "tmpfs:25%"
   rootfs.after:
     - if: '[ ! -f /run/cos/recovery_mode ] && [ ! -f /run/cos/live_mode ]'
       name: "Grow persistent"
@@ -40,6 +58,10 @@ stages:
         device:
           label: COS_PERSISTENT
         expand_partition:
+  # XXX:
+  # Fetch datasources ONLY when network is present
+  # This prevents network configuration via cloud-init from datasources.
+  # See: https://github.com/rancher-sandbox/cOS-toolkit/issues/1140
   network:
     - if: '[ ! -f /oem/userdata ]'
       name: "Pull data from provider"

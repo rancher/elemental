@@ -81,9 +81,9 @@ var _ = Describe("os2 Smoke tests", func() {
 			Expect(out).To(Equal("vagrant\n"))
 
 			out, _ = s.Command(`cat /run/vagrant/.ssh/authorized_keys`)
-			Expect(out).To(ContainSubstring("vagrant insecure public key"))
+			Expect(out).To(ContainSubstring("ssh-rsa"))
 			out, _ = s.Command(`sudo cat /root/.ssh/authorized_keys`)
-			Expect(out).To(ContainSubstring("vagrant insecure public key"))
+			Expect(out).To(ContainSubstring("ssh-rsa"))
 		})
 	})
 
