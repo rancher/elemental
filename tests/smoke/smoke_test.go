@@ -77,8 +77,13 @@ var _ = Describe("os2 Smoke tests", func() {
 
 		// Added user via cloud-init is functional
 		It("has the user added via cloud-init", func() {
-			out, _ := s.Command(`sudo su - vagrant -c 'id -un'`)
-			Expect(out).To(Equal("vagrant"))
+			out, _ := s.Command(`su - vagrant -c 'id -un'`)
+			Expect(out).To(Equal("vagrant\n"))
+
+			out, _ = s.Command(`cat /run/vagrant/.ssh/authorized_keys`)
+			Expect(out).To(ContainSubstring("vagrant insecure public key"))
+			out, _ = s.Command(`sudo cat /root/.ssh/authorized_keys`)
+			Expect(out).To(ContainSubstring("vagrant insecure public key"))
 		})
 	})
 
