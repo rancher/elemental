@@ -3,7 +3,6 @@
 
 Vagrant.configure("2") do |config|
     config.vm.guest = :linux
-    # Temp workaround for https://github.com/rancher-sandbox/os2/issues/15
     config.ssh.username = "root"
     config.vm.boot_timeout = 460
     config.ssh.connect_timeout = 360

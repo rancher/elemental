@@ -30,13 +30,23 @@ var _ = Describe("os2 Smoke tests", func() {
 			s.Command("k3s kubectl get pods -A -o json > /tmp/pods.json")
 			s.Command("k3s kubectl get events -A -o json > /tmp/events.json")
 			s.Command("k3s kubectl get helmcharts -A -o json > /tmp/helm.json")
+			s.Command("df -h > /tmp/disk")
+			s.Command("mount > /tmp/mounts")
+			s.Command("blkid > /tmp/blkid")
 
 			s.GatherAllLogs(
-				[]string{"ros-installer",
+				[]string{
+					"ros-installer",
+					"cos-setup-boot",
+					"cos-setup-network",
 					"rancherd",
 					"k3s",
 				},
-				[]string{"/tmp/pods.json",
+				[]string{
+					"/tmp/pods.json",
+					"/tmp/disk",
+					"/tmp/mounts",
+					"/tmp/blkid",
 					"/tmp/events.json",
 					"/tmp/helm.json",
 				})
@@ -73,6 +83,17 @@ var _ = Describe("os2 Smoke tests", func() {
 				ContainSubstring("cos-immutable-rootfs.service: Succeeded"),
 				ContainSubstring("cos-setup-rootfs.service: Succeeded"),
 			))
+		})
+
+		// Added user via cloud-init is functional
+		It("has the user added via cloud-init", func() {
+			out, _ := s.Command(`su - vagrant -c 'id -un'`)
+			Expect(out).To(Equal("vagrant\n"))
+
+			out, _ = s.Command(`cat /run/vagrant/.ssh/authorized_keys`)
+			Expect(out).To(ContainSubstring("ssh-rsa"))
+			out, _ = s.Command(`sudo cat /root/.ssh/authorized_keys`)
+			Expect(out).To(ContainSubstring("ssh-rsa"))
 		})
 	})
 

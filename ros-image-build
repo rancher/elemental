@@ -32,7 +32,7 @@ RUN cd /usr/sbin && \
     rm tmp
 RUN cd /usr/src && \
     git clone https://github.com/rancher-sandbox/cOS-toolkit && \
-    cd cOS-toolkit && git checkout 0385bdfa14d0c175b30ba288f72afe1bd55567f7 -b build
+    cd cOS-toolkit && git checkout ${COS_VERSION} -b build
 RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
     chmod +x /usr/bin/luet
 RUN mkdir -p /iso/iso-overlay/boot/grub2 /etc/luet
@@ -261,6 +261,7 @@ VERSION=${IMAGE##*:}
 GIT_COMMIT=${GIT_COMMIT:-HEAD}
 NAME=${IMAGE%%:${VERSION}}
 NAME=${NAME//[^a-zA-Z0-9-@.\/_]/-}
+COS_VERSION=${COS_VERSION:-116994398a94d4afabce71e985f4aa4ce5847c0c}
 
 if [ "$1" == dockerfile ]; then
     dockerfile

@@ -39,7 +39,7 @@ ENV USER=root
 SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
 
 # Each package we want to install needs a new line here
-RUN meta/cos-minimal
+RUN meta/cos-core
 RUN meta/cos-verify
 RUN utils/k9s
 RUN utils/nerdctl

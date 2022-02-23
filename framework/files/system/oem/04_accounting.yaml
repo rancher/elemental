@@ -7,7 +7,7 @@ stages:
     files:
     - path: /etc/issue.d/99_passwd
       content: |
-        Login with username=root, password=cos
+        Login with username=root, password=ros
     ensure_entities:
     - path: /etc/shadow
       entity: |
