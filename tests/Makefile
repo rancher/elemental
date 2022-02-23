@@ -50,7 +50,7 @@ build-box:
 
 # targets to run tests on VBox (GHA macOS runners)
 build-box/sda.vdi: build-box
-	VBoxManage createmedium disk --filename build-box/sda.vdi --size 30000
+	VBoxManage createmedium disk --filename build-box/sda.vdi --size 40000
 
 iso-to-vm: build-box/sda.vdi
 	VBoxManage createvm --name "test" --register

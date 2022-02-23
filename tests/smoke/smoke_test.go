@@ -30,13 +30,20 @@ var _ = Describe("os2 Smoke tests", func() {
 			s.Command("k3s kubectl get pods -A -o json > /tmp/pods.json")
 			s.Command("k3s kubectl get events -A -o json > /tmp/events.json")
 			s.Command("k3s kubectl get helmcharts -A -o json > /tmp/helm.json")
+			s.Command("df -h > /tmp/disk")
+			s.Command("mount > /tmp/mounts")
+			s.Command("blkid > /tmp/blkid")
 
 			s.GatherAllLogs(
 				[]string{"ros-installer",
 					"rancherd",
 					"k3s",
 				},
-				[]string{"/tmp/pods.json",
+				[]string{
+					"/tmp/pods.json",
+					"/tmp/disk",
+					"/tmp/mounts",
+					"/tmp/blkid",
 					"/tmp/events.json",
 					"/tmp/helm.json",
 				})
