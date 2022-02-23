@@ -75,9 +75,3 @@ stages:
       - elemental cloud-init -s initramfs /oem/userdata
       - elemental cloud-init -s boot /oem/userdata
       - rm -rf /oem/userdata_load
-  fs.before:
-    - if: '[ ! -f "/run/cos/recovery_mode" ] && [ ! -f /run/cos/live_mode ]'
-      name: "Grow persistent fs"
-      commands:
-      - /usr/sbin/partprobe
-      - /usr/sbin/resize2fs $(/usr/sbin/blkid -L COS_PERSISTENT)
