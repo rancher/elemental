@@ -35,7 +35,10 @@ var _ = Describe("os2 Smoke tests", func() {
 			s.Command("blkid > /tmp/blkid")
 
 			s.GatherAllLogs(
-				[]string{"ros-installer",
+				[]string{
+					"ros-installer",
+					"cos-setup-boot",
+					"cos-setup-network",
 					"rancherd",
 					"k3s",
 				},
