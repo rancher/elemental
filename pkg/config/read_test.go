@@ -2,14 +2,102 @@ package config_test
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
 
+	gotpm "github.com/rancher-sandbox/go-tpm"
+
+	"github.com/gorilla/websocket"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/rancher-sandbox/os2/pkg/config"
 )
+
+func writeRead(conn *websocket.Conn, input []byte) ([]byte, error) {
+	writer, err := conn.NextWriter(websocket.BinaryMessage)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := writer.Write(input); err != nil {
+		return nil, err
+	}
+
+	if err := writer.Close(); err != nil {
+		return nil, err
+	}
+
+	_, reader, err := conn.NextReader()
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.ReadAll(reader)
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+// Mimics a WS server which accepts TPM Bearer token
+func WSServer(ctx context.Context) {
+	s := http.Server{
+		Addr:         "127.0.0.1:9980",
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	m := http.NewServeMux()
+	m.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		conn, _ := upgrader.Upgrade(w, r, nil) // error ignored for sake of simplicity
+
+		for {
+
+			token := r.Header.Get("Authorization")
+			ek, at, err := gotpm.GetAttestationData(token)
+			if err != nil {
+				fmt.Println("error", err.Error())
+				return
+			}
+
+			secret, challenge, err := gotpm.GenerateChallenge(ek, at)
+			if err != nil {
+				fmt.Println("error", err.Error())
+				return
+			}
+
+			resp, _ := writeRead(conn, challenge)
+
+			if err := gotpm.ValidateChallenge(secret, resp); err != nil {
+				fmt.Println(string(resp))
+				fmt.Println("error validating challenge", err.Error())
+				return
+			}
+
+			writer, _ := conn.NextWriter(websocket.BinaryMessage)
+			json.NewEncoder(writer).Encode(map[string]interface{}{
+				"rancheros": map[string]interface{}{
+					"install": map[string]string{
+						"isoUrl": "foo",
+					},
+				},
+			})
+		}
+	})
+
+	s.Handler = m
+
+	go s.ListenAndServe()
+	go func() {
+		<-ctx.Done()
+		s.Shutdown(ctx)
+	}()
+}
 
 var _ = Describe("os2 config unit tests", func() {
 
@@ -198,5 +286,44 @@ ssh_authorized_keys:
 			ff, _ := ioutil.ReadFile(f.Name())
 			Expect(string(ff)).To(Equal("#cloud-config\nrancheros: {}\nssh_authorized_keys:\n- github:mudler\n"))
 		})
+
+		It("reads iso_url by contacting a registrationUrl server", func() {
+
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			WSServer(ctx)
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+    seed: "5"
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo"))
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			c, err = ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo"))
+		})
+
 	})
 })

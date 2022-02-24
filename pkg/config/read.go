@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -200,6 +201,10 @@ func readConfigMap(ctx context.Context, cfg string, includeCmdline bool) (map[st
 func updateData(ctx context.Context, data map[string]interface{}) (map[string]interface{}, error) {
 	registrationURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationUrl"))
 	registrationCA := convert.ToString(values.GetValueN(data, "rancheros", "install", "registrationCaCert"))
+	emulatedTPM := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "emulated"))
+	emulatedSeed := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "seed"))
+	noSmbios := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "no_smbios"))
+
 	if registrationURL != "" {
 		isoURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "isoUrl"))
 		for {
@@ -207,7 +212,7 @@ func updateData(ctx context.Context, data map[string]interface{}) (map[string]in
 			case <-ctx.Done():
 				return data, nil
 			default:
-				newData, err := returnRegistrationData(registrationURL, registrationCA)
+				newData, err := returnRegistrationData(registrationURL, registrationCA, emulatedTPM, emulatedSeed, noSmbios)
 				if err == nil {
 					newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
 					if newISOURL == "" {
@@ -272,15 +277,37 @@ func ReadConfig(ctx context.Context, cfg string, includeCmdline bool) (result Co
 	return result, nil
 }
 
-func returnRegistrationData(url, ca string) (map[string]interface{}, error) {
-	smbios, err := getSMBiosHeaders()
+func returnRegistrationData(url, ca, emulatedTPM, TPMSeed, noSmbios string) (map[string]interface{}, error) {
+	opts := []tpm.Option{tpm.WithCAs([]byte(ca))}
+
+	// can be explicitly disabled for testing purposes
+	if noSmbios != "true" {
+		smbios, err := getSMBiosHeaders()
+		if err != nil {
+			return nil, err
+		}
+		opts = append(opts, tpm.WithHeader(smbios))
+	}
+
+	if emulatedTPM == "true" {
+		logrus.Info("TPM Emulation enabled")
+		opts = append(opts, tpm.Emulated)
+		if TPMSeed != "" {
+			s, err := strconv.ParseInt(TPMSeed, 10, 64)
+			if err == nil {
+				logrus.Info("TPM Emulation Seed", s)
+				opts = append(opts, tpm.WithSeed(s))
+			}
+		} else {
+			opts = append(opts, tpm.WithSeed(1))
+		}
+	}
+
+	data, err := tpm.Get(url, opts...)
 	if err != nil {
 		return nil, err
 	}
-	data, err := tpm.Get(url, tpm.WithCAs([]byte(ca)), tpm.WithHeader(smbios))
-	if err != nil {
-		return nil, err
-	}
+
 	logrus.Infof("Retrieved config from registrationURL: %s", data)
 	result := map[string]interface{}{}
 	return result, json.Unmarshal(data, &result)
