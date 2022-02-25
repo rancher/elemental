@@ -295,7 +295,7 @@ func returnRegistrationData(url, ca, emulatedTPM, TPMSeed, noSmbios string) (map
 		if TPMSeed != "" {
 			s, err := strconv.ParseInt(TPMSeed, 10, 64)
 			if err == nil {
-				logrus.Info("TPM Emulation Seed", s)
+				logrus.Infof("TPM Emulation Seed '%s'", TPMSeed)
 				opts = append(opts, tpm.WithSeed(s))
 			}
 		} else {
