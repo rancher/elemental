@@ -8,7 +8,7 @@ FROM quay.io/luet/base:0.22.7-1 as luet
 FROM base AS build
 ENV LUET_NOLOCK=true
 ENV USER=root
-RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
+RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip openssl-devel
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 COPY --from=luet /usr/bin/luet /usr/bin/luet
 RUN luet install -y utils/helm
@@ -25,7 +25,7 @@ RUN cd /usr/src && \
     CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-operator ./cmd/ros-operator && \
     upx /usr/sbin/ros-operator
 RUN cd /usr/src && \
-    CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-installer ./cmd/ros-installer && \
+    go build -o /usr/sbin/ros-installer ./cmd/ros-installer && \
     upx /usr/sbin/ros-installer
 
 FROM quay.io/luet/base:0.22.7-1 AS framework-build

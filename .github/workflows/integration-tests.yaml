@@ -11,7 +11,8 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
       DOCKER_REGISTRY: quay.io
       REPO: quay.io/costoolkit/os2-ci
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
+    #runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       -
