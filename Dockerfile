@@ -8,7 +8,7 @@ FROM quay.io/luet/base:0.22.7-1 as luet
 FROM base AS build
 ENV LUET_NOLOCK=true
 ENV USER=root
-RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip
+RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip openssl-devel
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 COPY --from=luet /usr/bin/luet /usr/bin/luet
 RUN luet install -y utils/helm
