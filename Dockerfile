@@ -25,7 +25,7 @@ RUN cd /usr/src && \
     CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-operator ./cmd/ros-operator && \
     upx /usr/sbin/ros-operator
 RUN cd /usr/src && \
-    CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-installer ./cmd/ros-installer && \
+    go build -o /usr/sbin/ros-installer ./cmd/ros-installer && \
     upx /usr/sbin/ros-installer
 
 FROM quay.io/luet/base:0.22.7-1 AS framework-build
