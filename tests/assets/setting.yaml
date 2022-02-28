@@ -4,4 +4,4 @@ kind: Setting
 metadata:
   name: server-url
 source: "env"
-value: "test.nip.io"
+value: "127.0.0.1.nip.io"
