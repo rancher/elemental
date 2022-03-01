@@ -21,6 +21,6 @@ metadata:
 spec:
     chart: https://releases.rancher.com/server-charts/stable/rancher-2.6.3.tgz
     set:
-      hostname: "test.nip.io"
+      hostname: "127.0.0.1.nip.io"
       bootstrapPassword: "admin"
       replicas: 1

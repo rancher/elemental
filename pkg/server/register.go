@@ -60,11 +60,18 @@ func (i *InventoryServer) sampleConfig(machineRegistration *v1.MachineRegistrati
 	if err != nil {
 		return err
 	}
+
+	installSection := map[string]interface{}{
+		"registrationURL": machineRegistration.Status.RegistrationURL,
+	}
+	certs := i.cacert()
+	if certs != "" {
+		installSection["registrationCaCert"] = certs
+	}
+
 	return yaml.NewEncoder(writer).Encode(map[string]interface{}{
 		"rancheros": map[string]interface{}{
-			"install": map[string]interface{}{
-				"registrationURL": machineRegistration.Status.RegistrationURL,
-			},
+			"install": installSection,
 		},
 	})
 }

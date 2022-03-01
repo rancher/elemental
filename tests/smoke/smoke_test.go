@@ -30,6 +30,7 @@ var _ = Describe("os2 Smoke tests", func() {
 			s.Command("k3s kubectl get pods -A -o json > /tmp/pods.json")
 			s.Command("k3s kubectl get events -A -o json > /tmp/events.json")
 			s.Command("k3s kubectl get helmcharts -A -o json > /tmp/helm.json")
+			s.Command("k3s kubectl get ingress -A -o json > /tmp/ingress.json")
 			s.Command("df -h > /tmp/disk")
 			s.Command("mount > /tmp/mounts")
 			s.Command("blkid > /tmp/blkid")
@@ -49,6 +50,7 @@ var _ = Describe("os2 Smoke tests", func() {
 					"/tmp/blkid",
 					"/tmp/events.json",
 					"/tmp/helm.json",
+					"/tmp/ingress.json",
 				})
 		}
 	})
@@ -203,10 +205,17 @@ var _ = Describe("os2 Smoke tests", func() {
 					),
 				)
 
+				var url string
 				Eventually(func() string {
 					out, _ := s.Command("k3s kubectl get machineregistration -n fleet-default machine-registration -o json | jq '.status.registrationURL' -r")
+					url = out
 					return out
-				}, 15*time.Minute, 1*time.Second).Should(ContainSubstring("test.nip.io/v1-rancheros/registration"))
+				}, 15*time.Minute, 1*time.Second).Should(ContainSubstring("127.0.0.1.nip.io/v1-rancheros/registration"))
+
+				Eventually(func() string {
+					out, _ := s.Command("curl -k -L " + url)
+					return out
+				}, 5*time.Minute, 1*time.Second).Should(And(ContainSubstring("BEGIN CERTIFICATE"), ContainSubstring("127.0.0.1.nip.io/v1-rancheros/registration")))
 			})
 		})
 	})
