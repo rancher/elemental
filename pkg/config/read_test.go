@@ -10,6 +10,7 @@ import (
 	"time"
 
 	gotpm "github.com/rancher-sandbox/go-tpm"
+	values "github.com/rancher/wrangler/pkg/data"
 
 	"github.com/gorilla/websocket"
 	. "github.com/onsi/ginkgo/v2"
@@ -45,7 +46,7 @@ var upgrader = websocket.Upgrader{
 }
 
 // Mimics a WS server which accepts TPM Bearer token
-func WSServer(ctx context.Context) {
+func WSServer(ctx context.Context, data map[string]interface{}) {
 	s := http.Server{
 		Addr:         "127.0.0.1:9980",
 		ReadTimeout:  10 * time.Second,
@@ -80,13 +81,7 @@ func WSServer(ctx context.Context) {
 			}
 
 			writer, _ := conn.NextWriter(websocket.BinaryMessage)
-			json.NewEncoder(writer).Encode(map[string]interface{}{
-				"rancheros": map[string]interface{}{
-					"install": map[string]string{
-						"isoUrl": "foo",
-					},
-				},
-			})
+			json.NewEncoder(writer).Encode(data)
 		}
 	})
 
@@ -102,9 +97,61 @@ func WSServer(ctx context.Context) {
 var _ = Describe("os2 config unit tests", func() {
 
 	var c Config
+	var data map[string]interface{}
 
 	BeforeEach(func() {
 		c = Config{}
+		data = map[string]interface{}{
+			"rancheros": map[string]interface{}{
+				"install": map[string]string{
+					"isoUrl": "foo",
+				},
+			},
+		}
+	})
+
+	Context("Validation", func() {
+		It("fails if isoUrl and containerImage are both used at the same time", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  install:
+    containerImage: "docker/image:test"
+    isoUrl: "test"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			_, err = ReadConfig(ctx, f.Name(), false)
+			Expect(err).To(HaveOccurred())
+		})
+		It("fails if isoUrl and containerImage are both empty", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+    seed: "5"
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			// Empty the install key so there is no isourl nor containerImage
+			values.PutValue(data, "", "rancheros", "install")
+			WSServer(ctx, data)
+			_, err = ReadConfig(ctx, f.Name(), false)
+			Expect(err).To(HaveOccurred())
+		})
+
 	})
 
 	Context("convert to environment configuration", func() {
@@ -134,12 +181,13 @@ var _ = Describe("os2 config unit tests", func() {
 						Debug:           true,
 						PowerOff:        true,
 						TTY:             "foo",
+						ContainerImage:  "container",
 					},
 				},
 			}
 			e, err := ToEnv(c)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(e)).To(Equal(10))
+			Expect(len(e)).To(Equal(11))
 			Expect(e).To(
 				ContainElements(
 					"SSH_AUTHORIZED_KEYS=[github:mudler]",
@@ -152,6 +200,7 @@ var _ = Describe("os2 config unit tests", func() {
 					"ELEMENTAL_DEBUG=true",
 					"ELEMENTAL_POWEROFF=true",
 					"ELEMENTAL_TTY=foo",
+					"ELEMENTAL_DOCKER_IMAGE=container",
 				),
 			)
 		})
@@ -194,6 +243,44 @@ rancheros:
 			c, err := ReadConfig(ctx, f.Name(), false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo_bar"))
+		})
+
+		It("reads containerImage, without contacting a registrationUrl server", func() {
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  install:
+    containerImage: "docker/image:test"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ISOURL).To(Equal(""))
+			Expect(c.RancherOS.Install.ContainerImage).To(Equal("docker/image:test"))
+		})
+		It("reads containerImage and registrationUrl", func() {
+
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  install:
+    registrationUrl: "foobar"
+    containerImage: "docker/image:test"
+`), os.ModePerm)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancel()
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ContainerImage).To(Equal("docker/image:test"))
 		})
 
 		It("reads isoUrl instead of iso_url", func() {
@@ -292,7 +379,7 @@ ssh_authorized_keys:
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			WSServer(ctx)
+			WSServer(ctx, data)
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
@@ -323,6 +410,47 @@ rancheros:
 			c, err = ReadConfig(ctx, f.Name(), false)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo"))
+		})
+		It("reads containerImage by contacting a registrationUrl server", func() {
+
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			// Override the install value on the data
+			value := map[string]string{"containerImage": "test"}
+			values.PutValue(data, value, "rancheros", "install")
+
+			WSServer(ctx, data)
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+    seed: "5"
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ContainerImage).To(Equal("test"))
+
+			ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			c, err = ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ContainerImage).To(Equal("test"))
 		})
 
 	})

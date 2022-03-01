@@ -296,7 +296,7 @@ func (s *SUT) connectToHost(timeout bool) (*ssh.Client, error) {
 }
 
 // GatherAllLogs will try to gather as much info from the system as possible, including services, dmesg and os related info
-func (s SUT) GatherAllLogs(services []string,logFiles []string) {
+func (s SUT) GatherAllLogs(services []string, logFiles []string) {
 	// services
 	for _, ser := range services {
 		out, err := s.command(fmt.Sprintf("journalctl -u %s -o short-iso >> /tmp/%s.log", ser, ser), true)
