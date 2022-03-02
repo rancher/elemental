@@ -1,12 +1,6 @@
 name: Static Analysis
 on:
   push:
-    branches:
-      - master
-      - main
-    tags:
-      - 'v*'
-  pull_request:
 concurrency:
   group: static-analysis-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
