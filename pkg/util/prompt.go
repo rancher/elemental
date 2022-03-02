@@ -1,3 +1,19 @@
+/*
+Copyright © 2022 SUSE LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package util
 
 import (
@@ -7,7 +23,7 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 var (
@@ -31,21 +47,21 @@ func PromptPassword() (string, bool, error) {
 	if err != nil {
 		return "", false, errors.Wrapf(err, "failed to confirm password")
 	}
-	return string(c), bytes.Compare(p, c) == 0, nil
+	return string(c), bytes.Equal(p, c), nil
 }
 
 func MaskPassword(r *os.File, w io.Writer) ([]byte, error) {
 	var p []byte
 	var err error
 	fd := int(r.Fd())
-	if terminal.IsTerminal(fd) {
-		s, e := terminal.MakeRaw(fd)
+	if term.IsTerminal(fd) {
+		s, e := term.MakeRaw(fd)
 		if e != nil {
 			return p, e
 		}
 		defer func() {
-			terminal.Restore(fd, s)
-			fmt.Fprintln(w)
+			_ = term.Restore(fd, s)
+			_, _ = fmt.Fprintln(w)
 		}()
 	}
 	// Reference: ascii-table-0-127
@@ -58,7 +74,7 @@ func MaskPassword(r *os.File, w io.Writer) ([]byte, error) {
 			// Delete || Backspace
 			if l := len(p); l > 0 {
 				p = p[:l-1]
-				fmt.Fprint(w, string(bs))
+				_, _ = fmt.Fprint(w, string(bs))
 			}
 		} else if v == 13 || v == 10 {
 			// CR || LF
