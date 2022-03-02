@@ -141,18 +141,15 @@ func Prompt(text, def string) (string, error) {
 }
 
 func PromptOptional(text, def string) (string, error) {
-	for {
-		PrintToTerm(text)
-		answer, err := bufio.NewReader(os.Stdin).ReadString('\n')
-		if err != nil {
-			return "", err
-		}
-
-		answer = strings.TrimSpace(answer)
-		if answer == "" {
-			answer = def
-		}
-
-		return answer, nil //nolint:staticcheck
+	PrintToTerm(text)
+	answer, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		return "", err
 	}
+
+	answer = strings.TrimSpace(answer)
+	if answer == "" {
+		answer = def
+	}
+	return answer, nil
 }
