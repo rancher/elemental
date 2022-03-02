@@ -2,11 +2,12 @@ package smoke_test
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/os2/tests/sut"
-	"os"
-	"time"
 )
 
 func systemdUnitIsStarted(s string, st *sut.SUT) {

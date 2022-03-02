@@ -53,10 +53,11 @@ func ToEnv(cfg Config) ([]string, error) {
 
 // it's a mapping of how config env option should be transliterated to the elemental CLI
 var defaultOverrides = map[string]string{
-	"ELEMENTAL_CONFIG_URL": "ELEMENTAL_CLOUD_INIT",
-	"ELEMENTAL_ISO_URL":    "ELEMENTAL_ISO",
-	"ELEMENTAL_POWER_OFF":  "ELEMENTAL_POWEROFF",
-	"ELEMENTAL_DEVICE":     "ELEMENTAL_TARGET",
+	"ELEMENTAL_CONFIG_URL":      "ELEMENTAL_CLOUD_INIT",
+	"ELEMENTAL_ISO_URL":         "ELEMENTAL_ISO",
+	"ELEMENTAL_POWER_OFF":       "ELEMENTAL_POWEROFF",
+	"ELEMENTAL_DEVICE":          "ELEMENTAL_TARGET",
+	"ELEMENTAL_CONTAINER_IMAGE": "ELEMENTAL_DOCKER_IMAGE",
 }
 
 func envOverrides(keyName string) string {
@@ -204,9 +205,14 @@ func updateData(ctx context.Context, data map[string]interface{}) (map[string]in
 	emulatedTPM := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "emulated"))
 	emulatedSeed := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "seed"))
 	noSmbios := convert.ToString(values.GetValueN(data, "rancheros", "tpm", "no_smbios"))
+	isoURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "isoUrl"))
+	ContainerImage := convert.ToString(values.GetValueN(data, "rancheros", "install", "containerImage"))
+	// Can't set both values at the same time
+	if isoURL != "" && ContainerImage != "" {
+		return nil, fmt.Errorf("cant set both rancheros.install.iso_url and rancheros.install.containerImage in /proc/cmdline or in MachineRegistration both .spec.cloudConfig.rancheros.install.isoUrl and .spec.cloudConfig.rancheros.install.containerImage")
+	}
 
 	if registrationURL != "" {
-		isoURL := convert.ToString(values.GetValueN(data, "rancheros", "install", "isoUrl"))
 		for {
 			select {
 			case <-ctx.Done():
@@ -215,12 +221,19 @@ func updateData(ctx context.Context, data map[string]interface{}) (map[string]in
 				newData, err := returnRegistrationData(registrationURL, registrationCA, emulatedTPM, emulatedSeed, noSmbios)
 				if err == nil {
 					newISOURL := convert.ToString(values.GetValueN(newData, "rancheros", "install", "isoUrl"))
+					newContainerImage := convert.ToString(values.GetValueN(newData, "rancheros", "install", "containerImage"))
+					// If values from registration server are empty, override the old values into the new data
 					if newISOURL == "" {
-						if isoURL == "" {
-							return nil, fmt.Errorf("rancheros.install.iso_url is required to be set in /proc/cmdline or in MachineRegistration in .spec.cloudConfig.rancheros.install.isoUrl")
-						}
 						values.PutValue(newData, isoURL, "rancheros", "install", "isoUrl")
 					}
+					if newContainerImage == "" {
+						values.PutValue(newData, ContainerImage, "rancheros", "install", "containerImage")
+					}
+					// If everything is empty, error out, we have no source for install
+					if newISOURL == "" && isoURL == "" && newContainerImage == "" && ContainerImage == "" {
+						return nil, fmt.Errorf("rancheros.install.iso_url/containerImage is required to be set in /proc/cmdline or in MachineRegistration in .spec.cloudConfig.rancheros.install.isoUrl/containerImage")
+					}
+					// Return the data obtained from the registration url with our full data
 					return newData, nil
 				}
 				logrus.Errorf("failed to read registration URL %s, retrying: %v", registrationURL, err)

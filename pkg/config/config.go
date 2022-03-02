@@ -10,6 +10,7 @@ type Install struct {
 	Device             string `json:"device,omitempty"`
 	ConfigURL          string `json:"configUrl,omitempty"`
 	ISOURL             string `json:"isoUrl,omitempty"`
+	ContainerImage     string `json:"containerImage,omitempty"`
 	PowerOff           bool   `json:"powerOff,omitempty"`
 	NoFormat           bool   `json:"noFormat,omitempty"`
 	Debug              bool   `json:"debug,omitempty"`
