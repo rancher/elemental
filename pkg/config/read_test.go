@@ -103,9 +103,7 @@ func WSServer(ctx context.Context, data map[string]interface{}) {
 
 	s.Handler = m
 
-	go func() {
-		_ = s.ListenAndServe()
-	}()
+	go s.ListenAndServe()
 	go func() {
 		<-ctx.Done()
 		_ = s.Shutdown(ctx)
@@ -132,9 +130,7 @@ var _ = Describe("os2 config unit tests", func() {
 		It("fails if isoUrl and containerImage are both used at the same time", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -151,9 +147,7 @@ rancheros:
 		It("fails if isoUrl and containerImage are both empty", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -232,9 +226,7 @@ rancheros:
 		It("reads iso_url and registrationUrl", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -254,9 +246,7 @@ rancheros:
 		It("reads iso_url only, without contacting a registrationUrl server", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -274,9 +264,7 @@ rancheros:
 		It("reads containerImage, without contacting a registrationUrl server", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -295,9 +283,7 @@ rancheros:
 
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -316,9 +302,7 @@ rancheros:
 		It("reads isoUrl instead of iso_url", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -336,9 +320,7 @@ rancheros:
 		It("reads ssh_authorized_keys", func() {
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 ssh_authorized_keys:
@@ -375,9 +357,7 @@ ssh_authorized_keys:
 
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			err = ToFile(c, f.Name())
 			Expect(err).ToNot(HaveOccurred())
@@ -401,9 +381,7 @@ ssh_authorized_keys:
 
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			err = ToFile(c, f.Name())
 			Expect(err).ToNot(HaveOccurred())
@@ -420,9 +398,7 @@ ssh_authorized_keys:
 			WSServer(ctx, data)
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
@@ -463,9 +439,7 @@ rancheros:
 			WSServer(ctx, data)
 			f, err := ioutil.TempFile("", "xxxxtest")
 			Expect(err).ToNot(HaveOccurred())
-			defer func(name string) {
-				_ = os.Remove(name)
-			}(f.Name())
+			defer os.Remove(f.Name())
 
 			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:

@@ -2,6 +2,7 @@ run:
   timeout: 5m
   skip-dirs:
     - "zz_generated_*"
+  tests: false
 output:
   format: github-actions
 linters:
