@@ -19,7 +19,8 @@ var _ = Describe("os2 install tests", func() {
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
-				ContainSubstring("Copying Passive image..."),
+				ContainSubstring("Finished copying COS_PASSIVE"),
+				ContainSubstring("Grub install to device /dev/sda complete"),
 			))
 			Expect(err).ToNot(HaveOccurred())
 		})
