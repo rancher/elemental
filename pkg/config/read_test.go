@@ -1,3 +1,19 @@
+/*
+Copyright © 2022 SUSE LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package config_test
 
 import (
@@ -81,7 +97,7 @@ func WSServer(ctx context.Context, data map[string]interface{}) {
 			}
 
 			writer, _ := conn.NextWriter(websocket.BinaryMessage)
-			json.NewEncoder(writer).Encode(data)
+			_ = json.NewEncoder(writer).Encode(data)
 		}
 	})
 
@@ -90,7 +106,7 @@ func WSServer(ctx context.Context, data map[string]interface{}) {
 	go s.ListenAndServe()
 	go func() {
 		<-ctx.Done()
-		s.Shutdown(ctx)
+		_ = s.Shutdown(ctx)
 	}()
 }
 
@@ -116,7 +132,7 @@ var _ = Describe("os2 config unit tests", func() {
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     containerImage: "docker/image:test"
@@ -133,7 +149,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   tpm:
     emulated: true
@@ -212,7 +228,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     registrationUrl: "foobaz"
@@ -232,7 +248,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     iso_url: "foo_bar"
@@ -250,7 +266,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     containerImage: "docker/image:test"
@@ -269,7 +285,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     registrationUrl: "foobar"
@@ -288,7 +304,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   install:
     isoUrl: "foo_bar"
@@ -306,7 +322,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 ssh_authorized_keys:
 - foo
 `), os.ModePerm)
@@ -384,7 +400,7 @@ ssh_authorized_keys:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   tpm:
     emulated: true
@@ -398,7 +414,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			Expect(c.RancherOS.Install.ISOURL).To(Equal("foo"))
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   tpm:
     emulated: true
@@ -425,7 +441,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			defer os.Remove(f.Name())
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   tpm:
     emulated: true
@@ -439,7 +455,7 @@ rancheros:
 			Expect(err).ToNot(HaveOccurred())
 			Expect(c.RancherOS.Install.ContainerImage).To(Equal("test"))
 
-			ioutil.WriteFile(f.Name(), []byte(`
+			_ = ioutil.WriteFile(f.Name(), []byte(`
 rancheros:
   tpm:
     emulated: true
