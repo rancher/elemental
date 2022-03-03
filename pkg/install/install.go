@@ -75,7 +75,6 @@ func runInstall(cfg config.Config, output string) error {
 		if err != nil || !val {
 			return err
 		}
-		cfg.Data = nil
 	}
 
 	if cfg.RancherOS.Install.ConfigURL == "" && !cfg.RancherOS.Install.Automatic {
