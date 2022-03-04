@@ -22,7 +22,7 @@ sed -i \
     build/chart/values.yaml
 
 sed -i \
-    -e 's|repository:.*|repository: '${REPO}'|' \
+    -e 's|repository:.*|repository: '${REPO_ROS_OPERATOR}'|' \
     build/chart/values.yaml
 
 helm package -d ./dist/artifacts ./build/chart
