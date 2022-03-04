@@ -53,7 +53,11 @@ RUN utils/rancherd@0.0.1-alpha13-3
 RUN utils/helm
 
 FROM scratch AS framework
-COPY --from=framework-build /framework /
+COPY --from=framework-build /framework/etc /etc
+COPY --from=framework-build /framework/lib /lib
+COPY --from=framework-build /framework/usr /usr
+COPY --from=framework-build /framework/system /system
+COPY --from=framework-build /framework/var/lib /var/lib
 COPY --from=build /usr/src/dist/rancheros-operator-chart.tgz /usr/share/rancher/os2/
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 COPY --from=build /usr/sbin/ros-installer /usr/sbin/ros-installer
