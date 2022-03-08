@@ -64,6 +64,10 @@ COPY --from=build /usr/sbin/ros-installer /usr/sbin/ros-installer
 COPY --from=build /usr/sbin/ros-operator /usr/sbin/ros-operator
 COPY framework/files/ /
 
+
+FROM scratch as ros-operator
+COPY --from=build /usr/sbin/ros-operator /usr/sbin/ros-operator
+
 # Make OS image
 FROM base as os
 RUN zypper dup -y

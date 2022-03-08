@@ -18,6 +18,7 @@ make iso
 if [ "$PUSH" = "true" ]; then
     make push
     make push-framework
+    make push-ros-operator
 fi
 
 if [ "$PUSH" = "true" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "${DRONE_TAG}" ]; then
