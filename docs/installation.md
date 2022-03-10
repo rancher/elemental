@@ -18,7 +18,7 @@ The installation configuration should be hosted on an HTTP or TFTP server. A sim
 ### Kernel Command Line
 
 Install directives can be set from the kernel command line using a period (.) seperated key structure such as
-`rancheros.install.configurl`.  They kernel command line keys are case-insensitive.
+`rancheros.install.config_url`.  They kernel command line keys are case-insensitive.
 
 ### Reference
 
