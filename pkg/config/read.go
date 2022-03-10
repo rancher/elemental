@@ -245,10 +245,6 @@ func updateData(ctx context.Context, data map[string]interface{}) (map[string]in
 					if newContainerImage == "" {
 						values.PutValue(newData, ContainerImage, "rancheros", "install", "containerImage")
 					}
-					// If everything is empty, error out, we have no source for install
-					if newISOURL == "" && isoURL == "" && newContainerImage == "" && ContainerImage == "" {
-						return nil, fmt.Errorf("rancheros.install.iso_url/containerImage is required to be set in /proc/cmdline or in MachineRegistration in .spec.cloudConfig.rancheros.install.isoUrl/containerImage")
-					}
 					// Return the data obtained from the registration url with our full data
 					return newData, nil
 				}
