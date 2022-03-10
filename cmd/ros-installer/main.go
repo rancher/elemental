@@ -32,6 +32,7 @@ var (
 	printConfig = flag.Bool("print-config", false, "Print effective configuration and exit")
 	configFile  = flag.String("config-file", "/oem/userdata", "Config file to use, local file or http/tftp URL")
 	powerOff    = flag.Bool("power-off", false, "Power off after installation")
+	reboot      = flag.Bool("reboot", false, "Reboot after installation")
 	yes         = flag.Bool("y", false, "Do not prompt for questions")
 )
 
@@ -50,7 +51,7 @@ func main() {
 		return
 	}
 
-	if err := install.Run(*automatic, *configFile, *powerOff, *yes); err != nil {
+	if err := install.Run(*automatic, *configFile, *powerOff, *reboot, *yes); err != nil {
 		logrus.Fatal(err)
 	}
 }
