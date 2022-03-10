@@ -469,5 +469,33 @@ rancheros:
 			Expect(c.RancherOS.Install.ContainerImage).To(Equal("test"))
 		})
 
+		It("doesn't error out if isoUrl or containerImage are not provided", func() {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+
+			// Override the install value on the data
+			value := map[string]string{}
+			values.PutValue(data, value, "rancheros", "install")
+
+			WSServer(ctx, data)
+			f, err := ioutil.TempFile("", "xxxxtest")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.Remove(f.Name())
+
+			_ = ioutil.WriteFile(f.Name(), []byte(`
+rancheros:
+  tpm:
+    emulated: true
+    no_smbios: true
+    seed: "5"
+  install:
+    registrationUrl: "http://127.0.0.1:9980/test"
+`), os.ModePerm)
+
+			c, err := ReadConfig(ctx, f.Name(), false)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(c.RancherOS.Install.ContainerImage).To(Equal(""))
+			Expect(c.RancherOS.Install.ISOURL).To(Equal(""))
+		})
 	})
 })
