@@ -28,7 +28,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-func Run(automatic bool, configFile string, powerOff bool, reboot bool, silent bool) error {
+func Run(automatic bool, configFile string, powerOff bool, reboot bool, noRebootAutomatic bool, silent bool) error {
 	cfg, err := config.ReadConfig(context.Background(), configFile, automatic)
 	if err != nil {
 		return err
@@ -46,8 +46,8 @@ func Run(automatic bool, configFile string, powerOff bool, reboot bool, silent b
 		cfg.RancherOS.Install.Automatic = true
 	}
 
-	// If we set the installation to automatic, reboot is set to true
-	if automatic {
+	// If we set the installation to automatic, reboot is set to true unless we set no reboot
+	if automatic && !noRebootAutomatic {
 		cfg.RancherOS.Install.Reboot = true
 	}
 
