@@ -28,6 +28,7 @@ type Install struct {
 	ISOURL             string `json:"isoUrl,omitempty"`
 	ContainerImage     string `json:"containerImage,omitempty"`
 	PowerOff           bool   `json:"powerOff,omitempty"`
+	Reboot             bool   `json:"reboot,omitempty"`
 	NoFormat           bool   `json:"noFormat,omitempty"`
 	Debug              bool   `json:"debug,omitempty"`
 	TTY                string `json:"tty,omitempty"`
