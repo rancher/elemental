@@ -37,7 +37,7 @@ run:
 
 .PHONY: install
 install:
-	ginkgo -r ./install
+	ginkgo --label-filter setup -r ./install
 
 build/ci.iso:
 	./prepare_cloudinit
@@ -70,3 +70,14 @@ clean_vm_from_iso:
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 	VBoxManage unregistervm "test" --delete &>/dev/null || true
 	VBoxManage closemedium disk sda.vdi --delete &>/dev/null || true
+
+installer-tests: build-box/sda.vdi
+	VBoxManage createvm --name "test" --register
+	VBoxManage modifyvm "test" --memory 10240 --cpus 3
+	VBoxManage modifyvm "test" --nic1 nat --boot1 disk --boot2 dvd --natpf1 "guestssh,tcp,,2222,,22"
+	VBoxManage storagectl "test" --name "sata controller" --add sata --portcount 2 --hostiocache off
+	VBoxManage storageattach "test" --storagectl "sata controller" --port 0 --device 0 --type hdd --medium build-box/sda.vdi
+	VBoxManage storageattach "test" --storagectl "sata controller" --port 1 --device 0 --type dvddrive --medium $(ISO)
+	VBoxManage startvm "test" --type headless
+	ginkgo --label-filter "!setup" -r ./install
+	VBoxManage controlvm "test" poweroff &>/dev/null || true

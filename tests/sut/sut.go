@@ -468,3 +468,10 @@ func DialWithDeadline(network string, addr string, config *ssh.ClientConfig, tim
 	}()
 	return ssh.NewClient(c, chans, reqs), nil
 }
+
+func (s *SUT) WriteInlineFile(content, path string) {
+	_, err := s.Command(`cat << EOF > ` + path + `
+` + content + `
+EOF`)
+	Expect(err).ToNot(HaveOccurred())
+}
