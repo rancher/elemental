@@ -2,8 +2,9 @@
 # This file allows to tweak cOS configuration such as: default upgrade/recovery image and GRUB menu entry
 
 # Disable/enable image verification during upgrades ( default: true )
-VERIFY=false
-_COSIGN=false
+NO_VERIFY=true
+
+COSIGN=false
 
 # Disable/enable upgrades via release channels instead of container images. ( default: true )
 CHANNEL_UPGRADES=false
