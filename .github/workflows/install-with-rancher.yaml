@@ -1,0 +1,74 @@
+name: Install ROS on a server through Rancher
+
+on:
+  workflow_dispatch:
+    inputs:
+      registry:
+        required: false
+        default: registry.hub.docker.com
+        type: string
+        description: Registry to use
+      org:
+        required: false
+        #default: costoolkit
+        default: ldevulder
+        type: string
+        description: Organization to use
+
+jobs:
+  build:
+    env:
+      DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
+      REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
+      REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Make images (container/iso/qcow2/etc.)
+        run: make ci
+      - name: Upload results
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: dist
+          if-no-files-found: error
+      - name: Release space from worker ♻
+        if: always()
+        run: |
+          sudo rm -rf build bin dist || true
+          docker system prune -f -a --volumes || true
+  install-with-rancher:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17'
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+      - run: |
+          ls -liah
+          ls -liah artifacts
+          mv artifacts/*.iso ros.iso
+          mv artifacts/*.tgz ros-operator.tgz
+          rm -rf artifacts
+      - name: Run tests
+        run: |
+          echo JUST A TEST!
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: ros-vbox.logs.zip
+          path: tests/**/logs/*
+          if-no-files-found: warn
