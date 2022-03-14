@@ -261,7 +261,7 @@ VERSION=${IMAGE##*:}
 GIT_COMMIT=${GIT_COMMIT:-HEAD}
 NAME=${IMAGE%%:${VERSION}}
 NAME=${NAME//[^a-zA-Z0-9-@.\/_]/-}
-COS_VERSION=${COS_VERSION:-b4924c9807ceee79ca9c7dc1a266af2f6e326474}
+COS_VERSION=${COS_VERSION:-781cc657aa5ea16b8fe978b8d4bcd19740943db0}
 
 if [ "$1" == dockerfile ]; then
     dockerfile
