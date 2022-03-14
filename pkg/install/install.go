@@ -131,9 +131,12 @@ func runInstall(cfg config.Config, output string) error {
 
 	printEnv(cfg)
 
-	cmd := exec.Command("cos-installer")
+	installerOpts := []string{"elemental", "install", "--no-verify"}
+
+	cmd := exec.Command("elemental")
 	cmd.Env = append(os.Environ(), ev...)
 	cmd.Stdout = os.Stdout
+	cmd.Args = installerOpts
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	return cmd.Run()

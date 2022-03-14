@@ -1,6 +1,5 @@
 FROM opensuse/leap:15.3 as base
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
-    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 
 FROM quay.io/luet/base:0.22.7-1 as luet

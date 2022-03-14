@@ -191,7 +191,7 @@ var _ = Describe("os2 Smoke tests", func() {
 
 				Eventually(func() string {
 					out, _ := s.Command("k3s kubectl get pods --all-namespaces")
-					return out
+					return out	
 				}, 15*time.Minute, 2*time.Second).Should(ContainSubstring("rancheros-operator-"))
 			})
 

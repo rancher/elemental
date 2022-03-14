@@ -12,12 +12,12 @@ repositories:
   arch: "amd64"
   # Enable/disable Docker notary checks
   # 
-  reference: 20220302200031-repository.yaml
+  reference: 20220313190659-repository.yaml
   verify: false
   urls:
   - "quay.io/costoolkit/releases-green"
 - <<: *cos
   arch: "arm64"
-  reference: 20220302210559-repository.yaml
+  reference: 20220313193615-repository.yaml
   urls:
   - "quay.io/costoolkit/releases-green-arm64"
