@@ -1,6 +1,5 @@
 FROM opensuse/leap:15.3
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf && \
-    sed -i 's/download/provo-mirror/g' /etc/zypp/repos.d/*repo
+RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 RUN zypper install -y socat net-tools-deprecated libtasn1-devel gnutls-devel libseccomp-devel json-glib-devel system-user-tss git
 RUN zypper install -y autoconf
