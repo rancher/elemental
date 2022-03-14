@@ -41,8 +41,8 @@ jobs:
       - name: Release space from worker ♻
         if: always()
         run: |
-          sudo rm -rf build bin dist || true
-          docker system prune -f -a --volumes || true
+          sudo rm -rf build bin dist
+          docker system prune -f -a --volumes
   install-with-rancher:
     runs-on: self-hosted
     needs: build
@@ -57,7 +57,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: artifacts
-      - run: |
+      - name: Cleanup artifacts
+        run: |
           ls -liah
           ls -liah artifacts
           mv artifacts/*.iso ros.iso
@@ -65,10 +66,46 @@ jobs:
           rm -rf artifacts
       - name: Run tests
         run: |
-          echo JUST A TEST!
-      - uses: actions/upload-artifact@v2
+          # Configure default network
+          sudo systemctl start libvirtd
+          grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
+          sudo virsh net-start default
+          sudo virsh net-dumpxml default | grep -q '\<ros-node\>' || sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config
+          # Create VM
+          sudo virt-install \
+            --name ros-node \
+            --os-type=Linux \
+            --os-variant=opensuse-unknown \
+            --hvm \
+            --ram=2048 \
+            --vcpus=2 \
+            --disk path=ros-node.img,bus=virtio,size=35 \
+            --graphics none \
+            --rng random \
+            --serial pty \
+            --autoconsole none \
+            --cdrom ros.iso \
+            --network bridge=virbr0,mac=52:54:00:00:00:01
+          # !! DEBUG !!
+          sudo virsh list
+      - name: Upload logs
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: ros-vbox.logs.zip
           path: tests/**/logs/*
           if-no-files-found: warn
+      - name: Cleanup runner
+        if: always()
+        run: |
+          # Delete VM
+          sudo virsh destroy ros-node
+          sudo virsh undefine ros-node
+          # Remove default network config
+          sudo virsh net-dumpxml default | grep -q '\<ros-node\>' && sudo virsh net-update default delete ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config
+          sudo virsh net-destroy default
+          sudo virsh net-autostart --disable default
+          grep -q '^allow all$' /etc/qemu/bridge.conf && sudo sed -i '/^allow all$/d' /etc/qemu/bridge.conf
+          sudo systemctl disable --now libvirtd
+          # Delete files
+          rm -f ros.iso ros-node.*
