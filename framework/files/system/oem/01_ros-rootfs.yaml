@@ -58,6 +58,7 @@ stages:
         device:
           label: COS_PERSISTENT
         expand_partition:
+          size: 0
   # XXX:
   # Fetch datasources ONLY when network is present
   # This prevents network configuration via cloud-init from datasources.
