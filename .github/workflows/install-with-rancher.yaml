@@ -76,8 +76,6 @@ jobs:
           scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
         run: |
-          # Install rancheros-operator
-          scripts/install-chart
           # Configure Rancher
           scripts/configure-rancher
       - name: Run tests

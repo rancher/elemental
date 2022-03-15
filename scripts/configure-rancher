@@ -1,5 +1,13 @@
 #!/bin/bash
 
+set -e -x
+
+# Install generated RancherOS Operator chart
+helm upgrade --install rancheros-operator ros-operator.tgz \
+  --namespace cattle-rancheros-operator-system \
+  --create-namespace \
+  --wait
+
 # Add MachineRegistration in Rancher
 REG_YAML=$(
 cat <<EOF
