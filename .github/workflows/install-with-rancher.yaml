@@ -16,36 +16,38 @@ on:
         description: Organization to use
 
 jobs:
-  build:
-    env:
-      DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
-      REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
-      REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Make images (container/iso/qcow2/etc.)
-        run: make ci
-      - name: Upload results
-        uses: actions/upload-artifact@v2
-        with:
-          name: artifacts
-          path: dist
-          if-no-files-found: error
-      - name: Release space from worker ♻
-        if: always()
-        run: |
-          sudo rm -rf build bin dist
-          docker system prune -f -a --volumes
+# build:
+#   runs-on: ubuntu-latest
+#   env:
+#     DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+#     DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+#     DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
+#     REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
+#     REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
+#   steps:
+#     - name: Checkout
+#       uses: actions/checkout@v2
+#     - name: Set up Docker Buildx
+#       id: buildx
+#       uses: docker/setup-buildx-action@v1
+#     - name: Make images (container/iso/qcow2/etc.)
+#       run: make ci
+#     - name: Upload results
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: artifacts
+#         path: dist
+#         if-no-files-found: error
+#     - name: Release space from worker ♻
+#       if: always()
+#       run: |
+#         sudo rm -rf build bin dist
+#         docker system prune -f -a --volumes
   install-with-rancher:
     runs-on: self-hosted
-    needs: build
+#   needs: build
+    env:
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -53,12 +55,16 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '^1.17'
-      - name: Download artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: artifacts
+#     - name: Download artifacts
+#       uses: actions/download-artifact@v3
+#       with:
+#         name: artifacts
       - name: Cleanup artifacts
         run: |
+          # !! DEBUG !!
+          mkdir -p artifacts
+          cp -ax ../../artifacts/. artifacts/.
+          # !! DEBUG !!
           ls -liah
           ls -liah artifacts
           mv artifacts/*.iso ros.iso
@@ -66,64 +72,14 @@ jobs:
           rm -rf artifacts
       - name: Install Rancher
         run: |
-          # Install Rancher on a K3s cluster or with Docker
-          curl -sfL https://get.k3s.io | sudo INSTALL_K3S_VERSION=v1.21.9+k3s1 sh -s - --write-kubeconfig-mode 644
-          helm repo add jetstack https://charts.jetstack.io
-          helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
-          helm repo update
-          helm upgrade --install cert-manager jetstack/cert-manager \
-            --namespace cert-manager \
-            --create-namespace \
-            --set installCRDs=true \
-            --set extraArgs[0]=--enable-certificate-owner-ref=true \
-            --wait
-          helm upgrade --install rancher rancher-stable/rancher \
-            --namespace cattle-system \
-            --create-namespace \
-            --set hostname=$(hostname -f) \
-            --set bootstrapPassword=rancherpassword \
-            --set extraEnv[0].name=CATTLE_SERVER_URL \
-            --set extraEnv[0].value=https://$(hostname -f) \
-            --set extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD \
-            --set extraEnv[1].value=rancherpassword \
-            --wait
+          # Install Rancher on a K3s cluster
+          scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
         run: |
           # Install rancheros-operator
-          helm upgrade --install rancheros-operator ros-operator.tgz
-            --namespace cattle-rancheros-operator-system \
-            --create-namespace \
-            --wait
-          # Add MachineRegistration in Rancher
-          kubectl apply -f /usr/share/rancher/os2/machine-registration.yaml
-          # Add hostname template in MachineRegistration
-          PATCH="{\"spec\":{\"cloudConfig\":{\"hostname\":\"ros-node-{{ trunc 4 .MachineID }}\"}}}"
-          kubectl patch MachineRegistration default --type merge -p "${PATCH}"
-          # Get token URL
-          TOKEN=$(kubectl get MachineRegistration default -o jsonpath='{.status.registrationToken}')
-          TOKEN_URL=$(kubectl get MachineRegistration default -o jsonpath='{.status.registrationURL}')
-          # Create a new cluster
-          CLUSTER_NAME="cluster-k3s"
-          K3S_VERSION=v1.21.9+k3s1
-          CLUSTER_YAML=$(
-          cat <<EOF
-          kind: Cluster
-          apiVersion: provisioning.cattle.io/v1
-          metadata:
-            name: ${CLUSTER_NAME}
-          spec:
-            rkeConfig:
-              machineGlobalConfig:
-                cluster-cidr: "10.44.0.0/16"
-                service-cidr: "10.45.0.0/16"
-            kubernetesVersion: ${K3S_VERSION}
-          EOF
-          )
-          kubectl apply -f - <<<"${CLUSTER_YAML}"
-          # Check that the cluster is correctly created in Rancher
-          kubectl get cluster cluster-k3s -o jsonpath='{.metadata.name}{"\n"}'
-          # Get server config file
-          curl --insecure ${TOKEN_URL} -o ${TOKEN}.yaml
+          scripts/install-chart
+          # Configure Rancher
+          scripts/configure-rancher
       - name: Run tests
         run: |
           # Configure default network
@@ -147,7 +103,8 @@ jobs:
             --cdrom ros.iso \
             --network bridge=virbr0,mac=52:54:00:00:00:01
           # !! DEBUG !!
-          sudo virsh list
+          sudo virsh list || true
+          # !! DEBUG !!
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
@@ -158,18 +115,18 @@ jobs:
       - name: Cleanup runner
         if: always()
         run: |
-          # Delete VM
-          sudo virsh destroy ros-node
-          sudo virsh undefine ros-node
+          ## Delete VM
+          #sudo virsh destroy ros-node || true
+          #sudo virsh undefine ros-node || true
           # Remove default network config
-          sudo virsh net-dumpxml default | grep -q '\<ros-node\>' && sudo virsh net-update default delete ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config
-          sudo virsh net-destroy default
-          sudo virsh net-autostart --disable default
-          grep -q '^allow all$' /etc/qemu/bridge.conf && sudo sed -i '/^allow all$/d' /etc/qemu/bridge.conf
-          sudo systemctl disable --now libvirtd
-          # Uninstall K3s
-          /usr/local/bin/k3s-uninstall.sh
-          # Remove Helm repos
-          helm repo remove rancher-stable jetstack
-          # Delete files
+          #if sudo virsh net-dumpxml default | grep -q '\<ros-node\>'; then sudo virsh net-update default delete ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config || true; fi
+          #sudo virsh net-destroy default || true
+          #sudo virsh net-autostart --disable default || true
+          #if grep -q '^allow all$' /etc/qemu/bridge.conf; then sudo sed -i '/^allow all$/d' /etc/qemu/bridge.conf || true; fi
+          #sudo systemctl disable --now libvirtd || true
+          ## Uninstall K3s
+          #/usr/local/bin/k3s-uninstall.sh || true
+          ## Remove Helm repos
+          #helm repo remove rancher-stable jetstack || true
+          ## Delete files
           # rm -f ros.iso ros-node.*

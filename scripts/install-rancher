@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e -x
+
+# Install K3s
+curl -sfL https://get.k3s.io \
+  | sudo INSTALL_K3S_VERSION=v1.21.9+k3s1 sh -s - --write-kubeconfig-mode 644
+
+# Wait for K3s to start
+timeout 2m bash -c "until ! kubectl get pod -A 2>/dev/null | grep -Eq 'ContainerCreating|CrashLoopBackOff'; do sleep 1; done"
+
+# Configure Helm
+helm repo add jetstack https://charts.jetstack.io
+helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+helm repo update
+
+# Install cert-manager
+helm upgrade --install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --set installCRDs=true \
+  --set extraArgs[0]=--enable-certificate-owner-ref=true \
+  --wait
+
+# Install Rancher
+helm upgrade --install rancher rancher-stable/rancher \
+  --namespace cattle-system \
+  --create-namespace \
+  --set hostname=$(hostname -f) \
+  --set bootstrapPassword=rancherpassword \
+  --set extraEnv[0].name=CATTLE_SERVER_URL \
+  --set extraEnv[0].value=https://$(hostname -f) \
+  --set extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD \
+  --set extraEnv[1].value=rancherpassword \
+  --wait

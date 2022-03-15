@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Add MachineRegistration in Rancher
+kubectl apply -f /usr/share/rancher/os2/machine-registration.yaml
+
+# Add hostname template in MachineRegistration
+PATCH="{\"spec\":{\"cloudConfig\":{\"hostname\":\"ros-node-{{ trunc 4 .MachineID }}\"}}}"
+kubectl patch MachineRegistration default --type merge -p "${PATCH}"
+
+# Get token URL
+TOKEN=$(kubectl get MachineRegistration default -o jsonpath='{.status.registrationToken}')
+TOKEN_URL=$(kubectl get MachineRegistration default -o jsonpath='{.status.registrationURL}')
+
+# Create a new cluster
+CLUSTER_NAME="cluster-k3s"
+K3S_VERSION=v1.21.9+k3s1
+CLUSTER_YAML=$(
+cat <<EOF
+kind: Cluster
+apiVersion: provisioning.cattle.io/v1
+metadata:
+  name: ${CLUSTER_NAME}
+spec:
+  rkeConfig:
+    machineGlobalConfig:
+      cluster-cidr: "10.44.0.0/16"
+      service-cidr: "10.45.0.0/16"
+  kubernetesVersion: ${K3S_VERSION}
+EOF
+)
+kubectl apply -f - <<<"${CLUSTER_YAML}"
+
+# Check that the cluster is correctly created in Rancher
+kubectl get cluster cluster-k3s -o jsonpath='{.metadata.name}{"\n"}'
+
+# Get server config file
+curl --insecure ${TOKEN_URL} -o ${TOKEN}.yaml
