@@ -1,7 +1,23 @@
 #!/bin/bash
 
 # Add MachineRegistration in Rancher
-kubectl apply -f /usr/share/rancher/os2/machine-registration.yaml
+REG_YAML=$(
+cat <<EOF
+apiVersion: rancheros.cattle.io/v1
+kind: MachineRegistration
+metadata:
+  name: machine-registration
+  namespace: fleet-default
+spec:
+  cloudConfig:
+    install:
+      device: /dev/vda
+    users:
+    - name: root
+      passwd: root
+EOF
+)
+kubectl apply -f - <<<"${REG_YAML}"
 
 # Add hostname template in MachineRegistration
 PATCH="{\"spec\":{\"cloudConfig\":{\"hostname\":\"ros-node-{{ trunc 4 .MachineID }}\"}}}"
@@ -20,6 +36,7 @@ kind: Cluster
 apiVersion: provisioning.cattle.io/v1
 metadata:
   name: ${CLUSTER_NAME}
+  namespace: fleet-default
 spec:
   rkeConfig:
     machineGlobalConfig:
