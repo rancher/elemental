@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e -x
 source /usr/lib/rancheros-release
-cos-upgrade --no-verify --no-cosign --docker-image "${IMAGE}"
+elemental upgrade --no-verify --docker-image "${IMAGE}"
 reboot
