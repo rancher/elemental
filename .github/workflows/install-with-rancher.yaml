@@ -69,25 +69,15 @@ jobs:
           cp -ax ../../artifacts/. artifacts/.
       # !! DEBUG !!
       - name: Install Rancher
-        run: |
-          # Install Rancher on a K3s cluster
-          scripts/install-rancher
+        run: scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
-        run: |
-          # Configure Rancher - Step 01
-          scripts/configure-rancher-step-01
+        run: scripts/configure-rancher-step-01
       - name: Install RancherOS on the test server
-        run: |
-          # Install RancherOS
-          scripts/install-ros-node
+        run: script -e -c scripts/install-ros-node
       - name: Configure Rancher to add the test server in a test cluster
-        run: |
-          # Configure Rancher - Step 02
-          scripts/configure-rancher-step-02
+        run: scripts/configure-rancher-step-02
       - name: Add the test server in the test cluster
-        run: |
-          # Add installed node in cluster
-          scripts/add-node-in-cluster
+        run: scripts/add-node-in-cluster
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
