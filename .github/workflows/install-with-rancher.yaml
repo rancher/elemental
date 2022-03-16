@@ -99,6 +99,7 @@ jobs:
             --serial pty \
             --autoconsole none \
             --cdrom ros.iso \
+            --tpm emulator,model=tpm-crb,version=2.0 \
             --network bridge=virbr0,mac=52:54:00:00:00:01
           # !! DEBUG !!
           sudo virsh list || true
