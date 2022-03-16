@@ -62,17 +62,12 @@ jobs:
 #       uses: actions/download-artifact@v3
 #       with:
 #         name: artifacts
-      - name: Cleanup artifacts
+      # !! DEBUG !!
+      - name: Download artifacts
         run: |
-          # !! DEBUG !!
           mkdir -p artifacts
           cp -ax ../../artifacts/. artifacts/.
-          # !! DEBUG !!
-          ls -liah
-          ls -liah artifacts
-          mv artifacts/*.iso ros.iso
-          mv artifacts/*.tgz ros-operator.tgz
-          rm -rf artifacts
+      # !! DEBUG !!
       - name: Install Rancher
         run: |
           # Install Rancher on a K3s cluster
@@ -84,7 +79,7 @@ jobs:
       - name: Install RancherOS on the test server
         run: |
           # Install RancherOS
-          script/install-ros-node
+          scripts/install-ros-node
       - name: Configure Rancher to add the test server in a test cluster
         run: |
           # Configure Rancher - Step 02
@@ -119,4 +114,4 @@ jobs:
           ## Remove Helm repos
           #helm repo remove rancher-stable jetstack || true
           ## Delete files
-          # rm -f ros.iso ros-node.*
+          # rm -rf artifacts ros-node.*
