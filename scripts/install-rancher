@@ -2,9 +2,9 @@
 
 set -e -x
 
-# Install K3s
+# Install K3s - RKE2 could be installed too, to add later?
 curl -sfL https://get.k3s.io \
-  | sudo INSTALL_K3S_VERSION=${K3S_VERSION} sh -s - --write-kubeconfig-mode 644
+  | sudo INSTALL_K3S_VERSION=${K8S_VERSION} sh -s - --write-kubeconfig-mode 644
 
 # Wait for K3s to start
 timeout 2m bash -c "until ! kubectl get pod -A 2>/dev/null | grep -Eq 'ContainerCreating|CrashLoopBackOff'; do sleep 1; done"

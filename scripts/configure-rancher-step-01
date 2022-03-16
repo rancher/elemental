@@ -51,7 +51,7 @@ spec:
     machineGlobalConfig:
       cluster-cidr: "10.44.0.0/16"
       service-cidr: "10.45.0.0/16"
-  kubernetesVersion: ${K3S_VERSION}
+  kubernetesVersion: ${K8S_VERSION}
 EOF
 )
 kubectl apply -f - <<<"${CLUSTER_YAML}"
