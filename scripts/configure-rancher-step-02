@@ -10,15 +10,7 @@ SERVER_ID=$(kubectl get MachineInventories -n ${CLUSTER_NS} -o jsonpath='{.items
   && echo "No server found in MachineInventories!" >&2 \
   && exit 1
 
-# Link the installed server to the predefined cluster
-# and add server role to allow K3s/RKE2 provisioning
-# spec:
-#   clusterName: ""
-#   config:
-#     labels: null
-#     role: ""
-#   smbios:
-#
+# Link the installed server to the predefined cluster and add server role to allow K3s/RKE2 provisioning
 ROLE=server
 PATCH="{\"spec\":{\"clusterName\":\"${CLUSTER_NAME}\",\"config\":{\"role\":\"${ROLE}\"}}}"
 kubectl patch MachineInventories -n ${CLUSTER_NS} ${SERVER_ID} --type merge -p "${PATCH}"
