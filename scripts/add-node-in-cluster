@@ -9,6 +9,7 @@ sudo virsh start ros-node
 timeout 10m bash -c "until ! kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o yaml | grep -q 'message: waiting for at least one bootstrap node'; do sleep 1; done"
 
 # Check that the node is correctly added in the cluster
+SERVER_ID=$(kubectl get MachineInventories -n ${CLUSTER_NS} -o jsonpath='{.items[0].metadata.name}')
 INTERNAL_CLUSTER_NAME=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpath='{.status.clusterName}')
 INTERNAL_CLUSTER_TOKEN_NS=$(kubectl get MachineInventories -n ${CLUSTER_NS} ${SERVER_ID} -o jsonpath='{.status.clusterRegistrationTokenNamespace}')
 
