@@ -4,7 +4,6 @@ set -e -x
 
 # Variable(s)
 REG_NAME=machine-registration
-CLUSTER_NS=fleet-default
 
 # Install generated RancherOS Operator chart
 helm upgrade --install rancheros-operator ros-operator.tgz \
@@ -40,8 +39,6 @@ TOKEN=$(kubectl get MachineRegistration -n ${CLUSTER_NS} ${REG_NAME} -o jsonpath
 TOKEN_URL=$(kubectl get MachineRegistration -n ${CLUSTER_NS} ${REG_NAME} -o jsonpath='{.status.registrationURL}')
 
 # Create a new cluster
-CLUSTER_NAME="cluster-k3s"
-K3S_VERSION=v1.21.9+k3s1
 CLUSTER_YAML=$(
 cat <<EOF
 kind: Cluster
@@ -63,4 +60,4 @@ kubectl apply -f - <<<"${CLUSTER_YAML}"
 kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpath='{.metadata.name}{"\n"}'
 
 # Get server config file
-curl --insecure ${TOKEN_URL} -o ${TOKEN}.yaml
+curl --insecure ${TOKEN_URL} -o artifacts/install-config.yaml

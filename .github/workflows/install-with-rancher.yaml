@@ -47,6 +47,9 @@ jobs:
     runs-on: self-hosted
 #   needs: build
     env:
+      CLUSTER_NAME: cluster-k3s
+      CLUSTER_NS: fleet-default
+      K3S_VERSION: v1.21.9+k3s1
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
       - name: Checkout
@@ -76,34 +79,20 @@ jobs:
           scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
         run: |
-          # Configure Rancher
-          scripts/configure-rancher
-      - name: Run tests
+          # Configure Rancher - Step 01
+          scripts/configure-rancher-step-01
+      - name: Install RancherOS on the test server
         run: |
-          # Configure default network
-          sudo systemctl start libvirtd
-          grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
-          sudo virsh net-start default
-          sudo virsh net-dumpxml default | grep -q '\<ros-node\>' || sudo virsh net-update default add ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config
-          # Create VM
-          sudo virt-install \
-            --name ros-node \
-            --os-type=Linux \
-            --os-variant=opensuse-unknown \
-            --hvm \
-            --ram=2048 \
-            --vcpus=2 \
-            --disk path=ros-node.img,bus=virtio,size=35 \
-            --graphics none \
-            --rng random \
-            --serial pty \
-            --autoconsole none \
-            --cdrom ros.iso \
-            --tpm emulator,model=tpm-crb,version=2.0 \
-            --network bridge=virbr0,mac=52:54:00:00:00:01
-          # !! DEBUG !!
-          sudo virsh list || true
-          # !! DEBUG !!
+          # Install RancherOS
+          script/install-ros-node
+      - name: Configure Rancher to add the test server in a test cluster
+        run: |
+          # Configure Rancher - Step 02
+          scripts/configure-rancher-step-02
+      - name: Add the test server in the test cluster
+        run: |
+          # Add installed node in cluster
+          scripts/add-node-in-cluster
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
@@ -114,13 +103,15 @@ jobs:
       - name: Cleanup runner
         if: always()
         run: |
+          ## Stop HTTP server
+          #HTTPD_PID=$(ps -efww | awk '/[h]ttp\.server/ { print $2 }')
+          #[[ -n "${HTTPD_PID}" ]] && kill ${HTTPD_PID}
           ## Delete VM
           #sudo virsh destroy ros-node || true
           #sudo virsh undefine ros-node || true
           # Remove default network config
-          #if sudo virsh net-dumpxml default | grep -q '\<ros-node\>'; then sudo virsh net-update default delete ip-dhcp-host "<host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.10' />" --live --config || true; fi
           #sudo virsh net-destroy default || true
-          #sudo virsh net-autostart --disable default || true
+          #sudo virsh net-undefine default || true
           #if grep -q '^allow all$' /etc/qemu/bridge.conf; then sudo sed -i '/^allow all$/d' /etc/qemu/bridge.conf || true; fi
           #sudo systemctl disable --now libvirtd || true
           ## Uninstall K3s
