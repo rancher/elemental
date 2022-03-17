@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e -x
+
+# openSUSE Leap: Install qemu/libvirt/virt-manager
+zypper -n in -l qemu-kvm libvirt virt-install sudo curl helm
+
+# Start libvirtd
+libvirtd --daemon
+virtlogd --daemon

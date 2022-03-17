@@ -15,7 +15,6 @@ sed -i \
   artifacts/${IPXE_SCRIPT}
 
 # Configure default network
-sudo systemctl start libvirtd
 grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
 cat > net-default.xml <<EOF
 <network>
@@ -35,6 +34,7 @@ cat > net-default.xml <<EOF
   </ip>
 </network>
 EOF
+sudo virsh net-undefine default
 sudo virsh net-create net-default.xml
 
 # Create VM
@@ -49,6 +49,7 @@ sudo virt-install \
   --vcpus=2 \
   --cpu host \
   --disk path=ros-node.img,bus=virtio,size=35 \
+  --check disk_size=off \
   --graphics none \
   --serial pty \
   --console pty,target_type=virtio \

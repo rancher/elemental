@@ -16,58 +16,63 @@ on:
         description: Organization to use
 
 jobs:
-# build:
-#   runs-on: ubuntu-latest
-#   env:
-#     DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-#     DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-#     DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
-#     REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
-#     REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
-#   steps:
-#     - name: Checkout
-#       uses: actions/checkout@v2
-#     - name: Set up Docker Buildx
-#       id: buildx
-#       uses: docker/setup-buildx-action@v1
-#     - name: Make images (container/iso/qcow2/etc.)
-#       run: make ci
-#     - name: Upload results
-#       uses: actions/upload-artifact@v3
-#       with:
-#         name: artifacts
-#         path: dist
-#         if-no-files-found: error
-#     - name: Release space from worker ♻
-#       if: always()
-#       run: |
-#         sudo rm -rf build bin dist
-#         docker system prune -f -a --volumes
-  install-with-rancher:
-    runs-on: self-hosted
-#   needs: build
+  build:
+    runs-on: ubuntu-latest
     env:
-      CLUSTER_NAME: cluster-k3s
-      CLUSTER_NS: fleet-default
-      K8S_VERSION: v1.21.9+k3s1
-      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
+      REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
+      REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install Go
-        uses: actions/setup-go@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Make images (container/iso/qcow2/etc.)
+        run: make ci
+      - name: Upload results
+        uses: actions/upload-artifact@v3
         with:
-          go-version: '^1.17'
-#     - name: Download artifacts
-#       uses: actions/download-artifact@v3
-#       with:
-#         name: artifacts
-      # !! DEBUG !!
-      - name: Download artifacts
+          name: artifacts
+          path: dist
+          if-no-files-found: error
+      - name: Release space from worker ♻
+        if: always()
         run: |
-          mkdir -p artifacts
-          cp -ax ../../artifacts/. artifacts/.
-      # !! DEBUG !!
+          sudo rm -rf build bin dist
+          docker system prune -f -a --volumes
+  install-with-rancher:
+    runs-on: self-hosted
+    needs: build
+    container:
+      image: opensuse/leap:latest
+      env:
+        CLUSTER_NAME: cluster-k3s
+        CLUSTER_NS: fleet-default
+        K8S_VERSION: v1.21.9+k3s1
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+#     - name: Install Go
+#       uses: actions/setup-go@v2
+#       with:
+#         go-version: '^1.17'
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: artifacts
+#     # !! DEBUG !!
+#     - name: Download artifacts
+#       run: |
+#         mkdir -p artifacts
+#         cp -ax ../../artifacts/. artifacts/.
+#     # !! DEBUG !!
+      - name: Install dependencies
+        run: scripts/configure-qemu-container
       - name: Install Rancher
         run: scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
