@@ -14,6 +14,11 @@ sed -i \
   -e '/set config /s@.*@set config ${url}/install-config.yaml@' \
   artifacts/${IPXE_SCRIPT}
 
+# Start libvirtd
+# Systemd cannot be used in a container
+libvirtd --daemon
+virtlogd --daemon
+
 # Configure default network
 grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
 cat > net-default.xml <<EOF

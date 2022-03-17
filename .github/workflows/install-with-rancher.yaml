@@ -55,24 +55,14 @@ jobs:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       options: --privileged
     steps:
+      - name: Install dependencies
+        run: zypper -n in -l qemu-kvm libvirt virt-install sudo curl helm git-core tar
       - name: Checkout
         uses: actions/checkout@v2
-#     - name: Install Go
-#       uses: actions/setup-go@v2
-#       with:
-#         go-version: '^1.17'
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
           name: artifacts
-#     # !! DEBUG !!
-#     - name: Download artifacts
-#       run: |
-#         mkdir -p artifacts
-#         cp -ax ../../artifacts/. artifacts/.
-#     # !! DEBUG !!
-      - name: Install dependencies
-        run: scripts/configure-qemu-container
       - name: Install Rancher
         run: scripts/install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
@@ -90,23 +80,3 @@ jobs:
           name: ros-vbox.logs.zip
           path: tests/**/logs/*
           if-no-files-found: warn
-      - name: Cleanup runner
-        if: always()
-        run: |
-          ## Stop HTTP server
-          #HTTPD_PID=$(ps -efww | awk '/[h]ttp\.server/ { print $2 }')
-          #[[ -n "${HTTPD_PID}" ]] && kill ${HTTPD_PID}
-          ## Delete VM
-          #sudo virsh destroy ros-node || true
-          #sudo virsh undefine ros-node || true
-          # Remove default network config
-          #sudo virsh net-destroy default || true
-          #sudo virsh net-undefine default || true
-          #if grep -q '^allow all$' /etc/qemu/bridge.conf; then sudo sed -i '/^allow all$/d' /etc/qemu/bridge.conf || true; fi
-          #sudo systemctl disable --now libvirtd || true
-          ## Uninstall K3s
-          #/usr/local/bin/k3s-uninstall.sh || true
-          ## Remove Helm repos
-          #helm repo remove rancher-stable jetstack || true
-          ## Delete files
-          # rm -rf artifacts ros-node.*
