@@ -6,7 +6,7 @@ set -e -x
 REG_NAME=machine-registration
 
 # Install generated RancherOS Operator chart
-helm upgrade --install rancheros-operator artifacts/rancheros-operator-*.tgz \
+helm upgrade --install rancheros-operator ../artifacts/rancheros-operator-*.tgz \
   --namespace cattle-rancheros-operator-system \
   --create-namespace \
   --wait
@@ -64,4 +64,4 @@ CHECKED_CLUSTER=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpa
   && exit 1
 
 # Get server config file
-curl --insecure ${TOKEN_URL} -o artifacts/install-config.yaml
+curl --insecure ${TOKEN_URL} -o ../artifacts/install-config.yaml

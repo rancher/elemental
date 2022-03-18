@@ -63,15 +63,15 @@ jobs:
         with:
           name: artifacts
       - name: Install Rancher
-        run: scripts/install-rancher
+        run: cd tests && make install-rancher
       - name: Configure Rancher to provision RancherOS on a test server
-        run: scripts/configure-rancher-step-01
+        run: cd tests && make configure-rancher-step-01
       - name: Install RancherOS on the test server
-        run: script -e -c scripts/install-ros-node
+        run: cd tests && make install-ros-node
       - name: Configure Rancher to add the test server in a test cluster
-        run: scripts/configure-rancher-step-02
+        run: cd tests && make configure-rancher-step-02
       - name: Add the test server in the test cluster
-        run: scripts/add-node-in-cluster
+        run: cd tests && make add-node-in-cluster
       - name: Upload logs
         uses: actions/upload-artifact@v3
         if: failure()
