@@ -57,7 +57,7 @@ EOF
 kubectl apply -f - <<<"${CLUSTER_YAML}"
 
 # Check that the cluster is correctly created in Rancher
-CHECKED_CLUSTER=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpath='{.metadata.name}{"\n"}')
+CHECKED_CLUSTER=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpath='{.metadata.name}')
 
 [[ "${CHECKED_CLUSTER}" != "${CLUSTER_NAME}" ]] \
   && echo "Cluster ${CLUSTER_NAME} has not been created!" >&2 \
