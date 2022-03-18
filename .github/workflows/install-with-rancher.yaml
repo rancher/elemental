@@ -74,9 +74,9 @@ jobs:
       - name: Add the test server in the test cluster
         run: scripts/add-node-in-cluster
       - name: Upload logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: ros-vbox.logs.zip
-          path: tests/**/logs/*
+          name: k3s.log
+          path: /tmp/k3s.log
           if-no-files-found: warn
