@@ -31,6 +31,26 @@ jobs:
           name: artifacts
           path: dist
           if-no-files-found: error
+      - uses: actions/upload-artifact@v2
+        with:
+          name: iso
+          path: dist/artifacts/*.iso
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v2
+        with:
+          name: qcow
+          path: dist/artifacts/*.qcow.gz
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v2
+        with:
+          name: box
+          path: dist/artifacts/*.box
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v2
+        with:
+          name: chart
+          path: dist/artifacts/*.tgz
+          if-no-files-found: warn
       - name: Release space from worker ♻
         if: always()
         run: |
