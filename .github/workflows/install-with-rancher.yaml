@@ -5,13 +5,12 @@ on:
     inputs:
       registry:
         required: false
-        default: registry.hub.docker.com
+        default: quay.io
         type: string
         description: Registry to use
       org:
         required: false
-        #default: costoolkit
-        default: ldevulder
+        default: costoolkit
         type: string
         description: Organization to use
 
@@ -19,8 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
       DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
       REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
       REPO_ROS_OPERATOR: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/ros-operator-ci
