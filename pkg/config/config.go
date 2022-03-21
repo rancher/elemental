@@ -38,6 +38,7 @@ type Install struct {
 	Password           string `json:"password,omitempty"`
 	RegistrationURL    string `json:"registrationUrl,omitempty"`
 	RegistrationCACert string `json:"registrationCaCert,omitempty"`
+	EjectCd            bool   `json:"ejectCd,omitempty"`
 }
 
 type Config struct {
