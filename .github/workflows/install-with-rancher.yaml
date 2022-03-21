@@ -55,7 +55,7 @@ jobs:
       options: --privileged
     steps:
       - name: Install dependencies
-        run: zypper -n in -l qemu-kvm libvirt virt-install sudo curl helm git-core tar
+        run: zypper -n in -l qemu-kvm libvirt virt-install sudo curl helm git-core tar make
       - name: Checkout
         uses: actions/checkout@v2
       - name: Download artifacts
