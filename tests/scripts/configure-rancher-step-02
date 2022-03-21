@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e -x
+
+# Check that the installed server is available in Rancher
+SERVER_ID=$(kubectl get MachineInventories -n ${CLUSTER_NS} -o jsonpath='{.items[0].metadata.name}')
+
+# Raise an error if there is no server id
+[[ -z "${SERVER_ID}" ]] \
+  && echo "No server found in MachineInventories!" >&2 \
+  && exit 1
+
+# Link the installed server to the predefined cluster and add server role to allow K3s/RKE2 provisioning
+ROLE=server
+PATCH="{\"spec\":{\"clusterName\":\"${CLUSTER_NAME}\",\"config\":{\"role\":\"${ROLE}\"}}}"
+kubectl patch MachineInventories -n ${CLUSTER_NS} ${SERVER_ID} --type merge -p "${PATCH}"

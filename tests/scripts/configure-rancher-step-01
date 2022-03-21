@@ -1,0 +1,67 @@
+#!/bin/bash
+
+set -e -x
+
+# Variable(s)
+REG_NAME=machine-registration
+
+# Install generated RancherOS Operator chart
+helm upgrade --install rancheros-operator ../artifacts/rancheros-operator-*.tgz \
+  --namespace cattle-rancheros-operator-system \
+  --create-namespace \
+  --wait
+
+# Add MachineRegistration in Rancher
+REG_YAML=$(
+cat <<EOF
+apiVersion: rancheros.cattle.io/v1
+kind: MachineRegistration
+metadata:
+  name: ${REG_NAME}
+  namespace: ${CLUSTER_NS}
+spec:
+  cloudConfig:
+    install:
+      device: /dev/vda
+    users:
+    - name: root
+      passwd: root
+EOF
+)
+kubectl apply -f - <<<"${REG_YAML}"
+
+# Add hostname template in MachineRegistration
+PATCH="{\"spec\":{\"cloudConfig\":{\"hostname\":\"ros-node-{{ trunc 4 .MachineID }}\"}}}"
+kubectl patch MachineRegistration -n ${CLUSTER_NS} ${REG_NAME} --type merge -p "${PATCH}"
+
+# Get token URL
+TOKEN=$(kubectl get MachineRegistration -n ${CLUSTER_NS} ${REG_NAME} -o jsonpath='{.status.registrationToken}')
+TOKEN_URL=$(kubectl get MachineRegistration -n ${CLUSTER_NS} ${REG_NAME} -o jsonpath='{.status.registrationURL}')
+
+# Create a new cluster
+CLUSTER_YAML=$(
+cat <<EOF
+kind: Cluster
+apiVersion: provisioning.cattle.io/v1
+metadata:
+  name: ${CLUSTER_NAME}
+  namespace: ${CLUSTER_NS}
+spec:
+  rkeConfig:
+    machineGlobalConfig:
+      cluster-cidr: "10.44.0.0/16"
+      service-cidr: "10.45.0.0/16"
+  kubernetesVersion: ${K8S_VERSION}
+EOF
+)
+kubectl apply -f - <<<"${CLUSTER_YAML}"
+
+# Check that the cluster is correctly created in Rancher
+CHECKED_CLUSTER=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpath='{.metadata.name}')
+
+[[ "${CHECKED_CLUSTER}" != "${CLUSTER_NAME}" ]] \
+  && echo "Cluster ${CLUSTER_NAME} has not been created!" >&2 \
+  && exit 1
+
+# Get server config file
+curl --insecure ${TOKEN_URL} -o ../artifacts/install-config.yaml

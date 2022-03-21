@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -e -x
+
+# Install K3s - RKE2 could be installed too, to add later?
+curl -sfL https://get.k3s.io \
+  | sudo INSTALL_K3S_VERSION=${K8S_VERSION} INSTALL_K3S_SKIP_ENABLE=true sh -s - --write-kubeconfig-mode 644
+
+# Start K3s - systemd cannot be used in a container!
+setsid --fork /usr/local/bin/k3s server --snapshotter=native --write-kubeconfig-mode 644 >/tmp/k3s.log 2>&1
+sleep 1m
+
+# Wait for K3s to start
+timeout 2m bash -c "until ! kubectl get pod -A 2>/dev/null | grep -Eq 'ContainerCreating|CrashLoopBackOff'; do sleep 1; done"
+
+# Configure Helm
+helm repo add jetstack https://charts.jetstack.io
+helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+helm repo update
+
+# Install cert-manager
+helm upgrade --install cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --set installCRDs=true \
+  --set extraArgs[0]=--enable-certificate-owner-ref=true \
+  --wait
+
+# Install Rancher
+# Wait for 30 minutes, as in a container Rancher can take a lot of time to install..
+helm upgrade --install rancher rancher-stable/rancher \
+  --namespace cattle-system \
+  --create-namespace \
+  --set hostname=${HOSTNAME} \
+  --set bootstrapPassword=rancherpassword \
+  --set extraEnv[0].name=CATTLE_SERVER_URL \
+  --set extraEnv[0].value=https://${HOSTNAME} \
+  --set extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD \
+  --set extraEnv[1].value=rancherpassword \
+  --timeout 30m \
+  --wait
