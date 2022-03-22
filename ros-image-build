@@ -21,7 +21,7 @@ RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/
 RUN zypper ref
 ENV LUET_NOLOCK=true
 # Copy luet from the official images
-RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar pigz go1.16 qemu-uefi-aarch64
+RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar pigz go1.16 qemu-uefi-aarch64 mtools
 RUN cd /usr/sbin && \
     rm packer && \
     SUFFIX=amd64 && \
