@@ -17,7 +17,7 @@ limitations under the License.
 package v1
 
 import (
-	"github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
+	fleet "github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
 	"github.com/rancher/wrangler/pkg/genericcondition"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,10 +35,10 @@ type MachineRegistration struct {
 }
 
 type MachineRegistrationSpec struct {
-	MachineName                 string               `json:"machineName,omitempty"`
-	MachineInventoryLabels      map[string]string    `json:"machineInventoryLabels,omitempty"`
-	MachineInventoryAnnotations map[string]string    `json:"machineInventoryAnnotations,omitempty"`
-	CloudConfig                 *v1alpha1.GenericMap `json:"cloudConfig,omitempty"`
+	MachineName                 string            `json:"machineName,omitempty"`
+	MachineInventoryLabels      map[string]string `json:"machineInventoryLabels,omitempty"`
+	MachineInventoryAnnotations map[string]string `json:"machineInventoryAnnotations,omitempty"`
+	CloudConfig                 *fleet.GenericMap `json:"cloudConfig,omitempty"`
 }
 
 type MachineRegistrationStatus struct {
@@ -60,7 +60,7 @@ type MachineInventory struct {
 
 type MachineInventorySpec struct {
 	TPMHash                string               `json:"tpmHash,omitempty"`
-	SMBIOS                 *v1alpha1.GenericMap `json:"smbios,omitempty"`
+	SMBIOS                 *fleet.GenericMap    `json:"smbios,omitempty"`
 	ClusterName            string               `json:"clusterName"`
 	MachineTokenSecretName string               `json:"machineTokenSecretName,omitempty"`
 	Config                 MachineRuntimeConfig `json:"config,omitempty"`

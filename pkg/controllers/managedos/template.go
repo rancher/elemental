@@ -67,6 +67,16 @@ func objects(mos *osv1.ManagedOSImage, prefix string) ([]runtime.Object, error) 
 		selector = &metav1.LabelSelector{}
 	}
 
+	upgradeContainerSpec := mos.Spec.UpgradeContainer
+	if upgradeContainerSpec == nil {
+		upgradeContainerSpec = &upgradev1.ContainerSpec{
+			Image: PrefixPrivateRegistry(image[0], prefix),
+			Command: []string{
+				"/usr/sbin/suc-upgrade",
+			},
+		}
+	}
+
 	return []runtime.Object{
 		&rbacv1.ClusterRole{
 			ObjectMeta: metav1.ObjectMeta{
@@ -132,12 +142,7 @@ func objects(mos *osv1.ManagedOSImage, prefix string) ([]runtime.Object, error) 
 					Name: "os-upgrader-data",
 					Path: "/run/data",
 				}},
-				Upgrade: &upgradev1.ContainerSpec{
-					Image: PrefixPrivateRegistry(image[0], prefix),
-					Command: []string{
-						"/usr/sbin/suc-upgrade",
-					},
-				},
+				Upgrade: upgradeContainerSpec,
 			},
 		},
 	}, nil

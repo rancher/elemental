@@ -94,6 +94,18 @@ spec:
   # multiple clusters.  The syntax of this field matches the
   # Fleet targets and is described at https://fleet.rancher.io/gitrepo-targets/
   targets: []
+
+  # Overrides the default container created for running the upgrade with a custom one
+  # This is optional and used only if specific upgrading mechanisms needs to be applied
+  # in place of the default behavior.
+  # The image used here overrides ones specified in osImage, depending on the upgrade strategy.
+  upgradeContainer:
+    image: ubuntu
+    command: ["/bin/sh"]
+    args: ["-c", "true"]
+    env:
+    - name: TEST_ENV
+      value: testValue
 ```
 
 ## Inventory Management

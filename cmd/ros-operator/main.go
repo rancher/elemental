@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"context"
 	"flag"
 	"os"
 
@@ -33,7 +32,7 @@ var (
 func main() {
 	flag.Parse()
 	logrus.Info("Starting controller")
-	ctx := signals.SetupSignalHandler(context.Background())
+	ctx := signals.SetupSignalContext()
 
 	if os.Getenv("NAMESPACE") != "" {
 		*namespace = os.Getenv("NAMESPACE")
