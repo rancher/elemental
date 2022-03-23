@@ -19,7 +19,7 @@ package main
 import (
 	"os"
 
-	"github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
+	fleet "github.com/rancher/fleet/pkg/apis/fleet.cattle.io/v1alpha1"
 	v3 "github.com/rancher/rancher/pkg/apis/management.cattle.io/v3"
 	provv1 "github.com/rancher/rancher/pkg/apis/provisioning.cattle.io/v1"
 	controllergen "github.com/rancher/wrangler/pkg/controller-gen"
@@ -45,7 +45,7 @@ func main() {
 			},
 			"fleet.cattle.io": {
 				Types: []interface{}{
-					v1alpha1.Bundle{},
+					fleet.Bundle{},
 				},
 			},
 			"rancheros.cattle.io": {

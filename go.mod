@@ -46,11 +46,11 @@ require (
 	github.com/rancher/rancher/pkg/apis v0.0.0-20211013185633-a636bda2a00e
 	github.com/rancher/steve v0.0.0-20210922195510-7224dc21013d
 	github.com/rancher/system-upgrade-controller/pkg/apis v0.0.0-20210929162341-5e6e996d9486
-	github.com/rancher/wrangler v0.8.7
+	github.com/rancher/wrangler v0.8.11-0.20220217210408-3ecd23dfea3b
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tredoe/osutil v1.0.5
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
+	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
+	golang.org/x/tools v0.1.10 // indirect
 	gopkg.in/pin/tftp.v2 v2.1.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
