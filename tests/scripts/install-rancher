@@ -4,7 +4,7 @@ set -e -x
 
 # Install K3s - RKE2 could be installed too, to add later?
 curl -sfL https://get.k3s.io \
-  | sudo INSTALL_K3S_VERSION=${K8S_VERSION} INSTALL_K3S_SKIP_ENABLE=true sh -s - --write-kubeconfig-mode 644
+  | INSTALL_K3S_VERSION=${K8S_VERSION} INSTALL_K3S_SKIP_ENABLE=true sh -s - --write-kubeconfig-mode 644
 
 # Start K3s - systemd cannot be used in a container!
 setsid --fork /usr/local/bin/k3s server --snapshotter=native --write-kubeconfig-mode 644 >/tmp/k3s.log 2>&1

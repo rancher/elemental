@@ -20,7 +20,7 @@ libvirtd --daemon
 virtlogd --daemon
 
 # Configure default network
-grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
+grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | tee -a /etc/qemu/bridge.conf
 cat > net-default.xml <<EOF
 <network>
   <name>default</name>
@@ -39,11 +39,11 @@ cat > net-default.xml <<EOF
   </ip>
 </network>
 EOF
-sudo virsh net-undefine default
-sudo virsh net-create net-default.xml
+virsh net-undefine default
+virsh net-create net-default.xml
 
 # Create VM
-sudo virt-install \
+virt-install \
   --name ros-node \
   --os-type Linux \
   --os-variant opensuse-unknown \
