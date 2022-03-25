@@ -2,7 +2,6 @@ package smoke_test
 
 import (
 	"fmt"
-	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -121,14 +120,8 @@ var _ = Describe("os2 Smoke tests", func() {
 
 	Context("ros-operator", func() {
 		It("installs and create a machine registration resource", func() {
-			chart := os.Getenv("ROS_CHART")
-			if chart == "" {
-				Skip("No chart provided, skipping tests")
-			}
-			err := s.SendFile(chart, "/usr/local/ros.tgz", "0770")
-			Expect(err).ToNot(HaveOccurred())
 
-			err = s.SendFile("../assets/machineregistration.yaml", "/usr/local/machine.yaml", "0770")
+			err := s.SendFile("../assets/machineregistration.yaml", "/usr/local/machine.yaml", "0770")
 			Expect(err).ToNot(HaveOccurred())
 
 			err = s.SendFile("../assets/external_charts.yaml", "/usr/local/charts.yaml", "0770")
@@ -185,13 +178,15 @@ var _ = Describe("os2 Smoke tests", func() {
 				)
 
 				Eventually(func() string {
-					out, _ := s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm -n cattle-rancheros-operator-system install --create-namespace rancheros-operator /usr/local/ros.tgz")
+					_, _ = s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm repo add rancheros https://rancher-sandbox.github.io/rancheros-operator/")
+					_, _ = s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm repo update")
+					out, _ := s.Command("KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm -n cattle-rancheros-operator-system install --create-namespace rancheros-operator rancheros/rancheros-operator --devel")
 					return out
 				}, 15*time.Minute, 2*time.Second).Should(ContainSubstring("STATUS: deployed"))
 
 				Eventually(func() string {
 					out, _ := s.Command("k3s kubectl get pods --all-namespaces")
-					return out	
+					return out
 				}, 15*time.Minute, 2*time.Second).Should(ContainSubstring("rancheros-operator-"))
 			})
 

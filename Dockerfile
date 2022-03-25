@@ -2,31 +2,27 @@ FROM opensuse/leap:15.3 as base
 RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 
-FROM quay.io/luet/base:0.22.7-1 as luet
+# This target downloads the rancheros operator and makes it available to the framework target
+FROM alpine/helm:3.8.1 as helm
+RUN helm repo add rancheros https://rancher-sandbox.github.io/rancheros-operator
+RUN mkdir /usr/chart
+# use --devel so alpha versions show up
+RUN helm pull rancheros/rancheros-operator -d /usr/chart/ --devel
+# naming convention is discarded on building the framework image, look into this
+RUN mv /usr/chart/rancheros-operator-*.tgz /usr/chart/rancheros-operator-chart.tgz
 
-FROM base AS build
-ENV LUET_NOLOCK=true
-ENV USER=root
+# this target builds the ros-installer binary. Im not sure why there are extra deps in here, look into this to drop them if possible
+FROM base AS ros-installer
 RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip openssl-devel
-COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
-COPY --from=luet /usr/bin/luet /usr/bin/luet
-RUN luet install -y utils/helm
 COPY go.mod go.sum /usr/src/
 COPY cmd /usr/src/cmd
 COPY pkg /usr/src/pkg
 COPY scripts /usr/src/scripts
-COPY chart /usr/src/chart
-ARG IMAGE_TAG=latest
-ARG IMAGE_REPO=norepo
-RUN TAG=${IMAGE_TAG} REPO=${IMAGE_REPO} /usr/src/scripts/package-helm && \
-    cp /usr/src/dist/artifacts/rancheros-operator-*.tgz /usr/src/dist/rancheros-operator-chart.tgz
-RUN cd /usr/src && \
-    CGO_ENABLED=0 go build -ldflags "-extldflags -static -s" -o /usr/sbin/ros-operator ./cmd/ros-operator && \
-    upx /usr/sbin/ros-operator
 RUN cd /usr/src && \
     go build -o /usr/sbin/ros-installer ./cmd/ros-installer && \
     upx /usr/sbin/ros-installer
 
+# This installs the cos packages that we need
 FROM quay.io/luet/base:0.22.7-1 AS framework-build
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 ARG CACHEBUST
@@ -51,21 +47,19 @@ RUN selinux/k3s
 RUN utils/rancherd@0.0.1-alpha13-3
 RUN utils/helm
 
+# This copies from other images the necessary files
 FROM scratch AS framework
 COPY --from=framework-build /framework/etc /etc
 COPY --from=framework-build /framework/lib /lib
 COPY --from=framework-build /framework/usr /usr
 COPY --from=framework-build /framework/system /system
 COPY --from=framework-build /framework/var/lib /var/lib
-COPY --from=build /usr/src/dist/rancheros-operator-chart.tgz /usr/share/rancher/os2/
+COPY --from=ros-installer /usr/sbin/ros-installer /usr/sbin/ros-installer
+# This is used by framework/files/usr/sbin/ros-operator-install
+COPY --from=helm /usr/chart/rancheros-operator-chart.tgz /usr/share/rancher/os2
+# This adds our local overrides into the framework image
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
-COPY --from=build /usr/sbin/ros-installer /usr/sbin/ros-installer
-COPY --from=build /usr/sbin/ros-operator /usr/sbin/ros-operator
 COPY framework/files/ /
-
-
-FROM scratch as ros-operator
-COPY --from=build /usr/sbin/ros-operator /usr/sbin/ros-operator
 
 # Make OS image
 FROM base as os
