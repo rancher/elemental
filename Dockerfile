@@ -12,15 +12,17 @@ RUN helm pull rancheros/rancheros-operator -d /usr/chart/ --devel
 RUN mv /usr/chart/rancheros-operator-*.tgz /usr/chart/rancheros-operator-chart.tgz
 
 # this target builds the ros-installer binary. Im not sure why there are extra deps in here, look into this to drop them if possible
+# deps here seem to be a side effect of wanting those tool to run luet-makeiso but not having them available on the dapper system
+# or on the base image used by ro-image-build
+# I dont think they should be here
 FROM base AS ros-installer
-RUN zypper in -y squashfs xorriso go1.16 upx busybox-static curl tar git gzip openssl-devel
-COPY go.mod go.sum /usr/src/
-COPY cmd /usr/src/cmd
-COPY pkg /usr/src/pkg
-COPY scripts /usr/src/scripts
-RUN cd /usr/src && \
-    go build -o /usr/sbin/ros-installer ./cmd/ros-installer && \
-    upx /usr/sbin/ros-installer
+RUN zypper in -y openssl-devel gcc go1.16
+WORKDIR /src
+COPY go.mod go.sum /src/
+RUN go mod download
+COPY cmd /src/cmd
+COPY pkg /src/pkg
+RUN go build -o /usr/sbin/ros-installer ./cmd/ros-installer
 
 # This installs the cos packages that we need
 FROM quay.io/luet/base:0.22.7-1 AS framework-build
