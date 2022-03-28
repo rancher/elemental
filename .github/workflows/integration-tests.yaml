@@ -70,7 +70,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: artifacts
+          name: iso
+          path: artifacts
       - run: |
               ls -liah
               ls -liah artifacts
@@ -112,7 +113,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: artifacts
+          name: iso
+          path: artifacts
       - run: |
               ls -liah
               ls -liah artifacts
@@ -144,7 +146,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
-          name: artifacts
+          name: box
+          path: artifacts
       - run: |
               ls -liah
               ls -liah artifacts
