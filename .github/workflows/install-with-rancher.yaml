@@ -1,6 +1,13 @@
-name: Install ROS on a server through Rancher
+name: Bootstrap RancherOS on a VM with Rancher
 
 on:
+  pull_request:
+    branches: [ master ]
+    types: [ closed ]
+    paths-ignore:
+    - 'docs/**'
+    - '*docs*'
+    - 'README.md'
   workflow_dispatch:
     inputs:
       registry:
@@ -16,6 +23,7 @@ on:
 
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
@@ -45,7 +53,7 @@ jobs:
           sudo rm -rf build bin dist
           docker system prune -f -a --volumes
   install-with-rancher:
-    runs-on: self-hosted
+    runs-on: nested-virt
     needs: build
     container:
       image: opensuse/leap:latest
