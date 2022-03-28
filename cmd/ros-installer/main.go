@@ -35,6 +35,7 @@ var (
 	reboot            = flag.Bool("reboot", false, "Reboot after installation")
 	noRebootAutomatic = flag.Bool("no-reboot-automatic", false, "Dont reboot after installation (only for automatic installation which defaults to reboot after install)")
 	yes               = flag.Bool("y", false, "Do not prompt for questions")
+	ejectCD           = flag.Bool("eject-cd", false, "Ejects the CD on system reboot")
 )
 
 func main() {
@@ -52,7 +53,7 @@ func main() {
 		return
 	}
 
-	if err := install.Run(*automatic, *configFile, *powerOff, *reboot, *noRebootAutomatic, *yes); err != nil {
+	if err := install.Run(*automatic, *configFile, *powerOff, *reboot, *noRebootAutomatic, *yes, *ejectCD); err != nil {
 		logrus.Fatal(err)
 	}
 }
