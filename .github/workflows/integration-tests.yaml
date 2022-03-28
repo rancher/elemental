@@ -27,7 +27,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
-          path: dist
+          path: |
+            dist/artifacts/*
+            !dist/artifacts/*.iso
+            !dist/artifacts/*.qcow.gz
+            !dist/artifacts/*.box
           if-no-files-found: error
       - uses: actions/upload-artifact@v2
         with:
