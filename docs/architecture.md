@@ -47,6 +47,7 @@ a generic Linux distribution.
 
 RancherOS v2 includes an operator that is responsible for managing OS upgrades
 and managing a secure device inventory to assist with zero touch provisioning.
+See the full operator docs at [rancheros-operator](https://github.com/rancher-sandbox/rancheros-operator/blob/main/README.md)
 
 
 ## openSUSE Leap

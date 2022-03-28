@@ -13,7 +13,7 @@ to use Kubernetes approaches to upgrade the components.
 ## RancherOS
 
 RancherOS is upgraded with the RancherOS operator. Refer to the
-[RancherOS Operator](./operator.md) documentation for complete information, but the
+[RancherOS Operator](https://github.com/rancher-sandbox/rancheros-operator/blob/main/README.md) documentation for complete information, but the
 TL;DR is
 
 ```bash
