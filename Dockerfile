@@ -4,17 +4,16 @@ RUN zypper ref
 
 # This target downloads the rancheros operator and makes it available to the framework target
 FROM alpine/helm:3.8.1 as helm
-RUN helm repo add rancheros https://rancher-sandbox.github.io/rancheros-operator
+ARG CHART_REPO=https://rancher-sandbox.github.io/rancheros-operator
+# ">0.0.0-0" means latest including pre-release versions
+ARG CHART_VERSION=">0.0.0-0"
+RUN helm repo add rancheros $CHART_REPO
 RUN mkdir /usr/chart
-# use --devel so alpha versions show up
-RUN helm pull rancheros/rancheros-operator -d /usr/chart/ --devel
+RUN helm pull rancheros/rancheros-operator -d /usr/chart/ --version $CHART_VERSION
 # naming convention is discarded on building the framework image, look into this
 RUN mv /usr/chart/rancheros-operator-*.tgz /usr/chart/rancheros-operator-chart.tgz
 
-# this target builds the ros-installer binary. Im not sure why there are extra deps in here, look into this to drop them if possible
-# deps here seem to be a side effect of wanting those tool to run luet-makeiso but not having them available on the dapper system
-# or on the base image used by ro-image-build
-# I dont think they should be here
+# this target builds the ros-installer binary.
 FROM base AS ros-installer
 RUN zypper in -y openssl-devel gcc go1.16
 WORKDIR /src
@@ -58,6 +57,7 @@ COPY --from=framework-build /framework/system /system
 COPY --from=framework-build /framework/var/lib /var/lib
 COPY --from=ros-installer /usr/sbin/ros-installer /usr/sbin/ros-installer
 # This is used by framework/files/usr/sbin/ros-operator-install
+# name needs to be exactly rancheros-operator-chart.tgz at the path otherwise it wont load it
 COPY --from=helm /usr/chart/rancheros-operator-chart.tgz /usr/share/rancher/os2
 # This adds our local overrides into the framework image
 COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
