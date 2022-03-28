@@ -6,7 +6,11 @@ set -e
 
 build()
 {
-    dockerfile | docker build -f - --build-arg IMAGE="${IMAGE}" . "${@}"
+    if [ "$CI" == "true" ]; then
+        dockerfile | docker buildx build -f - --build-arg IMAGE="${IMAGE}" --cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max . "${@}"
+    else
+        dockerfile | docker buildx build -f - --build-arg IMAGE="${IMAGE}" . "${@}"
+    fi
 }
 
 dockerfile()
@@ -211,10 +215,10 @@ qcow()
 {
     ID=qcow-${RANDOM}
     if docker run -i --device /dev/kvm busybox /bin/true; then
-        build --target qcow-build --build-arg ACCEL=kvm -t $ID
+        build --load --target qcow-build --build-arg ACCEL=kvm -t $ID
         docker run --net=host -i --device /dev/kvm --name $ID $ID
     else
-        build --target qcow-build --build-arg ACCEL=tcg -t $ID
+        build --load --target qcow-build --build-arg ACCEL=tcg -t $ID
         docker run --net=host -i --name $ID $ID
     fi || {
         docker rm -fv $ID
@@ -234,7 +238,7 @@ ami()
         exit 1
     fi
 
-    build --target ami \
+    build --load --target ami \
         --build-arg AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
         --build-arg AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
         --build-arg AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \

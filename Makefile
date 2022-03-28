@@ -3,6 +3,11 @@ REPO?=quay.io/costoolkit/os2
 TAG?=dev
 IMAGE=${REPO}:${TAG}
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+CI?=false
+
+ifeq ("$(CI)","true")
+	CACHE_CI=--cache-from type=local,src=/tmp/.buildx-cache --cache-to type=local,dest=/tmp/.buildx-cache-new,mode=max
+endif
 
 .dapper:
 	@echo Downloading dapper
@@ -25,21 +30,23 @@ clean:
 
 .PHONY: build-framework
 build-framework:
-	docker build \
+	docker buildx build \
+		--load \
 		--build-arg CACHEBUST=${CACHEBUST} \
 		--build-arg IMAGE_TAG=${TAG} \
 		--build-arg IMAGE_REPO=${REPO}-framework \
 		--target framework \
-		-t ${REPO}-framework:${TAG} .
+		-t ${REPO}-framework:${TAG} ${CACHE_CI} .
 
 .PHONY: build
 build:
-	docker build \
+	docker buildx build \
+		--load \
 		--build-arg CACHEBUST=${CACHEBUST} \
 		--build-arg IMAGE_TAG=${TAG} \
 		--build-arg IMAGE_REPO=${REPO} \
 		--target $$([ ${TAG} = dev ] && echo os || echo default) \
-		-t ${IMAGE} .
+		-t ${IMAGE} ${CACHE_CI} .
 
 .PHONY: push
 push:

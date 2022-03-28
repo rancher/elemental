@@ -12,13 +12,14 @@ if [ -n "$DOCKER_PASSWORD" ]; then
 fi
 
 export TAG
+
 make build
-make iso
 
 if [ "$PUSH" = "true" ]; then
     make push
-    make push-framework
 fi
+
+make iso
 
 if [ "$PUSH" = "true" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "${DRONE_TAG}" ]; then
     IMAGE_TARGETS="${IMAGE_TARGETS} all-amis"
