@@ -27,7 +27,7 @@ theme:
 
 # Customization
 extra:
-  homepage: https://rancher.github.io/os2
+  homepage: https://rancher-sandbox.github.io/os2
 
 #google_analytics:
 plugins:
