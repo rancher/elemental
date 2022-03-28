@@ -34,7 +34,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: dist
+          path: |
+            dist/artifacts/*
+            !dist/artifacts/*.qcow.gz
+            !dist/artifacts/*.box
           if-no-files-found: error
       - name: Release space from worker ♻
         if: always()
