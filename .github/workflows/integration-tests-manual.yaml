@@ -12,11 +12,6 @@ on:
         default: https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-v0.1.0-alpha12-amd64.iso
         type: string
         description: ISO image to test
-      chart:
-        required: false
-        default: https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-operator-0.1.0-alpha12-amd64.tgz
-        type: string
-        description: ros chart
 jobs:
 
   tests-vbox:
@@ -34,13 +29,10 @@ jobs:
         env:
           BOX_URL: ${{ github.event.inputs.box-image }}
           ISO_URL: ${{ github.event.inputs.iso-image }}
-          CHART_URL: ${{ github.event.inputs.chart }}
         run: |
           curl -L ${ISO_URL:-https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-v0.1.0-alpha12-amd64.iso} -o ros.iso
           # curl -L ${BOX_URL:-https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-v0.1.0-alpha12-amd64.box} -o ros.box
-          curl -L ${CHART_URL:-https://github.com/rancher/os2/releases/download/v0.1.0-alpha12/rancheros-operator-0.1.0-alpha12-amd64.tgz} -o ros-operator.tgz
           export COS_HOST=127.0.0.1:2222
-          export ROS_CHART=$PWD/ros-operator.tgz
           export ISO=$PWD/ros.iso
           make deps
           cd tests && make vbox-tests

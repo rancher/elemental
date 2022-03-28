@@ -1,6 +1,5 @@
 .DEFAULT_GOAL := package
 REPO?=quay.io/costoolkit/os2
-REPO_ROS_OPERATOR?=quay.io/costoolkit/ros-operator
 TAG?=dev
 IMAGE=${REPO}:${TAG}
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -33,15 +32,6 @@ build-framework:
 		--target framework \
 		-t ${REPO}-framework:${TAG} .
 
-.PHONY: build-ros-operator
-build-ros-operator:
-	docker build \
-		--build-arg CACHEBUST=${CACHEBUST} \
-		--build-arg IMAGE_TAG=${TAG} \
-		--build-arg IMAGE_REPO=${REPO_ROS_OPERATOR} \
-		--target ros-operator \
-		-t ${REPO_ROS_OPERATOR}:${TAG} .
-
 .PHONY: build
 build:
 	docker build \
@@ -59,9 +49,6 @@ push:
 push-framework: build-framework
 	docker push ${REPO}-framework:${TAG}
 
-.PHONY: push-ros-operator
-push-ros-operator: build-ros-operator
-	docker push ${REPO_ROS_OPERATOR}:${TAG}
 
 .PHONY: iso
 iso:

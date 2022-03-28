@@ -18,7 +18,6 @@ make iso
 if [ "$PUSH" = "true" ]; then
     make push
     make push-framework
-    make push-ros-operator
 fi
 
 if [ "$PUSH" = "true" ] && [ -n "$AWS_SECRET_ACCESS_KEY" ] && [ -n "${DRONE_TAG}" ]; then
@@ -44,8 +43,6 @@ if [ "${TAG}" = "dev" ]; then
     VERSION=${TAG}
     PXE_ASSET_VERSION=${TAG}
 fi
-
-./scripts/package-helm
 
 cat > build/output.ipxe << EOF
 #!ipxe

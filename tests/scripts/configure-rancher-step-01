@@ -6,7 +6,8 @@ set -e -x
 REG_NAME=machine-registration
 
 # Install generated RancherOS Operator chart
-helm upgrade --install rancheros-operator ../artifacts/rancheros-operator-*.tgz \
+helm repo add rancheros https://rancher-sandbox.github.io/rancheros-operator/
+helm upgrade --install rancheros-operator rancheros/rancheros-operator --devel \
   --namespace cattle-rancheros-operator-system \
   --create-namespace \
   --wait

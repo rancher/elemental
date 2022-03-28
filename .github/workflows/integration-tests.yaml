@@ -10,8 +10,6 @@ env:
    DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
    DOCKER_REGISTRY: quay.io
    REPO: quay.io/costoolkit/os2-ci
-   REPO_ROS_OPERATOR: quay.io/costoolkit/ros-operator-ci
-
 jobs:
   build:
 
@@ -46,11 +44,6 @@ jobs:
           name: box
           path: dist/artifacts/*.box
           if-no-files-found: warn
-      - uses: actions/upload-artifact@v2
-        with:
-          name: chart
-          path: dist/artifacts/*.tgz
-          if-no-files-found: warn
       - name: Release space from worker ♻
         if: always()
         run: |
@@ -78,7 +71,6 @@ jobs:
               ls -liah
               ls -liah artifacts
               mv artifacts/*.iso ros.iso
-              mv artifacts/*.tgz ros-operator.tgz
               rm -rf artifacts
       - name: OS version
         id: version
@@ -91,7 +83,6 @@ jobs:
           BOX_URL: ${{ github.event.inputs.box-image }}
         run: |
           export COS_HOST=127.0.0.1:2222
-          export ROS_CHART=$PWD/ros-operator.tgz
           export ISO=$PWD/ros.iso
           export CONTAINER_IMAGE=$REPO:${{ steps.version.outputs.tag }}
           make deps
@@ -122,14 +113,12 @@ jobs:
               ls -liah
               ls -liah artifacts
               mv artifacts/*.iso ros.iso
-              mv artifacts/*.tgz ros-operator.tgz
               rm -rf artifacts
       - name: Run tests
         env:
           BOX_URL: ${{ github.event.inputs.box-image }}
         run: |
           export COS_HOST=127.0.0.1:2222
-          export ROS_CHART=$PWD/ros-operator.tgz
           export ISO=$PWD/ros.iso
           make deps
           cd tests && make vbox-tests
