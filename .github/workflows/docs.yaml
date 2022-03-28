@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,4 +14,9 @@ jobs:
           python-version: 3.x
       - run: pip install mkdocs-material
       - run: pip install mkdocs-markdownextradata-plugin
-      - run: mkdocs gh-deploy --force --strict
+      - name: Deploy docs
+        if: ${{ github.event_name == 'push' }}
+        run: mkdocs gh-deploy --force --strict
+      - name: Build docs
+        if: ${{ github.event_name == 'pull_request' }}
+        run: mkdocs build --strict

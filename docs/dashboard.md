@@ -1,7 +1,7 @@
 # Dashboard/UI
 
 The Rancher UI is running by default on port `:8443`.  There default
-`admin` user password set is a long random striung.  You can run `rancherd reset-admin` to
+`admin` user password set is a long random string.  You can run `rancherd reset-admin` to
 get a new `admin` password to login.
 
 To disable the Rancher UI from running on a host port, or to change the
