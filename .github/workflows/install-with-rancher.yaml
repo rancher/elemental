@@ -1,6 +1,12 @@
-name: Install ROS on a server through Rancher
+name: Bootstrap RancherOS on a VM with Rancher
 
 on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+    - 'docs/**'
+    - '*docs*'
+    - 'README.md'
   workflow_dispatch:
     inputs:
       registry:
@@ -34,7 +40,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: artifacts
-          path: dist
+          path: |
+            dist/artifacts/*
+            !dist/artifacts/*.qcow.gz
+            !dist/artifacts/*.box
           if-no-files-found: error
       - name: Release space from worker ♻
         if: always()
@@ -42,7 +51,7 @@ jobs:
           sudo rm -rf build bin dist
           docker system prune -f -a --volumes
   install-with-rancher:
-    runs-on: self-hosted
+    runs-on: nested-virt
     needs: build
     container:
       image: opensuse/leap:latest
