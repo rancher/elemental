@@ -27,7 +27,7 @@ metadata:
   namespace: fleet-local
 spec:
   # Set to the new RancherOS version you would like to upgrade to
-  osImage: rancher/os2:v0.0.0
+  osImage: quay.io/costoolkit/os2:v0.0.0
 ```
 
 ## rancherd

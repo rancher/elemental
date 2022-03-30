@@ -9,7 +9,7 @@ Kubernetes operators.
 
 ## Use Cases
 
-RancherOS is intended to be ran as the operating system beneath a Rancher Multi-Cluster 
+RancherOS is intended to be run as the operating system beneath a Rancher Multi-Cluster 
 Management server or as a node in a Kubernetes cluster managed by Rancher. RancherOS
 also allows you to build stand alone Kubernetes clusters that run an embedded
 and smaller version of Rancher to manage the local cluster. A key attribute of RancherOS
