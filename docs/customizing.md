@@ -8,7 +8,7 @@ following Dockerfile
 
 ```Dockerfile
 # The version of RancherOS to modify
-FROM rancher-sandbox/os2:v0.0.1-test01
+FROM rancher-sandbox/os2:VERSION
 
 # Your custom commands
 RUN zypper install -y cowsay
@@ -21,6 +21,8 @@ RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
     echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release && \
     echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
 ```
+
+Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/os2?tab=tags) or [github](https://github.com/rancher-sandbox/os2/releases)
 
 And then the following commands
 
