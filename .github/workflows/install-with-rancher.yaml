@@ -7,18 +7,6 @@ on:
     - 'docs/**'
     - '*docs*'
     - 'README.md'
-  workflow_dispatch:
-    inputs:
-      registry:
-        required: false
-        default: quay.io
-        type: string
-        description: Registry to use
-      org:
-        required: false
-        default: costoolkit
-        type: string
-        description: Organization to use
 
 jobs:
   build:
@@ -26,8 +14,8 @@ jobs:
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-      DOCKER_REGISTRY: ${{ github.event.inputs.registry }}
-      REPO: ${{ github.event.inputs.registry }}/${{ github.event.inputs.org }}/os2-ci
+      DOCKER_REGISTRY: quay.io
+      REPO: quay.io/costoolkit/os2-ci
     steps:
       - name: Checkout
         uses: actions/checkout@v2
