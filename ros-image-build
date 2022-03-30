@@ -2,6 +2,9 @@
 # Note: ros-image-build requires the input image to be pushed 
 # due to buildx usage.
 
+# Export  this here so users dont need to
+export DOCKER_BUILDKIT=1
+
 set -e
 
 build()

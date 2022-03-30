@@ -8,7 +8,7 @@ following Dockerfile
 
 ```Dockerfile
 # The version of RancherOS to modify
-FROM rancher/os2:v0.0.1-test01
+FROM rancher-sandbox/os2:VERSION
 
 # Your custom commands
 RUN zypper install -y cowsay
@@ -21,6 +21,8 @@ RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
     echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release && \
     echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
 ```
+
+Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/os2?tab=tags) or [github](https://github.com/rancher-sandbox/os2/releases)
 
 And then the following commands
 
@@ -45,7 +47,7 @@ run the below command
 
 ```bash
 # Download the ros-image-build script
-curl -o ros-image-build https://raw.githubusercontent.com/rancher/os2/main/ros-image-build
+curl -o ros-image-build https://raw.githubusercontent.com/rancher-sandbox/os2/main/ros-image-build
 
 # Run the script creating a qcow image, an ISO, and an AMI
 bash ros-image-build myrepo/custom-build:v1.1.1 qcow,iso,ami

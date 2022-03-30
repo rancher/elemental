@@ -74,7 +74,7 @@ ros-installer -config-file ${LOCATION}
 
 ### Interactive
 
-`ros-installer` can also be ran without any arguments to allow you to install a simple vanilla image with a
+`ros-installer` can also be run without any arguments to allow you to install a simple vanilla image with a
 root password set.
 
 ## iPXE Installation
