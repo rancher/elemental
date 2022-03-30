@@ -1,9 +1,8 @@
 name: Bootstrap RancherOS on a VM with Rancher
 
 on:
-  pull_request:
+  push:
     branches: [ master ]
-    types: [ closed ]
     paths-ignore:
     - 'docs/**'
     - '*docs*'
@@ -23,7 +22,6 @@ on:
 
 jobs:
   build:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
