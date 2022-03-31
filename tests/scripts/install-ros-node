@@ -3,16 +3,14 @@
 set -e -x
 
 # Start a simple HTTP server for iPXE/OS installation
-pushd ../artifacts
 setsid --fork python3 -m http.server >/dev/null 2>&1
 IPXE_SCRIPT=$(ls *.ipxe 2>/dev/null)
-popd
 
 # Fix iPXE boot script for CI
 sed -i \
   -e "/^set url/s@.*@set url http://192.168.122.1:8000@" \
   -e '/set config /s@.*@set config ${url}/install-config.yaml@' \
-  ../artifacts/${IPXE_SCRIPT}
+  ${IPXE_SCRIPT}
 
 # Start libvirtd
 # Systemd cannot be used in a container
@@ -20,7 +18,7 @@ libvirtd --daemon
 virtlogd --daemon
 
 # Configure default network
-grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | sudo tee -a /etc/qemu/bridge.conf
+grep -q '^allow all$' /etc/qemu/bridge.conf || echo 'allow all' | tee -a /etc/qemu/bridge.conf
 cat > net-default.xml <<EOF
 <network>
   <name>default</name>
@@ -39,11 +37,11 @@ cat > net-default.xml <<EOF
   </ip>
 </network>
 EOF
-sudo virsh net-undefine default
-sudo virsh net-create net-default.xml
+virsh net-undefine default
+virsh net-create net-default.xml
 
 # Create VM
-sudo virt-install \
+virt-install \
   --name ros-node \
   --os-type Linux \
   --os-variant opensuse-unknown \
