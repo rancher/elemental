@@ -3,14 +3,16 @@
 set -e -x
 
 # Start a simple HTTP server for iPXE/OS installation
+pushd ..
 setsid --fork python3 -m http.server >/dev/null 2>&1
 IPXE_SCRIPT=$(ls *.ipxe 2>/dev/null)
+popd
 
 # Fix iPXE boot script for CI
 sed -i \
   -e "/^set url/s@.*@set url http://192.168.122.1:8000@" \
   -e '/set config /s@.*@set config ${url}/install-config.yaml@' \
-  ${IPXE_SCRIPT}
+  ../${IPXE_SCRIPT}
 
 # Start libvirtd
 # Systemd cannot be used in a container

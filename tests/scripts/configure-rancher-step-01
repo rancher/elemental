@@ -87,4 +87,4 @@ CHECKED_CLUSTER=$(kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o jsonpa
   && exit 1
 
 # Get server config file
-curl --insecure ${TOKEN_URL} -o install-config.yaml
+curl --insecure ${TOKEN_URL} -o ../install-config.yaml
