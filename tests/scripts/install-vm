@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -e -x
+
+# Variable(s)
+VM_NAME=$1
+
+# Create VM
+script -e -c "virt-install \
+  --name ${VM_NAME} \
+  --os-type Linux \
+  --os-variant opensuse-unknown \
+  --virt-type kvm \
+  --machine q35 \
+  --boot bios.useserial=on \
+  --ram=2048 \
+  --vcpus=2 \
+  --cpu host \
+  --disk path=hdd.img,bus=virtio,size=35 \
+  --check disk_size=off \
+  --graphics none \
+  --serial pty \
+  --console pty,target_type=virtio \
+  --rng random \
+  --tpm emulator,model=tpm-crb,version=2.0 \
+  --noreboot \
+  --pxe \
+  --network network=default,bridge=virbr0,model=virtio,mac=52:54:00:00:00:01"

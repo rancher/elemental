@@ -4,7 +4,7 @@ metadata:
   name: machine-registration
   # The namespace must match the namespace of the cluster
   # assigned to the clusters.provisioning.cattle.io resource
-  namespace: fleet-default
+  # namespace: fleet-default
 spec:
   # Labels to be added to the created MachineInventory object
   machineInventoryLabels: {}
@@ -12,11 +12,9 @@ spec:
   machineInventoryAnnotations: {}
   # The cloud config that will be used to provision the node
   cloudConfig:
+    hostname: ros-node-{{ trunc 4 .MachineID }}
     install:
       device: /dev/vda
-    rancheros:
-      install:
-        isoUrl: https://something.example.com
     users:
     - name: root
       passwd: root

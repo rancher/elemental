@@ -83,21 +83,5 @@ installer-tests: build-box/sda.vdi deps
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 
 # e2e CI tests
-
-install-rancher:
-	./scripts/install-rancher
-
-configure-rancher-step-01:
-	./scripts/configure-rancher-step-01
-
-install-ros-node:
-	# Force the execution with a tty, needed to follow VM installation
-	script -e -c ./scripts/install-ros-node
-
-configure-rancher-step-02:
-	./scripts/configure-rancher-step-02
-
-add-node-in-cluster:
-	./scripts/add-node-in-cluster
-
-e2e-bootstraping-node-with-rancher: install-rancher configure-rancher-step-01 install-ros-node configure-rancher-step-02 add-node-in-cluster
+e2e-bootstraping-node-with-rancher: deps
+	ginkgo --label-filter bootstrapping -r -v ./e2e
