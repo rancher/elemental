@@ -33,11 +33,11 @@ deps:
 integration-tests: clean add up deps run
 
 run:
-	ginkgo -r ./smoke
+	ginkgo -r -v ./smoke
 
 .PHONY: install
 install:
-	ginkgo --label-filter setup -r ./install
+	ginkgo --label-filter setup -r -v ./install
 
 build/ci.iso:
 	./prepare_cloudinit
@@ -79,10 +79,11 @@ installer-tests: build-box/sda.vdi
 	VBoxManage storageattach "test" --storagectl "sata controller" --port 0 --device 0 --type hdd --medium build-box/sda.vdi
 	VBoxManage storageattach "test" --storagectl "sata controller" --port 1 --device 0 --type dvddrive --medium $(ISO)
 	VBoxManage startvm "test" --type headless
-	ginkgo --label-filter "!setup" -r ./install
+	ginkgo --label-filter "!setup" -r -v ./install
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 
 # e2e CI tests
+
 install-rancher:
 	./scripts/install-rancher
 
