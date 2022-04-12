@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: kvm-host
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
@@ -39,7 +39,7 @@ jobs:
           sudo rm -rf build bin dist
           docker system prune -f -a --volumes
   install-with-rancher:
-    runs-on: nested-virt
+    runs-on: kvm-host
     needs: build
     container:
       image: opensuse/leap:latest
