@@ -60,6 +60,33 @@ initrd \${url}/\${initrd}
 boot
 EOF
 
+GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-rancher-sandbox/os2}"
+UPGRADECHANNEL_DISCOVERY_IMAGE="${UPGRADECHANNEL_DISCOVERY_IMAGE:-quay.io/costoolkit/upgradechannel-discovery:v0.3-4b83dbe}"
+for i in "amd64"; do
+cat > build/output.upgradechannel-$i.yaml << EOF
+apiVersion: rancheros.cattle.io/v1
+kind: ManagedOSVersionChannel
+metadata:
+  name: os2-$i
+  namespace: fleet-default
+spec:
+  options:
+    args:
+    - github
+    command:
+    - /usr/bin/upgradechannel-discovery
+    envs:
+    - name: REPOSITORY
+      value: ${GITHUB_REPOSITORY}
+    - name: IMAGE_PREFIX
+      value: ${REPO}
+    - name: VERSION_SUFFIX
+      value: -${i}
+    image: $UPGRADECHANNEL_DISCOVERY_IMAGE
+  type: custom
+EOF
+done
+
 mkdir -p dist/artifacts
 for i in build/output*; do
     mv -f $i dist/artifacts/rancheros-${TAG}${i##build/output}
