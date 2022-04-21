@@ -42,7 +42,7 @@ install:
 build/ci.iso:
 	./prepare_cloudinit
 
-vbox-tests: build/ci.iso iso-to-vm
+vbox-tests: build/ci.iso deps iso-to-vm
 	$(MAKE) run
 
 build-box:
@@ -52,7 +52,7 @@ build-box:
 build-box/sda.vdi: build-box
 	VBoxManage createmedium disk --filename build-box/sda.vdi --size 40000
 
-iso-to-vm: build-box/sda.vdi
+iso-to-vm: build-box/sda.vdi deps
 	VBoxManage createvm --name "test" --register
 	VBoxManage modifyvm "test" --memory 10240 --cpus 3
 	VBoxManage modifyvm "test" --nic1 nat --boot1 disk --boot2 dvd --natpf1 "guestssh,tcp,,2222,,22"
@@ -71,7 +71,7 @@ clean_vm_from_iso:
 	VBoxManage unregistervm "test" --delete &>/dev/null || true
 	VBoxManage closemedium disk sda.vdi --delete &>/dev/null || true
 
-installer-tests: build-box/sda.vdi
+installer-tests: build-box/sda.vdi deps
 	VBoxManage createvm --name "test" --register
 	VBoxManage modifyvm "test" --memory 10240 --cpus 3
 	VBoxManage modifyvm "test" --nic1 nat --boot1 disk --boot2 dvd --natpf1 "guestssh,tcp,,2222,,22"
