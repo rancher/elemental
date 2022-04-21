@@ -32,8 +32,8 @@ replace (
 )
 
 require (
-	github.com/google/certificate-transparency-go v1.1.2
-	github.com/google/go-attestation v0.4.3
+	github.com/bramvdbogaerde/go-scp v1.2.0
+	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.0
 	github.com/mattn/go-isatty v0.0.12
 	github.com/onsi/ginkgo/v2 v2.1.3
@@ -41,22 +41,14 @@ require (
 	github.com/pin/tftp v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rancher-sandbox/go-tpm v0.0.0-20220217133323-a7b15ad1f8f7
-	github.com/rancher/fleet/pkg/apis v0.0.0-20210927195558-4aaa778d23dd
-	github.com/rancher/lasso v0.0.0-20210709145333-6c6cd7fd6607
-	github.com/rancher/rancher/pkg/apis v0.0.0-20211013185633-a636bda2a00e
-	github.com/rancher/steve v0.0.0-20210922195510-7224dc21013d
-	github.com/rancher/system-upgrade-controller/pkg/apis v0.0.0-20210929162341-5e6e996d9486
 	github.com/rancher/wrangler v0.8.11-0.20220217210408-3ecd23dfea3b
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tredoe/osutil v1.0.5
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
+	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
-	golang.org/x/tools v0.1.10 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/pin/tftp.v2 v2.1.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	gotest.tools v2.2.0+incompatible
-	k8s.io/api v0.22.2
-	k8s.io/apimachinery v0.22.2
-	k8s.io/client-go v12.0.0+incompatible
-	sigs.k8s.io/controller-runtime v0.9.0-beta.0
 	sigs.k8s.io/yaml v1.2.0
 )

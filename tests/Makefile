@@ -27,7 +27,7 @@ up: build/ci.iso
 	vagrant up $(BOX_IMAGE) --provider=libvirt
 
 deps: 
-	go get github.com/onsi/ginkgo/v2/ginkgo
+	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
 	go get github.com/onsi/gomega/...
 
 integration-tests: clean add up deps run
