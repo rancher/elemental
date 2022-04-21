@@ -1,3 +1,19 @@
+/*
+Copyright © 2022 SUSE LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package sut
 
 import (
@@ -14,8 +30,8 @@ import (
 
 	"github.com/bramvdbogaerde/go-scp"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	. "github.com/onsi/ginkgo/v2" //nolint:revive
+	. "github.com/onsi/gomega"    //nolint:revive
 	"github.com/pkg/errors"
 	ssh "golang.org/x/crypto/ssh"
 )
@@ -24,17 +40,19 @@ const (
 	grubSwapOnce = "grub2-editenv /oem/grubenv set next_entry=%s"
 	grubSwap     = "grub2-editenv /oem/grubenv set saved_entry=%s"
 
-	Passive     = 0
-	Active      = iota
-	Recovery    = iota
-	LiveCD      = iota
+	// Passive is indicating the system passive partition
+	Passive = 0
+	// Active is indicating the system active partition
+	Active = iota
+	// Recovery is indicating the system recovery partition
+	Recovery = iota
+	// LiveCD is indicating the livecd boot environment
+	LiveCD = iota
+	// UnknownBoot means that the boot typology could have not been determined
 	UnknownBoot = iota
 
-	TimeoutRawDiskTest = 600 // Timeout to connect for recovery_raw_disk_test
-
-	Ext2 = "ext2"
-	Ext3 = "ext3"
-	Ext4 = "ext4"
+	// TimeoutRawDiskTest aimeout to connect for recovery_raw_disk_test
+	TimeoutRawDiskTest = 600
 )
 
 // DiskLayout is the struct that contains the disk output from lsblk
@@ -76,7 +94,7 @@ func NewSUT() *SUT {
 	}
 	pass := os.Getenv("COS_PASS")
 	if pass == "" {
-		pass = "cos"
+		pass = "ros"
 	}
 
 	host := os.Getenv("COS_HOST")
@@ -246,7 +264,7 @@ func (s *SUT) command(cmd string, timeout bool) (string, error) {
 // Reboot reboots the system under test
 func (s *SUT) Reboot(t ...int) {
 	By("Reboot")
-	s.command("reboot", true)
+	_, _ = s.command("reboot", true)
 	time.Sleep(10 * time.Second)
 	s.EventuallyConnects(t...)
 }
@@ -279,10 +297,7 @@ func (s *SUT) SendFile(src, dst, permission string) error {
 	defer scpClient.Close()
 	defer f.Close()
 
-	if err := scpClient.CopyFile(context.Background(), f, dst, permission); err != nil {
-		return err
-	}
-	return nil
+	return scpClient.CopyFile(context.Background(), f, dst, permission)
 }
 
 func (s *SUT) connectToHost(timeout bool) (*ssh.Client, error) {
@@ -422,8 +437,7 @@ func (s *SUT) EjectCOSCD() {
 func (s *SUT) RestoreCOSCD() {
 	By("Restoring the CD")
 	out, err := exec.Command("bash", "-c", fmt.Sprintf("VBoxManage storageattach 'test' --storagectl 'sata controller' --port 1 --device 0 --type dvddrive --medium %s --forceunmount", s.CDLocation)).CombinedOutput()
-	fmt.Printf(string(out))
-	Expect(err).To(BeNil())
+	Expect(err).To(BeNil(), string(out))
 }
 
 func (s SUT) GetDiskLayout(disk string) DiskLayout {
@@ -445,16 +459,16 @@ func DialWithDeadline(network string, addr string, config *ssh.ClientConfig, tim
 		return nil, err
 	}
 	if config.Timeout > 0 {
-		conn.SetReadDeadline(time.Now().Add(config.Timeout))
-		conn.SetWriteDeadline(time.Now().Add(config.Timeout))
+		_ = conn.SetReadDeadline(time.Now().Add(config.Timeout))
+		_ = conn.SetWriteDeadline(time.Now().Add(config.Timeout))
 	}
 	c, chans, reqs, err := ssh.NewClientConn(conn, addr, config)
 	if err != nil {
 		return nil, err
 	}
 	if !timeout {
-		conn.SetReadDeadline(time.Time{})
-		conn.SetWriteDeadline(time.Time{})
+		_ = conn.SetReadDeadline(time.Time{})
+		_ = conn.SetWriteDeadline(time.Time{})
 	}
 
 	go func() {
