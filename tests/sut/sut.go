@@ -1,6 +1,7 @@
 package sut
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -278,7 +279,7 @@ func (s *SUT) SendFile(src, dst, permission string) error {
 	defer scpClient.Close()
 	defer f.Close()
 
-	if err := scpClient.CopyFile(f, dst, permission); err != nil {
+	if err := scpClient.CopyFile(context.Background(), f, dst, permission); err != nil {
 		return err
 	}
 	return nil
@@ -379,7 +380,7 @@ func (s SUT) GatherLog(logPath string) {
 	defer scpClient.Close()
 	defer f.Close()
 
-	err = scpClient.CopyFromRemote(f, logPath)
+	err = scpClient.CopyFromRemote(context.Background(), f, logPath)
 
 	if err != nil {
 		fmt.Printf("Error while copying file: %s\n", err.Error())
