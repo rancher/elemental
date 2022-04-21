@@ -103,7 +103,7 @@ all-amis: \
 	#ami-us-east-2 \
 
 deps: 
-	go get github.com/onsi/ginkgo/v2/ginkgo
+	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
 	go get github.com/onsi/gomega/...
 
 integration-tests: 
