@@ -1,3 +1,19 @@
+/*
+Copyright © 2022 SUSE LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package tools
 
 import (
@@ -11,9 +27,8 @@ import (
 	"strconv"
 )
 
-// Get file from URL
-func GetFileFromUrl(url string, fileName string, skipVerify bool) error {
-	if skipVerify == false {
+func GetFileFromURL(url string, fileName string, skipVerify bool) error {
+	if !skipVerify {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
@@ -34,7 +49,6 @@ func GetFileFromUrl(url string, fileName string, skipVerify bool) error {
 	return err
 }
 
-// Get files' list
 func GetFiles(dir string, pattern string) ([]string, error) {
 	files, err := filepath.Glob(dir + "/" + pattern)
 	if err != nil {
@@ -48,7 +62,7 @@ func GetFiles(dir string, pattern string) ([]string, error) {
 	return nil, err
 }
 
-// Partially from https://forum.golangbridge.org/t/using-sed-in-golang/23526/16
+// Sed code partially from https://forum.golangbridge.org/t/using-sed-in-golang/23526/16
 func Sed(oldValue, newValue, filePath string) error {
 	fileData, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -72,9 +86,8 @@ func Sed(oldValue, newValue, filePath string) error {
 	return err
 }
 
-// Share a directory through HTTP
-// TODO: improve it to run in background!
-func HttpShare(dir string, port int) error {
+func HTTPShare(dir string, port int) error {
+	// TODO: improve it to run in background!
 	fs := http.FileServer(http.Dir(dir))
 	http.Handle("/", fs)
 

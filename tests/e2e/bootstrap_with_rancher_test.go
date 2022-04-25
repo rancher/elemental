@@ -60,7 +60,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 		By("Installing K3s", func() {
 			// Get K3s installation script
 			fileName := "k3s-install.sh"
-			err := tools.GetFileFromUrl("https://get.k3s.io", fileName, true)
+			err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
 			Expect(err).NotTo(HaveOccurred())
 
 			// Execute K3s installation
@@ -181,7 +181,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 			err = kubectl.Apply(clusterNS, addClusterYaml)
 			Expect(err).NotTo(HaveOccurred())
 
-			tokenUrl, err := kubectl.Run("get", "MachineRegistration",
+			tokenURL, err := kubectl.Run("get", "MachineRegistration",
 				"--namespace", clusterNS,
 				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
 			Expect(err).NotTo(HaveOccurred())
@@ -196,7 +196,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 			// Get the YAML config file
 			fileName := "../../install-config.yaml"
-			err = tools.GetFileFromUrl(tokenUrl, fileName, false)
+			err = tools.GetFileFromURL(tokenURL, fileName, false)
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})
@@ -220,7 +220,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 		By("Starting HTTP server for network installation", func() {
 			// TODO: improve it to run in background!
-			// err := tools.HttpShare("../..", 8000)
+			// err := tools.HTTpShare("../..", 8000)
 			// Expect(err).NotTo(HaveOccurred())
 
 			// Use Python for now...
