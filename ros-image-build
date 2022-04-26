@@ -59,45 +59,20 @@ RUN echo -e \
 '  urls:\n'\
 '  - "quay.io/costoolkit/releases-green-arm64"\n' > /etc/luet/luet.yaml && \
 echo -e \
-'packages:\n'\
+'iso:\n'\
+'  rootfs:\n'\
+'  - /iso/overlay\n'\
 '  uefi:\n'\
 '  - live/grub2-efi-image\n'\
-'  isoimage:\n'\
+'  image:\n'\
 '  - live/grub2\n'\
 '  - live/grub2-efi-image\n'\
+'  - /iso/iso-overlay\n'\
+'  label: "COS_LIVE"\n'\
 '\n'\
-'boot_file: "boot/x86_64/loader/eltorito.img"\n'\
-'boot_catalog: "boot/x86_64/boot.catalog"\n'\
-'isohybrid_mbr: "boot/x86_64/loader/boot_hybrid.img"\n'\
-'\n'\
-'initramfs:\n'\
-'  kernel_file: "vmlinuz"\n'\
-'  rootfs_file: "initrd"\n'\
-'\n'\
-'overlay:\n'\
-'  rootfs: /iso/overlay\n'\
-'  isoimage: /iso/iso-overlay\n'\
-'\n'\
-'image_prefix: "output"\n'\
-'label: "COS_LIVE"\n'\
-'\n'\
-'squashfs_options:\n'\
-'  compression: xz\n'\
-'\n'\
-'luet:\n'\
-'  repositories:\n'\
-'  - name: "cos-toolkit-green-amd64"\n'\
-'    type: "docker"\n'\
-'    enable: true\n'\
-'    arch: amd64\n'\
-'    urls:\n'\
-'    - "quay.io/costoolkit/releases-green"\n'\
-'  - name: "cos-toolkit-green-arm64"\n'\
-'    type: "docker"\n'\
-'    enable: true\n'\
-'    arch: arm64\n'\
-'    urls:\n'\
-'    - "quay.io/costoolkit/releases-green-arm64"\n' > /iso/iso.yaml
+'date: false\n'\
+'name: "output"\n' > /iso/manifest.yaml
+
 RUN echo -e \
 'search --file --set=root /boot/kernel.xz\n'\
 'set default=0\n'\
@@ -137,7 +112,7 @@ RUN echo -e '#cloud-config\n'\
 'rancheros:\n'\
 '  install:\n'\
 '    automatic: false\n' > /iso/iso-overlay/config
-RUN luet install --no-spinner -y toolchain/luet-makeiso
+RUN luet install --no-spinner -y toolchain/elemental-cli
 ARG CONFIG
 RUN if [ -n "$CONFIG" ]; then echo "$CONFIG" > /iso/iso-overlay/config; fi
 WORKDIR /usr/src/cOS-toolkit/packer
@@ -145,7 +120,7 @@ WORKDIR /usr/src/cOS-toolkit/packer
 FROM tools AS iso-build
 COPY --from=os / /iso/overlay
 RUN cd /iso && \
-    luet-makeiso iso.yaml
+    elemental --debug --config-dir . build-iso
 
 FROM iso-build AS qcow-build
 ARG ACCEL=tcg
