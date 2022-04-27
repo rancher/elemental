@@ -57,21 +57,7 @@ RUN echo -e \
 '  enable: true\n'\
 '  arch: arm64\n'\
 '  urls:\n'\
-'  - "quay.io/costoolkit/releases-green-arm64"\n' > /etc/luet/luet.yaml && \
-echo -e \
-'iso:\n'\
-'  rootfs:\n'\
-'  - /iso/overlay\n'\
-'  uefi:\n'\
-'  - live/grub2-efi-image\n'\
-'  image:\n'\
-'  - live/grub2\n'\
-'  - live/grub2-efi-image\n'\
-'  - /iso/iso-overlay\n'\
-'  label: "COS_LIVE"\n'\
-'\n'\
-'date: false\n'\
-'name: "output"\n' > /iso/manifest.yaml
+'  - "quay.io/costoolkit/releases-green-arm64"\n' > /etc/luet/luet.yaml
 
 RUN echo -e \
 'search --file --set=root /boot/kernel.xz\n'\
@@ -120,7 +106,7 @@ WORKDIR /usr/src/cOS-toolkit/packer
 FROM tools AS iso-build
 COPY --from=os / /iso/overlay
 RUN cd /iso && \
-    elemental --debug --config-dir . build-iso
+    elemental --debug build-iso -n output --overlay-iso /iso/iso-overlay /iso/overlay
 
 FROM iso-build AS qcow-build
 ARG ACCEL=tcg
