@@ -25,7 +25,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"github.com/rancher-sandbox/os2/tests/e2e/helpers/tools"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
 func getServerId(clusterNS string) string {
