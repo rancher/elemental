@@ -55,6 +55,7 @@ jobs:
         INSTALL_K3S_VERSION: v1.21.9+k3s1
         INSTALL_K3S_SKIP_ENABLE: true
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+        PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       options: --privileged
     steps:
       - name: Install dependencies
@@ -73,7 +74,7 @@ jobs:
         run: |
           # Clean Helm repo
           REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
-          helm repo remove ${REPO}
+          [[ -n "${REPO}" ]] && helm repo remove ${REPO}
           cd tests && make e2e-bootstraping-node-with-rancher
       - name: Upload logs
         uses: actions/upload-artifact@v3
