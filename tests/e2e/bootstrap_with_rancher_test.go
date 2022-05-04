@@ -205,7 +205,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 		netDefaultFileName := "../assets/net-default.xml"
 
 		By("Configuring iPXE boot script for CI", func() {
-			ipxeScript, err := tools.GetFiles("..", "*.ipxe")
+			ipxeScript, err := tools.GetFiles("../..", "*.ipxe")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(len(ipxeScript)).To(BeNumerically("==", 1))
 			err = tools.Sed("set url.*", "set url http://192.168.122.1:8000", ipxeScript[0])
