@@ -59,7 +59,7 @@ jobs:
       options: --privileged
     steps:
       - name: Install dependencies
-        run: zypper -n in -l qemu-kvm libvirt virt-install curl helm git-core tar make
+        run: zypper -n in -l qemu-kvm libvirt virt-install curl helm git-core tar make gcc
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Go
