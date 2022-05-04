@@ -65,8 +65,8 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 			// Execute K3s installation
 			out, err := exec.Command("sh", fileName).CombinedOutput()
-			Expect(err).NotTo(HaveOccurred())
 			GinkgoWriter.Printf("%s\n", out)
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		By("Starting K3s", func() {

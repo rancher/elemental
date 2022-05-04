@@ -40,12 +40,12 @@ require (
 	github.com/onsi/gomega v1.18.1
 	github.com/pin/tftp v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20220503081716-e20a5bbd9065 // indirect
 	github.com/rancher-sandbox/go-tpm v0.0.0-20220217133323-a7b15ad1f8f7
 	github.com/rancher/wrangler v0.8.11-0.20220217210408-3ecd23dfea3b
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tredoe/osutil v1.0.5
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
 	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/pin/tftp.v2 v2.1.0
