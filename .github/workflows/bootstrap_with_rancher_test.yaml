@@ -10,19 +10,13 @@ on:
 
 jobs:
   build:
-    runs-on: kvm-host
-    container:
-      image: ubuntu:latest
-      env:
-        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-        DOCKER_REGISTRY: quay.io
-        REPO: quay.io/costoolkit/os2-ci
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+      DOCKER_REGISTRY: quay.io
+      REPO: quay.io/costoolkit/os2-ci
     steps:
-      - name: Install deps
-        run: |
-          apt-get update
-          apt-get install -y make curl docker.io sudo
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
