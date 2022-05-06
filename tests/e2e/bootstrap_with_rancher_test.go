@@ -307,13 +307,13 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 			internalClusterName, err := kubectl.Run("get", "cluster",
 				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath='.status.clusterName'")
+				"-o", "jsonpath={.status.clusterName}")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(internalClusterName).ToNot(Equal(""))
 
 			internalClusterToken, err := kubectl.Run("get", "MachineInventories",
 				"--namespace", clusterNS, serverId,
-				"-o", "jsonpath='.status.clusterRegistrationTokenNamespace'")
+				"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(internalClusterToken).ToNot(Equal(""))
 
