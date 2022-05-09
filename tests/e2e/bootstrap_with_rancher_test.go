@@ -210,7 +210,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 			Expect(len(ipxeScript)).To(BeNumerically("==", 1))
 			err = tools.Sed("set url.*", "set url http://192.168.122.1:8000", ipxeScript[0])
 			Expect(err).NotTo(HaveOccurred())
-			err = tools.Sed("set config.*", "set config $${url}/install-config.yaml", ipxeScript[0])
+			err = tools.Sed(".*set config.*", "set config $${url}/install-config.yaml", ipxeScript[0])
 			Expect(err).NotTo(HaveOccurred())
 
 			scriptName := filepath.Base(ipxeScript[0])
