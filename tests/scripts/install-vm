@@ -16,7 +16,7 @@ script -e -c "virt-install \
   --ram=2048 \
   --vcpus=2 \
   --cpu host \
-  --disk path=hdd.img,bus=virtio,size=35 \
+  --disk path=hdd.img,bus=scsi,size=35 \
   --check disk_size=off \
   --graphics none \
   --serial pty \
