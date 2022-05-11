@@ -6,7 +6,8 @@ stages:
     - path: /etc/motd
       content: |
 
-        Run "ros-installer" to install to disk
+        "ros-installer" is already running.
+        Use "journalctl -f -u ros-installer" to see the progress.
          
       permissions: 0644
     - path: /etc/systemd/system/serial-getty@ttyS0.service.d/override.conf
