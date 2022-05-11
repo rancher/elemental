@@ -37,6 +37,7 @@ SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
 # Each package we want to install needs a new line here
 RUN meta/cos-core
 RUN cloud-config/livecd
+RUN cloud-config/boot-assessment
 RUN cloud-config/recovery
 RUN cloud-config/network
 
