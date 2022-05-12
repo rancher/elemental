@@ -19,12 +19,12 @@ ARG IMAGE=rancher/os2:dev
 
 FROM ${IMAGE} AS os
 
-FROM ${IMAGE} AS tools
+FROM quay.io/costoolkit/elemental:v0.0.14-5bdba36 AS tools
 RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 ENV LUET_NOLOCK=true
 # Copy luet from the official images
-RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar pigz go1.16 qemu-uefi-aarch64 mtools
+RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar pigz go1.16 qemu-uefi-aarch64 mtools rsync
 RUN cd /usr/sbin && \
     rm packer && \
     SUFFIX=amd64 && \
@@ -35,30 +35,7 @@ RUN cd /usr/sbin && \
 RUN cd /usr/src && \
     git clone https://github.com/rancher-sandbox/cOS-toolkit && \
     cd cOS-toolkit && git checkout ${COS_VERSION} -b build
-RUN curl -Lo /usr/bin/luet https://github.com/mudler/luet/releases/download/0.20.10/luet-0.20.10-linux-$(go env GOARCH) && \
-    chmod +x /usr/bin/luet
-RUN mkdir -p /iso/iso-overlay/boot/grub2 /etc/luet
-RUN echo -e \
-'logging:\n'\
-'  color: false\n'\
-'  enable_emoji: false\n'\
-'general:\n'\
-'   debug: false\n'\
-'   spinner_charset: 9\n'\
-'repositories:\n'\
-'- name: "cos-toolkit-green-amd64"\n'\
-'  type: "docker"\n'\
-'  enable: true\n'\
-'  arch: amd64\n'\
-'  urls:\n'\
-'  - "quay.io/costoolkit/releases-green"\n'\
-'- name: "cos-toolkit-green"\n'\
-'  type: "docker"\n'\
-'  enable: true\n'\
-'  arch: arm64\n'\
-'  urls:\n'\
-'  - "quay.io/costoolkit/releases-green-arm64"\n' > /etc/luet/luet.yaml
-
+RUN mkdir -p /iso/iso-overlay/boot/grub2
 RUN echo -e \
 'search --file --set=root /boot/kernel.xz\n'\
 'set default=0\n'\
@@ -98,7 +75,6 @@ RUN echo -e '#cloud-config\n'\
 'rancheros:\n'\
 '  install:\n'\
 '    automatic: false\n' > /iso/iso-overlay/config
-RUN luet install --no-spinner -y toolchain/elemental-cli
 ARG CONFIG
 RUN if [ -n "$CONFIG" ]; then echo "$CONFIG" > /iso/iso-overlay/config; fi
 WORKDIR /usr/src/cOS-toolkit/packer
@@ -128,7 +104,7 @@ RUN echo 'mkdir /output &&' >> /usr/bin/image && \
     echo 'mv *.box /output/output.box' >> /usr/bin/image && \
     echo 'pigz -dc *.tar.gz | tar xvf -' >> /usr/bin/image && \
     echo 'cat cOS | pigz -c > /output/output.qcow.gz'>> /usr/bin/image
-CMD ["bash", "-x", "/usr/bin/image"]
+ENTRYPOINT /usr/bin/image
 
 FROM qcow-build AS qcow-build2
 RUN bash -x /usr/bin/image

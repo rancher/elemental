@@ -3,6 +3,4 @@ set -e
 
 cd $(dirname $0)
 
-./test
-./validate
 IMAGE_TARGETS=${IMAGE_TARGETS:-qcow} ./package

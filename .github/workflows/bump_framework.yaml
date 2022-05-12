@@ -1,0 +1,21 @@
+name: cOS bump
+on: 
+ schedule:
+   - cron: 0 20 * * *
+ workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Bump cos 🔧
+      run: |
+           make update-cos-framework
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+        push-to-fork: cos-ci-forks/os2
+        commit-message: ":arrow_up: Bump cOS"
+        title: "cOS bump"
+        body: "Bump of cOS framework files"

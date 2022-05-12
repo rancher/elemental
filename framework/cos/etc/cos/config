@@ -1,0 +1,66 @@
+# cOS configuration file
+# This file allows to tweak cOS configuration such as: default upgrade/recovery image and GRUB menu entry
+
+# Disable/enable image verification during upgrades ( default: false )
+#NO_VERIFY=false
+
+# Disable/enable upgrades via release channels instead of container images. ( default: true )
+#CHANNEL_UPGRADES=false
+
+# Default container image used for upgrades. ( defaults to system/cos with channel CHANNEL_UPGRADES enabled )
+#UPGRADE_IMAGE="quay.io/mudler/cos-test:cos-standard"
+
+# Default recovery image to use when upgrading the recovery partition
+# ( defaults to recovery/cos in vanilla cOS images with channel CHANNEL_UPGRADES enabled. Otherwise it defaults to UPGRADE_IMAGE ).
+#RECOVERY_IMAGE="quay.io/mudler/cos-test:cos-standard"
+
+# GRUB entry to display on boot. ( defaults: cOS )
+#GRUB_ENTRY_NAME="example"
+
+# Space separated list of additional paths that are used to
+# source cloud-config from. ( defaults paths are: /system/oem /oem/ /usr/local/cloud-config/ )
+#CLOUD_INIT_PATHS=""
+
+# This is the directory that can be used to store cloud-init files that can be enabled/disabled in runtime
+# by cos-features. ( defaults to /system/features )
+#COS_FEATURESDIR="/system/features"
+
+# This is the repository that hosts the signature files used by cosign and luet-cosign plugin during upgrade/deploy to
+# check the artifact signatures
+#COSIGN_REPOSITORY="raccos/releases-green"
+
+# This sets keyless verify on building packages with luet and the luet-cosign plugin.
+# 1  = enabled keyless, 0 = disabled, uses normal public key verification
+#COSIGN_EXPERIMENTAL=1
+
+# This sets the location of the public key to use to verify the packages installed by luet during upgrade/deploy
+# This can be set to file, URL, KMS URI or Kubernetes Secret
+# This is only used if COSIGN_EXPERIMENTAL is set to 0
+#COSIGN_PUBLIC_KEY_LOCATION=""
+
+# Default size (in MB) of disk image files (.img) created during upgrades
+#DEFAULT_IMAGE_SIZE=3240
+
+# Path to default configuration grub file
+#GRUBCONF="/etc/cos/grub.cfg"
+
+# Label of the OEM volume
+OEM_LABEL="COS_OEM"
+
+# Label of the PERSISTENT volume
+PERSISTENT_LABEL="COS_PERSISTENT"
+
+# Label of the RECOVERY volume
+RECOVERY_LABEL="COS_RECOVERY"
+
+# Label of the STATE volume
+STATE_LABEL="COS_STATE"
+
+# Label of the ACTIVE volume
+ACTIVE_LABEL="COS_ACTIVE"
+
+# Label of the PASSIVE volume
+PASSIVE_LABEL="COS_PASSIVE"
+
+# Label of the SYSTEM volume
+SYSTEM_LABEL="COS_SYSTEM"
