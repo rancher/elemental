@@ -303,7 +303,7 @@ func ReadConfig(ctx context.Context, cfg string, includeCmdline bool) (result Co
 }
 
 func returnRegistrationData(url, ca, emulatedTPM, TPMSeed, noSmbios string) (map[string]interface{}, error) {
-	opts := []tpm.Option{tpm.WithCAs([]byte(ca))}
+	opts := []tpm.Option{tpm.WithCAs([]byte(ca)), tpm.AppendCustomCAToSystemCA}
 
 	// can be explicitly disabled for testing purposes
 	if noSmbios != "true" {

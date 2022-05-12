@@ -41,7 +41,7 @@ require (
 	github.com/pin/tftp v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20220503081716-e20a5bbd9065 // indirect
-	github.com/rancher-sandbox/go-tpm v0.0.0-20220217133323-a7b15ad1f8f7
+	github.com/rancher-sandbox/go-tpm v0.0.0-20220512105546-a8efc2a6448e
 	github.com/rancher/wrangler v0.8.11-0.20220217210408-3ecd23dfea3b
 	github.com/sirupsen/logrus v1.8.1
 	github.com/tredoe/osutil v1.0.5
