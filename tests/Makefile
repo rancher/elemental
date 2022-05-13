@@ -83,5 +83,9 @@ installer-tests: build-box/sda.vdi deps
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 
 # e2e CI tests
-e2e-bootstraping-node-with-rancher: deps
-	ginkgo --label-filter bootstrapping -r -v ./e2e
+e2e-install-rancher: deps
+	ginkgo --label-filter install -r -v ./e2e
+e2e-bootstrap-node: deps
+	ginkgo --label-filter bootstrap -r -v ./e2e
+e2e-upgrade-node: deps
+	ginkgo --label-filter upgrade -r -v ./e2e

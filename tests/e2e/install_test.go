@@ -14,10 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package e2e
+package e2e_test
 
 import (
-	"bytes"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -29,28 +28,7 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
-func getServerId(clusterNS string) string {
-	serverId, err := kubectl.Run("get", "MachineInventories",
-		"--namespace", clusterNS,
-		"-o", "jsonpath={.items[0].metadata.name}")
-	Expect(err).NotTo(HaveOccurred())
-	Expect(serverId).ToNot(Equal(""))
-
-	return serverId
-}
-
-var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping"), func() {
-	const (
-		vmName       = "ros-node"
-		userName     = "root"
-		userPassword = "r0s@pwd1"
-	)
-
-	var (
-		clusterName = os.Getenv("CLUSTER_NAME")
-		clusterNS   = os.Getenv("CLUSTER_NS")
-	)
-
+var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 	// Create kubectl context
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
@@ -146,7 +124,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 		})
 	})
 
-	It("Configure Rancher (step 01)", func() {
+	It("Configure Rancher", func() {
 		By("Installing RancherOS Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"rancheros-operator",
@@ -171,7 +149,24 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
-		By("Adding MachineRegistration in Rancher", func() {
+		By("Creating a new cluster", func() {
+			addClusterYaml := "../assets/add_cluster.yaml"
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, addClusterYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = kubectl.Apply(clusterNS, addClusterYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			createdCluster, err := kubectl.Run("get", "cluster",
+				"--namespace", clusterNS,
+				clusterName, "-o", "jsonpath={.metadata.name}")
+			Expect(err).NotTo(HaveOccurred())
+
+			// Check that's the created cluster is the good one
+			Expect(createdCluster).To(Equal(clusterName))
+		})
+
+		By("Adding MachineRegistration", func() {
 			registrationYaml := "../assets/machineregistration.yaml"
 
 			err := tools.Sed("%VM_NAME%", vmName, registrationYaml)
@@ -185,28 +180,11 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 			err = kubectl.Apply(clusterNS, registrationYaml)
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		By("Creating a new cluster", func() {
-			addClusterYaml := "../assets/add_cluster.yaml"
-			err := tools.Sed("%CLUSTER_NAME%", clusterName, addClusterYaml)
-			Expect(err).NotTo(HaveOccurred())
-
-			err = kubectl.Apply(clusterNS, addClusterYaml)
-			Expect(err).NotTo(HaveOccurred())
 
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
 				"--namespace", clusterNS,
 				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
 			Expect(err).NotTo(HaveOccurred())
-
-			createdCluster, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS,
-				clusterName, "-o", "jsonpath={.metadata.name}")
-			Expect(err).NotTo(HaveOccurred())
-
-			// Check that's the created cluster is the good one
-			Expect(createdCluster).To(Equal(clusterName))
 
 			// Get the YAML config file
 			fileName := "../../install-config.yaml"
@@ -215,7 +193,7 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 		})
 	})
 
-	It("Install RancherOS node", func() {
+	It("Configure libvirt", func() {
 		netDefaultFileName := "../assets/net-default.xml"
 
 		By("Configuring iPXE boot script for CI", func() {
@@ -255,104 +233,6 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 			Expect(err).NotTo(HaveOccurred())
 			err = exec.Command("virsh", "net-create", netDefaultFileName).Run()
 			Expect(err).NotTo(HaveOccurred())
-		})
-
-		By("Creating and installing VM", func() {
-			/*
-				cmd := exec.Command("virt-install",
-					"--name", vmName,
-					"--os-type", "Linux",
-					"--os-variant", "opensuse-unknown",
-					"--virt-type", "kvm",
-					"--machine", "q35",
-					"--boot", "bios.useserial=on",
-					"--ram", "2048",
-					"--vcpus", "2",
-					"--cpu", "host",
-					"--disk", "path=hdd.img,bus=virtio,size=35",
-					"--check", "disk_size=off",
-					"--graphics", "none",
-					"--serial", "pty",
-					"--console", "pty,target_type=virtio",
-					"--rng", "random",
-					"--tpm", "emulator,model=tpm-crb,version=2.0",
-					"--noreboot",
-					"--pxe",
-					"--network", "network=default,bridge=virbr0,model=virtio,mac=52:54:00:00:00:01",
-				)
-			*/
-			cmd := exec.Command("../scripts/install-vm", vmName)
-			out, err := cmd.CombinedOutput()
-			GinkgoWriter.Printf("%s\n", out)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		By("Checking that the VM is available in Rancher", func() {
-			getServerId(clusterNS)
-		})
-	})
-
-	It("Add server in "+clusterName, func() {
-		By("Adding server role to predefined cluster", func() {
-			serverId := getServerId(clusterNS)
-			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
-			_, err := kubectl.Run("patch", "MachineInventories",
-				"--namespace", clusterNS, serverId,
-				"--type", "merge", "--patch", patchCmd,
-			)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		By("Restarting the VM", func() {
-			err := exec.Command("virsh", "start", vmName).Run()
-			Expect(err).NotTo(HaveOccurred())
-
-			// Waiting for node to be added to the cluster (maybe can be wrote purely in Go?)
-			err = exec.Command("../scripts/wait-for-node").Run()
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		By("Checking that the VM is added in the cluster", func() {
-			serverId, err := kubectl.Run("get", "MachineInventories",
-				"--namespace", clusterNS,
-				"-o", "jsonpath={.items[0].metadata.name}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(serverId).ToNot(Equal(""))
-
-			internalClusterName, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath={.status.clusterName}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(internalClusterName).ToNot(Equal(""))
-
-			internalClusterToken, err := kubectl.Run("get", "MachineInventories",
-				"--namespace", clusterNS, serverId,
-				"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(internalClusterToken).ToNot(Equal(""))
-
-			// Check that the VM is added
-			Expect(internalClusterName).To(Equal(internalClusterToken))
-		})
-
-		By("Checking VM ssh connection", func() {
-			// TODO: Create a native Go function for this
-			ip, err := exec.Command("sed", "-n", "/name='"+vmName+"'/s/.*ip='\\(.*\\)'.*/\\1/p", "../assets/net-default.xml").CombinedOutput()
-			ip = bytes.Trim(ip, "\n")
-			GinkgoWriter.Printf("IP=%s\n", ip)
-			Expect(err).NotTo(HaveOccurred())
-
-			client := &tools.Client{
-				Host:     string(ip) + ":22",
-				Username: userName,
-				Password: userPassword,
-			}
-
-			// Retry the SSH connection, as it can takes time for the user to be created
-			Eventually(func() string {
-				out, _ := client.RunSSH("uname -n")
-				return out
-			}, "5m", "5s").Should(ContainSubstring(vmName))
 		})
 	})
 })

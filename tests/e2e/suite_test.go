@@ -17,10 +17,21 @@ limitations under the License.
 package e2e_test
 
 import (
+	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+)
+
+const (
+	vmName       = "ros-node"
+	userName     = "root"
+	userPassword = "r0s@pwd1"
+)
+
+var (
+	clusterName, clusterNS, osImage string
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -32,3 +43,9 @@ func TestE2E(t *testing.T) {
 	RegisterFailHandler(FailWithReport)
 	RunSpecs(t, "End-To-End Test Suite")
 }
+
+var _ = BeforeSuite(func() {
+	clusterName = os.Getenv("CLUSTER_NAME")
+	clusterNS = os.Getenv("CLUSTER_NS")
+	osImage = os.Getenv("CONTAINER_IMAGE")
+})
