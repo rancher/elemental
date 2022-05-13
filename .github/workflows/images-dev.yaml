@@ -19,7 +19,7 @@ jobs:
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
       - run: |
-              make build build-framework push push-framework
+              make build push
       - name: Release space from worker ♻
         if: always()
         run: |

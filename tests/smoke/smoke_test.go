@@ -90,7 +90,7 @@ var _ = Describe("os2 Smoke tests", func() {
 		It("has default cmdline", func() {
 			out, _ := s.Command("cat /proc/cmdline")
 			Expect(out).To(And(
-				ContainSubstring("selinux=1"),
+				ContainSubstring("rd.neednet=1"),
 			))
 		})
 

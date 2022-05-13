@@ -1,0 +1,15 @@
+[Unit]
+Description=cOS setup reconciler
+
+[Service]
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
+Type=oneshot
+ExecStart=/bin/bash -c "systemd-inhibit /usr/bin/elemental run-stage reconcile"
+TimeoutStopSec=180
+KillMode=process
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

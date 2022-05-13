@@ -1,0 +1,11 @@
+[Unit]
+Description=cOS system configuration
+Before=getty.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/elemental run-stage boot
+
+[Install]
+WantedBy=multi-user.target

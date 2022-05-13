@@ -1,0 +1,10 @@
+[Unit]
+Description=cOS setup reconciler
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=60min
+Unit=cos-setup-reconcile.service
+
+[Install]
+WantedBy=multi-user.target

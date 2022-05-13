@@ -1,0 +1,16 @@
+[Unit]
+Description=cOS setup after network
+After=network-online.target
+
+[Service]
+Nice=19
+IOSchedulingClass=2
+IOSchedulingPriority=7
+Type=oneshot
+ExecStart=/usr/bin/elemental run-stage network
+TimeoutStopSec=180
+KillMode=process
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
