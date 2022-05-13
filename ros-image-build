@@ -19,12 +19,18 @@ ARG IMAGE=rancher/os2:dev
 
 FROM ${IMAGE} AS os
 
-FROM quay.io/costoolkit/elemental:v0.0.14-5bdba36 AS tools
+FROM quay.io/costoolkit/elemental:v0.0.14-5bdba36 AS elemental
+
+# Keep using leap 15.3. libslirp looks broken and incompatible with packer
+FROM opensuse/leap:15.3 AS tools
+COPY --from=elemental /usr/bin/elemental /usr/bin
+
 RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
 RUN zypper ref
 ENV LUET_NOLOCK=true
 # Copy luet from the official images
-RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar pigz go1.16 qemu-uefi-aarch64 mtools rsync
+RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar e2fsprogs dosfstools pigz go1.16 qemu-uefi-aarch64 mtools rsync
+
 RUN cd /usr/sbin && \
     rm packer && \
     SUFFIX=amd64 && \
