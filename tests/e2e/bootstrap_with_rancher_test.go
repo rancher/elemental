@@ -17,6 +17,7 @@ limitations under the License.
 package e2e
 
 import (
+	"bytes"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -40,7 +41,9 @@ func getServerId(clusterNS string) string {
 
 var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping"), func() {
 	const (
-		vmName = "ros-node"
+		vmName       = "ros-node"
+		userName     = "root"
+		userPassword = "r0s@pwd1"
 	)
 
 	var (
@@ -169,7 +172,18 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 		})
 
 		By("Adding MachineRegistration in Rancher", func() {
-			err := kubectl.Apply(clusterNS, "../assets/machineregistration.yaml")
+			registrationYaml := "../assets/machineregistration.yaml"
+
+			err := tools.Sed("%VM_NAME%", vmName, registrationYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = tools.Sed("%USER%", userName, registrationYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = tools.Sed("%PASSWORD%", userPassword, registrationYaml)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = kubectl.Apply(clusterNS, registrationYaml)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -319,6 +333,26 @@ var _ = Describe("E2E - Bootstrapping node with Rancher", Label("bootstrapping")
 
 			// Check that the VM is added
 			Expect(internalClusterName).To(Equal(internalClusterToken))
+		})
+
+		By("Checking VM ssh connection", func() {
+			// TODO: Create a native Go function for this
+			ip, err := exec.Command("sed", "-n", "/name='"+vmName+"'/s/.*ip='\\(.*\\)'.*/\\1/p", "../assets/net-default.xml").CombinedOutput()
+			ip = bytes.Trim(ip, "\n")
+			GinkgoWriter.Printf("IP=%s\n", ip)
+			Expect(err).NotTo(HaveOccurred())
+
+			client := &tools.Client{
+				Host:     string(ip) + ":22",
+				Username: userName,
+				Password: userPassword,
+			}
+
+			// Retry the SSH connection, as it can takes time for the user to be created
+			Eventually(func() string {
+				out, _ := client.RunSSH("uname -n")
+				return out
+			}, "5m", "5s").Should(ContainSubstring(vmName))
 		})
 	})
 })
