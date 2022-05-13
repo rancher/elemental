@@ -12,10 +12,10 @@ spec:
   machineInventoryAnnotations: {}
   # The cloud config that will be used to provision the node
   cloudConfig:
-    hostname: ros-node-{{ trunc 4 .MachineID }}
+    hostname: %VM_NAME%-{{ trunc 4 .MachineID }}
     users:
-    - name: root
-      passwd: r0s@pwd1
+    - name: %USER%
+      passwd: %PASSWORD%
     rancheros:
       install:
         device: /dev/sda
