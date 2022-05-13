@@ -103,3 +103,4 @@ update-cos-framework:
 		-v $(ROOT_DIR)/framework/cos:/framework \
 		alpine -c \
 		"$(_FW_CMD)"
+	$(SUDO) chown -R $$(id -u) $(ROOT_DIR)/framework/cos
