@@ -19,3 +19,4 @@ jobs:
         commit-message: ":arrow_up: Bump cOS"
         title: "cOS bump"
         body: "Bump of cOS framework files"
+        signoff: true
