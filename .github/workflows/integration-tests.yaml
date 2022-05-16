@@ -10,7 +10,7 @@ concurrency:
 
 env:
    DOCKER_REGISTRY: ttl.sh
-   REPO: ttl.sh/os2-ci-${{ github.head_ref || github.ref }}
+   REPO: ttl.sh/os2-ci-${{ github.sha }}
    TAG: 8h
    PUSH: "true"
 jobs:
