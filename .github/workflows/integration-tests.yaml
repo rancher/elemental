@@ -1,15 +1,18 @@
 name: Integration tests
 on:
   push:
+    branches:
+      - master
+  pull_request:
 concurrency:
   group: integration-tests=full-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
 
 env:
-   DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
-   DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-   DOCKER_REGISTRY: quay.io
-   REPO: quay.io/costoolkit/os2-ci
+   DOCKER_REGISTRY: ttl.sh
+   REPO: ttl.sh/os2-ci-${{ github.sha }}
+   TAG: 8h
+   PUSH: "true"
 jobs:
   build:
 
