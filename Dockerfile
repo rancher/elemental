@@ -6,7 +6,7 @@ COPY framework/cos/ /
 COPY framework/files/ /
 
 # Copy in some local OS customizations
-COPY opensuse/files /
+COPY system/files /
 
 ARG IMAGE_TAG=latest
 RUN cat /etc/os-release.tmpl | env \
