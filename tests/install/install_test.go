@@ -82,7 +82,7 @@ rancheros:
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying COS_PASSIVE"),
-				ContainSubstring("Unpacking docker image: "+containerImage),
+				ContainSubstring("Unpacking a container image: "+containerImage),
 				ContainSubstring("Grub install to device /dev/sda complete"),
 			), out)
 			Expect(err).ToNot(HaveOccurred())
