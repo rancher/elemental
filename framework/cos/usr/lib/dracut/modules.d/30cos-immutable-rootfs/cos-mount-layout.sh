@@ -248,6 +248,8 @@ for mount in "${mountpoints[@]}"; do
             fstab+=$(mountOverlay "${mount%%:*}")
         fi
     else
+        # FSCK
+        systemd-fsck "${mount}"
         fstab+=$(mountPersistent "${mount}")
     fi
 done
