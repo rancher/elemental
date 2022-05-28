@@ -2,12 +2,13 @@
 
 # called by dracut
 check() {
+    require_binaries "$systemdutildir"/systemd || return 1
     return 255
 }
 
-# called by dracut
+# called by dracut 
 depends() {
-    echo rootfs-block dm
+    echo systemd rootfs-block dm fs-lib
     return 0
 }
 
@@ -29,7 +30,7 @@ install() {
     # Include utilities required for cos-setup services,
     # probably a devoted cos-setup dracut module makes sense
     inst_multiple -o \
-        partprobe sync udevadm lsblk sgdisk parted mkfs.ext2 mkfs.ext3 mkfs.ext4 mkfs.vfat mkfs.fat mkfs.xfs blkid e2fsck resize2fs mount xfs_growfs umount
+        "$systemdutildir"/systemd-fsck partprobe sync udevadm lsblk sgdisk parted mkfs.ext2 mkfs.ext3 mkfs.ext4 mkfs.vfat mkfs.fat mkfs.xfs blkid e2fsck resize2fs mount xfs_growfs umount
     inst_hook cmdline 30 "${moddir}/parse-cos-cmdline.sh"
     inst_script "${moddir}/cos-generator.sh" \
         "${systemdutildir}/system-generators/dracut-cos-generator"
@@ -40,5 +41,7 @@ install() {
     mkdir -p "${initdir}/${systemdsystemunitdir}/initrd-fs.target.requires"
     ln_r "../cos-immutable-rootfs.service" \
         "${systemdsystemunitdir}/initrd-fs.target.requires/cos-immutable-rootfs.service"
+    ln_r "$systemdutildir"/systemd-fsck \
+        "/sbin/systemd-fsck"
     dracut_need_initqueue
 }
