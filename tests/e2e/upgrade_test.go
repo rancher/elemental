@@ -17,7 +17,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"bytes"
 	"os/exec"
 	"strings"
 
@@ -33,37 +32,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 	It("Install RancherOS node", func() {
 		By("Creating and installing VM", func() {
-			/*
-				cmd := exec.Command("virt-install",
-					"--name", localVmName,
-					"--os-type", "Linux",
-					"--os-variant", "opensuse-unknown",
-					"--virt-type", "kvm",
-					"--machine", "q35",
-					"--boot", "bios.useserial=on",
-					"--ram", "2048",
-					"--vcpus", "2",
-					"--cpu", "host",
-					"--disk", "path=hdd.img,bus=virtio,size=35",
-					"--check", "disk_size=off",
-					"--graphics", "none",
-					"--serial", "pty",
-					"--console", "pty,target_type=virtio",
-					"--rng", "random",
-					"--tpm", "emulator,model=tpm-crb,version=2.0",
-					"--noreboot",
-					"--pxe",
-					"--network", "network=default,bridge=virbr0,model=virtio,mac=52:54:00:00:00:01",
-				)
-			*/
-			// TODO: Create a native Go function for this
 			netDefaultFileName := "../assets/net-default.xml"
-			mac, err := exec.Command("sed", "-n", "/name='"+localVmName+"'/s/.*mac='\\(.*\\)'.*/\\1/p", netDefaultFileName).CombinedOutput()
+			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
-			mac = bytes.Trim(mac, "\n")
 
 			// Install VM
-			cmd := exec.Command("../scripts/install-vm", localVmName, mac)
+			cmd := exec.Command("../scripts/install-vm", localVmName, hostData.Mac)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).NotTo(HaveOccurred())
@@ -118,15 +92,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Checking VM ssh connection", func() {
-			// TODO: Create a native Go function for this
 			netDefaultFileName := "../assets/net-default.xml"
-			ip, err := exec.Command("sed", "-n", "/name='"+localVmName+"'/s/.*ip='\\(.*\\)'.*/\\1/p", netDefaultFileName).CombinedOutput()
-			ip = bytes.Trim(ip, "\n")
-			GinkgoWriter.Printf("IP=%s\n", ip)
+			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
 			client := &tools.Client{
-				Host:     string(ip) + ":22",
+				Host:     string(hostData.IP) + ":22",
 				Username: userName,
 				Password: userPassword,
 			}
@@ -164,15 +135,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Checking VM upgrade", func() {
-			// TODO: Create a native Go function for this
 			netDefaultFileName := "../assets/net-default.xml"
-			ip, err := exec.Command("sed", "-n", "/name='"+localVmName+"'/s/.*ip='\\(.*\\)'.*/\\1/p", netDefaultFileName).CombinedOutput()
-			ip = bytes.Trim(ip, "\n")
-			GinkgoWriter.Printf("IP=%s\n", ip)
+			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
 			client := &tools.Client{
-				Host:     string(ip) + ":22",
+				Host:     string(hostData.IP) + ":22",
 				Username: userName,
 				Password: userPassword,
 			}

@@ -7,7 +7,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.1.4
 	github.com/onsi/gomega v1.19.0
 	github.com/pkg/errors v0.9.1
-	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20220511173504-84f99b92390d
+	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20220530155042-814373cbdde2
 	golang.org/x/crypto v0.0.0-20220511200225-c6db032c6c88
 )
 
