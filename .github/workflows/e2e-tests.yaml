@@ -129,8 +129,12 @@ jobs:
           REPO: quay.io/costoolkit/os2-ci
           ARCH: amd64
         run: |
-          # Remove current version
+          # Keep upgradechannel yaml file - Backup step
+          mv -f rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml keep-this-file
+          # Remove *ALL* files (but not upgradechannel one!) from current version
           rm -f rancheros-${GITHUB_SHA::7}-${ARCH}*
+          # Keep upgradechannel yaml file - Restore step
+          mv -f keep-this-file rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml
           # Download the latest *OFFICIAL* version available
           OS2_ISO=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
                            | awk "/browser_download_url.*-${ARCH}.iso/ { gsub(\"\\\"\",\"\"); print \$2 }")

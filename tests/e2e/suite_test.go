@@ -25,9 +25,10 @@ import (
 )
 
 const (
-	vmName       = "ros-node"
-	userName     = "root"
-	userPassword = "r0s@pwd1"
+	vmNameRoot         = "ros-node"
+	userName           = "root"
+	userPassword       = "r0s@pwd1"
+	netDefaultFileName = "../assets/net-default.xml"
 )
 
 var (
@@ -48,4 +49,6 @@ var _ = BeforeSuite(func() {
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
+	vmIndex = os.Getenv("VM_INDEX")
+	vmName = vmNameRoot + "-" + vmIndex
 })

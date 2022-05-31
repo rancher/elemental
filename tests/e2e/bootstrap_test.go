@@ -27,9 +27,18 @@ import (
 )
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
+	var (
+		serverId string
+	)
+
 	It("Install RancherOS node", func() {
+		By("Configuring iPXE boot script for network installation", func() {
+			numberOfFile, err := misc.ConfigureiPXE()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(numberOfFile).To(BeNumerically(">=", 1))
+		})
+
 		By("Creating and installing VM", func() {
-			netDefaultFileName := "../assets/net-default.xml"
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -41,13 +50,17 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
-			misc.GetServerId(clusterNS)
+			id, err := misc.GetServerId(clusterNS, 0)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(id).ToNot(Equal(""))
+
+			// Export the id of the newly installed node
+			serverId = id
 		})
 	})
 
-	It("Add server "+vmName+" in "+clusterName, func() {
+	It("Add server "+vmName, func() {
 		By("Adding server role to predefined cluster", func() {
-			serverId := misc.GetServerId(clusterNS)
 			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
 			_, err := kubectl.Run("patch", "MachineInventories",
 				"--namespace", clusterNS, serverId,
@@ -66,12 +79,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Checking that the VM is added in the cluster", func() {
-			serverId, err := kubectl.Run("get", "MachineInventories",
-				"--namespace", clusterNS,
-				"-o", "jsonpath={.items[0].metadata.name}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(serverId).ToNot(Equal(""))
-
 			internalClusterName, err := kubectl.Run("get", "cluster",
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.status.clusterName}")
@@ -89,7 +96,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Checking VM ssh connection", func() {
-			netDefaultFileName := "../assets/net-default.xml"
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
@@ -103,7 +109,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("uname -n")
 				return out
-			}, "5m", "5s").Should(ContainSubstring(vmName))
+			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
 		})
 	})
 })

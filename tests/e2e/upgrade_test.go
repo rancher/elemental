@@ -28,29 +28,40 @@ import (
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
-	var localVmName = vmName + "-02"
+	var (
+		serverId string
+	)
 
 	It("Install RancherOS node", func() {
+		By("Configuring iPXE boot script for network installation", func() {
+			numberOfFile, err := misc.ConfigureiPXE()
+			Expect(err).NotTo(HaveOccurred())
+			Expect(numberOfFile).To(BeNumerically(">=", 1))
+		})
+
 		By("Creating and installing VM", func() {
-			netDefaultFileName := "../assets/net-default.xml"
-			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
+			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
 			// Install VM
-			cmd := exec.Command("../scripts/install-vm", localVmName, hostData.Mac)
+			cmd := exec.Command("../scripts/install-vm", vmName, hostData.Mac)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).NotTo(HaveOccurred())
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
-			misc.GetServerId(clusterNS)
+			id, err := misc.GetServerId(clusterNS, 1)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(id).ToNot(Equal(""))
+
+			// Export the id of the newly installed node
+			serverId = id
 		})
 	})
 
-	It("Add server "+localVmName+" in "+clusterName, func() {
+	It("Add server "+vmName, func() {
 		By("Adding server role to predefined cluster", func() {
-			serverId := misc.GetServerId(clusterNS)
 			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
 			_, err := kubectl.Run("patch", "MachineInventories",
 				"--namespace", clusterNS, serverId,
@@ -60,7 +71,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Restarting the VM", func() {
-			err := exec.Command("virsh", "start", localVmName).Run()
+			err := exec.Command("virsh", "start", vmName).Run()
 			Expect(err).NotTo(HaveOccurred())
 
 			// Waiting for node to be added to the cluster (maybe can be wrote purely in Go?)
@@ -69,12 +80,6 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Checking that the VM is added in the cluster", func() {
-			serverId, err := kubectl.Run("get", "MachineInventories",
-				"--namespace", clusterNS,
-				"-o", "jsonpath={.items[0].metadata.name}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(serverId).ToNot(Equal(""))
-
 			internalClusterName, err := kubectl.Run("get", "cluster",
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.status.clusterName}")
@@ -92,8 +97,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Checking VM ssh connection", func() {
-			netDefaultFileName := "../assets/net-default.xml"
-			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
+			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
 			client := &tools.Client{
@@ -106,7 +110,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("uname -n")
 				return out
-			}, "5m", "5s").Should(ContainSubstring(localVmName))
+			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
 		})
 	})
 
@@ -135,8 +139,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		})
 
 		By("Checking VM upgrade", func() {
-			netDefaultFileName := "../assets/net-default.xml"
-			hostData, err := tools.GetHostNetConfig(".*name='"+localVmName+"'.*", netDefaultFileName)
+			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).NotTo(HaveOccurred())
 
 			client := &tools.Client{
@@ -151,7 +154,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION_ID}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, "10m", "30s").Should(Equal(version))
+			}, "20m", "30s").Should(Equal(version))
 		})
 	})
 })

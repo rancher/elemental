@@ -19,7 +19,6 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"path/filepath"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -194,22 +193,6 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 	})
 
 	It("Configure libvirt", func() {
-		netDefaultFileName := "../assets/net-default.xml"
-
-		By("Configuring iPXE boot script for CI", func() {
-			ipxeScript, err := tools.GetFiles("../..", "*.ipxe")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(len(ipxeScript)).To(BeNumerically("==", 1))
-			err = tools.Sed("set url.*", "set url http://192.168.122.1:8000", ipxeScript[0])
-			Expect(err).NotTo(HaveOccurred())
-			err = tools.Sed(".*set config.*", "set config $${url}/install-config.yaml", ipxeScript[0])
-			Expect(err).NotTo(HaveOccurred())
-
-			scriptName := filepath.Base(ipxeScript[0])
-			err = tools.Sed("%IPXE_SCRIPT%", "<bootp file='http://192.168.122.1:8000/"+scriptName+"'/>", netDefaultFileName)
-			Expect(err).NotTo(HaveOccurred())
-		})
-
 		By("Starting HTTP server for network installation", func() {
 			// TODO: improve it to run in background!
 			// err := tools.HTTpShare("../..", 8000)
@@ -231,6 +214,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 		By("Starting default network", func() {
 			err := exec.Command("virsh", "net-undefine", "default").Run()
 			Expect(err).NotTo(HaveOccurred())
+
 			err = exec.Command("virsh", "net-create", netDefaultFileName).Run()
 			Expect(err).NotTo(HaveOccurred())
 		})
