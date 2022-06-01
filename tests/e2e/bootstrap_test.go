@@ -72,10 +72,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Restarting the VM", func() {
 			err := exec.Command("virsh", "start", vmName).Run()
 			Expect(err).To(Not(HaveOccurred()))
-
-			// Waiting for node to be added to the cluster (maybe can be wrote purely in Go?)
-			err = exec.Command("../scripts/wait-for-node").Run()
-			Expect(err).To((HaveOccurred()))
 		})
 
 		By("Checking that the VM is added in the cluster", func() {
@@ -85,14 +81,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(internalClusterName).To(Not(BeEmpty()))
 
-			internalClusterToken, err := kubectl.Run("get", "MachineInventories",
-				"--namespace", clusterNS, serverId,
-				"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterToken).To(Not(BeEmpty()))
-
 			// Check that the VM is added
-			Expect(internalClusterName).To(Equal(internalClusterToken))
+			Eventually(func() string {
+				internalClusterToken, _ := kubectl.Run("get", "MachineInventories",
+					"--namespace", clusterNS, serverId,
+					"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
+				return internalClusterToken
+			}, "10m", "10s").Should(Equal(internalClusterName))
 		})
 
 		By("Checking VM ssh connection", func() {
