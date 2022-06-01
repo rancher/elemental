@@ -34,7 +34,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 		PollInterval: 500 * time.Millisecond,
 	}
 
-	It("Install Rancher", func() {
+	It("Install and configure Rancher and libvirt", func() {
 		By("Installing K3s", func() {
 			// Get K3s installation script
 			fileName := "k3s-install.sh"
@@ -123,9 +123,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err = k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
 			Expect(err).To(Not(HaveOccurred()))
 		})
-	})
 
-	It("Configure Rancher", func() {
 		By("Installing RancherOS Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"rancheros-operator",
@@ -192,9 +190,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err = tools.GetFileFromURL(tokenURL, fileName, false)
 			Expect(err).To(Not(HaveOccurred()))
 		})
-	})
 
-	It("Configure libvirt", func() {
 		By("Starting HTTP server for network installation", func() {
 			// TODO: improve it to run in background!
 			// err := tools.HTTpShare("../..", 8000)

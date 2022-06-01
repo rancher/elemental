@@ -29,7 +29,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		serverId string
 	)
 
-	It("Install node", func() {
+	It("Install node and add it in Rancher", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
 		})
@@ -59,9 +59,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			// Export the id of the newly installed node
 			serverId = id
 		})
-	})
 
-	It("Add server "+vmName+" in Rancher", func() {
 		By("Adding server role to predefined cluster", func() {
 			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
 			_, err := kubectl.Run("patch", "MachineInventories",
