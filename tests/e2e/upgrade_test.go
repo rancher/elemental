@@ -28,12 +28,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		/*
 			By("Adding UpgradeChannel in Rancher", func() {
 				err := kubectl.Apply(clusterNS, "../../rancheros-*.upgradechannel-*.yaml")
-				Expect(err).NotTo(HaveOccurred())
+				Expect(err).To(Not(HaveOccurred()))
 			})
 
 			By("Triggering Upgrade in Rancher", func() {
 				err := kubectl.Apply(clusterNS, "../assets/upgrade-with-managedOSVersion.yaml")
-				Expect(err).NotTo(HaveOccurred())
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		*/
 
@@ -41,18 +41,18 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			upgradeWithOsImageYaml := "../assets/upgrade-with-osImage.yaml"
 
 			err := tools.Sed("%OS_IMAGE%", osImage, upgradeWithOsImageYaml)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			err = tools.Sed("%CLUSTER_NAME%", clusterName, upgradeWithOsImageYaml)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.Apply(clusterNS, upgradeWithOsImageYaml)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Checking VM upgrade", func() {
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			client := &tools.Client{
 				Host:     string(hostData.IP) + ":22",

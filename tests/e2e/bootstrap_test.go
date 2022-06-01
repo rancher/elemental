@@ -32,25 +32,25 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	It("Install "+vmName+" node", func() {
 		By("Configuring iPXE boot script for network installation", func() {
 			numberOfFile, err := misc.ConfigureiPXE()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(numberOfFile).To(BeNumerically(">=", 1))
 		})
 
 		By("Creating and installing VM", func() {
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Install VM
 			cmd := exec.Command("../scripts/install-vm", vmName, hostData.Mac)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
 			id, err := misc.GetServerId(clusterNS, vmIndex)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(id).ToNot(Equal(""))
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(id).To(Not(Equal("")))
 
 			// Export the id of the newly installed node
 			serverId = id
@@ -64,30 +64,30 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				"--namespace", clusterNS, serverId,
 				"--type", "merge", "--patch", patchCmd,
 			)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Restarting the VM", func() {
 			err := exec.Command("virsh", "start", vmName).Run()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Waiting for node to be added to the cluster (maybe can be wrote purely in Go?)
 			err = exec.Command("../scripts/wait-for-node").Run()
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To((HaveOccurred()))
 		})
 
 		By("Checking that the VM is added in the cluster", func() {
 			internalClusterName, err := kubectl.Run("get", "cluster",
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.status.clusterName}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(internalClusterName).ToNot(Equal(""))
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(internalClusterName).To(Not(Equal("")))
 
 			internalClusterToken, err := kubectl.Run("get", "MachineInventories",
 				"--namespace", clusterNS, serverId,
 				"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(internalClusterToken).ToNot(Equal(""))
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(internalClusterToken).To(Not(Equal("")))
 
 			// Check that the VM is added
 			Expect(internalClusterName).To(Equal(internalClusterToken))
@@ -95,7 +95,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Checking VM ssh connection", func() {
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).NotTo(HaveOccurred())
+			Expect(err).To(Not(HaveOccurred()))
 
 			client := &tools.Client{
 				Host:     string(hostData.IP) + ":22",
