@@ -114,33 +114,58 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: initrd
-      - name: E2E - Installing Rancher
+      - name: E2E - Clean local Helm repositorie
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO}
+      - name: E2E - Install Rancher
+        run: |
           cd tests && make e2e-install-rancher
-      - name: E2E - Bootstrapping node with Rancher
+      - name: E2E - Bootstrap node 1 with current build
+        env:
+          VM_INDEX: 1
         run: |
           # Execute test
           cd tests && make e2e-bootstrap-node
-      - name: E2E - Upgrading node with Rancher
-        env:
-          REPO: quay.io/costoolkit/os2-ci
-          ARCH: amd64
+      - name: E2E - Clean current build
         run: |
-          # Keep upgradechannel yaml file - Backup step
-          mv -f rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml keep-this-file
-          # Remove *ALL* files (but not upgradechannel one!) from current version
-          rm -f rancheros-${GITHUB_SHA::7}-${ARCH}*
-          # Keep upgradechannel yaml file - Restore step
-          mv -f keep-this-file rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml
+          # Backup *ALL* files from current build
+          mkdir -p keep-current-build
+          mv -f rancheros-${GITHUB_SHA::7}-${ARCH}* keep-current-build/
           # Download the latest *OFFICIAL* version available
           OS2_ISO=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
                            | awk "/browser_download_url.*-${ARCH}.iso/ { gsub(\"\\\"\",\"\"); print \$2 }")
           for I in \.iso \.ipxe \.squashfs -kernel -initrd; do URL=${OS2_ISO/\.iso/${I}}; curl -Ls -o ${URL##*/} ${URL}; done
+      - name: E2E - Bootstrap node 2 with latest released build
+        env:
+          VM_INDEX: 2
+        run: |
+          # Execute test
+          cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 2 (with osImage method)
+        env:
+          VM_INDEX: 2
+          REPO: quay.io/costoolkit/os2-ci
+          ARCH: amd64
+        run: |
           # Execute test
           export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}
+          cd tests && make e2e-upgrade-node
+      - name: E2E - Bootstrap node 3 with latest released build
+        env:
+          VM_INDEX: 3
+        run: |
+          # Execute test
+          cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 3 (with UpgradeChannel method)
+        env:
+          VM_INDEX: 3
+          ARCH: amd64
+        run: |
+          # Restore upgradechannel yaml file
+          cp -a keep-current-build/rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml .
+          # Execute test
           cd tests && make e2e-upgrade-node
       - name: Upload logs
         uses: actions/upload-artifact@v3

@@ -4,9 +4,7 @@ Copyright © 2022 SUSE LLC
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +29,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		serverId string
 	)
 
-	It("Install RancherOS node", func() {
+	It("Install "+vmName+" node", func() {
 		By("Configuring iPXE boot script for network installation", func() {
 			numberOfFile, err := misc.ConfigureiPXE()
 			Expect(err).NotTo(HaveOccurred())
@@ -50,7 +48,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
-			id, err := misc.GetServerId(clusterNS, 0)
+			id, err := misc.GetServerId(clusterNS, vmIndex)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(id).ToNot(Equal(""))
 
@@ -59,7 +57,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 	})
 
-	It("Add server "+vmName, func() {
+	It("Add server "+vmName+" in Rancher", func() {
 		By("Adding server role to predefined cluster", func() {
 			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
 			_, err := kubectl.Run("patch", "MachineInventories",

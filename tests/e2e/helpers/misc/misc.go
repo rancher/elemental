@@ -12,7 +12,7 @@ import (
 func GetServerId(clusterNS string, index int) (string, error) {
 	serverId, err := kubectl.Run("get", "MachineInventories",
 		"--namespace", clusterNS,
-		"-o", "jsonpath={.items["+fmt.Sprint(index)+"].metadata.name}")
+		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
 	if err != nil {
 		return "", err
 	}

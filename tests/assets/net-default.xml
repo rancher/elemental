@@ -9,9 +9,9 @@
   <ip address='192.168.122.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='192.168.122.2' end='192.168.122.254'/>
-      <host mac='52:54:00:00:00:01' name='ros-node' ip='192.168.122.11'/>
-      <host mac='52:54:00:00:00:02' name='ros-node-02' ip='192.168.122.12'/>
-      <host mac='52:54:00:00:00:03' name='ros-node-03' ip='192.168.122.13'/>
+      <host mac='52:54:00:00:00:01' name='ros-node-1' ip='192.168.122.11'/>
+      <host mac='52:54:00:00:00:02' name='ros-node-2' ip='192.168.122.12'/>
+      <host mac='52:54:00:00:00:03' name='ros-node-3' ip='192.168.122.13'/>
       <bootp file='http://192.168.122.1:8000/rancheros.ipxe'/>
     </dhcp>
   </ip>
