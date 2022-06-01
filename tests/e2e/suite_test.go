@@ -15,7 +15,9 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -33,6 +35,7 @@ var (
 	clusterName string
 	clusterNS   string
 	osImage     string
+	vmName      string
 	vmIndex     int
 )
 
@@ -50,9 +53,15 @@ var _ = BeforeSuite(func() {
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
-	vmIndex = os.Getenv("VM_INDEX")
-	vmName = vmNameRoot + "-" + vmIndex
+	index, set := os.LookupEnv("VM_INDEX")
 
-	// VM_INDEX should greater or equal to 1
-	Expect(vmIndex).To(BeNumerically(">=", 1))
+	// Only if VM_INDEX is set
+	if set {
+		var err error
+		vmIndex, err = strconv.Atoi(index)
+		Expect(err).To(Not(HaveOccurred()))
+
+		// Now we can set the VM name
+		vmName = vmNameRoot + "-" + fmt.Sprint(vmIndex)
+	}
 })

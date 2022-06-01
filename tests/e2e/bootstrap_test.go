@@ -29,7 +29,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		serverId string
 	)
 
-	It("Install "+vmName+" node", func() {
+	It("Install node", func() {
+		By("Checking if VM name is set", func() {
+			Expect(vmName).To(Not(BeEmpty()))
+		})
+
 		By("Configuring iPXE boot script for network installation", func() {
 			numberOfFile, err := misc.ConfigureiPXE()
 			Expect(err).To(Not(HaveOccurred()))
@@ -50,7 +54,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Checking that the VM is available in Rancher", func() {
 			id, err := misc.GetServerId(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
-			Expect(id).To(Not(Equal("")))
+			Expect(id).To(Not(BeEmpty()))
 
 			// Export the id of the newly installed node
 			serverId = id
@@ -81,13 +85,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.status.clusterName}")
 			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterName).To(Not(Equal("")))
+			Expect(internalClusterName).To(Not(BeEmpty()))
 
 			internalClusterToken, err := kubectl.Run("get", "MachineInventories",
 				"--namespace", clusterNS, serverId,
 				"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
 			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterToken).To(Not(Equal("")))
+			Expect(internalClusterToken).To(Not(BeEmpty()))
 
 			// Check that the VM is added
 			Expect(internalClusterName).To(Equal(internalClusterToken))

@@ -84,6 +84,7 @@ jobs:
         INSTALL_K3S_SKIP_ENABLE: true
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
         PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        VM_INDEX: 0
       options: --privileged
     steps:
       - name: Install dependencies

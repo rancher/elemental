@@ -24,7 +24,7 @@ import (
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
-	It("Upgrade "+vmName+" node", func() {
+	It("Upgrade node", func() {
 		/*
 			By("Adding UpgradeChannel in Rancher", func() {
 				err := kubectl.Apply(clusterNS, "../../rancheros-*.upgradechannel-*.yaml")
@@ -36,6 +36,10 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		*/
+
+		By("Checking if VM name is set", func() {
+			Expect(vmName).To(Not(BeEmpty()))
+		})
 
 		By("Triggering Upgrade in Rancher", func() {
 			upgradeWithOsImageYaml := "../assets/upgrade-with-osImage.yaml"
