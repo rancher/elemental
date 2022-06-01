@@ -25,32 +25,44 @@ import (
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	It("Upgrade node", func() {
-		/*
-			By("Adding UpgradeChannel in Rancher", func() {
-				err := kubectl.Apply(clusterNS, "../../rancheros-*.upgradechannel-*.yaml")
-				Expect(err).To(Not(HaveOccurred()))
-			})
-
-			By("Triggering Upgrade in Rancher", func() {
-				err := kubectl.Apply(clusterNS, "../assets/upgrade-with-managedOSVersion.yaml")
-				Expect(err).To(Not(HaveOccurred()))
-			})
-		*/
-
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
 		})
 
-		By("Triggering Upgrade in Rancher", func() {
-			upgradeWithOsImageYaml := "../assets/upgrade-with-osImage.yaml"
+		By("Checking if upgrade type is set", func() {
+			Expect(upgradeType).To(Not(BeEmpty()))
+		})
 
-			err := tools.Sed("%OS_IMAGE%", osImage, upgradeWithOsImageYaml)
+		By("Triggering Upgrade in Rancher with "+upgradeType, func() {
+			upgradeOsYaml := "../assets/upgrade.yaml"
+
+			if upgradeType == "upgradechannel" {
+				upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(upgradeChannelFile).To(Not(BeEmpty()))
+
+				err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Get ManagedOSVersionChannel name
+				name, err := kubectl.Run("get", "ManagedOSVersionChannel",
+					"--namespace", clusterNS,
+					"-o", "jsonpath={.items[0].metadata.name}")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = tools.Sed("%OS_IMAGE%", "managedOSVersionName: "+name, upgradeOsYaml)
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			if upgradeType == "osimage" {
+				err := tools.Sed("%OS_IMAGE%", "osImage: "+osImage, upgradeOsYaml)
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, upgradeOsYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = tools.Sed("%CLUSTER_NAME%", clusterName, upgradeWithOsImageYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.Apply(clusterNS, upgradeWithOsImageYaml)
+			err = kubectl.Apply(clusterNS, upgradeOsYaml)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -71,6 +83,11 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				out = strings.Trim(out, "\n")
 				return out
 			}, "20m", "30s").Should(Equal(version))
+		})
+
+		By("Cleaning upgrade orders", func() {
+			err := kubectl.DeleteResource(clusterNS, "ManagedOSImage", "default-os-image")
+			Expect(err).To(Not(HaveOccurred()))
 		})
 	})
 })

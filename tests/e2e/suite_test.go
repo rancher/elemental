@@ -36,6 +36,7 @@ var (
 	clusterNS   string
 	osImage     string
 	vmName      string
+	upgradeType string
 	vmIndex     int
 )
 
@@ -53,6 +54,7 @@ var _ = BeforeSuite(func() {
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
+	upgradeType = os.Getenv("UPGRADE_TYPE")
 	index, set := os.LookupEnv("VM_INDEX")
 
 	// Only if VM_INDEX is set

@@ -6,7 +6,6 @@ metadata:
   # assigned to the clusters.provisioning.cattle.io resource
   # namespace: fleet-default
 spec:
-  # Set to the new ManagedOSVersion you would like to upgrade to
-  managedOSVersionName: os2-amd64
+  %OS_IMAGE%
   clusterTargets:
   - clusterName: %CLUSTER_NAME%
