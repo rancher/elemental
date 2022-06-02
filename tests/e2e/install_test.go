@@ -124,7 +124,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Installing RancherOS Operator", func() {
+		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"rancheros-operator",
 				"https://rancher-sandbox.github.io/rancheros-operator",
