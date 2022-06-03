@@ -4,6 +4,7 @@ set -e -x
 
 # Variable(s)
 VM_NAME=$1
+MAC=$2
 
 # Create VM
 script -e -c "virt-install \
@@ -16,7 +17,7 @@ script -e -c "virt-install \
   --ram=2048 \
   --vcpus=2 \
   --cpu host \
-  --disk path=hdd.img,bus=scsi,size=35 \
+  --disk path=${VM_NAME}.img,bus=scsi,size=35 \
   --check disk_size=off \
   --graphics none \
   --serial pty \
@@ -25,4 +26,4 @@ script -e -c "virt-install \
   --tpm emulator,model=tpm-crb,version=2.0 \
   --noreboot \
   --pxe \
-  --network network=default,bridge=virbr0,model=virtio,mac=52:54:00:00:00:01"
+  --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"

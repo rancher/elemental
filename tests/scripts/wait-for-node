@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# Waiting for node to be added to the cluster
-timeout 10m bash -c "until ! kubectl get cluster -n ${CLUSTER_NS} ${CLUSTER_NAME} -o yaml | grep -q 'message: waiting for at least one bootstrap node'; do sleep 1; done"
