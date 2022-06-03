@@ -1,4 +1,4 @@
-name: Bootstrap RancherOS on a VM with Rancher
+name: Elemental End-To-End tests with Rancher
 
 on:
   push:
@@ -84,6 +84,7 @@ jobs:
         INSTALL_K3S_SKIP_ENABLE: true
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
         PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        ARCH: amd64
       options: --privileged
     steps:
       - name: Install dependencies
@@ -148,10 +149,9 @@ jobs:
           UPGRADE_TYPE: osimage
           REPO: quay.io/costoolkit/os2-ci
           VM_INDEX: 2
-          ARCH: amd64
         run: |
           # Execute test
-          export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}
+          export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
           cd tests && make e2e-upgrade-node
       - name: E2E - Bootstrap node 3 with latest released build
         env:
@@ -163,7 +163,6 @@ jobs:
         env:
           UPGRADE_TYPE: upgradechannel
           VM_INDEX: 3
-          ARCH: amd64
         run: |
           # Restore upgradechannel yaml file
           cp -a keep-current-build/rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml .
