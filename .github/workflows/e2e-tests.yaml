@@ -150,12 +150,13 @@ jobs:
           cd tests && make e2e-bootstrap-node
       - name: E2E - Upgrade node 2 (with osImage method)
         env:
-          UPGRADE_TYPE: osimage
+          UPGRADE_TYPE: osImage
           REPO: quay.io/costoolkit/os2-ci
           VM_INDEX: 2
         run: |
-          # Execute test
+          # This variable is used to upgrade the OS and check the OS version after upgrade
           export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
+          # Execute test
           cd tests && make e2e-upgrade-node
       - name: E2E - Bootstrap node 3 with latest released build
         env:
@@ -165,11 +166,13 @@ jobs:
           cd tests && make e2e-bootstrap-node
       - name: E2E - Upgrade node 3 (with UpgradeChannel method)
         env:
-          UPGRADE_TYPE: upgradechannel
+          UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: |
           # Restore upgradechannel yaml file
           cp -a keep-current-build/rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml .
+          # This variable is used to check the OS version after upgrade
+          export CONTAINER_IMAGE=:${GITHUB_SHA::7}-${ARCH}
           # Execute test
           cd tests && make e2e-upgrade-node
       - name: Upload logs

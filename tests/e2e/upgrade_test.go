@@ -35,8 +35,9 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 		By("Triggering Upgrade in Rancher with "+upgradeType, func() {
 			upgradeOsYaml := "../assets/upgrade.yaml"
+			upgradeTypeValue := osImage // Default to osImage
 
-			if upgradeType == "upgradechannel" {
+			if upgradeType == "managedOSVersionName" {
 				upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(upgradeChannelFile).To(Not(BeEmpty()))
@@ -44,18 +45,19 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
 				Expect(err).To(Not(HaveOccurred()))
 
-				// Get ManagedOSVersionChannel name
-				name, err := kubectl.Run("get", "ManagedOSVersionChannel",
+				// Get ManagedOSVersionChannel value
+				upgradeTypeValue, err = kubectl.Run("get", "ManagedOSVersionChannel",
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[0].metadata.name}")
 				Expect(err).To(Not(HaveOccurred()))
-
-				err = tools.Sed("%OS_IMAGE%", "managedOSVersionName: "+name, upgradeOsYaml)
-				Expect(err).To(Not(HaveOccurred()))
+				Expect(upgradeTypeValue).To(Not(BeEmpty()))
 			}
 
-			if upgradeType == "osimage" {
-				err := tools.Sed("%OS_IMAGE%", "osImage: "+osImage, upgradeOsYaml)
+			// We don't know what is the previous type of upgrade, so easier to replace all here
+			// as there is only one in the yaml file anyway
+			patterns := []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"}
+			for _, p := range patterns {
+				err := tools.Sed(p, upgradeType+": "+upgradeTypeValue, upgradeOsYaml)
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
