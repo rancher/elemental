@@ -133,46 +133,45 @@ jobs:
         run: |
           # Execute test
           cd tests && make e2e-bootstrap-node
-      - name: E2E - Clean current build
-        run: |
-          # Backup *ALL* files from current build
-          mkdir -p keep-current-build
-          mv -f rancheros-${GITHUB_SHA::7}-${ARCH}* keep-current-build/
-          # Download the latest *OFFICIAL* version available
-          OS2_ISO=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
-                           | awk "/browser_download_url.*-${ARCH}.iso/ { gsub(\"\\\"\",\"\"); print \$2 }")
-          for I in \.iso \.ipxe \.squashfs -kernel -initrd; do URL=${OS2_ISO/\.iso/${I}}; curl -Ls -o ${URL##*/} ${URL}; done
-      - name: E2E - Bootstrap node 2 with latest released build
+      - name: E2E - Bootstrap node 2 with current build
         env:
           VM_INDEX: 2
         run: |
           # Execute test
           cd tests && make e2e-bootstrap-node
-      - name: E2E - Upgrade node 2 (with osImage method)
+      - name: E2E - Upgrade node 2 (with UpgradeChannel method) to latest released build
         env:
-          UPGRADE_TYPE: osImage
-          REPO: quay.io/costoolkit/os2-ci
+          UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 2
         run: |
-          # This variable is used to upgrade the OS and check the OS version after upgrade
-          export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
+          VERSION=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
+                    | awk '/tag_name/ { gsub("\"",""); print $2 }')
+          # This variable is used to check the OS version after upgrade
+          export CONTAINER_IMAGE=:${VERSION%,}-${ARCH}
           # Execute test
           cd tests && make e2e-upgrade-node
+      - name: E2E - Clean current build
+        run: |
+          # Remove *ALL* files from current build
+          rm -f rancheros-${GITHUB_SHA::7}-${ARCH}*
+          # Download the latest *OFFICIAL* version available
+          OS2_ISO=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
+                    | awk "/browser_download_url.*-${ARCH}.iso/ { gsub(\"\\\"\",\"\"); print \$2 }")
+          for I in \.iso \.ipxe \.squashfs -kernel -initrd; do URL=${OS2_ISO/\.iso/${I}}; curl -Ls -o ${URL##*/} ${URL}; done
       - name: E2E - Bootstrap node 3 with latest released build
         env:
           VM_INDEX: 3
         run: |
           # Execute test
           cd tests && make e2e-bootstrap-node
-      - name: E2E - Upgrade node 3 (with UpgradeChannel method)
+      - name: E2E - Upgrade node 3 (with osImage method) to current build
         env:
-          UPGRADE_TYPE: managedOSVersionName
+          UPGRADE_TYPE: osImage
+          REPO: quay.io/costoolkit/os2-ci
           VM_INDEX: 3
         run: |
-          # Restore upgradechannel yaml file
-          cp -a keep-current-build/rancheros-${GITHUB_SHA::7}-${ARCH}.upgradechannel-${ARCH}.yaml .
-          # This variable is used to check the OS version after upgrade
-          export CONTAINER_IMAGE=:${GITHUB_SHA::7}-${ARCH}
+          # This variable is used to upgrade the OS and check the OS version after upgrade
+          export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
           # Execute test
           cd tests && make e2e-upgrade-node
       - name: Upload logs

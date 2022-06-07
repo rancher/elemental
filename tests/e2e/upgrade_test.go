@@ -25,6 +25,8 @@ import (
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	It("Upgrade node", func() {
+		osVersion := strings.Split(osImage, ":")[1]
+
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
 		})
@@ -45,12 +47,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
 				Expect(err).To(Not(HaveOccurred()))
 
-				// Get ManagedOSVersionChannel value
-				upgradeTypeValue, err = kubectl.Run("get", "ManagedOSVersionChannel",
-					"--namespace", clusterNS,
-					"-o", "jsonpath={.items[0].metadata.name}")
-				Expect(err).To(Not(HaveOccurred()))
-				Expect(upgradeTypeValue).To(Not(BeEmpty()))
+				upgradeTypeValue = osVersion
 			}
 
 			// We don't know what is the previous type of upgrade, so easier to replace all here
@@ -78,13 +75,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				Password: userPassword,
 			}
 
-			version := strings.Split(osImage, ":")[1]
 			Eventually(func() string {
 				// Use grep here in case of comment in the file!
-				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION_ID}")
+				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, "20m", "30s").Should(Equal(version))
+			}, "20m", "30s").Should(Equal(osVersion))
 		})
 
 		By("Cleaning upgrade orders", func() {
