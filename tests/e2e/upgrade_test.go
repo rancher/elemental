@@ -80,7 +80,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, "20m", "30s").Should(Equal(osVersion))
+			}, "30m", "30s").Should(Equal(osVersion))
 		})
 
 		By("Cleaning upgrade orders", func() {
