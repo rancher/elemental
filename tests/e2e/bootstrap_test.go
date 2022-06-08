@@ -105,6 +105,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				out, _ := client.RunSSH("uname -n")
 				return out
 			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
+
+			// fleet-agent is the last pod that start, wait for it before continuing
+			Eventually(func() string {
+				out, _ := client.RunSSH("kubectl get pod -n cattle-fleet-system -l app=fleet-agent")
+				return out
+			}, "10m", "30s").Should(ContainSubstring("Running"))
 		})
 	})
 })
