@@ -3,17 +3,17 @@
 # Command line
 
 You can also use the `rancherd upgrade` command on a `server` node to automatically 
-upgrade RancherOS, Rancher, and/or Kubernetes.
+upgrade Elemental, Rancher, and/or Kubernetes.
 
 # Kubernetes API
 
-All components in RancherOS are managed using Kubernetes. Below is how
+All components in Elemental are managed using Kubernetes. Below is how
 to use Kubernetes approaches to upgrade the components.
 
-## RancherOS
+## Elemental
 
-RancherOS is upgraded with the RancherOS operator. Refer to the
-[RancherOS Operator](https://github.com/rancher-sandbox/rancheros-operator/blob/main/README.md) documentation for complete information, but the
+Elemental is upgraded with the Elemental operator. Refer to the
+[Elemental Operator](https://github.com/rancher/elemental-operator/blob/main/README.md) documentation for complete information, but the
 TL;DR is
 
 ```bash
@@ -26,13 +26,15 @@ metadata:
   name: default-os-image
   namespace: fleet-local
 spec:
-  # Set to the new RancherOS version you would like to upgrade to
+  # Set to the new Elemental version you would like to upgrade to
   osImage: quay.io/costoolkit/os2:v0.0.0
 ```
 
 ### Managing available versions
 
-An upgrade channel file ( `rancheros-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped in os2 releases and can be applied in a Kubernetes cluster where the rancheros operator is installed to syncronize available version for upgrades.
+An upgrade channel file (
+`rancheros-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
+in Elemental releases and can be applied in a Kubernetes cluster where the rancheros operator is installed to syncronize available version for upgrades.
 
 
 For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it where the ros-operator is installed: 
@@ -82,12 +84,13 @@ spec:
 
 Note: be sure to have `osImage` empty when refering to a `ManagedOSVersion` as it takes precedence over `ManagedOSVersion`s.
 
-## rancherd
+## system-agent
 
-Rancherd itself doesn't need to be upgraded. It is only ran once per node
-to bootstrap the system and then after that provides no value. Rancherd is
-packaged in the OS image so newer versions of Rancherd will come with newer
-versions of RancherOS.
+Rancher system agent itself doesn't need to be upgraded. It is only ran once per node
+to bootstrap the system and then after that provides no value. Rancher
+system agent is
+packaged in the OS image so newer versions of Rancher system agent will come with newer
+versions of Elemental.
 
 ## Rancher
 Rancher is installed as a helm chart following the standard procedure. You can upgrade
