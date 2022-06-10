@@ -1,19 +1,19 @@
 # Custom Images
 
-RancherOS image can easily be remastered using a docker build.
-For example, to add `cowsay` to RancherOS you would use the
+Elemental image can easily be remastered using a docker build.
+For example, to add `cowsay` to Elemental you would use the
 following Dockerfile
 
 ## Docker image
 
 ```Dockerfile
-# The version of RancherOS to modify
+# The version of Elemental to modify
 FROM rancher-sandbox/os2:VERSION
 
 # Your custom commands
 RUN zypper install -y cowsay
 
-# IMPORTANT: /usr/lib/rancheros-release is used for versioning/upgrade. The
+# IMPORTANT: /usr/lib/Elemental-release is used for versioning/upgrade. The
 # values here should reflect the tag of the image currently being built
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest
@@ -22,7 +22,7 @@ RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
     echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
 ```
 
-Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/os2?tab=tags) or [github](https://github.com/rancher-sandbox/os2/releases)
+Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/elemental?tab=tags) or [github](https://github.com/rancher/elemental/releases)
 
 And then the following commands
 
@@ -47,7 +47,7 @@ run the below command
 
 ```bash
 # Download the ros-image-build script
-curl -o ros-image-build https://raw.githubusercontent.com/rancher-sandbox/os2/main/ros-image-build
+curl -o ros-image-build https://raw.githubusercontent.com/rancher/elemental/main/ros-image-build
 
 # Run the script creating a qcow image, an ISO, and an AMI
 bash ros-image-build myrepo/custom-build:v1.1.1 qcow,iso,ami
