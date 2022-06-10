@@ -2,8 +2,8 @@
 
 ## Overview
 
-The design of RancherOS is that you boot from a vanilla image and through cloud-init and Kubernetes mechanisms
-the node will be configured. Installation of RancherOS is really the process of building an image from which
+The design of Elemental is that you boot from a vanilla image and through cloud-init and Kubernetes mechanisms
+the node will be configured. Installation of Elemental is really the process of building an image from which
 you can boot.  During the image building process you can bake in default OEM configuration that is a part of the
 image.
 
@@ -18,13 +18,13 @@ The installation configuration should be hosted on an HTTP or TFTP server. A sim
 ### Kernel Command Line
 
 Install directives can be set from the kernel command line using a period (.) seperated key structure such as
-`rancheros.install.config_url`.  They kernel command line keys are case-insensitive.
+`Elemental.install.config_url`.  They kernel command line keys are case-insensitive.
 
 ### Reference
 
 ```yaml
 #cloud-config
-rancheros:
+Elemental:
   install:
     # An http://, https://, or tftp:// URL to load as the base configuration
     # for this configuration. This configuration can include any install 
@@ -44,7 +44,7 @@ rancheros:
     # then this flag will force the installer to use UEFI even if not detected.
     forceEFI: false
     # If true then it is assumed that the disk is already formatted with the standard
-    # partitions need by RancherOS.  Refer to the partition table section below for the
+    # partitions need by Elemental.  Refer to the partition table section below for the
     # exact requirements. Also, if this is set to true 
     noFormat: false
     # After installation the system will reboot by default.  If you wish to instead
@@ -79,11 +79,11 @@ root password set.
 
 ## iPXE Installation
 
-Download the latest ipxe script from [current release](https://github.com/rancher-sandbox/os2/releases/latest)
+Download the latest ipxe script from [current release](https://github.com/rancher/elemental/releases/latest)
 
 ## Partition Table
 
-RancherOS requires the following partitions.  These partitions are required by [cOS-toolkit](https://rancher-sandbox.github.io/cos-toolkit-docs/docs)
+Elemental requires the following partitions.  These partitions are required by [cOS-toolkit](https://rancher-sandbox.github.io/cos-toolkit-docs/docs)
 
 | Label          | Default Size    | Contains                                                    |
 | ---------------|-----------------|------------------------------------------------------------ |
