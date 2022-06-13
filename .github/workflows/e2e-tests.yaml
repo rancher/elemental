@@ -174,6 +174,22 @@ jobs:
           export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
           # Execute test
           cd tests && make e2e-upgrade-node
+      - name: E2E - Bootstrap node 4 with latest released build
+        env:
+          VM_INDEX: 4
+        run: |
+          # Execute test
+          cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 4 (with manual method) to current build
+        env:
+          UPGRADE_TYPE: manual
+          REPO: quay.io/costoolkit/os2-ci
+          VM_INDEX: 4
+        run: |
+          # This variable is used to upgrade the OS and check the OS version after upgrade
+          export CONTAINER_IMAGE=${REPO}:${GITHUB_SHA::7}-${ARCH}
+          # Execute test
+          cd tests && make e2e-upgrade-node
       - name: Upload logs
         uses: actions/upload-artifact@v3
         if: failure()
