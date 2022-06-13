@@ -123,7 +123,7 @@ jobs:
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
-          [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO}
+          [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: E2E - Install Rancher
         run: |
           cd tests && make e2e-install-rancher
