@@ -25,10 +25,6 @@
 # by cos-features. ( defaults to /system/features )
 #COS_FEATURESDIR="/system/features"
 
-# This is the repository that hosts the signature files used by cosign and luet-cosign plugin during upgrade/deploy to
-# check the artifact signatures
-#COSIGN_REPOSITORY="raccos/releases-teal"
-
 # This sets keyless verify on building packages with luet and the luet-cosign plugin.
 # 1  = enabled keyless, 0 = disabled, uses normal public key verification
 #COSIGN_EXPERIMENTAL=1

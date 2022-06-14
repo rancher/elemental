@@ -155,11 +155,14 @@ function mountOverlay {
     if [ "${base##/run}" == "${base}"  ]; then
         base="/sysroot${base}"
     fi
-    mkdir -p "${merged}"
     if ! mountpoint -q "${merged}"; then
         upperdir="${base}/${mount//\//-}.overlay/upper"
         workdir="${base}/${mount//\//-}.overlay/work"
-        mkdir -p "${upperdir}" "${workdir}"
+        mkdir -p "${merged}" "${upperdir}" "${workdir}"
+        if [ $? -ne 0 ]; then
+            >&2 echo "failed creating one of '${merged}', '${upperdir}' or '${workdir}'. Ignoring '${merged}' mount"
+            return
+        fi
         mount -t overlay overlay -o "defaults,lowerdir=${merged},upperdir=${upperdir},workdir=${workdir}" "${merged}"
         fstab_line="overlay /${mount} overlay defaults,lowerdir=/${mount},upperdir=${upperdir##/sysroot},workdir=${workdir##/sysroot}"
         required_mount=$(findmnt -fno TARGET --target "${base}")
@@ -183,6 +186,10 @@ function mountState {
         state_dir="/sysroot${state_target}/${mount//\//-}.bind"
         if ! mountpoint -q "${base}"; then
             mkdir -p "${base}" "${state_dir}"
+            if [ $? -ne 0 ]; then
+                >&2 echo "failed creating '${base}' or '${state_dir}'. Ignoring '${base}' mount"
+                return
+            fi
             rsync -aqAX "${base}/" "${state_dir}/"
             mount -o defaults,bind "${state_dir}" "${base}"
             fstab_line="${state_dir##/sysroot} /${mount} none defaults,bind 0 0\n"
@@ -249,7 +256,7 @@ for mount in "${mountpoints[@]}"; do
         fi
     else
         # FSCK
-        systemd-fsck "${mount}"
+        systemd-fsck "${mount#*:}"
         fstab+=$(mountPersistent "${mount}")
     fi
 done
