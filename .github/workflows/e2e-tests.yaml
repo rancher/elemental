@@ -145,19 +145,21 @@ jobs:
           VM_INDEX: 2
         run: |
           VERSION=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
-                    | awk '/tag_name/ { gsub("\"",""); print $2 }')
+                    | sed -n -E '/"tag_name":/s/.*"([^"]+)".*/\1/p')
           # This variable is used to check the OS version after upgrade
-          export CONTAINER_IMAGE=:${VERSION%,}-${ARCH}
+          export CONTAINER_IMAGE=:${VERSION}-${ARCH}
           # Execute test
           cd tests && make e2e-upgrade-node
-      - name: E2E - Clean current build
+      - name: E2E - Backup current build
         run: |
-          # Remove *ALL* files from current build
-          rm -f rancheros-${GITHUB_SHA::7}-${ARCH}*
-          # Download the latest *OFFICIAL* version available
-          OS2_ISO=$(curl -s ${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases/latest \
-                    | awk "/browser_download_url.*-${ARCH}.iso/ { gsub(\"\\\"\",\"\"); print \$2 }")
-          for I in \.iso \.ipxe \.squashfs -kernel -initrd; do URL=${OS2_ISO/\.iso/${I}}; curl -Ls -o ${URL##*/} ${URL}; done
+          # Backup files from current build
+          mkdir -p backup && mv -f rancheros-${GITHUB_SHA::7}-${ARCH}* $_
+      - name: E2E - Download latest release
+        uses: robinraju/release-downloader@v1.3
+        with:
+          repository: ${{ github.repository }}
+          latest: true
+          fileName: "*"
       - name: E2E - Bootstrap node 3 with latest released build
         env:
           VM_INDEX: 3
