@@ -31,16 +31,19 @@ ENV LUET_NOLOCK=true
 # Copy luet from the official images
 RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar e2fsprogs dosfstools pigz go1.16 qemu-uefi-aarch64 mtools rsync
 
-RUN cd /usr/sbin && \
-    rm packer && \
+WORKDIR /usr/sbin
+RUN rm packer && \
     SUFFIX=amd64 && \
     if [ "$(uname -m)" = "aarch64" ]; then SUFFIX=arm64; fi && \
     curl https://releases.hashicorp.com/packer/1.7.4/packer_1.7.4_linux_${SUFFIX}.zip > tmp && \
     unzip tmp && \
     rm tmp
-RUN cd /usr/src && \
-    git clone https://github.com/rancher-sandbox/cOS-toolkit && \
-    cd cOS-toolkit && git checkout ${COS_VERSION} -b build
+WORKDIR /usr/src
+RUN git clone https://github.com/rancher/elemental-toolkit && \
+    cd elemental-toolkit && git checkout ${COS_VERSION} -b build && \
+# Save version info to /output-build-info.txt
+    echo "elemental-cli:$(elemental version)" > /output-build-info.txt && \
+    echo "elemental-toolkit:$(git describe --tags)" >> /output-build-info.txt
 RUN mkdir -p /iso/iso-overlay/boot/grub2
 RUN echo -e \
 'search --file --set=root /boot/kernel.xz\n'\
@@ -90,6 +93,7 @@ COPY --from=os / /iso/overlay
 RUN cd /iso && \
     elemental --debug build-iso -n output --overlay-iso /iso/iso-overlay /iso/overlay
 
+
 FROM iso-build AS qcow-build
 ARG ACCEL=tcg
 RUN SUFFIX= && \
@@ -120,6 +124,7 @@ COPY --from=qcow-build2 /output/ /
 
 FROM scratch AS iso
 COPY --from=iso-build /iso/output.iso /
+COPY --from=iso-build /output-build-info.txt /
 
 FROM tools AS ami
 ARG AWS_ACCESS_KEY_ID

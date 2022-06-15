@@ -67,6 +67,13 @@ jobs:
           path: |
             dist/artifacts/*-initrd
           if-no-files-found: error
+      - name: Upload build-info
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-info
+          path: |
+            dist/artifacts/*build-info.txt
+          if-no-files-found: error
       - name: Release space from worker ♻
         if: always()
         run: |
