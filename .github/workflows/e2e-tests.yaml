@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: build-host
     env:
       DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
