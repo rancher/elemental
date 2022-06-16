@@ -8,19 +8,27 @@ on:
 jobs:
   build:
     runs-on: build-host
-    env:
-      DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-      DOCKER_REGISTRY: quay.io
-      REPO: quay.io/costoolkit/os2
+    container:
+      image: ubuntu:latest
+      env:
+        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
+        DOCKER_REGISTRY: quay.io
+        REPO: quay.io/costoolkit/os2
+        # Disable KVM for Vagrant image (can be forced during execution if needed)
+        NO_KVM: 1
     steps:
-      - uses: actions/checkout@v2
-      -
-        name: Set up Docker Buildx
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y sudo make curl docker.io
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
-      - run: |
-              make ci
+        uses: docker/setup-buildx-action@v2
+      - name: Make images (container/iso/qcow2/etc.)
+        run: make ci
       - name: Release
         uses: rancher-sandbox/github-action-ghr@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -31,7 +39,5 @@ jobs:
       - name: Release space from worker ♻
         if: always()
         run: |
-          sudo rm -rf build || true
-          sudo rm -rf bin || true
-          sudo rm -rf dist || true
+          sudo rm -rf build bin dist || true
           docker system prune -f -a --volumes || true
