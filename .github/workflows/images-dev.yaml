@@ -1,29 +1,30 @@
 name: Build images
+
 on:
   workflow_dispatch:
+
 concurrency:
   group: images-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       REPO: quay.io/costoolkit/os2
     steps:
-      - uses: actions/checkout@v2
-      -
-        name: Login to Container Registry
-        uses: docker/login-action@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Container Registry
+        uses: docker/login-action@v2
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
-      - run: |
-              make build push
+      - name: Build and push
+        run: make build push
       - name: Release space from worker ♻
         if: always()
         run: |
-          sudo rm -rf build || true
-          sudo rm -rf bin || true
-          sudo rm -rf dist || true
+          sudo rm -rf build bin dist || true
           docker system prune -f -a --volumes || true
