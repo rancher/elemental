@@ -67,6 +67,12 @@ jobs:
           path: |
             dist/artifacts/*-initrd
           if-no-files-found: error
+      - name: Upload .txt
+        uses: actions/upload-artifact@v2
+        with:
+          name: txt
+          path: dist/artifacts/*.txt
+          if-no-files-found: warn
       - name: Release space from worker ♻
         if: always()
         run: |
