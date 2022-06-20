@@ -29,6 +29,6 @@
 **Upgrade node by:**
 - Checking if VM name is set
 - Checking if upgrade type is set
-- Triggering Upgrade in Rancher with <upgradeType>
+- Triggering Upgrade in Rancher with <upgradeType> | Triggering Manual Upgrade
 - Checking VM upgrade
 - Cleaning upgrade orders

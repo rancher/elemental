@@ -24,9 +24,25 @@ import (
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
-	It("Upgrade node", func() {
-		osVersion := strings.Split(osImage, ":")[1]
+	var (
+		client    *tools.Client
+		osVersion string
+	)
 
+	BeforeEach(func() {
+		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
+		Expect(err).To(Not(HaveOccurred()))
+
+		client = &tools.Client{
+			Host:     string(hostData.IP) + ":22",
+			Username: userName,
+			Password: userPassword,
+		}
+
+		osVersion = strings.Split(osImage, ":")[1]
+	})
+
+	It("Upgrade node", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
 		})
@@ -35,46 +51,50 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})
 
-		By("Triggering Upgrade in Rancher with "+upgradeType, func() {
-			upgradeOsYaml := "../assets/upgrade.yaml"
-			upgradeTypeValue := osImage // Default to osImage
+		if upgradeType != "manual" {
+			By("Triggering Upgrade in Rancher with "+upgradeType, func() {
+				upgradeOsYaml := "../assets/upgrade.yaml"
+				upgradeTypeValue := osImage // Default to osImage
 
-			if upgradeType == "managedOSVersionName" {
-				upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
+				if upgradeType == "managedOSVersionName" {
+					upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(upgradeChannelFile).To(Not(BeEmpty()))
+
+					err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
+					Expect(err).To(Not(HaveOccurred()))
+
+					upgradeTypeValue = osVersion
+				}
+
+				// We don't know what is the previous type of upgrade, so easier to replace all here
+				// as there is only one in the yaml file anyway
+				patterns := []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"}
+				for _, p := range patterns {
+					err := tools.Sed(p, upgradeType+": "+upgradeTypeValue, upgradeOsYaml)
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
+				err := tools.Sed("%CLUSTER_NAME%", clusterName, upgradeOsYaml)
 				Expect(err).To(Not(HaveOccurred()))
-				Expect(upgradeChannelFile).To(Not(BeEmpty()))
 
-				err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
+				err = kubectl.Apply(clusterNS, upgradeOsYaml)
 				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 
-				upgradeTypeValue = osVersion
-			}
-
-			// We don't know what is the previous type of upgrade, so easier to replace all here
-			// as there is only one in the yaml file anyway
-			patterns := []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"}
-			for _, p := range patterns {
-				err := tools.Sed(p, upgradeType+": "+upgradeTypeValue, upgradeOsYaml)
+		if upgradeType == "manual" {
+			By("Triggering Manual Upgrade", func() {
+				out, err := client.RunSSH("elemental upgrade -d " + osImage)
 				Expect(err).To(Not(HaveOccurred()))
-			}
+				Expect(out).To((ContainSubstring("Upgrade completed")))
 
-			err := tools.Sed("%CLUSTER_NAME%", clusterName, upgradeOsYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.Apply(clusterNS, upgradeOsYaml)
-			Expect(err).To(Not(HaveOccurred()))
-		})
+				// Simply reboot, no check as an ssh error will be throwned anyway
+				_, _ = client.RunSSH("reboot")
+			})
+		}
 
 		By("Checking VM upgrade", func() {
-			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).To(Not(HaveOccurred()))
-
-			client := &tools.Client{
-				Host:     string(hostData.IP) + ":22",
-				Username: userName,
-				Password: userPassword,
-			}
-
 			Eventually(func() string {
 				// Use grep here in case of comment in the file!
 				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
@@ -83,9 +103,11 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			}, "30m", "30s").Should(Equal(osVersion))
 		})
 
-		By("Cleaning upgrade orders", func() {
-			err := kubectl.DeleteResource(clusterNS, "ManagedOSImage", "default-os-image")
-			Expect(err).To(Not(HaveOccurred()))
-		})
+		if upgradeType != "manual" {
+			By("Cleaning upgrade orders", func() {
+				err := kubectl.DeleteResource(clusterNS, "ManagedOSImage", "default-os-image")
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })
