@@ -13,20 +13,14 @@ env:
   REPO: ttl.sh/os2-ci
 jobs:
   build:
-    runs-on: build-host
-    container:
-      image: ubuntu:latest
-      env:
-        DOCKER_REGISTRY: ttl.sh
-        TAG: ${{ github.sha }}
-        PUSH: "true"
-        # Disable KVM for Vagrant image (can be forced during execution if needed)
-        NO_KVM: 1
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_REGISTRY: ttl.sh
+      TAG: ${{ github.sha }}
+      PUSH: "true"
+      # Disable KVM for Vagrant image (can be forced during execution if needed)
+      NO_KVM: 1
     steps:
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y sudo make curl docker.io
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
