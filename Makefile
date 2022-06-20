@@ -31,6 +31,12 @@ build:
 		--build-arg IMAGE_TAG=${TAG} \
 		--build-arg IMAGE_REPO=${REPO} \
 		-t ${IMAGE} .
+	mkdir -p dist/artifacts
+	docker run --name build_tmp -d ${IMAGE} sleep 5
+	docker cp ${ROOT_DIR}/scripts build_tmp:/scripts
+	docker exec build_tmp /bin/sh -c '/scripts/package-info.sh > /packages.txt'	
+	docker cp build_tmp:/packages.txt dist/artifacts/packages.txt
+	docker rm -f build_tmp
 
 .PHONY: push
 push:
