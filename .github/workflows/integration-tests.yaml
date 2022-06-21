@@ -56,7 +56,8 @@ jobs:
           name: box
           path: dist/artifacts/*.box
           if-no-files-found: warn
-      - uses: actions/upload-artifact@v2
+      - name: Upload .txt
+        uses: actions/upload-artifact@v3
         with:
           name: txt
           path: dist/artifacts/*.txt

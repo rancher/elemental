@@ -39,7 +39,7 @@ jobs:
           path: dist/artifacts/*
           key: ${{ github.head_ref || github.ref }}-${{ github.repository }}-artifacts
       - name: Upload .txt
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: txt
           path: dist/artifacts/*.txt
