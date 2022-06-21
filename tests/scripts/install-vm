@@ -14,8 +14,8 @@ script -e -c "virt-install \
   --virt-type kvm \
   --machine q35 \
   --boot bios.useserial=on \
-  --ram=2048 \
-  --vcpus=2 \
+  --ram=4096 \
+  --vcpus=4 \
   --cpu host \
   --disk path=${VM_NAME}.img,bus=scsi,size=35 \
   --check disk_size=off \
