@@ -30,7 +30,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  600 * time.Second,
+		PollTimeout:  1200 * time.Second,
 		PollInterval: 500 * time.Millisecond,
 	}
 
