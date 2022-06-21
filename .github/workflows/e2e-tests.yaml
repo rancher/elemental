@@ -20,8 +20,6 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
         DOCKER_REGISTRY: quay.io
-        # Disable KVM for Vagrant image (can be forced during execution if needed)
-        NO_KVM: 1
     steps:
       - name: Install dependencies
         run: |
