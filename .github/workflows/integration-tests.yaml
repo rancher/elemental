@@ -10,12 +10,11 @@ concurrency:
 
 env:
    DOCKER_REGISTRY: ttl.sh
-   REPO: ttl.sh/os2-ci-${{ github.sha }}
-   TAG: 8h
+   REPO: ttl.sh/os2-ci
+   TAG: ${{ github.sha }}
    PUSH: "true"
 jobs:
   build:
-
     runs-on: ubuntu-latest
     #runs-on: self-hosted
     steps:
@@ -85,19 +84,13 @@ jobs:
               ls -liah artifacts
               mv artifacts/*.iso ros.iso
               rm -rf artifacts
-      - name: OS version
-        id: version
-        run: |
-          source scripts/version
-          # Set output parameters.
-          echo ::set-output name=tag::${TAG}
       - name: Run tests
         env:
           BOX_URL: ${{ github.event.inputs.box-image }}
         run: |
           export COS_HOST=127.0.0.1:2222
           export ISO=$PWD/ros.iso
-          export CONTAINER_IMAGE=$REPO:${{ steps.version.outputs.tag }}
+          export CONTAINER_IMAGE=$REPO:$TAG
           make deps
           cd tests && make installer-tests
       - uses: actions/upload-artifact@v2
