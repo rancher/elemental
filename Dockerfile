@@ -4,6 +4,8 @@ FROM $BASE_IMAGE
 # Framework files
 COPY framework/cos/ /
 COPY framework/files/ /
+COPY --from=rancher/system-agent:v0.2.7 /usr/bin/rancher-system-agent /usr/sbin/rancher-system-agent
+COPY --from=ghcr.io/rancher/elemental-operator:dev /usr/bin/elemental-operator /usr/sbin/elemental-operator
 
 # Copy in some local OS customizations
 COPY system/files /

@@ -1,3 +1,0 @@
-postInstructions:
-- command: /usr/sbin/ros-operator-install
-  saveOutput: true

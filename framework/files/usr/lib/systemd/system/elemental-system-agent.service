@@ -1,0 +1,17 @@
+[Unit]
+Description=Elemental System Agent
+Documentation=https://www.rancher.com
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+StandardOutput=journal+console
+StandardError=journal+console
+Environment="CATTLE_AGENT_CONFIG=/etc/rancher/elemental/agent/config.yaml"
+ExecStart=/usr/sbin/rancher-system-agent sentinel
