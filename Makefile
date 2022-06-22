@@ -24,13 +24,14 @@ package: .dapper
 clean:
 	rm -rf build dist
 
-.PHONY: build
-build:
+.PHONY: build-test
+build-test:
 	docker build \
 		--build-arg CACHEBUST=${CACHEBUST} \
 		--build-arg IMAGE_TAG=${TAG} \
 		--build-arg IMAGE_REPO=${REPO} \
-		-t ${IMAGE} .
+		-t ${IMAGE} \
+        -f Dockerfile.e2e .
 	mkdir -p dist/artifacts
 	docker run --name build_tmp -d ${IMAGE} sleep 5
 	docker cp ${ROOT_DIR}/scripts build_tmp:/scripts
