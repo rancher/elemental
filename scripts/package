@@ -12,7 +12,7 @@ if [ -n "$DOCKER_PASSWORD" ]; then
 fi
 
 export TAG
-make build
+make build-test
 make iso
 
 if [ "$PUSH" = "true" ]; then

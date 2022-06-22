@@ -43,7 +43,7 @@ fi
 
 
 if [ "$1" == "" ] && [ ! -e output.iso ]; then
-    make -C .. build iso
+    make -C .. build-test iso
 fi
 
     #-bios /usr/share/qemu/OVMF.fd \
