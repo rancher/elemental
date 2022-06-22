@@ -1,0 +1,18 @@
+[Unit]
+Description=Elemental Operator Registration
+Wants=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=-/etc/default/%N
+EnvironmentFile=-/etc/sysconfig/%N
+TimeoutStartSec=0
+StandardOutput=journal+console
+StandardError=journal+console
+ExecStartPre=/bin/sh -c 'echo "ELEMENTAL_TARGET=/dev/$(lsblk -r -o NAME,TYPE | grep -w disk | grep -v fd0 | awk \'{print $1}\')" > /etc/sysconfig/elemental-install'
+ExecStartPre=/usr/sbin/elemental-operator register /oem
+ExecStart=/usr/bin/elemental install --config-dir /etc/elemental
