@@ -19,10 +19,26 @@ package smoke_test
 import (
 	"os"
 
+	"gopkg.in/yaml.v2"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/os2/tests/sut"
 )
+
+type RancherOsConfig struct {
+	Rancheros Rancheros `yaml:"rancheros,omitempty"`
+}
+
+type Rancheros struct {
+	Install Install `yaml:"install,omitempty"`
+}
+
+type Install struct {
+	Device         string `yaml:"device,omitempty"`
+	Automatic      bool   `yaml:"automatic,omitempty"`
+	ContainerImage string `yaml:"containerImage,omitempty"`
+}
 
 var _ = Describe("os2 installation", Label("setup"), func() {
 	var s *sut.SUT
@@ -34,13 +50,17 @@ var _ = Describe("os2 installation", Label("setup"), func() {
 	// This is used to setup the machine that will run other tests
 	Context("First boot", func() {
 		It("can install", func() {
+			cfg := RancherOsConfig{
+				Rancheros: Rancheros{
+					Install: Install{
+						Device:    "/dev/sda",
+						Automatic: true,
+					},
+				},
+			}
 
-			s.WriteInlineFile(`
-rancheros:
- install:
-   device: /dev/sda
-   automatic: true
-`, "/oem/userdata")
+			yamlData, err := yaml.Marshal(&cfg)
+			s.WriteInlineFile(string(yamlData), "/oem/userdata")
 
 			out, err := s.Command("ros-installer --automatic --no-reboot-automatic && sync")
 			Expect(out).To(And(
@@ -63,19 +83,23 @@ var _ = Describe("os2 setup tests", func() {
 
 	Context("First boot", func() {
 		It("can install from a container image", func() {
-
 			containerImage := os.Getenv("CONTAINER_IMAGE")
 			if containerImage == "" {
 				Skip("No CONTAINER_IMAGE defined")
 			}
 
-			s.WriteInlineFile(`
-rancheros:
- install:	
-   device: /dev/sda
-   containerImage: `+containerImage+`
-   automatic: true
-`, "/oem/userdata")
+			cfg := RancherOsConfig{
+				Rancheros: Rancheros{
+					Install: Install{
+						Device:         "/dev/sda",
+						Automatic:      true,
+						ContainerImage: containerImage,
+					},
+				},
+			}
+
+			yamlData, err := yaml.Marshal(&cfg)
+			s.WriteInlineFile(string(yamlData), "/oem/userdata")
 
 			out, err := s.Command("ros-installer --automatic --no-reboot-automatic && sync")
 			Expect(out).To(And(
