@@ -11,12 +11,12 @@ concurrency:
 
 env:
   REPO: ttl.sh/os2-ci
+  TAG: ${{ github.sha }}
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
       DOCKER_REGISTRY: ttl.sh
-      TAG: ${{ github.sha }}
       PUSH: "true"
       # Disable KVM for Vagrant image (can be forced during execution if needed)
       NO_KVM: 1
