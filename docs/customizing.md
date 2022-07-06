@@ -8,7 +8,7 @@ following Dockerfile
 
 ```Dockerfile
 # The version of Elemental to modify
-FROM rancher-sandbox/os2:VERSION
+FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2
 
 # Your custom commands
 RUN zypper install -y cowsay
@@ -17,9 +17,9 @@ RUN zypper install -y cowsay
 # values here should reflect the tag of the image currently being built
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest
-RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
-    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release && \
-    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
+RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/elemental-release && \
+    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/elemental-release && \
+    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/elemental-release
 ```
 
 Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/elemental?tab=tags) or [github](https://github.com/rancher/elemental/releases)
@@ -46,11 +46,11 @@ To create bootable images from the docker image you just created
 run the below command
 
 ```bash
-# Download the ros-image-build script
-curl -o ros-image-build https://raw.githubusercontent.com/rancher/elemental/main/ros-image-build
+# Download the elemental-image-build script
+curl -o elemental-image-build https://raw.githubusercontent.com/rancher/elemental/main/elemental-image-build
 
 # Run the script creating a qcow image, an ISO, and an AMI
-bash ros-image-build myrepo/custom-build:v1.1.1 qcow,iso,ami
+bash elemental-image-build myrepo/custom-build:v1.1.1 qcow,iso,ami
 ```
 
 The above command will create an ISO, a qcow image, and publish AMIs. You need not create all
@@ -62,7 +62,7 @@ To create an ISO that upon boot will automatically run an installation, as an al
 run the following command.
 
 ```bash
-bash ros-image-build myrepo/custom-build:v1.1.1 iso mycloud-config-file.txt
+bash elemental-image-build myrepo/custom-build:v1.1.1 iso mycloud-config-file.txt
 ```
 
 The third parameter is a path to a file that will be used as the cloud config passed to the installation.

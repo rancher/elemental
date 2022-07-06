@@ -1,4 +1,4 @@
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSImage
 metadata:
   name: default-os-image

@@ -57,7 +57,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				upgradeTypeValue := osImage // Default to osImage
 
 				if upgradeType == "managedOSVersionName" {
-					upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
+					upgradeChannelFile, err := tools.GetFiles("../..", "elemental-*.upgradechannel-*.yaml")
 					Expect(err).To(Not(HaveOccurred()))
 					Expect(upgradeChannelFile).To(Not(BeEmpty()))
 

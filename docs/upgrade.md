@@ -20,7 +20,7 @@ TL;DR is
 kubectl edit -n fleet-local default-os-image
 ```
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
@@ -33,13 +33,13 @@ spec:
 ### Managing available versions
 
 An upgrade channel file (
-`rancheros-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
-in Elemental releases and can be applied in a Kubernetes cluster where the rancheros operator is installed to syncronize available version for upgrades.
+`elemental-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
+in Elemental releases and can be applied in a Kubernetes cluster where the elemental operator is installed to syncronize available version for upgrades.
 
 
 For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it where the ros-operator is installed: 
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSVersionChannel
 metadata:
   name: os2-amd64
@@ -72,7 +72,7 @@ kubectl edit -n fleet-local default-os-image
 ```
 
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSImage
 metadata:
   name: default-os-image

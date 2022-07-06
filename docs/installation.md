@@ -61,7 +61,7 @@ Elemental:
 
 ## ISO Installation
 
-When booting from the ISO you will immediately be presented with the shell. The root password is hard coded to `ros`
+When booting from the ISO you will immediately be presented with the shell. The root password is hard coded to `elemental`
 if needed. A SSH server will be running so realize that because of the __hard coded password this is an insecure
 system__ to be running on a public network.
 
@@ -69,12 +69,12 @@ From the shell run the below where `${LOCATION}` should be a path to a local fil
 `tftp://` URL.
 
 ```bash
-ros-installer -config-file ${LOCATION}
+elemental-installer -config-file ${LOCATION}
 ```
 
 ### Interactive
 
-`ros-installer` can also be run without any arguments to allow you to install a simple vanilla image with a
+`elemental-installer` can also be run without any arguments to allow you to install a simple vanilla image with a
 root password set.
 
 ## iPXE Installation

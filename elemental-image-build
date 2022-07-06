@@ -1,5 +1,5 @@
 #!/bin/bash
-# Note: ros-image-build requires the input image to be pushed 
+# Note: elemental-image-build requires the input image to be pushed 
 # due to buildx usage.
 
 # Export  this here so users dont need to
@@ -15,32 +15,13 @@ build()
 dockerfile()
 {
     cat << "EOF"
-ARG IMAGE=rancher/os2:dev
+ARG IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2
 
 FROM ${IMAGE} AS os
 
-FROM quay.io/costoolkit/elemental:v0.0.14-5bdba36 AS elemental
-
 # Keep using leap 15.3. libslirp looks broken and incompatible with packer
-FROM opensuse/leap:15.3 AS tools
-COPY --from=elemental /usr/bin/elemental /usr/bin
+FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-builder-image AS tools
 
-RUN sed -i -s 's/^# rpm.install.excludedocs/rpm.install.excludedocs/' /etc/zypp/zypp.conf
-RUN zypper ref
-ENV LUET_NOLOCK=true
-# Copy luet from the official images
-RUN zypper in -y squashfs xorriso curl unzip git qemu-arm qemu-x86 qemu-tools tar e2fsprogs dosfstools pigz go1.16 qemu-uefi-aarch64 mtools rsync
-
-RUN cd /usr/sbin && \
-    rm packer && \
-    SUFFIX=amd64 && \
-    if [ "$(uname -m)" = "aarch64" ]; then SUFFIX=arm64; fi && \
-    curl https://releases.hashicorp.com/packer/1.7.4/packer_1.7.4_linux_${SUFFIX}.zip > tmp && \
-    unzip tmp && \
-    rm tmp
-RUN cd /usr/src && \
-    git clone https://github.com/rancher-sandbox/cOS-toolkit && \
-    cd cOS-toolkit && git checkout ${COS_VERSION} -b build
 RUN mkdir -p /iso/iso-overlay/boot/grub2
 RUN echo -e \
 'search --file --set=root /boot/kernel.xz\n'\
@@ -64,9 +45,9 @@ RUN echo -e \
 'if [ -f ${font} ];then\n'\
 '    loadfont ${font}\n'\
 'fi\n'\
-'menuentry "RancherOS Install" --class os --unrestricted {\n'\
+'menuentry "Elemental Teal Install" --class os --unrestricted {\n'\
 '    echo Loading kernel...\n'\
-'    $linux ($root)/boot/kernel.xz cdroot root=live:CDLABEL=COS_LIVE rd.live.dir=/ rd.live.squashimg=rootfs.squashfs console=tty1 console=ttyS0 rd.cos.disable rancheros.install.automatic=true rancheros.install.config_url=/run/initramfs/live/config\n'\
+'    $linux ($root)/boot/kernel.xz cdroot root=live:CDLABEL=COS_LIVE rd.live.dir=/ rd.live.squashimg=rootfs.squashfs console=tty1 console=ttyS0 rd.cos.disable elemental.install.automatic=true elemental.install.config_url=/run/initramfs/live/config\n'\
 '    echo Loading initrd...\n'\
 '    $initrd ($root)/boot/rootfs.xz\n'\
 '}\n'\
@@ -78,12 +59,11 @@ RUN echo -e \
 '    }\n'\
 'fi\n' > /iso/iso-overlay/boot/grub2/grub.cfg
 RUN echo -e '#cloud-config\n'\
-'rancheros:\n'\
+'elemental:\n'\
 '  install:\n'\
 '    automatic: false\n' > /iso/iso-overlay/config
 ARG CONFIG
 RUN if [ -n "$CONFIG" ]; then echo "$CONFIG" > /iso/iso-overlay/config; fi
-WORKDIR /usr/src/cOS-toolkit/packer
 
 FROM tools AS iso-build
 COPY --from=os / /iso/overlay
@@ -99,7 +79,7 @@ RUN SUFFIX= && \
     echo 'set -e -x' >> /usr/bin/image && \
     echo PACKER_LOG=1 packer build \
     -var "aws_temporary_security_group_source_cidr=$(curl -sf https://api.ipify.org)/32" \
-    -var "root_password=ros" \
+    -var "root_password=elemental" \
     -var "firmware=${FIRMWARE}" \
     -var "memory=1024" \
     -var "iso=/iso/output.iso" \
@@ -125,8 +105,8 @@ FROM tools AS ami
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG AWS_DEFAULT_REGION
-ARG IMAGE=rancher/os2:dev
-ARG NAME=RancherOS-Image-dev
+ARG IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest
+ARG NAME=Elemental-Image-dev
 ARG VERSION=1
 ARG GIT_COMMIT=HEAD
 RUN packer build \

@@ -13,7 +13,7 @@
       <host mac='52:54:00:00:00:02' name='ros-node-2' ip='192.168.122.12'/>
       <host mac='52:54:00:00:00:03' name='ros-node-3' ip='192.168.122.13'/>
       <host mac='52:54:00:00:00:04' name='ros-node-4' ip='192.168.122.14'/>
-      <bootp file='http://192.168.122.1:8000/rancheros.ipxe'/>
+      <bootp file='http://192.168.122.1:8000/elemental.ipxe'/>
     </dhcp>
   </ip>
 </network>

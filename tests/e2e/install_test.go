@@ -126,25 +126,25 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
-				"rancheros-operator",
-				"https://rancher-sandbox.github.io/rancheros-operator",
+				"elemental-operator",
+				"https://rancher-sandbox.github.io/elemental-operator",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "rancheros-operator", "rancheros-operator/rancheros-operator",
+			err = kubectl.RunHelmBinaryWithCustomErr("install", "elemental-operator", "elemental-operator/elemental-operator",
 				"--version", ">0.0.0-0",
-				"--namespace", "cattle-rancheros-operator-system",
+				"--namespace", "cattle-elemental-operator-system",
 				"--create-namespace",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("cattle-rancheros-operator-system", "app=rancheros-operator", "rancheros-operator")
+			err = k.WaitForPod("cattle-elemental-operator-system", "app=elemental-operator", "elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 
-			k.WaitForNamespaceWithPod("cattle-rancheros-operator-system", "app=rancheros-operator")
+			k.WaitForNamespaceWithPod("cattle-elemental-operator-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 

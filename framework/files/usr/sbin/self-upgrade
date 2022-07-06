@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e -x
-source /usr/lib/rancheros-release
+source /usr/lib/elemental-release
 elemental upgrade --no-verify --docker-image "${IMAGE}"
 reboot

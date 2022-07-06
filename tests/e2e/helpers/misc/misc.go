@@ -39,7 +39,7 @@ func ConfigureiPXE() (int, error) {
 		}
 
 		// Delete the previous symlink, use RemoveAll to avoid error if the file doesn't exist
-		symLink := "../../rancheros.ipxe"
+		symLink := "../../elemental.ipxe"
 		err = os.RemoveAll(symLink)
 		if err != nil {
 			return 0, err

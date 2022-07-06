@@ -1,4 +1,4 @@
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: MachineRegistration
 metadata:
   name: machine-registration
@@ -16,7 +16,7 @@ spec:
     users:
     - name: %USER%
       passwd: %PASSWORD%
-    rancheros:
+    elemental:
       install:
         device: /dev/sda
         debug: true

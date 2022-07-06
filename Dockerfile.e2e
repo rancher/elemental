@@ -18,12 +18,12 @@ RUN cat /etc/os-release.tmpl | env \
     envsubst > /etc/os-release && \
     rm /etc/os-release.tmpl
 
-# IMPORTANT: Setup rancheros-release used for versioning/upgrade. The
+# IMPORTANT: Setup elemental-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
 ARG IMAGE_REPO=norepo
-RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
-    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release && \
-    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
+RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/elemental-release && \
+    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/elemental-release && \
+    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/elemental-release
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN mkinitrd && \

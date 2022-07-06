@@ -36,7 +36,7 @@ var _ = Describe("os2 installation", Label("setup"), func() {
 		It("can install", func() {
 
 			s.WriteInlineFile(`
-rancheros:
+elemental:
  install:
    device: /dev/sda
    automatic: true
@@ -70,7 +70,7 @@ var _ = Describe("os2 setup tests", func() {
 			}
 
 			s.WriteInlineFile(`
-rancheros:
+elemental:
  install:	
    device: /dev/sda
    containerImage: `+containerImage+`

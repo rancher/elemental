@@ -48,13 +48,13 @@ cat > build/output.ipxe << EOF
 set arch ${ARCH}
 set version ${VERSION}
 set url ${RELEASE_URL}/\${version}
-set kernel rancheros-${PXE_ASSET_VERSION}-kernel
-set initrd rancheros-${PXE_ASSET_VERSION}-initrd
-set rootfs rancheros-${PXE_ASSET_VERSION}.squashfs
-set iso    rancheros-${PXE_ASSET_VERSION}.iso
+set kernel elemental-${PXE_ASSET_VERSION}-kernel
+set initrd elemental-${PXE_ASSET_VERSION}-initrd
+set rootfs elemental-${PXE_ASSET_VERSION}.squashfs
+set iso    elemental-${PXE_ASSET_VERSION}.iso
 # set config http://example.com/machine-config
 # set cmdline extra.values=1
-kernel \${url}/\${kernel} initrd=\${initrd} ip=dhcp rd.cos.disable root=live:\${url}/\${rootfs} rancheros.install.automatic=true rancheros.install.iso_url=\${url}/\${iso} rancheros.install.config_url=\${config} console=tty1 console=ttyS0 \${cmdline}
+kernel \${url}/\${kernel} initrd=\${initrd} ip=dhcp rd.cos.disable root=live:\${url}/\${rootfs} elemental.install.automatic=true elemental.install.iso_url=\${url}/\${iso} elemental.install.config_url=\${config} console=tty1 console=ttyS0 \${cmdline}
 initrd \${url}/\${initrd}
 boot
 EOF
@@ -63,7 +63,7 @@ GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-rancher-sandbox/os2}"
 UPGRADECHANNEL_DISCOVERY_IMAGE="${UPGRADECHANNEL_DISCOVERY_IMAGE:-quay.io/costoolkit/upgradechannel-discovery:v0.3-4b83dbe}"
 for i in "amd64"; do
 cat > build/output.upgradechannel-$i.yaml << EOF
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSVersionChannel
 metadata:
   name: os2-$i
@@ -88,6 +88,6 @@ done
 
 mkdir -p dist/artifacts
 for i in build/output*; do
-    mv -f $i dist/artifacts/rancheros-${TAG}${i##build/output}
-    echo Built: dist/artifacts/rancheros-${TAG}${i##build/output}
+    mv -f $i dist/artifacts/elemental-${TAG}${i##build/output}
+    echo Built: dist/artifacts/elemental-${TAG}${i##build/output}
 done

@@ -17,11 +17,11 @@ BOOT=
 if [ "$1" = "pxe" ]; then
     shift 1
     if [ ! -e ipxe.cfg ]; then
-        if [ ! -e ../dist/artifacts/rancheros-dev.ipxe ]; then
+        if [ ! -e ../dist/artifacts/elemental-dev.ipxe ]; then
             make -C .. package
         fi
-        if [ -e ../dist/artifacts/rancheros-dev.ipxe ]; then
-            cp ../dist/artifacts/rancheros-dev.ipxe ipxe.cfg
+        if [ -e ../dist/artifacts/elemental-dev.ipxe ]; then
+            cp ../dist/artifacts/elemental-dev.ipxe ipxe.cfg
         fi
     fi
     set -- /usr/share/ipxe/ipxe.iso
