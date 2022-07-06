@@ -86,7 +86,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		if upgradeType == "manual" {
 			By("Triggering Manual Upgrade", func() {
 				out, err := client.RunSSH("elemental upgrade -d " + osImage)
-				Expect(err).To(Not(HaveOccurred()))
+				Expect(err).To(Not(HaveOccurred()), out)
 				Expect(out).To((ContainSubstring("Upgrade completed")))
 
 				// Simply reboot, no check as an ssh error will be throwned anyway
