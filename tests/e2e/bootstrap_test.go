@@ -62,11 +62,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Adding server role to predefined cluster", func() {
 			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
-			_, err := kubectl.Run("patch", "MachineInventories",
+			out, err := kubectl.Run("patch", "MachineInventories",
 				"--namespace", clusterNS, serverId,
 				"--type", "merge", "--patch", patchCmd,
 			)
-			Expect(err).To(Not(HaveOccurred()))
+			Expect(err).To(Not(HaveOccurred()), out)
 		})
 
 		By("Restarting the VM", func() {
