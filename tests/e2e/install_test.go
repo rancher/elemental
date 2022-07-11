@@ -49,6 +49,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 		By("Starting K3s", func() {
 			// Start in background
+			// TODO: use something better to start in background, because this code seems to not write k3s.log file...
 			err := exec.Command("/usr/local/bin/k3s", "server", "--snapshotter=native", ">/tmp/k3s.log", "2>&1").Start()
 			Expect(err).To(Not(HaveOccurred()))
 
