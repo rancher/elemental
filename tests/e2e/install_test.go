@@ -53,7 +53,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Delay few seconds before checking
-			time.Sleep(5 * time.Second)
+			time.Sleep(20 * time.Second)
 		})
 
 		By("Waiting for K3s to be started", func() {
