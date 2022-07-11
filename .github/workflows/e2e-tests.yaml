@@ -142,8 +142,15 @@ jobs:
           name: k3s-install.log
           path: /tmp/k3s.log
           if-no-files-found: warn
-      - name: Release space from worker ♻
+      - name: Release space from container ♻
         if: always()
         run: |
-          sudo rm -rf build bin dist || true
-          docker system prune -f -a --volumes || true
+          rm -rf build bin dist
+  cleanup:
+    runs-on: kvm-host
+    if: always()
+    needs: e2e-tests
+    steps:
+      - name: Release space from worker ♻
+        run: |
+          sudo docker system prune -f -a --volumes
