@@ -37,7 +37,7 @@ jobs:
         id: cache-artifacts
         with:
           path: dist/artifacts/*
-          key: ${{ github.head_ref || github.ref }}-${{ github.repository }}-artifacts
+          key: ${{ github.sha }}-${{ github.repository }}-artifacts
       - name: Upload .txt
         uses: actions/upload-artifact@v3
         with:
@@ -72,9 +72,11 @@ jobs:
         id: cache-artifacts
         with:
           path: dist/artifacts/*
-          key: ${{ github.head_ref || github.ref }}-${{ github.repository }}-artifacts
+          key: ${{ github.sha }}-${{ github.repository }}-artifacts
       - name: Move artifacts
-        run: mv dist/artifacts/* .
+        run: |
+          ls -l dist/artifacts/
+          mv dist/artifacts/* .
       - name: E2E - Clean local Helm repositorie
         run: |
           # Clean Helm repo
