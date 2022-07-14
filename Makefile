@@ -50,9 +50,10 @@ iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
 endif
+	@mkdir -p dist/artifacts
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso --target default --build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} -t elemental/iso:latest .
-	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/dist:/mnt elemental/iso:latest --debug build-iso -o /mnt --squash-no-compression -n elemental --overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at dist/elemental.iso"
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/dist/artifacts:/mnt elemental/iso:latest --debug build-iso -o /mnt --squash-no-compression -n elemental-${TAG} --overlay-iso overlay dir:rootfs
+	@echo "INFO: ISO available at dist/artifacts/elemental-${TAG}.iso"
 
 .PHONY: qcow
 qcow:

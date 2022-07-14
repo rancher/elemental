@@ -13,7 +13,6 @@ fi
 
 export TAG
 make build-test
-make iso
 
 if [ "$PUSH" = "true" ]; then
     make push

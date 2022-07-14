@@ -30,7 +30,9 @@ jobs:
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v2
-      - name: Make images (container/iso/qcow2/etc.)
+      - name: Make ISO
+        run: make iso
+      - name: Make images (container/qcow2/etc.)
         run: make ci
       - name: Cache data
         uses: actions/cache@v3
