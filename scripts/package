@@ -32,7 +32,6 @@ isoinfo -x /rootfs.squashfs -R -i build/output.iso > build/output.squashfs
 isoinfo -x /boot/kernel.xz -R -i build/output.iso > build/output-kernel
 isoinfo -x /boot/rootfs.xz -R -i build/output.iso > build/output-initrd
 
-
 RELEASE_URL=${RELEASE_URL:-https://github.com/rancher-sandbox/os2/releases/download}
 INSTALL_CFG=${RELEASE_URL}/${VERSION}/example-cloud-init
 PXE_ASSET_VERSION="\${version}-\${arch}"

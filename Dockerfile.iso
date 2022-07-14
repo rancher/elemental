@@ -1,0 +1,10 @@
+FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest AS os
+FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-builder-image as tools
+
+FROM tools AS default
+WORKDIR /iso
+COPY --from=os / rootfs
+COPY iso/grub.cfg overlay/boot/grub2/grub.cfg
+ARG CLOUD_CONFIG_FILE=iso/config
+COPY $CLOUD_CONFIG_FILE overlay/config
+ENTRYPOINT ["/usr/bin/elemental"]
