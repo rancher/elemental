@@ -5,6 +5,8 @@ IMAGE=${REPO}:${TAG}
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SUDO?=sudo
 FRAMEWORK_PACKAGES?=meta/cos-light
+CLOUD_CONFIG_FILE?="iso/config"
+
 .dapper:
 	@echo Downloading dapper
 	@curl -sL https://releases.rancher.com/dapper/latest/dapper-$$(uname -s)-$$(uname -m) > .dapper.tmp
@@ -45,8 +47,12 @@ push:
 
 .PHONY: iso
 iso:
-	./ros-image-build ${IMAGE} iso
-	@echo "INFO: ISO available at build/output.iso"
+ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
+	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
+endif
+	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso --target default --build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} -t elemental/iso:latest .
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/dist:/mnt elemental/iso:latest --debug build-iso -o /mnt --squash-no-compression -n elemental --overlay-iso overlay dir:rootfs
+	@echo "INFO: ISO available at dist/elemental.iso"
 
 .PHONY: qcow
 qcow:
