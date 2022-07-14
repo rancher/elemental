@@ -1,43 +1,34 @@
 #!/bin/bash
 
 function doLoopMount {
-    local label
+    local partdev
+    local partname
     local dev
 
     # Iterate over current device labels
-    for dev in /dev/disk/by-label/*; do
-        label=$(basename "${dev}")
-        [ -e "/tmp/cosloop-${label}" ] && continue
-        > "/tmp/cosloop-${label}" 
+    for partdev in $(lsblk -ln -o path,type | grep part | cut -d" " -f1); do
+        partname=$(basename "${partdev}")
+        [ -e "/tmp/cosloop-${partname}" ] && continue
+        > "/tmp/cosloop-${partname}" 
 
-        mount -t auto -o "${cos_root_perm}" "/dev/disk/by-label/${label}" "${cos_state}" || continue
+        # Ensure run system-fsck, at least, for the root partition
+        systemd-fsck "${partdev}"
+
+        # Only run systemd-fsck if root is already found
+        [ "${found}" == "ok" ] && continue
+
+        mount -t auto -o "${cos_root_perm}" "${partdev}" "${cos_state}" || continue
         if [ -f "${cos_state}/${cos_img}" ]; then
-
-            # FSCHECK if cos_root_perm == "ro" on both
-            if [ "$cos_root_perm" == "ro" ]; then
-               systemd-fsck "/dev/disk/by-label/${label}"
-            fi
 
             dev=$(losetup --show -f "${cos_state}/${cos_img}")
 
-            # FSCHECK if cos_root_perm == "ro"
-            if [ "$cos_root_perm" == "ro" ]; then
-               systemd-fsck "$dev"
-            fi
+            # attempt to run systemd-fsck on the loop device
+            systemd-fsck "${dev}"
 
-            exit 0
+            found="ok"
         else
             umount "${cos_state}"
         fi
-    done
-}
-
-function dofsCheck {
-    # Iterate over current partitions
-    # As fs corruption could lead to partitions with no label, we scan here for all partitions found and we run systemd-fsck
-    for dev in /dev/disk/by-partuuid/*; do
-        partuuid=$(basename "${dev}")
-        systemd-fsck "/dev/disk/by-partuuid/${partuuid}"
     done
 }
 
@@ -48,6 +39,7 @@ PATH=/usr/sbin:/usr/bin:/sbin:/bin
 declare cos_img=$1
 declare cos_root_perm="ro"
 declare cos_state="/run/initramfs/cos-state"
+declare found=""
 
 [ -z "${cos_img}" ] && exit 1
 
@@ -59,8 +51,10 @@ ismounted "${cos_state}" && exit 0
 
 mkdir -p "${cos_state}"
 
-dofsCheck
 doLoopMount
+if [ "${found}" == "ok" ]; then
+    exit 0
+fi
 
 rm -r "${cos_state}"
 exit 1
