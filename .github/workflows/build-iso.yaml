@@ -1,0 +1,18 @@
+name: Build iso from simple script
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y sudo curl docker.io
+      - name: Build iso from script
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rancher/elemental/master/elemental-iso-build)"
