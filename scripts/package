@@ -13,6 +13,7 @@ fi
 
 export TAG
 make build-test
+make iso
 
 if [ "$PUSH" = "true" ]; then
     make push
@@ -26,6 +27,10 @@ export GIT_COMMIT=${COMMIT}
 if [ -n "${IMAGE_TARGETS}" ]; then
     make -j8 ${IMAGE_TARGETS}
 fi
+
+isoinfo -x /rootfs.squashfs -R -i build/output.iso > build/output.squashfs
+isoinfo -x /boot/kernel.xz -R -i build/output.iso > build/output-kernel
+isoinfo -x /boot/rootfs.xz -R -i build/output.iso > build/output-initrd
 
 RELEASE_URL=${RELEASE_URL:-https://github.com/rancher-sandbox/os2/releases/download}
 INSTALL_CFG=${RELEASE_URL}/${VERSION}/example-cloud-init

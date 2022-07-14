@@ -47,6 +47,11 @@ push:
 
 .PHONY: iso
 iso:
+	./ros-image-build ${IMAGE} iso
+	@echo "INFO: ISO available at build/output.iso"
+
+.PHONY: proper_iso
+proper_iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
 endif
