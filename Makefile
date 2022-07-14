@@ -55,6 +55,12 @@ endif
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/dist/artifacts:/mnt elemental/iso:latest --debug build-iso -o /mnt --squash-no-compression -n elemental-${TAG} --overlay-iso overlay dir:rootfs
 	@echo "INFO: ISO available at dist/artifacts/elemental-${TAG}.iso"
 
+.PHONY: extract_kernel_init_squash
+	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${TAG}.iso > build/output.squashfs
+	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-kernel
+	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-initrd
+
+
 .PHONY: qcow
 qcow:
 	./ros-image-build ${IMAGE} qcow
