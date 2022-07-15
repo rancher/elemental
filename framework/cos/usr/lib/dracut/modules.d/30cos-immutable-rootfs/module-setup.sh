@@ -25,7 +25,7 @@ install() {
     declare initdir="${initdir}"
 
     inst_multiple \
-        mount mountpoint elemental sort findmnt rmdir findmnt rsync
+        mount mountpoint elemental sort findmnt rmdir findmnt rsync cut
 
     # Include utilities required for cos-setup services,
     # probably a devoted cos-setup dracut module makes sense
