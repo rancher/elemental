@@ -19,6 +19,9 @@ stages:
           mkdir -p /usr/local/etc
           cp /etc/machine-id /usr/local/etc
         fi
+    - name: "Create essential persistent paths"
+      directories:
+      - path: /usr/local/bin
   rootfs:
     - if: '[ ! -f "/run/cos/recovery_mode" ]'
       name: "Layout configuration"
