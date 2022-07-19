@@ -1,8 +1,9 @@
 [Unit]
-Description=RancherOS Automatic Installation
-Documentation=https://github.com/rancher-sandbox/os2
+Description=Elemental Operator Registration
+Documentation=https://github.com/rancher/elemental-operator
 Wants=network-online.target
 After=network-online.target
+ConditionPathExists=/run/cos/live_mode
 
 [Install]
 WantedBy=multi-user.target
@@ -13,4 +14,5 @@ EnvironmentFile=-/etc/default/%N
 EnvironmentFile=-/etc/sysconfig/%N
 TimeoutStartSec=0
 StandardOutput=journal+console
-ExecStart=/usr/sbin/ros-installer -automatic
+StandardError=journal+console
+ExecStart=/usr/sbin/elemental-operator register /oem

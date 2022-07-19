@@ -9,5 +9,5 @@ WORKDIR /iso
 COPY --from=os / rootfs
 COPY iso/grub.cfg overlay/boot/grub2/grub.cfg
 ARG CLOUD_CONFIG_FILE=iso/config
-COPY $CLOUD_CONFIG_FILE overlay/config
+COPY $CLOUD_CONFIG_FILE overlay/oem/config
 ENTRYPOINT ["/usr/bin/elemental"]
