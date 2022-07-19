@@ -2,7 +2,7 @@
 
 Elemental is a toolkit to build an immutable Linux distribution.
 
-It's primary purpose is to run Rancher and its corresponding Kubernetes distributions [RKE2](https://rke2.io) 
+Its primary purpose is to run Rancher and its corresponding Kubernetes distributions [RKE2](https://rke2.io) 
 and [k3s](https://k3s.io).
 But it can be configured for any other workload. That said, the following documentation focusses on a Rancher use-case.
 
