@@ -22,7 +22,7 @@ build:
 		--build-arg IMAGE_TAG=${GIT_TAG} \
 		--build-arg IMAGE_COMMIT=${GIT_COMMIT} \
 		--build-arg IMAGE_REPO=${REPO} \
-		-t elemental:${TAG} \
+		-t ${REPO}:${TAG} \
 		.
 
 # Build iso with the elemental image as base
@@ -35,7 +35,7 @@ endif
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
 		--target default \
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
-		--build-arg OS_IMAGE=elemental:${TAG} \
+		--build-arg OS_IMAGE=${REPO}:${TAG} \
 		--build-arg TOOL_IMAGE=quay.io/costoolkit/elemental:v0.0.15-f1fabd4 \
 		--build-arg VERSION=${TAG} \
 		-t iso:${TAG} .
