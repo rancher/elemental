@@ -2,7 +2,7 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD)
 GIT_COMMIT_SHORT ?= $(shell git rev-parse --short HEAD)
 GIT_TAG ?= $(shell git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0" )
 TAG ?= ${GIT_TAG}-${GIT_COMMIT_SHORT}
-REPO?=quay.io/costoolkit/elemental-ci
+REPO?=ttl.sh/elemental-ci
 IMAGE=${REPO}:${GIT_TAG}
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SUDO?=sudo
@@ -11,6 +11,7 @@ CLOUD_CONFIG_FILE?="iso/config"
 # This are the default images already in the dockerfile but we want to be able to override them
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
+TOOL_IMAGE?=quay.io/costoolkit/elemental:v0.0.15-f1fabd4
 
 .PHONY: clean
 clean:
@@ -40,7 +41,7 @@ endif
 		--target default \
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg OS_IMAGE=${REPO}:${TAG} \
-		--build-arg TOOL_IMAGE=quay.io/costoolkit/elemental:v0.0.15-f1fabd4 \
+		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
 		--build-arg ELEMENTAL_VERSION=${TAG} \
 		-t iso:${TAG} .
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
