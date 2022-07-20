@@ -105,6 +105,7 @@ endif
 	echo "initrd ${url}${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
 	echo "boot" >> build/elemental-${FINAL_TAG}.ipxe
 
+
 .PHONY: docs
 docs:
 	mkdocs build

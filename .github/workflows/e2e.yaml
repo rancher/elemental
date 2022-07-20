@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-iso:
+  build-ipxe:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -20,6 +20,9 @@ jobs:
           git describe --abbrev=0 --tags
           TAG=`git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0"`
           echo "::set-output name=elemental_tag::$TAG"
-      - name: Build iso
+      - name: Build image,iso and ipxe files
         run:
-          make iso
+          make ipxe
+      - uses: actions/upload-artifact@v3
+        with:
+          path: build/
