@@ -8,6 +8,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SUDO?=sudo
 FRAMEWORK_PACKAGES?=meta/cos-light
 CLOUD_CONFIG_FILE?="iso/config"
+# This are the default images already in the dockerfile but we want to be able to override them
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
 
@@ -40,7 +41,7 @@ endif
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg OS_IMAGE=${REPO}:${TAG} \
 		--build-arg TOOL_IMAGE=quay.io/costoolkit/elemental:v0.0.15-f1fabd4 \
-		--build-arg VERSION=${TAG} \
+		--build-arg ELEMENTAL_VERSION=${TAG} \
 		-t iso:${TAG} .
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
 		iso:${TAG} \
