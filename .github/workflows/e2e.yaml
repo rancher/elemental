@@ -1,0 +1,54 @@
+name: e2e
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build-all-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Export tag
+        id: export_tag
+        run: |
+          git describe --abbrev=0 --tags
+          TAG=`git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0"`
+          echo "::set-output name=elemental_tag::$TAG"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y genisoimage
+      - name: Build image
+        run: |
+          make build
+          make dump_image
+
+      - name: Build iso
+        run: |
+          make iso
+      - name: Build ipxe artifacts
+        run: |
+          make extract_kernel_init_squash
+          make ipxe
+      - uses: actions/upload-artifact@v3
+        with:
+          name: docker-image
+          path: build/*.tar
+      - uses: actions/upload-artifact@v3
+        with:
+          name: iso-image
+          path: build/*.iso
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ipxe-artifacts
+          path: |
+            build/*-kernel
+            build/*-initrd
+            build/*.squashfs
+            build/*.ipxe
