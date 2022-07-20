@@ -41,7 +41,7 @@ build:
 
 # Build iso with the elemental image as base
 .PHONY: iso
-iso: build
+iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
 endif
@@ -83,13 +83,13 @@ endif
 	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 .PHONY: extract_kernel_init_squash
-extract_kernel_init_squash: iso
-	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
-	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
-	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
+extract_kernel_init_squash:
+	isoinfo -x /rootfs.squashfs -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
+	isoinfo -x /boot/kernel.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
+	isoinfo -x /boot/rootfs.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
 
 .PHONY: ipxe
-ipxe: extract_kernel_init_squash
+ipxe:
 	echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
 	echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
 ifeq ($(RELEASE_TAG), "true")
@@ -105,6 +105,8 @@ endif
 	echo "initrd ${url}${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
 	echo "boot" >> build/elemental-${FINAL_TAG}.ipxe
 
+.PHONY: build_all
+build_all: build iso extract_kernel_init_squash ipxe
 
 .PHONY: docs
 docs:
