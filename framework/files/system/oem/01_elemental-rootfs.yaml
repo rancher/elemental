@@ -41,6 +41,7 @@ stages:
           /root
           /usr/libexec
           /var/log
+          /var/lib/elemental
           /var/lib/rancher
           /var/lib/kubelet
           /var/lib/wicked
