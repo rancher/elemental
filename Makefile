@@ -8,7 +8,8 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SUDO?=sudo
 FRAMEWORK_PACKAGES?=meta/cos-light
 CLOUD_CONFIG_FILE?="iso/config"
-OPERATOR_VERSION?=v0.2.1
+OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
+SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
 
 .PHONY: clean
 clean:
@@ -22,6 +23,8 @@ build:
 		--build-arg IMAGE_TAG=${GIT_TAG} \
 		--build-arg IMAGE_COMMIT=${GIT_COMMIT} \
 		--build-arg IMAGE_REPO=${REPO} \
+		--build-arg OPERATOR_IMAGE=${OPERATOR_IMAGE} \
+		--build-arg SYSTEM_AGENT_IMAGE=${SYSTEM_AGENT_IMAGE} \
 		-t ${REPO}:${TAG} \
 		.
 
