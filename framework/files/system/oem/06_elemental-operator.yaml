@@ -1,0 +1,7 @@
+name: "Elemental operator bootstrap"
+stages:
+  network.after:
+    # run only if on live cd and there is a config file
+    - if: '[ -f /run/cos/live_mode ] && [ -f /run/initramfs/live/livecd-cloud-config.yaml ]'
+        commands:
+          - elemental-operator register /run/initramfs/live/livecd-cloud-config.yaml
