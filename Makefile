@@ -42,7 +42,7 @@ build:
 .PHONY: dump_image
 dump_image:
 	@mkdir -p build
-	@docker save ${REPO}:${FINAL_TAG} -o build/elemental:${FINAL_TAG}.tar
+	@docker save ${REPO}:${FINAL_TAG} -o build/elemental_${FINAL_TAG}.tar
 
 # Build iso with the elemental image as base
 .PHONY: iso
@@ -89,10 +89,6 @@ endif
 
 .PHONY: extract_kernel_init_squash
 extract_kernel_init_squash:
-ifneq ($(shell find build/ -name elemental-${FINAL_TAG}.iso -print), "build/elemental-${FINAL_TAG}.iso")
-	@echo "Cant find required iso build/elemental-${FINAL_TAG}.iso to extract files"
-	@exit 1
-endif
 	isoinfo -x /rootfs.squashfs -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
 	isoinfo -x /boot/kernel.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
 	isoinfo -x /boot/rootfs.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd

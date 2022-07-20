@@ -25,14 +25,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y genisoimage
       - name: Build image
-        run:
+        run: |
           make build
           make dump_image
+
       - name: Build iso
-        run:
+        run: |
           make iso
       - name: Build ipxe artifacts
-        run:
+        run: |
           make extract_kernel_init_squash
           make ipxe
       - uses: actions/upload-artifact@v3
