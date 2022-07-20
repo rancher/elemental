@@ -83,11 +83,27 @@ endif
 	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 .PHONY: extract_kernel_init_squash
+extract_kernel_init_squash: iso
 	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
 	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
 	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
 
-
+.PHONY: ipxe
+ipxe: extract_kernel_init_squash
+	echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
+	echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
+ifeq ($(RELEASE_TAG), "true")
+	echo "set url https://github.com/rancher/elemental/releases/download/${FINAL_TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+else
+	echo "set url tftp://10.0.2.2/${TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+endif
+	echo "set kernel elemental-${FINAL_TAG}-kernel" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set iso    elemental-${FINAL_TAG}.iso" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "kernel ${url}/${kernel} initrd=${initrd} ip=dhcp rd.cos.disable root=live:${url}/${rootfs} console=tty1 console=ttyS0 ${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "initrd ${url}${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "boot" >> build/elemental-${FINAL_TAG}.ipxe
 
 .PHONY: docs
 docs:
