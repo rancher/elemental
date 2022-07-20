@@ -1,119 +1,123 @@
-.DEFAULT_GOAL := package
-REPO?=quay.io/costoolkit/os2
-TAG?=dev
-IMAGE=${REPO}:${TAG}
+GIT_COMMIT ?= $(shell git rev-parse HEAD)
+GIT_COMMIT_SHORT ?= $(shell git rev-parse --short HEAD)
+GIT_TAG ?= $(shell git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0" )
+TAG ?= ${GIT_TAG}-${GIT_COMMIT_SHORT}
+REPO?=ttl.sh/elemental-ci
+IMAGE=${REPO}:${GIT_TAG}
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SUDO?=sudo
 FRAMEWORK_PACKAGES?=meta/cos-light
 CLOUD_CONFIG_FILE?="iso/config"
+# This are the default images already in the dockerfile but we want to be able to override them
+OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
+SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
+TOOL_IMAGE?=quay.io/costoolkit/elemental:v0.0.15-f1fabd4
+# Used to know if this is a release or just a normal dev build
+RELEASE_TAG?=false
 
-.dapper:
-	@echo Downloading dapper
-	@curl -sL https://releases.rancher.com/dapper/latest/dapper-$$(uname -s)-$$(uname -m) > .dapper.tmp
-	@@chmod +x .dapper.tmp
-	@./.dapper.tmp -v
-	@mv .dapper.tmp .dapper
-
-.PHONY: ci
-ci: .dapper
-	./.dapper ci
-
-.PHONY: package
-package: .dapper
-	./.dapper package
+# Set tag based on release status for ease of use
+ifeq ($(RELEASE_TAG), "true")
+FINAL_TAG=$(GIT_TAG)
+else
+FINAL_TAG=$(TAG)
+endif
 
 .PHONY: clean
 clean:
-	rm -rf build dist
+	rm -rf build
 
-.PHONY: build-test
-build-test:
-	docker build \
-		--build-arg CACHEBUST=${CACHEBUST} \
-		--build-arg IMAGE_TAG=${TAG} \
+# Build elemental docker images
+.PHONY: build
+build:
+	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.image \
+		--target default \
+		--build-arg IMAGE_TAG=${FINAL_TAG} \
+		--build-arg IMAGE_COMMIT=${GIT_COMMIT} \
 		--build-arg IMAGE_REPO=${REPO} \
-		-t ${IMAGE} \
-        -f Dockerfile.e2e .
-	mkdir -p dist/artifacts
-	docker run --name build_tmp -d ${IMAGE} sleep 5
-	docker cp ${ROOT_DIR}/scripts build_tmp:/scripts
-	docker exec build_tmp /bin/sh -c '/scripts/package-info.sh > /packages.txt'	
-	docker cp build_tmp:/packages.txt dist/artifacts/packages.txt
-	docker rm -f build_tmp
+		--build-arg OPERATOR_IMAGE=${OPERATOR_IMAGE} \
+		--build-arg SYSTEM_AGENT_IMAGE=${SYSTEM_AGENT_IMAGE} \
+		-t ${REPO}:${FINAL_TAG} \
+		.
 
-.PHONY: push
-push:
-	docker push ${IMAGE}
+.PHONY: dump_image
+dump_image:
+	@mkdir -p build
+	@docker save ${REPO}:${FINAL_TAG} -o build/elemental_${FINAL_TAG}.tar
 
+# Build iso with the elemental image as base
 .PHONY: iso
 iso:
-	./ros-image-build ${IMAGE} iso
-	@echo "INFO: ISO available at build/output.iso"
+ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
+	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
+endif
+	@mkdir -p build
+	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
+		--target default \
+		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
+		--build-arg OS_IMAGE=${REPO}:${FINAL_TAG} \
+		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
+		--build-arg ELEMENTAL_VERSION=${FINAL_TAG} \
+		-t iso:${FINAL_TAG} .
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
+		iso:${FINAL_TAG} \
+		--debug build-iso \
+		-o /mnt \
+		--squash-no-compression \
+		-n elemental-${FINAL_TAG} \
+		--overlay-iso overlay dir:rootfs
+	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
-.PHONY: proper_iso
+# Build an iso with the OBS base containers
+.PHONY: remote_iso
 proper_iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
 endif
-	@mkdir -p dist/artifacts
-	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso --target default --build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} -t elemental/iso:latest .
-	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/dist/artifacts:/mnt elemental/iso:latest --debug build-iso -o /mnt --squash-no-compression -n elemental-${TAG} --overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at dist/artifacts/elemental-${TAG}.iso"
+	@mkdir -p build
+	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
+		--target default \
+		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
+		-t iso:latest .
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
+		iso:latest \
+		--debug build-iso \
+		-o /mnt \
+		--squash-no-compression \
+		-n elemental-${FINAL_TAG} \
+		--overlay-iso overlay dir:rootfs
+	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 .PHONY: extract_kernel_init_squash
-	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${TAG}.iso > build/output.squashfs
-	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-kernel
-	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-initrd
+extract_kernel_init_squash:
+	isoinfo -x /rootfs.squashfs -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
+	isoinfo -x /boot/kernel.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
+	isoinfo -x /boot/rootfs.xz -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
 
+.PHONY: ipxe
+ipxe:
+	echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
+	echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
+ifeq ($(RELEASE_TAG), "true")
+	echo "set url https://github.com/rancher/elemental/releases/download/${FINAL_TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+else
+	echo "set url tftp://10.0.2.2/${TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+endif
+	echo "set kernel elemental-${FINAL_TAG}-kernel" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "set iso    elemental-${FINAL_TAG}.iso" >> build/elemental-${FINAL_TAG}.ipxe  #not used anymore, check if we can boot from iso directly with sanboot?
+	echo "kernel ${url}/${kernel} initrd=${initrd} ip=dhcp rd.cos.disable root=live:${url}/${rootfs} console=tty1 console=ttyS0 ${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "initrd ${url}${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "boot" >> build/elemental-${FINAL_TAG}.ipxe
 
-.PHONY: qcow
-qcow:
-	./ros-image-build ${IMAGE} qcow
-	@echo "INFO: QCOW image available at build/output.qcow.gz"
+.PHONY: build_all
+build_all: build iso extract_kernel_init_squash ipxe
 
-.PHONY: ami-%
-ami-%:
-	AWS_DEFAULT_REGION=$* ./ros-image-build ${IMAGE} ami
+.PHONY: docs
+docs:
+	mkdocs build
 
-.PHONY: ami
-ami:
-	./ros-image-build ${IMAGE} ami
-
-.PHONY: run
-run:
-	./scripts/run
-
-.PHONY: run
-pxe:
-	./scripts/run pxe
-
-serve-docs: mkdocs
-	docker run -p 8000:8000 --rm -it -v $${PWD}:/docs mkdocs serve -a 0.0.0.0:8000
-
-mkdocs:
-	docker build -t mkdocs -f Dockerfile.docs .
-
-all-amis: \
-	ami-us-west-1 \
-	ami-us-west-2
-	#ami-ap-east-1 \
-	#ami-ap-northeast-1 \
-	#ami-ap-northeast-2 \
-	#ami-ap-northeast-3 \
-	#ami-ap-southeast-1 \
-	#ami-ap-southeast-2 \
-	#ami-ca-central-1 \
-	#ami-eu-central-1 \
-	#ami-eu-south-1 \
-	#ami-eu-west-1 \
-	#ami-eu-west-2 \
-	#ami-eu-west-3 \
-	#ami-me-south-1 \
-	#ami-sa-east-1 \
-	#ami-us-east-1 \
-	#ami-us-east-2 \
-
-deps: 
+deps:
 	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
 	go get github.com/onsi/gomega/...
 

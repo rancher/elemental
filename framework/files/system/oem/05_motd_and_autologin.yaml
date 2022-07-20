@@ -7,7 +7,7 @@ stages:
       content: |
 
         Installation is in progress.
-        You can "journalctl -f -u elemental-operator" to view progress
+        You can "journalctl -f -t elemental" to view progress
          
       permissions: 0644
     - path: /etc/systemd/system/serial-getty@ttyS0.service.d/override.conf
