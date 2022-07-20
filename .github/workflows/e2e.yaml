@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-ipxe:
+  build-all-artifacts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -24,9 +24,30 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y genisoimage
-      - name: Build image,iso and ipxe files
+      - name: Build image
         run:
-          make build_all
+          make build
+          make dump_image
+      - name: Build iso
+        run:
+          make iso
+      - name: Build ipxe artifacts
+        run:
+          make extract_kernel_init_squash
+          make ipxe
       - uses: actions/upload-artifact@v3
         with:
-          path: build/
+          name: docker-image
+          path: build/*.tar
+      - uses: actions/upload-artifact@v3
+        with:
+          name: iso-image
+          path: build/*.iso
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ipxe-artifacts
+          path: |
+            build/*-kernel
+            build/*-initrd
+            build/*.squashfs
+            build/*.ipxe
