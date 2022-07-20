@@ -12,6 +12,15 @@ CLOUD_CONFIG_FILE?="iso/config"
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
 TOOL_IMAGE?=quay.io/costoolkit/elemental:v0.0.15-f1fabd4
+# Used to know if this is a release or just a normal dev build
+RELEASE_TAG?=false
+
+# Set tag based on release status for ease of use
+ifeq ($(RELEASE_TAG), "true")
+FINAL_TAG=$(GIT_TAG)
+else
+FINAL_TAG=$(TAG)
+endif
 
 .PHONY: clean
 clean:
@@ -22,12 +31,12 @@ clean:
 build:
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.image \
 		--target default \
-		--build-arg IMAGE_TAG=${GIT_TAG} \
+		--build-arg IMAGE_TAG=${FINAL_TAG} \
 		--build-arg IMAGE_COMMIT=${GIT_COMMIT} \
 		--build-arg IMAGE_REPO=${REPO} \
 		--build-arg OPERATOR_IMAGE=${OPERATOR_IMAGE} \
 		--build-arg SYSTEM_AGENT_IMAGE=${SYSTEM_AGENT_IMAGE} \
-		-t ${REPO}:${TAG} \
+		-t ${REPO}:${FINAL_TAG} \
 		.
 
 # Build iso with the elemental image as base
@@ -40,18 +49,18 @@ endif
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
 		--target default \
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
-		--build-arg OS_IMAGE=${REPO}:${TAG} \
+		--build-arg OS_IMAGE=${REPO}:${FINAL_TAG} \
 		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
-		--build-arg ELEMENTAL_VERSION=${TAG} \
-		-t iso:${TAG} .
+		--build-arg ELEMENTAL_VERSION=${FINAL_TAG} \
+		-t iso:${FINAL_TAG} .
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
-		iso:${TAG} \
+		iso:${FINAL_TAG} \
 		--debug build-iso \
 		-o /mnt \
 		--squash-no-compression \
-		-n elemental-${TAG} \
+		-n elemental-${FINAL_TAG} \
 		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at build/elemental-${TAG}.iso"
+	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 # Build an iso with the OBS base containers
 .PHONY: remote_iso
@@ -69,14 +78,16 @@ endif
 		--debug build-iso \
 		-o /mnt \
 		--squash-no-compression \
-		-n elemental-${TAG} \
+		-n elemental-${FINAL_TAG} \
 		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at build/elemental-${TAG}.iso"
+	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 .PHONY: extract_kernel_init_squash
-	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${TAG}.iso > build/output.squashfs
-	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-kernel
-	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${TAG}.iso > build/output-initrd
+	isoinfo -x /rootfs.squashfs -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
+	isoinfo -x /boot/kernel.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
+	isoinfo -x /boot/rootfs.xz -R -i dist/artifacts/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
+
+
 
 .PHONY: docs
 docs:
