@@ -4,14 +4,20 @@ on:
   push:
     branches:
       - master
+  pull_request:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest ]
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install Docker
         uses: docker-practice/actions-setup-docker@v1
       - name: Build iso from script
+        shell: bash
         run: |
-          # Just a simple run to test the build script, no need to upload the generated iso!
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rancher/elemental/master/elemental-iso-build)"
+          cat elemental-iso-build | bash
