@@ -1,4 +1,4 @@
-name: Build iso from simple script
+name: Test build iso from simple script
 
 on:
   push:
@@ -9,10 +9,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y sudo curl docker.io
+      - name: Install Docker
+        uses: docker-practice/actions-setup-docker@v1
       - name: Build iso from script
         run: |
+          # Just a simple run to test the build script, no need to upload the generated iso!
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rancher/elemental/master/elemental-iso-build)"

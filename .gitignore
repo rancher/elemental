@@ -8,3 +8,8 @@
 /tests/build
 /tests/.vagrant
 /tests/build-box
+/cypress/videos/*
+/cypress/screenshots/*
+/cypress/downloads/*
+/node_modules
+package-lock.json

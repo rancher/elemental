@@ -11,7 +11,7 @@ CLOUD_CONFIG_FILE?="iso/config"
 # This are the default images already in the dockerfile but we want to be able to override them
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
-TOOL_IMAGE?=quay.io/costoolkit/elemental:v0.0.15-f1fabd4
+TOOL_IMAGE?=quay.io/costoolkit/elemental-cli:v0.0.15-f1fabd4
 # Used to know if this is a release or just a normal dev build
 RELEASE_TAG?=false
 
@@ -49,11 +49,12 @@ dump_image:
 iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
+else
+	@cp ${CLOUD_CONFIG_FILE} iso/config
 endif
 	@mkdir -p build
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
 		--target default \
-		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg OS_IMAGE=${REPO}:${FINAL_TAG} \
 		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
 		--build-arg ELEMENTAL_VERSION=${FINAL_TAG} \
