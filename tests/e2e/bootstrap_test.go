@@ -21,7 +21,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher-sandbox/os2/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
