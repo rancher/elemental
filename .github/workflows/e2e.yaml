@@ -19,7 +19,7 @@ jobs:
       env:
         CLUSTER_NAME: cluster-k3s
         CLUSTER_NS: fleet-default
-        INSTALL_K3S_VERSION: v1.21.9+k3s1
+        INSTALL_K3S_VERSION: v1.23.9+k3s1
         INSTALL_K3S_SKIP_ENABLE: true
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
         PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
