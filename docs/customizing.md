@@ -13,13 +13,13 @@ FROM rancher-sandbox/os2:VERSION
 # Your custom commands
 RUN zypper install -y cowsay
 
-# IMPORTANT: /usr/lib/Elemental-release is used for versioning/upgrade. The
+# IMPORTANT: /etc/os-release is used for versioning/upgrade. The
 # values here should reflect the tag of the image currently being built
 ARG IMAGE_REPO=norepo
 ARG IMAGE_TAG=latest
-RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release && \
-    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release && \
-    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
+RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /etc/os-release && \
+    echo "IMAGE_TAG=${IMAGE_TAG}"           >> /etc/os-release && \
+    echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /etc/os-release
 ```
 
 Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/elemental?tab=tags) or [github](https://github.com/rancher/elemental/releases)

@@ -49,12 +49,12 @@ RUN echo "VERSION_ID=$(echo ${IMAGE_TAG} | sed s/^v//)" >> /etc/os-release
 RUN echo "PRETTY_NAME=Elemental ${IMAGE_TAG}" >> /etc/os-release
 RUN echo "COMMIT=${IMAGE_COMMIT}" >> /etc/os-release
 
-# IMPORTANT: Setup rancheros-release used for versioning/upgrade. The
+# IMPORTANT: Setup os-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
 ARG IMAGE_REPO=norepo
-RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /usr/lib/rancheros-release
-RUN echo "IMAGE_TAG=${IMAGE_TAG}"           >> /usr/lib/rancheros-release
-RUN echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /usr/lib/rancheros-release
+RUN echo "IMAGE_REPO=${IMAGE_REPO}"         >> /etc/os-release
+RUN echo "IMAGE_TAG=${IMAGE_TAG}"           >> /etc/os-release
+RUN echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN mkinitrd && \

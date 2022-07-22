@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-. /usr/lib/rancheros-release
+. /etc/os-release
 
 IMAGE=$(echo "$IMAGE" | sed 's![/:]!-!g')
 for i in rke2 k3s; do
