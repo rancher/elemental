@@ -1,5 +1,5 @@
 # ARGS go first if used on FROM
-ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator:v0.3.0
+ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
 # Binaries and files needed from elemental-toolkit repository
 ARG LUET_VERSION=0.32.5
