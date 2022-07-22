@@ -49,11 +49,12 @@ dump_image:
 iso:
 ifeq ($(CLOUD_CONFIG_FILE),"iso/config")
 	@echo "No CLOUD_CONFIG_FILE set, using the default one at ${CLOUD_CONFIG_FILE}"
+else
+	@cp ${CLOUD_CONFIG_FILE} iso/config
 endif
 	@mkdir -p build
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
 		--target default \
-		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg OS_IMAGE=${REPO}:${FINAL_TAG} \
 		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
 		--build-arg ELEMENTAL_VERSION=${FINAL_TAG} \
