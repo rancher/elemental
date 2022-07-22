@@ -1,6 +1,6 @@
 [Unit]
-Description=RancherOS Populated Node Labels
-Documentation=https://github.com/rancher-sandbox/os2
+Description=Elemental Populated Node Labels
+Documentation=https://github.com/rancher/elemental
 Before=network-online.target
 
 [Install]
@@ -10,4 +10,4 @@ WantedBy=multi-user.target
 Type=oneshot
 EnvironmentFile=-/etc/default/%N
 EnvironmentFile=-/etc/sysconfig/%N
-ExecStart=ros-populate-node-labels
+ExecStart=elemental-populate-node-labels
