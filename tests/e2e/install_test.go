@@ -89,10 +89,13 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("cert-manager", "app.kubernetes.io/instance=cert-manager", "cert-manager-cainjector")
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/instance=cert-manager")
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=webhook")
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=cainjector")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -114,9 +117,6 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 				"--set", "extraEnv[1].value=rancherpassword",
 				"--set", "replicas=1",
 			)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("cattle-system", "app=rancher", "rancher")
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher")
