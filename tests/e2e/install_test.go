@@ -176,6 +176,9 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err = tools.Sed("%PASSWORD%", userPassword, registrationYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
+			err = tools.Sed("%CLUSTER_NAME%", clusterName, registrationYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
 			err = kubectl.Apply(clusterNS, registrationYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
