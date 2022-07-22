@@ -112,6 +112,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 				"--set", "extraEnv[0].value=https://"+hostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
+				"--set", "replicas=1",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
