@@ -6,7 +6,7 @@ repositories:
     cached: true
     priority: 1
     arch: "amd64"
-    reference: v0.8.14-22-repository.yaml
+    reference: repository.yaml
     verify: false
     urls:
       - "quay.io/costoolkit/releases-teal"
