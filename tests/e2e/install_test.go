@@ -71,7 +71,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err = k.WaitForPod("kube-system", "app.kubernetes.io/name=traefik", "traefik")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("kube-system", "app=svclb-traefik", "svclb-traefik")
+			err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
