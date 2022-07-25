@@ -49,6 +49,10 @@ jobs:
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: E2E - Install Rancher
         run: cd tests && make e2e-install-rancher
+      - name: E2E - Bootstrap node 1 with current build
+        env:
+          VM_INDEX: 1
+        run: cd tests && make e2e-bootstrap-node
   cleanup:
     runs-on: kvm-host
     if: always()
