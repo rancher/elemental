@@ -8,10 +8,15 @@ declare global {
       login(username?: string, password?: string, cacheSession?: boolean,): Chainable<Element>;
       byLabel(label: string,): Chainable<Element>;
       clickButton(label: string,): Chainable<Element>;
+      confirmDelete(): Chainable<Element>;
+      clickNavMenu(listLabel: string[],): Chainable<Element>;
       clickElementalMenu(label: string,): Chainable<Element>;
       typeValue(label: string, value: string, noLabel?: boolean, log?: boolean): Chainable<Element>;
       typeKeyValue(key: string, value: string,): Chainable<Element>;
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
+      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean): Chainable<Element>;
+      deleteMachReg(machRegName: string): Chainable<Element>;
+      deleteAllMachReg():Chainable<Element>;
     }
 }}
 
@@ -25,3 +30,6 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 });
 
 require('cypress-dark');
+require('cy-verify-downloads').addCustomCommand();
+require('cypress-plugin-tab');
+

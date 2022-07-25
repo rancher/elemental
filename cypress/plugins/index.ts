@@ -9,6 +9,8 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
   const url = process.env.RANCHER_URL || 'https://localhost:8005';
+  const { isFileExist, findFiles } = require('cy-verify-downloads');
+  on('task', { isFileExist, findFiles })
 
   config.baseUrl = url.replace(/\/$/, '');
 
