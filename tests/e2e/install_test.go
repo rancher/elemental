@@ -137,7 +137,6 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.RunHelmBinaryWithCustomErr("install", "elemental-operator", "elemental-operator/elemental-operator",
-				"--devel",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)
