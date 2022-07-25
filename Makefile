@@ -109,6 +109,8 @@ endif
 	echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "set iso    elemental-${FINAL_TAG}.iso" >> build/elemental-${FINAL_TAG}.ipxe  #not used anymore, check if we can boot from iso directly with sanboot?
+	echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "initrd \$${url}/\$${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
 	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} elemental.install.iso=\$${url}/\$${iso} elemental.install.config-urls=\$${config} console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
 
