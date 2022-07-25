@@ -1,6 +1,6 @@
 # Understanding Clusters
 
-RancherOS bootstraps a node with Kubernetes (k3s/rke2) and Rancher such
+Elemental bootstraps a node with Kubernetes (k3s/rke2) and Rancher such
 that all future management of Kubernetes and Rancher can be done from
 Kubernetes. This is done by running Rancherd once per node on boot. Once the system has
 been fully bootstrapped it will not run again. Rancherd is ran from cloud-init
