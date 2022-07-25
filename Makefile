@@ -9,7 +9,7 @@ SUDO?=sudo
 FRAMEWORK_PACKAGES?=meta/cos-light
 CLOUD_CONFIG_FILE?="iso/config"
 # This are the default images already in the dockerfile but we want to be able to override them
-OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:v0.3.0
+OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator:latest
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
 TOOL_IMAGE?=quay.io/costoolkit/elemental-cli:v0.0.15-f1fabd4
 # Used to know if this is a release or just a normal dev build

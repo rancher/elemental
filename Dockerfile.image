@@ -1,5 +1,5 @@
 # ARGS go first if used on FROM
-ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator:v0.3.0
+ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
 # Binaries and files needed from elemental-toolkit repository
 ARG LUET_VERSION=0.32.5
@@ -10,7 +10,6 @@ SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
 
 RUN utils/k9s
 RUN utils/nerdctl
-RUN utils/rancherd
 RUN toolchain/elemental-cli
 RUN toolchain/cosign
 RUN selinux/rancher
@@ -30,8 +29,8 @@ FROM registry.suse.com/suse/sle-micro-rancher/5.2:latest as default
 COPY --from=framework-build /framework /
 # Copy elemental-operator
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
-# Copy rancher-system-agent
-COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/rancher-system-agent
+# Copy rancher-system-agent as elemental-system-agent to avoid clashes
+COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/elemental-system-agent
 
 # Copy local framework files
 COPY framework/cos/ /

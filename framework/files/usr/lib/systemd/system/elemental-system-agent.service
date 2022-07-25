@@ -1,19 +1,17 @@
 [Unit]
-Description=Rancher System Agent
+Description=Elemental System Agent
 Documentation=https://github.com/rancher/system-agent
 Wants=network-online.target
 After=network-online.target
 ConditionPathExists=!/run/cos/live_mode
-ConditionPathExists=!/opt/rancher-system-agent
+ConditionPathExists=!/etc/systemd/system/rancher-system-agent.service
 
 [Install]
 WantedBy=multi-user.target
 
 [Service]
-Type=simple
-Restart=always
-RestartSec=5s
+Type=oneshot
 StandardOutput=journal+console
 StandardError=journal+console
-Environment="CATTLE_AGENT_CONFIG=/etc/rancher/agent/config.yaml"
-ExecStart=/usr/sbin/rancher-system-agent sentinel
+Environment="CATTLE_AGENT_CONFIG=/etc/elemental/agent/config.yaml"
+ExecStart=/usr/sbin/elemental-system-agent sentinel
