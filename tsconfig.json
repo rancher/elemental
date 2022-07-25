@@ -26,6 +26,7 @@
       "@types/node",
       "@nuxt/types",
       "cypress",
+      "cy-verify-downloads",
       "cypress-file-upload"
     ]
   },
