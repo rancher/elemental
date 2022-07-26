@@ -112,7 +112,7 @@ endif
 	echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "initrd \$${url}/\$${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} elemental.install.iso=\$${url}/\$${iso} elemental.install.config-urls=\$${config} console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
 
 .PHONY: build_all
 build_all: build iso extract_kernel_init_squash ipxe
