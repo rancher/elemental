@@ -15,16 +15,11 @@ the OEM configuration for the image.
 The installation configuration should be hosted on an HTTP or TFTP server. A simple approach is to use a
 [GitHub Gist](https://gist.github.com).
 
-### Kernel Command Line
-
-Install directives can be set from the kernel command line using a period (.) seperated key structure such as
-`Elemental.install.config_url`.  They kernel command line keys are case-insensitive.
-
 ### Reference
 
 ```yaml
 #cloud-config
-Elemental:
+elemental:
   install:
     # An http://, https://, or tftp:// URL to load as the base configuration
     # for this configuration. This configuration can include any install 
@@ -83,7 +78,7 @@ Download the latest ipxe script from [current release](https://github.com/ranche
 
 ## Partition Table
 
-Elemental requires the following partitions.  These partitions are required by [cOS-toolkit](https://rancher-sandbox.github.io/cos-toolkit-docs/docs)
+Elemental requires the following partitions.  These partitions are required by [Elemental-toolkit](https://rancher.github.io/elemental-toolkit/docs)
 
 | Label          | Default Size    | Contains                                                    |
 | ---------------|-----------------|------------------------------------------------------------ |

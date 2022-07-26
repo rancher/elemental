@@ -52,7 +52,6 @@ nav:
     - customizing.md
     - dashboard.md
     - mcm.md
-    - ami.md
   - Reference:
     - configuration.md
     - versions.md
