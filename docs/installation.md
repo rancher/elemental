@@ -15,11 +15,6 @@ the OEM configuration for the image.
 The installation configuration should be hosted on an HTTP or TFTP server. A simple approach is to use a
 [GitHub Gist](https://gist.github.com).
 
-### Kernel Command Line
-
-Install directives can be set from the kernel command line using a period (.) seperated key structure such as
-`elemental.install.config_url`.  They kernel command line keys are case-insensitive.
-
 ### Reference
 
 ```yaml
