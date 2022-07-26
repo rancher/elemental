@@ -8,7 +8,7 @@ metadata:
 spec:
   # Labels to be added to the created MachineInventory object
   machineInventoryLabels:
-    clusterName: %CLUSTER_NAME%
+    cluster-id: id-%CLUSTER_NAME%
   # Annotations to be added to the created MachineInventory object
   machineInventoryAnnotations: {}
   # The config that will be used to provision the node

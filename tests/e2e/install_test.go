@@ -151,6 +151,9 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err := tools.Sed("%CLUSTER_NAME%", clusterName, addClusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
+			err = tools.Sed("%K3S_VERSION%", k3sVersion, addClusterYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
 			err = kubectl.Apply(clusterNS, addClusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
