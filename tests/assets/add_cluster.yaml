@@ -5,7 +5,29 @@ metadata:
   # namespace: fleet-default
 spec:
   rkeConfig:
-    machineGlobalConfig:
-      cluster-cidr: "10.44.0.0/16"
-      service-cidr: "10.45.0.0/16"
-  kubernetesVersion: v1.21.9+k3s1
+    machinePools:
+    - controlPlaneRole: true
+      etcdRole: true
+      machineConfigRef:
+        apiVersion: elemental.cattle.io/v1beta1
+        kind: MachineInventorySelectorTemplate
+        name: selector-%CLUSTER_NAME%
+      name: pool-%CLUSTER_NAME%
+      quantity: 4
+      unhealthyNodeTimeout: 0s
+      workerRole: true
+  kubernetesVersion: %K3S_VERSION%
+---
+kind: MachineInventorySelectorTemplate
+apiVersion: elemental.cattle.io/v1beta1
+metadata:
+  name: selector-%CLUSTER_NAME%
+  # namespace: fleet-default
+spec:
+  template:
+    spec:
+      selector:
+        matchExpressions:
+        - key: cluster-id
+          operator: In
+          values: [ 'id-%CLUSTER_NAME%' ]
