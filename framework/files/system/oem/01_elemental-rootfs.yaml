@@ -63,24 +63,3 @@ stages:
           label: COS_PERSISTENT
         expand_partition:
           size: 0
-  # XXX:
-  # Fetch datasources ONLY when network is present
-  # This prevents network configuration via cloud-init from datasources.
-  # See: https://github.com/rancher-sandbox/cOS-toolkit/issues/1140
-  network:
-    - if: '[ ! -f /oem/userdata ]'
-      name: "Pull data from provider"
-      datasource:
-        providers: ["gcp", "openstack", "aws", "azure", "hetzner", "packet", "scaleway", "vultr", "digitalocean", "metaldata" ]
-        path: "/oem"
-      files:
-      - path: /oem/userdata_load
-    - if: '[ -f /oem/userdata ] && [ -f /oem/userdata_load ]'
-      commands:
-      - elemental cloud-init -s initramfs /oem/userdata
-      - elemental cloud-init -s boot /oem/userdata
-      - rm -rf /oem/userdata_load
-    - if: '[ -f oem/userdata_load ]'
-      name: Clear any userdata leftovers
-      commands:
-      - rm -rf /oem/userdata_load
