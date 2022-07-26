@@ -71,7 +71,7 @@ stages:
     - if: '[ ! -f /oem/userdata ]'
       name: "Pull data from provider"
       datasource:
-        providers: ["cdrom", "gcp", "openstack", "aws", "azure", "hetzner", "packet", "scaleway", "vultr", "digitalocean", "metaldata" ]
+        providers: ["gcp", "openstack", "aws", "azure", "hetzner", "packet", "scaleway", "vultr", "digitalocean", "metaldata" ]
         path: "/oem"
       files:
       - path: /oem/userdata_load
