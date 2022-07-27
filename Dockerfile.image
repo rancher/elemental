@@ -38,22 +38,13 @@ COPY framework/files/ /
 
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
-RUN echo NAME="Elemental" > /etc/os-release
-RUN echo ID="elemental" >> /etc/os-release
-RUN echo ID_LIKE="suse opensuse" >> /etc/os-release
-RUN echo BUG_REPORT_URL="https://github.com/rancher/elemental/issues" >> /etc/os-release
-RUN echo HOME_URL="https://github.com/rancher/elemental" >> /etc/os-release
-RUN echo "VERSION=${IMAGE_TAG}" >> /etc/os-release
-RUN echo "VERSION_ID=$(echo ${IMAGE_TAG} | sed s/^v//)" >> /etc/os-release
-RUN echo "PRETTY_NAME=Elemental ${IMAGE_TAG}" >> /etc/os-release
-RUN echo "COMMIT=${IMAGE_COMMIT}" >> /etc/os-release
-
-# IMPORTANT: Setup os-release used for versioning/upgrade. The
-# values here should reflect the tag of the image being built
 ARG IMAGE_REPO=norepo
-RUN echo "IMAGE_REPO=${IMAGE_REPO}"         >> /etc/os-release
-RUN echo "IMAGE_TAG=${IMAGE_TAG}"           >> /etc/os-release
-RUN echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /etc/os-release
+RUN echo VERSION=\"${IMAGE_TAG}\" >> /etc/os-release
+RUN echo VERSION_ID=\"$(echo ${IMAGE_TAG} | sed s/^v//)\" >> /etc/os-release
+RUN echo COMMIT=\"${IMAGE_COMMIT}\" >> /etc/os-release
+RUN echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release
+RUN echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release
+RUN echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN mkinitrd && \
