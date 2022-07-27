@@ -13,5 +13,6 @@ WantedBy=multi-user.target
 Type=oneshot
 StandardOutput=journal+console
 StandardError=journal+console
-Environment="CATTLE_AGENT_CONFIG=/etc/elemental/agent/config.yaml"
+Environment="CATTLE_AGENT_CONFIG=/etc/rancher/elemental/agent/config.yaml"
+Environment="CATTLE_LOGLEVEL=debug"
 ExecStart=/usr/sbin/elemental-system-agent sentinel
