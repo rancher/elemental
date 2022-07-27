@@ -65,22 +65,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Checking that the VM is added in the cluster", func() {
-			internalClusterName, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath={.status.clusterName}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterName).To(Not(BeEmpty()))
-
-			// Check that the VM is added
-			Eventually(func() string {
-				internalClusterToken, _ := kubectl.Run("get", "MachineInventories",
-					"--namespace", clusterNS, serverId,
-					"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-				return internalClusterToken
-			}, "10m", "10s").Should(Equal(internalClusterName))
-		})
-
 		By("Checking VM ssh connection", func() {
 			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
 			Expect(err).To(Not(HaveOccurred()))
@@ -102,6 +86,22 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				out, _ := client.RunSSH("kubectl get pod -n cattle-fleet-system -l app=fleet-agent")
 				return out
 			}, "10m", "30s").Should(ContainSubstring("Running"))
+		})
+
+		By("Checking that the VM is added in the cluster", func() {
+			internalClusterName, err := kubectl.Run("get", "cluster",
+				"--namespace", clusterNS, clusterName,
+				"-o", "jsonpath={.status.clusterName}")
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(internalClusterName).To(Not(BeEmpty()))
+
+			// Check that the VM is added
+			Eventually(func() string {
+				internalClusterToken, _ := kubectl.Run("get", "MachineInventories",
+					"--namespace", clusterNS, serverId,
+					"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
+				return internalClusterToken
+			}, "10m", "10s").Should(Equal(internalClusterName))
 		})
 	})
 })
