@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os/exec"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -58,6 +59,15 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Export the id of the newly installed node
 			serverId = id
+		})
+
+		By("Setting 'quantity' node to predefined cluster", func() {
+			patchCmd := `{"spec":{"rkeConfig":{"machinePools":[{"machineConfigRef":{"name":"selector-` + clusterName + `"},"name":"pool-` + clusterName + `","quantity":` + fmt.Sprint(vmIndex) + `}]}}}`
+			out, err := kubectl.Run("patch", "cluster",
+				"--namespace", clusterNS, clusterName,
+				"--type", "merge", "--patch", patchCmd,
+			)
+			Expect(err).To(Not(HaveOccurred()), out)
 		})
 
 		By("Restarting the VM", func() {
