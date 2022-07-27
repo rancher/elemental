@@ -23,5 +23,4 @@ spec:
         reboot: true
         device: /dev/sda
         debug: true
-  #machineName: m-${System Information/Manufacturer}-${System Information/Product Name}-${System Information/UUID}
-  machineName: %VM_NAME%-{{ trunc 4 .MachineID }}
+  #machineName: %VM_NAME%-{{ trunc 4 .MachineID }}
