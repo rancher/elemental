@@ -20,7 +20,8 @@ spec:
     elemental:
       install:
         automatic: true
-        reboot: true
+        reboot: false
+        poweroff: true
         device: /dev/sda
         debug: true
   #machineName: %VM_NAME%-{{ trunc 4 .MachineID }}
