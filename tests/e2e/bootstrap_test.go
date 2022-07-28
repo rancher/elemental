@@ -26,10 +26,6 @@ import (
 )
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
-	var (
-		serverId string
-	)
-
 	It("Install node and add it in Rancher", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
@@ -56,12 +52,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			id, err := misc.GetServerId(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
-
-			// Export the id of the newly installed node
-			serverId = id
 		})
 
-		By("Setting 'quantity' node to predefined cluster", func() {
+		By("Increasing 'quantity' node to predefined cluster", func() {
 			patchCmd := `{"spec":{"rkeConfig":{"machinePools":[{"machineConfigRef":{"name":"selector-` + clusterName + `"},"name":"pool-` + clusterName + `","quantity":` + fmt.Sprint(vmIndex) + `}]}}}`
 			out, err := kubectl.Run("patch", "cluster",
 				"--namespace", clusterNS, clusterName,
@@ -100,20 +93,22 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}, "10m", "30s").Should(ContainSubstring("Running"))
 		})
 
-		By("Checking that the VM is added in the cluster", func() {
-			internalClusterName, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath={.status.clusterName}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterName).To(Not(BeEmpty()))
-
-			// Check that the VM is added
+		By("Checking cluster status", func() {
+			// Check that a 'type' property named 'Ready' is set to true
 			Eventually(func() string {
-				internalClusterToken, _ := kubectl.Run("get", "MachineInventories",
-					"--namespace", clusterNS, serverId,
-					"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-				return internalClusterToken
-			}, "10m", "10s").Should(Equal(internalClusterName))
+				clusterStatus, _ := kubectl.Run("get", "cluster",
+					"--namespace", clusterNS, clusterName,
+					"-o", "jsonpath='{.status.conditions[?(@.type==\"Ready\")].status}'")
+				return clusterStatus
+			}, "5m", "10s").Should(Equal("True"))
+
+			// There should be no 'reason' property set in a clean cluster
+			Eventually(func() string {
+				reason, _ := kubectl.Run("get", "cluster",
+					"--namespace", clusterNS, clusterName,
+					"-o", "jsonpath='{.status.conditions[*].reason}'")
+				return reason
+			}, "5m", "10s").Should(BeEmpty())
 		})
 	})
 })
