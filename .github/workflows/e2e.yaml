@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Install dependencies
         run: zypper -n in -l qemu-kvm libvirt virt-install curl helm git-core tar make gcc
+      - name: Be sure to remove all previous data from worker ♻
+        run: rm -rf ./*
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install Go
@@ -59,5 +61,4 @@ jobs:
     needs: e2e-tests
     steps:
       - name: Release space from worker ♻
-        run: |
-          sudo docker system prune -f -a --volumes
+        run: sudo docker system prune -f -a --volumes
