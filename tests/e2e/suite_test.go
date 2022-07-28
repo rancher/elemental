@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	vmNameRoot         = "ros-node"
+	vmNameRoot         = "node"
 	userName           = "root"
 	userPassword       = "r0s@pwd1"
 	netDefaultFileName = "../assets/net-default.xml"
