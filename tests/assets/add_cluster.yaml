@@ -13,7 +13,7 @@ spec:
         kind: MachineInventorySelectorTemplate
         name: selector-%CLUSTER_NAME%
       name: pool-%CLUSTER_NAME%
-      quantity: 4
+      quantity: 1
       unhealthyNodeTimeout: 0s
       workerRole: true
   kubernetesVersion: %K3S_VERSION%
