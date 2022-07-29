@@ -47,6 +47,7 @@ stages:
           /var/lib/wicked
           /var/lib/longhorn
           /var/lib/cni
+          /var/lib/calico
         PERSISTENT_STATE_BIND: "true"
     - if: '[ -f "/run/cos/recovery_mode" ]'
       # omit the persistent partition on recovery mode
