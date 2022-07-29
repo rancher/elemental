@@ -1,4 +1,4 @@
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
   name: machine-registration
@@ -7,16 +7,21 @@ metadata:
   # namespace: fleet-default
 spec:
   # Labels to be added to the created MachineInventory object
-  machineInventoryLabels: {}
+  machineInventoryLabels:
+    cluster-id: id-%CLUSTER_NAME%
   # Annotations to be added to the created MachineInventory object
   machineInventoryAnnotations: {}
-  # The cloud config that will be used to provision the node
-  cloudConfig:
-    hostname: %VM_NAME%-{{ trunc 4 .MachineID }}
-    users:
-    - name: %USER%
-      passwd: %PASSWORD%
-    rancheros:
+  # The config that will be used to provision the node
+  config:
+    cloud-config:
+      users:
+        - name: %USER%
+          passwd: %PASSWORD%
+    elemental:
       install:
+        automatic: true
+        reboot: false
+        poweroff: true
         device: /dev/sda
         debug: true
+  #machineName: %VM_NAME%-{{ trunc 4 .MachineID }}

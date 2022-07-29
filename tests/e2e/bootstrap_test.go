@@ -15,20 +15,18 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os/exec"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher-sandbox/os2/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
-	var (
-		serverId string
-	)
-
 	It("Install node and add it in Rancher", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
@@ -55,15 +53,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			id, err := misc.GetServerId(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
-
-			// Export the id of the newly installed node
-			serverId = id
 		})
 
-		By("Adding server role to predefined cluster", func() {
-			patchCmd := `{"spec":{"clusterName":"` + clusterName + `","config":{"role":"server"}}}`
-			out, err := kubectl.Run("patch", "MachineInventories",
-				"--namespace", clusterNS, serverId,
+		By("Increasing 'quantity' node to predefined cluster", func() {
+			patchCmd := `{"spec":{"rkeConfig":{"machinePools":[{"machineConfigRef":{"name":"selector-` + clusterName + `"},"name":"pool-` + clusterName + `","quantity":` + fmt.Sprint(vmIndex) + `}]}}}`
+			out, err := kubectl.Run("patch", "cluster",
+				"--namespace", clusterNS, clusterName,
 				"--type", "merge", "--patch", patchCmd,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
@@ -72,22 +67,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Restarting the VM", func() {
 			err := exec.Command("virsh", "start", vmName).Run()
 			Expect(err).To(Not(HaveOccurred()))
-		})
-
-		By("Checking that the VM is added in the cluster", func() {
-			internalClusterName, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath={.status.clusterName}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(internalClusterName).To(Not(BeEmpty()))
-
-			// Check that the VM is added
-			Eventually(func() string {
-				internalClusterToken, _ := kubectl.Run("get", "MachineInventories",
-					"--namespace", clusterNS, serverId,
-					"-o", "jsonpath={.status.clusterRegistrationTokenNamespace}")
-				return internalClusterToken
-			}, "10m", "10s").Should(Equal(internalClusterName))
 		})
 
 		By("Checking VM ssh connection", func() {
@@ -100,17 +79,39 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Password: userPassword,
 			}
 
+			/* Disable this check for now, until https://github.com/rancher/elemental-operator/issues/90 is fixed!
 			// Retry the SSH connection, as it can takes time for the user to be created
 			Eventually(func() string {
 				out, _ := client.RunSSH("uname -n")
 				return out
 			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
+			*/
 
-			// fleet-agent is the last pod that start, wait for it before continuing
+			// system-agent is the pod that communicates to Rancher, wait for it before continuing
 			Eventually(func() string {
-				out, _ := client.RunSSH("kubectl get pod -n cattle-fleet-system -l app=fleet-agent")
+				out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 				return out
-			}, "10m", "30s").Should(ContainSubstring("Running"))
+			}, "5m", "30s").Should(ContainSubstring("Running"))
+		})
+
+		By("Checking cluster status", func() {
+			// Check that a 'type' property named 'Ready' is set to true
+			Eventually(func() string {
+				clusterStatus, _ := kubectl.Run("get", "cluster",
+					"--namespace", clusterNS, clusterName,
+					"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
+				return clusterStatus
+			}, "5m", "10s").Should(Equal("True"))
+
+			// Wait a little bit for the cluster to be in a stable state
+			time.Sleep(2 * time.Minute)
+
+			// There should be no 'reason' property set in a clean cluster
+			reason, err := kubectl.Run("get", "cluster",
+				"--namespace", clusterNS, clusterName,
+				"-o", "jsonpath={.status.conditions[*].reason}")
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(reason).To(BeEmpty())
 		})
 	})
 })

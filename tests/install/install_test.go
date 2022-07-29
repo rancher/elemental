@@ -23,7 +23,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/rancher-sandbox/os2/tests/sut"
+	"github.com/rancher/elemental/tests/sut"
 )
 
 type RancherOsConfig struct {
