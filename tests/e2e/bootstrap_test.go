@@ -91,7 +91,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 				return out
-			}, "10m", "30s").Should(ContainSubstring("Running"))
+			}, "5m", "30s").Should(ContainSubstring("Running"))
 		})
 
 		By("Checking cluster status", func() {
