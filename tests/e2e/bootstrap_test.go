@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"fmt"
 	"os/exec"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -102,13 +103,15 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				return clusterStatus
 			}, "5m", "10s").Should(Equal("True"))
 
+			// Wait a little bit for the cluster to be in a stable state
+			time.Sleep(2 * time.Minute)
+
 			// There should be no 'reason' property set in a clean cluster
-			Eventually(func() string {
-				reason, _ := kubectl.Run("get", "cluster",
-					"--namespace", clusterNS, clusterName,
-					"-o", "jsonpath={.status.conditions[*].reason}")
-				return reason
-			}, "5m", "10s").Should(BeEmpty())
+			reason, err := kubectl.Run("get", "cluster",
+				"--namespace", clusterNS, clusterName,
+				"-o", "jsonpath={.status.conditions[*].reason}")
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(reason).To(BeEmpty())
 		})
 	})
 })
