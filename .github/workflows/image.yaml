@@ -39,7 +39,7 @@ jobs:
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          password: ${{ secrets.QUAY_PASSWORD }}
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
