@@ -98,7 +98,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				clusterStatus, _ := kubectl.Run("get", "cluster",
 					"--namespace", clusterNS, clusterName,
-					"-o", "jsonpath='{.status.conditions[?(@.type==\"Ready\")].status}'")
+					"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
 				return clusterStatus
 			}, "5m", "10s").Should(Equal("True"))
 
@@ -106,7 +106,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				reason, _ := kubectl.Run("get", "cluster",
 					"--namespace", clusterNS, clusterName,
-					"-o", "jsonpath='{.status.conditions[*].reason}'")
+					"-o", "jsonpath={.status.conditions[*].reason}")
 				return reason
 			}, "5m", "10s").Should(BeEmpty())
 		})
