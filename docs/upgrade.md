@@ -2,8 +2,8 @@
 
 # Command line
 
-You can also use the `rancherd upgrade` command on a `server` node to automatically 
-upgrade Elemental, Rancher, and/or Kubernetes.
+You can also use the `elemental upgrade --system.uri <OS_IMAGE>` command on a elemental node instance to automatically 
+upgrade Elemental and/or Kubernetes.
 
 # Kubernetes API
 
@@ -17,14 +17,14 @@ Elemental is upgraded with the Elemental operator. Refer to the
 TL;DR is
 
 ```bash
-kubectl edit -n fleet-local default-os-image
+kubectl edit -n fleet-default default-os-image
 ```
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1beta1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
-  namespace: fleet-local
+  namespace: fleet-default
 spec:
   # Set to the new Elemental version you would like to upgrade to
   osImage: quay.io/costoolkit/os2:v0.0.0
@@ -33,13 +33,13 @@ spec:
 ### Managing available versions
 
 An upgrade channel file (
-`rancheros-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
-in Elemental releases and can be applied in a Kubernetes cluster where the rancheros operator is installed to syncronize available version for upgrades.
+`elemental-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
+in Elemental releases and can be applied in a Kubernetes cluster where the elemental operator is installed to syncronize available version for upgrades.
 
 
 For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it where the ros-operator is installed: 
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1beta1
 kind: ManagedOSVersionChannel
 metadata:
   name: os2-amd64
@@ -68,15 +68,15 @@ The operator will syncronize available versions and populate `ManagedOSVersion` 
 To trigger an upgrade from a `ManagedOSVersion` refer to its name in the `ManagedOSImage` field, instead of an `osImage`: 
 
 ```bash
-kubectl edit -n fleet-local default-os-image
+kubectl edit -n fleet-default default-os-image
 ```
 
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1beta1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
-  namespace: fleet-local
+  namespace: fleet-default
 spec:
   # Set to the new ManagedOSVersion you would like to upgrade to
   managedOSVersionName: v0.1.0-alpha22-amd64
