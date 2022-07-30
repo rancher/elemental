@@ -113,8 +113,8 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   if (checkAnnotations) {
     cy.clickButton('Add Annotation')
     cy.contains('.row', 'Annotations').within(() => {
-      cy.get('.kv-item.key').type('myAnnot1');
-      cy.get('.kv-item.value').type('myAnnotValue1');
+      cy.get('.kv-item.key').type('myAnnotation1');
+      cy.get('.kv-item.value').type('myAnnotationValue1');
     })
   }
 
@@ -132,16 +132,70 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   // Try to download the registration file and check it
   cy.clickButton("Download");
   cy.verifyDownload('generate_iso_image.zip');
+  cy.contains('Saving').should('not.exist');
   
-  // Check labels
-  // The field is disabled so we cannot check its content...
+  // Check label and annotation in YAML
+  // For now, we can only check in YAML because the fields are disabled and we cannot check their content
   // It looks like we can use shadow DOM to catch it but too complicated for now
-
-  // Check annotations
-  // Same reason as labels
+  cy.contains('Machine Registrations').click();
+  if (checkLabels) {cy.checkMachRegLabel({machRegName: machRegName, labelName: 'myLabel1', labelValue: 'myLabelValue1'})};
+  if (checkAnnotations) {cy.checkMachRegAnnotation({machRegName: machRegName, annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});}
 
   // Check Cloud configuration
   // Cannot be checked yet due to https://github.com/rancher/dashboard/issues/6458
+});
+
+// Add Label to machine registration
+Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
+  cy.clickButton('Add Label');
+  cy.contains('.row', 'Labels').within(() => {
+    cy.get('.kv-item.key').type(labelName);
+    cy.get('.kv-item.value').type(labelValue);
+  })
+});
+
+// Add Annotation to machine registration
+Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue}) => {
+  cy.clickButton('Add Annotation');
+  cy.contains('.row', 'Annotations').within(() => {
+    cy.get('.kv-item.key').type(annotationName);
+    cy.get('.kv-item.value').type(annotationValue);
+  })
+});
+
+// Check machine registration label in YAML
+Cypress.Commands.add('checkMachRegLabel', ({machRegName, labelName, labelValue}) => {
+  cy.contains(machRegName).click();
+  cy.get('div.actions > .role-multi-action').click()
+  cy.contains('li', 'Edit YAML').click();
+  cy.contains('Machine Registration: '+ machRegName).should('exist');
+  cy.contains(labelName + ': ' + labelValue);
+  cy.clickButton('Cancel');
+});
+
+// Check machine registration annotation in YAML
+Cypress.Commands.add('checkMachRegAnnotation', ({machRegName, annotationName, annotationValue}) => {
+  cy.contains(machRegName).click();
+  cy.get('div.actions > .role-multi-action').click()
+  cy.contains('li', 'Edit YAML').click();
+  cy.contains('Machine Registration: '+ machRegName).should('exist');
+  cy.contains(annotationName + ': ' + annotationValue);
+  cy.clickButton('Cancel');
+});
+
+// Edit a machine registration
+Cypress.Commands.add('editMachReg', ({machRegName, addLabel=false, addAnnotation=false}) => {
+  cy.contains(machRegName).click();
+
+  // Select the 3dots button and edit configuration
+  cy.get('div.actions > .role-multi-action').click()
+  cy.contains('li', 'Edit Config').click();
+
+  // Add Label
+  if (addLabel) {cy.addMachRegLabel({labelName: 'myLabel1', labelValue: 'myLabelValue1'})};
+
+  // Add Annotation
+  if (addAnnotation) {cy.addMachRegAnnotation({annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'})};
 });
 
 // Delete a machine registration
