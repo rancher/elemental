@@ -53,4 +53,39 @@ describe('Machine registration testing', () => {
     cy.deleteMachReg({machRegName: 'delete-test'});
   });
 
+  it('Edit a machine registration with edit config button', () => {
+    cy.createMachReg({machRegName: 'edit-config-test'});
+    cy.editMachReg({machRegName: 'edit-config-test', addLabel: true, addAnnotation: true });
+    cy.clickButton('Save');
+
+    // Check that we can see our label and annotation in the YAML
+    cy.checkMachRegLabel({machRegName: 'edit-config-test', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
+    cy.checkMachRegAnnotation({machRegName: 'edit-config-test', annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
+  });
+
+  it.skip('Edit a machine registration with edit YAML button', () => {
+    //cy.createMachReg({machRegName: 'edit-yaml-test'});
+    // TBD
+  });
+
+  it('Clone a machine registration', () => {
+    cy.createMachReg({machRegName: 'clone-test', checkLabels: true, checkAnnotations: true});
+    cy.get('div.actions > .role-multi-action').click()
+    cy.contains('li', 'Clone').click();
+    cy.typeValue({label: 'Name', value: 'cloned-machine-reg'});
+    cy.clickButton('Create');
+    cy.contains('.masthead', 'Machine Registration: cloned-machine-reg Active').should('exist');
+    
+    // Check that we got the same label and annotation in both machine registration
+    cy.checkMachRegLabel({machRegName: 'cloned-machine-reg', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
+    cy.checkMachRegAnnotation({machRegName: 'cloned-machine-reg', annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
+  });
+
+  it('Download Machine registration YAML', () => {
+    cy.createMachReg({machRegName: 'download-yaml-test'});
+    cy.get('div.actions > .role-multi-action').click()
+    cy.contains('li', 'Download YAML').click();
+    cy.verifyDownload('download-yaml-test.yaml');
+  });
+
 });
