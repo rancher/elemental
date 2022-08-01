@@ -147,14 +147,13 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 		})
 
 		By("Creating a new cluster", func() {
-			addClusterYaml := "../assets/add_cluster.yaml"
-			err := tools.Sed("%CLUSTER_NAME%", clusterName, addClusterYaml)
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = tools.Sed("%K3S_VERSION%", k3sVersion, addClusterYaml)
+			err = tools.Sed("%K3S_VERSION%", k3sVersion, clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.Apply(clusterNS, addClusterYaml)
+			err = kubectl.Apply(clusterNS, clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
 			createdCluster, err := kubectl.Run("get", "cluster",
@@ -164,6 +163,22 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 			// Check that's the created cluster is the good one
 			Expect(createdCluster).To(Equal(clusterName))
+		})
+
+		By("Creating cluster selector", func() {
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, selectorYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = kubectl.Apply(clusterNS, selectorYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Check that the selector is correctly created
+			Eventually(func() string {
+				out, _ := kubectl.Run("get", "MachineInventorySelector",
+					"--namespace", clusterNS,
+					"-o", "jsonpath={.items[*].metadata.name}")
+				return out
+			}, "5m", "5s").Should(ContainSubstring("selector-" + clusterName))
 		})
 
 		By("Adding MachineRegistration", func() {

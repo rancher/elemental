@@ -29,6 +29,8 @@ const (
 	userName           = "root"
 	userPassword       = "r0s@pwd1"
 	netDefaultFileName = "../assets/net-default.xml"
+	clusterYaml        = "../assets/cluster.yaml"
+	selectorYaml       = "../assets/selector.yaml"
 )
 
 var (

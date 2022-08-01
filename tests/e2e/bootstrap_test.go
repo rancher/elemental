@@ -56,10 +56,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Increasing 'quantity' node to predefined cluster", func() {
-			patchCmd := `{"spec":{"rkeConfig":{"machinePools":[{"machineConfigRef":{"name":"selector-` + clusterName + `"},"name":"pool-` + clusterName + `","quantity":` + fmt.Sprint(vmIndex) + `}]}}}`
+			// Patch the already-created yaml file directly
+			err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			//kubectl patch cluster cluster-k3s -n fleet-default --type merge --patch-file patch.yaml
 			out, err := kubectl.Run("patch", "cluster",
 				"--namespace", clusterNS, clusterName,
-				"--type", "merge", "--patch", patchCmd,
+				"--type", "merge", "--patch-file", clusterYaml,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
 		})
