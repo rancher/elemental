@@ -49,7 +49,7 @@ RUN echo COMMIT=\"${IMAGE_COMMIT}\" >> /etc/os-release
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release
 RUN echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release
 RUN echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
-RUN echo GRUB_ENTRY_NAME=\"Elemental ${IMAGE_TAG}\" >> /etc/os-release
+RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN mkinitrd && \
