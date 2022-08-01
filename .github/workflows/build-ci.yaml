@@ -1,4 +1,4 @@
-name: Build artifacts for CI tests
+name: build-ci
 
 on:
   push:
