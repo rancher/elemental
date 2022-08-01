@@ -26,7 +26,52 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
+func checkClusterAgent(client *tools.Client) {
+	// cluster-agent is the pod that communicates to Rancher, wait for it before continuing
+	Eventually(func() string {
+		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
+		return out
+	}, "5m", "30s").Should(ContainSubstring("Running"))
+}
+
+func checkClusterState() {
+	// Check that a 'type' property named 'Ready' is set to true
+	Eventually(func() string {
+		clusterStatus, _ := kubectl.Run("get", "cluster",
+			"--namespace", clusterNS, clusterName,
+			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
+		return clusterStatus
+	}, "5m", "10s").Should(Equal("True"))
+
+	// Wait a little bit for the cluster to be in a stable state
+	time.Sleep(2 * time.Minute)
+
+	// There should be no 'reason' property set in a clean cluster
+	reason, err := kubectl.Run("get", "cluster",
+		"--namespace", clusterNS, clusterName,
+		"-o", "jsonpath={.status.conditions[*].reason}")
+	Expect(err).To(Not(HaveOccurred()))
+	Expect(reason).To(BeEmpty())
+}
+
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
+	var (
+		client  *tools.Client
+		macAdrs string
+	)
+
+	BeforeEach(func() {
+		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
+		Expect(err).To(Not(HaveOccurred()))
+
+		client = &tools.Client{
+			Host:     string(hostData.IP) + ":22",
+			Username: userName,
+			Password: userPassword,
+		}
+		macAdrs = hostData.Mac
+	})
+
 	It("Install node and add it in Rancher", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
@@ -39,11 +84,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Creating and installing VM", func() {
-			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).To(Not(HaveOccurred()))
-
 			// Install VM
-			cmd := exec.Command("../scripts/install-vm", vmName, hostData.Mac)
+			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))
@@ -68,21 +110,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()), out)
 		})
 
-		By("Restarting the VM", func() {
+		By("Restarting the VM to add it in the cluster", func() {
 			err := exec.Command("virsh", "start", vmName).Run()
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Checking VM ssh connection", func() {
-			hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-			Expect(err).To(Not(HaveOccurred()))
-
-			client := &tools.Client{
-				Host:     string(hostData.IP) + ":22",
-				Username: userName,
-				Password: userPassword,
-			}
-
+		By("Checking VM connection and cluster state", func() {
 			/* Disable this check for now, until https://github.com/rancher/elemental-operator/issues/90 is fixed!
 			// Retry the SSH connection, as it can takes time for the user to be created
 			Eventually(func() string {
@@ -91,31 +124,22 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
 			*/
 
-			// system-agent is the pod that communicates to Rancher, wait for it before continuing
-			Eventually(func() string {
-				out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
-				return out
-			}, "5m", "30s").Should(ContainSubstring("Running"))
+			// Check agent and cluster state
+			checkClusterAgent(client)
+			checkClusterState()
 		})
 
-		By("Checking cluster status", func() {
-			// Check that a 'type' property named 'Ready' is set to true
-			Eventually(func() string {
-				clusterStatus, _ := kubectl.Run("get", "cluster",
-					"--namespace", clusterNS, clusterName,
-					"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
-				return clusterStatus
-			}, "5m", "10s").Should(Equal("True"))
+		By("Rebooting the VM and checking that cluster is still healthy after", func() {
+			// Execute 'reboot' in background, to avoid ssh locking
+			_, err := client.RunSSH("setsid -f reboot")
+			Expect(err).To(Not(HaveOccurred()))
 
-			// Wait a little bit for the cluster to be in a stable state
+			// Wait a little bit for the cluster to be in an unstable state (yes!)
 			time.Sleep(2 * time.Minute)
 
-			// There should be no 'reason' property set in a clean cluster
-			reason, err := kubectl.Run("get", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"-o", "jsonpath={.status.conditions[*].reason}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(reason).To(BeEmpty())
+			// Check agent and cluster state
+			checkClusterAgent(client)
+			checkClusterState()
 		})
 	})
 })
