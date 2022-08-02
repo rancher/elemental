@@ -97,7 +97,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(id).To(Not(BeEmpty()))
 		})
 
-		By("Increasing 'quantity' node to predefined cluster", func() {
+		By("Increasing 'quantity' node of predefined cluster", func() {
 			// Patch the already-created yaml file directly
 			err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
