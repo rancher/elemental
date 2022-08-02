@@ -89,8 +89,9 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				Expect(err).To(Not(HaveOccurred()), out)
 				Expect(out).To((ContainSubstring("Upgrade completed")))
 
-				// Simply reboot, no check as an ssh error will be throwned anyway
-				_, _ = client.RunSSH("reboot")
+				// Execute 'reboot' in background, to avoid ssh locking
+				_, err = client.RunSSH("setsid -f reboot")
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
 

@@ -27,7 +27,7 @@
 - Rebooting the VM and checking that cluster is still healthy after
 
 **NOTE:** the following tests will be rewrite shortly!
-## upgrade_test.go (2E - Upgrading node)
+## upgrade_test.go (E2E - Upgrading node)
 **Upgrade node by:**
 - Checking if VM name is set
 - Checking if upgrade type is set
