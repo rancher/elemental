@@ -23,6 +23,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Install Rancher", Label("install"), func() {
@@ -30,7 +31,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  300 * time.Second,
+		PollTimeout:  misc.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -54,7 +55,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Delay few seconds before checking
-			time.Sleep(20 * time.Second)
+			time.Sleep(misc.SetTimeout(20 * time.Second))
 		})
 
 		By("Waiting for K3s to be started", func() {
@@ -178,7 +179,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, "5m", "5s").Should(ContainSubstring("selector-" + clusterName))
+			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + clusterName))
 		})
 
 		By("Adding MachineRegistration", func() {
