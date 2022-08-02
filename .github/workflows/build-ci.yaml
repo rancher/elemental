@@ -1,6 +1,8 @@
 name: build-ci
 
 on:
+  schedule:
+    - cron: 0 22 * * *
   push:
     branches:
       - master
