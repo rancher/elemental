@@ -1,5 +1,6 @@
 # ARGS go first if used on FROM
-ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator:latest
+ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator-ci:latest
+ARG REGISTER_IMAGE=quay.io/costoolkit/elemental-register-ci:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
 ARG TOOL_IMAGE=quay.io/costoolkit/elemental-cli:v0.0.15-87f0cb4
 # Binaries and files needed from elemental-toolkit repository
@@ -18,6 +19,9 @@ RUN selinux/rancher
 # elemental-operator
 FROM $OPERATOR_IMAGE as elemental-operator
 
+# elemental-register
+FROM $REGISTER_IMAGE as elemental-register
+
 # rancher-system-agent
 FROM $SYSTEM_AGENT_IMAGE as system-agent
 
@@ -31,6 +35,8 @@ FROM registry.suse.com/suse/sle-micro-rancher/5.2:latest as default
 COPY --from=framework-build /framework /
 # Copy elemental-operator
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
+# Copy elemental-register
+COPY --from=elemental-register /usr/sbin/elemental-register /usr/sbin/elemental-register
 # Copy rancher-system-agent as elemental-system-agent to avoid clashes
 COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/elemental-system-agent
 # Copy elemental
