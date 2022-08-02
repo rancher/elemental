@@ -34,7 +34,7 @@ const (
 )
 
 var (
-	k3sVersion  string
+	k8sVersion  string
 	clusterName string
 	clusterNS   string
 	osImage     string
@@ -54,7 +54,7 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	k3sVersion = os.Getenv("INSTALL_K3S_VERSION")
+	k8sVersion = os.Getenv("INSTALL_K8S_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")

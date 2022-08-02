@@ -16,4 +16,4 @@ spec:
       quantity: 1
       unhealthyNodeTimeout: 0s
       workerRole: true
-  kubernetesVersion: %K3S_VERSION%
+  kubernetesVersion: %K8S_VERSION%

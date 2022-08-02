@@ -102,7 +102,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
-			//kubectl patch cluster cluster-k3s -n fleet-default --type merge --patch-file patch.yaml
 			out, err := kubectl.Run("patch", "cluster",
 				"--namespace", clusterNS, clusterName,
 				"--type", "merge", "--patch-file", clusterYaml,
