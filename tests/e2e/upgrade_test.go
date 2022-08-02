@@ -16,11 +16,13 @@ package e2e_test
 
 import (
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
@@ -89,8 +91,9 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				Expect(err).To(Not(HaveOccurred()), out)
 				Expect(out).To((ContainSubstring("Upgrade completed")))
 
-				// Simply reboot, no check as an ssh error will be throwned anyway
-				_, _ = client.RunSSH("reboot")
+				// Execute 'reboot' in background, to avoid ssh locking
+				_, err = client.RunSSH("setsid -f reboot")
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
 
@@ -100,7 +103,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, "30m", "30s").Should(Equal(osVersion))
+			}, misc.SetTimeout(30*time.Minute), 30*time.Second).Should(Equal(osVersion))
 		})
 
 		if upgradeType != "manual" {

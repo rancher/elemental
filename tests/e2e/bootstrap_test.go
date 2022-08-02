@@ -31,7 +31,7 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, "5m", "30s").Should(ContainSubstring("Running"))
+	}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(ContainSubstring("Running"))
 }
 
 func checkClusterState() {
@@ -41,10 +41,10 @@ func checkClusterState() {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
 		return clusterStatus
-	}, "5m", "10s").Should(Equal("True"))
+	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(Equal("True"))
 
 	// Wait a little bit for the cluster to be in a stable state
-	time.Sleep(2 * time.Minute)
+	time.Sleep(misc.SetTimeout(2 * time.Minute))
 
 	// There should be no 'reason' property set in a clean cluster
 	reason, err := kubectl.Run("get", "cluster",
@@ -120,7 +120,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("uname -n")
 				return out
-			}, "5m", "5s").Should(ContainSubstring(vmNameRoot))
+			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(vmNameRoot))
 			*/
 
 			// Check agent and cluster state
@@ -134,7 +134,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Wait a little bit for the cluster to be in an unstable state (yes!)
-			time.Sleep(2 * time.Minute)
+			time.Sleep(misc.SetTimeout(2 * time.Minute))
 
 			// Check agent and cluster state
 			checkClusterAgent(client)

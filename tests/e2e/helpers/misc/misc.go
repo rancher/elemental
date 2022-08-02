@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
@@ -55,4 +57,24 @@ func ConfigureiPXE() (int, error) {
 
 	// Returns the number of ipxe files found
 	return len(ipxeScript), nil
+}
+
+// Don't return error, in the worst case return the initial value
+// Otherwise an additional step will be needed for some commands (like Eventually)
+func SetTimeout(timeout time.Duration) time.Duration {
+	s, set := os.LookupEnv("TIMEOUT_SCALE")
+
+	// Only if TIMEOUT_SCALE is set
+	if set {
+		scale, err := strconv.Atoi(s)
+		if err != nil {
+			return timeout
+		}
+
+		// Return the scaled timeout
+		return timeout * time.Duration(scale)
+	}
+
+	// Nothing to do
+	return timeout
 }

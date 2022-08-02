@@ -8,7 +8,6 @@ on:
       - master
     types:
       - completed
-  workflow_dispatch:
 
 jobs:
   e2e-tests:
@@ -17,6 +16,7 @@ jobs:
     container:
       image: opensuse/leap:latest
       env:
+        TIMEOUT_SCALE: 2
         CLUSTER_NAME: cluster-k3s
         CLUSTER_NS: fleet-default
         INSTALL_K3S_VERSION: v1.23.9+k3s1
