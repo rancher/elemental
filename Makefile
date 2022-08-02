@@ -99,6 +99,7 @@ extract_kernel_init_squash:
 
 .PHONY: ipxe
 ipxe:
+	@mkdir -p build
 	echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
 	echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
 ifeq ($(RELEASE_TAG), "true")
@@ -110,9 +111,10 @@ endif
 	echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
 	echo "set iso    elemental-${FINAL_TAG}.iso" >> build/elemental-${FINAL_TAG}.ipxe  #not used anymore, check if we can boot from iso directly with sanboot?
-	echo "kernel ${url}/${kernel} initrd=${initrd} ip=dhcp rd.cos.disable root=live:${url}/${rootfs} console=tty1 console=ttyS0 ${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
-	echo "initrd ${url}${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
-	echo "boot" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
+	echo "initrd \$${url}/\$${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
 
 .PHONY: build_all
 build_all: build iso extract_kernel_init_squash ipxe

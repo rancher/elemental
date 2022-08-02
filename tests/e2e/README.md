@@ -9,6 +9,7 @@
 - Installing Rancher
 - Installing Elemental Operator
 - Creating a new cluster
+- Creating cluster selector
 - Adding MachineRegistration
 - Starting HTTP server for network installation
 - Starting libvirtd
@@ -20,11 +21,12 @@
 - Configuring iPXE boot script for network installation
 - Creating and installing VM
 - Checking that the VM is available in Rancher
-- Adding server role to predefined cluster
-- Restarting the VM
-- Checking that the VM is added in the cluster
-- Checking VM ssh connection
+- Increasing 'quantity' node of predefined cluster
+- Restarting the VM to add it in the cluster
+- Checking VM connection and cluster state
+- Rebooting the VM and checking that cluster is still healthy after
 
+**NOTE:** the following tests will be rewrite shortly!
 ## upgrade_test.go (2E - Upgrading node)
 **Upgrade node by:**
 - Checking if VM name is set

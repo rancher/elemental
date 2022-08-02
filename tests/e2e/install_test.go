@@ -30,7 +30,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  1200 * time.Second,
+		PollTimeout:  300 * time.Second,
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -71,7 +71,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			err = k.WaitForPod("kube-system", "app.kubernetes.io/name=traefik", "traefik")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("kube-system", "app=svclb-traefik", "svclb-traefik")
+			err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -89,10 +89,13 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("cert-manager", "app.kubernetes.io/instance=cert-manager", "cert-manager-cainjector")
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/instance=cert-manager")
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=webhook")
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=cainjector")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -112,10 +115,8 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 				"--set", "extraEnv[0].value=https://"+hostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
+				"--set", "replicas=1",
 			)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("cattle-system", "app=rancher", "rancher")
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher")
@@ -127,34 +128,32 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
-				"rancheros-operator",
-				"https://rancher-sandbox.github.io/rancheros-operator",
+				"elemental-operator",
+				"https://rancher.github.io/elemental-operator",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "rancheros-operator", "rancheros-operator/rancheros-operator",
-				"--version", ">0.0.0-0",
-				"--namespace", "cattle-rancheros-operator-system",
+			err = kubectl.RunHelmBinaryWithCustomErr("install", "elemental-operator", "elemental-operator/elemental-operator",
+				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForPod("cattle-rancheros-operator-system", "app=rancheros-operator", "rancheros-operator")
-			Expect(err).To(Not(HaveOccurred()))
-
-			k.WaitForNamespaceWithPod("cattle-rancheros-operator-system", "app=rancheros-operator")
+			k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Creating a new cluster", func() {
-			addClusterYaml := "../assets/add_cluster.yaml"
-			err := tools.Sed("%CLUSTER_NAME%", clusterName, addClusterYaml)
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.Apply(clusterNS, addClusterYaml)
+			err = tools.Sed("%K8S_VERSION%", k8sVersion, clusterYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = kubectl.Apply(clusterNS, clusterYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
 			createdCluster, err := kubectl.Run("get", "cluster",
@@ -164,6 +163,22 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 			// Check that's the created cluster is the good one
 			Expect(createdCluster).To(Equal(clusterName))
+		})
+
+		By("Creating cluster selector", func() {
+			err := tools.Sed("%CLUSTER_NAME%", clusterName, selectorYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = kubectl.Apply(clusterNS, selectorYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Check that the selector is correctly created
+			Eventually(func() string {
+				out, _ := kubectl.Run("get", "MachineInventorySelector",
+					"--namespace", clusterNS,
+					"-o", "jsonpath={.items[*].metadata.name}")
+				return out
+			}, "5m", "5s").Should(ContainSubstring("selector-" + clusterName))
 		})
 
 		By("Adding MachineRegistration", func() {
@@ -176,6 +191,9 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = tools.Sed("%PASSWORD%", userPassword, registrationYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = tools.Sed("%CLUSTER_NAME%", clusterName, registrationYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.Apply(clusterNS, registrationYaml)

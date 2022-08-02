@@ -25,13 +25,16 @@ import (
 )
 
 const (
-	vmNameRoot         = "ros-node"
+	vmNameRoot         = "node"
 	userName           = "root"
 	userPassword       = "r0s@pwd1"
 	netDefaultFileName = "../assets/net-default.xml"
+	clusterYaml        = "../assets/cluster.yaml"
+	selectorYaml       = "../assets/selector.yaml"
 )
 
 var (
+	k8sVersion  string
 	clusterName string
 	clusterNS   string
 	osImage     string
@@ -51,6 +54,7 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
+	k8sVersion = os.Getenv("INSTALL_K8S_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")

@@ -1,0 +1,19 @@
+kind: Cluster
+apiVersion: provisioning.cattle.io/v1
+metadata:
+  name: %CLUSTER_NAME%
+  # namespace: fleet-default
+spec:
+  rkeConfig:
+    machinePools:
+    - controlPlaneRole: true
+      etcdRole: true
+      machineConfigRef:
+        apiVersion: elemental.cattle.io/v1beta1
+        kind: MachineInventorySelectorTemplate
+        name: selector-%CLUSTER_NAME%
+      name: pool-%CLUSTER_NAME%
+      quantity: 1
+      unhealthyNodeTimeout: 0s
+      workerRole: true
+  kubernetesVersion: %K8S_VERSION%
