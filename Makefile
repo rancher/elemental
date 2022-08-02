@@ -12,7 +12,7 @@ CLOUD_CONFIG_FILE?="iso/config"
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator-ci:latest
 REGISTER_IMAGE?=quay.io/costoolkit/elemental-register-ci:latest
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
-TOOL_IMAGE?=quay.io/costoolkit/elemental-cli:v0.0.15-87f0cb4
+TOOL_IMAGE?=quay.io/costoolkit/elemental-cli-ci:latest
 # Used to know if this is a release or just a normal dev build
 RELEASE_TAG?=false
 

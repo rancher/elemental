@@ -2,7 +2,7 @@
 ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator-ci:latest
 ARG REGISTER_IMAGE=quay.io/costoolkit/elemental-register-ci:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
-ARG TOOL_IMAGE=quay.io/costoolkit/elemental-cli:v0.0.15-87f0cb4
+ARG TOOL_IMAGE=quay.io/costoolkit/elemental-cli-ci:latest
 # Binaries and files needed from elemental-toolkit repository
 ARG LUET_VERSION=0.32.5
 FROM quay.io/luet/base:$LUET_VERSION AS framework-build
