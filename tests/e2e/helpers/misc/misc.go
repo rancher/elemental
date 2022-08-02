@@ -59,20 +59,22 @@ func ConfigureiPXE() (int, error) {
 	return len(ipxeScript), nil
 }
 
-func SetTimeout(timeout time.Duration) (time.Duration, error) {
+// Don't return error, in the worst case return the initial value
+// Otherwise an additional step will be needed for some commands (like Eventually)
+func SetTimeout(timeout time.Duration) time.Duration {
 	s, set := os.LookupEnv("TIMEOUT_SCALE")
 
 	// Only if TIMEOUT_SCALE is set
 	if set {
 		scale, err := strconv.Atoi(s)
 		if err != nil {
-			return 0, err
+			return timeout
 		}
 
 		// Return the scaled timeout
-		return timeout * time.Duration(scale), nil
+		return timeout * time.Duration(scale)
 	}
 
 	// Nothing to do
-	return timeout, nil
+	return timeout
 }
