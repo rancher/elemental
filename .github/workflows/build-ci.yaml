@@ -1,6 +1,8 @@
 name: build-ci
 
 on:
+  schedule:
+    - cron: 0 22 * * *
   push:
     branches:
       - master
@@ -54,3 +56,31 @@ jobs:
             build/*-initrd
             build/*.squashfs
             build/*.ipxe
+      - name: Send failed status to slack (only on schedule)
+        if: failure() && github.event_name == 'schedule'
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Workflow build-ci ${{ github.job }}"
+                    },
+                    "accessory": {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":github:",
+                         "emoji": true
+                        },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
