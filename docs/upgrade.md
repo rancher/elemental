@@ -1,12 +1,5 @@
 # Upgrade
 
-# Command line
-
-You can also use the `rancherd upgrade` command on a `server` node to automatically 
-upgrade Elemental, Rancher, and/or Kubernetes.
-
-# Kubernetes API
-
 All components in Elemental are managed using Kubernetes. Below is how
 to use Kubernetes approaches to upgrade the components.
 
@@ -20,7 +13,7 @@ TL;DR is
 kubectl edit -n fleet-local default-os-image
 ```
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
@@ -32,14 +25,13 @@ spec:
 
 ### Managing available versions
 
-An upgrade channel file (
-`rancheros-v0.0.0-amd64.upgradechannel-amd64.yaml` ) file is shipped
-in Elemental releases and can be applied in a Kubernetes cluster where the rancheros operator is installed to syncronize available version for upgrades.
+An upgrade channel file can be applied in a Kubernetes cluster where the elemental operator is installed to syncronize available version for upgrades.
 
 
-For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it where the ros-operator is installed: 
+For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it to the Rancher management cluster:
+
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSVersionChannel
 metadata:
   name: os2-amd64
@@ -72,7 +64,7 @@ kubectl edit -n fleet-local default-os-image
 ```
 
 ```yaml
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
@@ -83,14 +75,6 @@ spec:
 ```
 
 Note: be sure to have `osImage` empty when refering to a `ManagedOSVersion` as it takes precedence over `ManagedOSVersion`s.
-
-## system-agent
-
-Rancher system agent itself doesn't need to be upgraded. It is only ran once per node
-to bootstrap the system and then after that provides no value. Rancher
-system agent is
-packaged in the OS image so newer versions of Rancher system agent will come with newer
-versions of Elemental.
 
 ## Rancher
 Rancher is installed as a helm chart following the standard procedure. You can upgrade

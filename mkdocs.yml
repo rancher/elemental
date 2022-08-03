@@ -45,7 +45,6 @@ markdown_extensions:
 nav:
   - Overview:
     - architecture.md
-    - clusters.md
   - Install/Upgrade:
     - installation.md
     - upgrade.md

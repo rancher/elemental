@@ -8,7 +8,7 @@ following Dockerfile
 
 ```Dockerfile
 # The version of Elemental to modify
-FROM rancher-sandbox/os2:VERSION
+FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:VERSION
 
 # Your custom commands
 RUN zypper install -y cowsay
@@ -22,7 +22,7 @@ RUN echo "IMAGE_REPO=${IMAGE_REPO}"          > /etc/os-release && \
     echo "IMAGE=${IMAGE_REPO}:${IMAGE_TAG}" >> /etc/os-release
 ```
 
-Where VERSION is the base version we want to customize. All version numbers available at [quay.io](https://quay.io/repository/costoolkit/elemental?tab=tags) or [github](https://github.com/rancher/elemental/releases)
+Where VERSION is the base version we want to customize.
 
 And then the following commands
 
@@ -40,31 +40,13 @@ check out your new image using docker with
 docker run -it myrepo/custom-build:v1.1.1 bash
 ```
 
-## Bootable images
+## Installation ISO
 
-To create bootable images from the docker image you just created
-run the below command
-
-```bash
-# Download the ros-image-build script
-curl -o ros-image-build https://raw.githubusercontent.com/rancher/elemental/main/ros-image-build
-
-# Run the script creating a qcow image, an ISO, and an AMI
-bash ros-image-build myrepo/custom-build:v1.1.1 qcow,iso,ami
-```
-
-The above command will create an ISO, a qcow image, and publish AMIs. You need not create all
-three types and can change to comma seperated list to the types you care for.
-
-## Auto-installing ISO
-
-To create an ISO that upon boot will automatically run an installation, as an alternative to iPXE install,
-run the following command.
+To create an ISO that upon boot will automatically attempt to register run the `elemental-iso-build` script
 
 ```bash
-bash ros-image-build myrepo/custom-build:v1.1.1 iso mycloud-config-file.txt
+bash elemental-iso-build CONFIG_FILE
 ```
 
-The third parameter is a path to a file that will be used as the cloud config passed to the installation.
-Refer to the [installation](./installation.md) and [configuration reference](./configuration.md) for the
-contents of the file.
+Where CONFIG_FILE is path to the configuration file including the registration data to register against the
+Rancher management cluster.
