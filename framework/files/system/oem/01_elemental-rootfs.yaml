@@ -5,6 +5,7 @@ stages:
       commands:
       - |
         if [ ! -e /usr/local/etc/hostname ]; then
+          mkdir -p /usr/local/etc 
           echo rancher-${RANDOM} > /usr/local/etc/hostname
         fi
         ln -sf /usr/local/etc/hostname /etc/hostname
