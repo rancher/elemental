@@ -13,7 +13,6 @@ theme:
   #favicon: 'assets/favicon.ico'
   palette:
     - scheme: default
-      primary: grey
       toggle:
         icon: material/eye-outline
         name: Dark Mode
@@ -24,6 +23,8 @@ theme:
         name: Light Mode
   icon:
     repo: fontawesome/brands/github
+  features:
+    - toc.integrate
 
 # Customization
 extra:
@@ -37,12 +38,17 @@ plugins:
 markdown_extensions:
 - codehilite
 - admonition
-- pymdownx.tabbed
+- pymdownx.tabbed:
+    alternate_style: true
+- admonition
+- pymdownx.snippets
+- pymdownx.inlinehilite
 - pymdownx.superfences
 - toc:
     permalink: true
 
 nav:
+  - Quickstart: quickstart.md
   - Overview:
     - architecture.md
   - Install/Upgrade:
