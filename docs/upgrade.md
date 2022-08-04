@@ -3,9 +3,9 @@
 All components in Elemental are managed using Kubernetes. Below is how
 to use Kubernetes approaches to upgrade the components.
 
-## Elemental
+## Elemental Teal
 
-Elemental is upgraded with the Elemental operator. Refer to the
+Elemental Teal is upgraded with the Elemental operator. Refer to the
 [Elemental Operator](https://github.com/rancher/elemental-operator/blob/main/README.md) documentation for complete information, but the
 TL;DR is
 
