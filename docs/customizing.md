@@ -48,5 +48,5 @@ To create an ISO that upon boot will automatically attempt to register run the `
 bash elemental-iso-build CONFIG_FILE
 ```
 
-Where CONFIG_FILE is path to the configuration file including the registration data to register against the
+Where CONFIG_FILE is the path to the configuration file including the registration data to register against the
 Rancher management cluster.
