@@ -1,11 +1,6 @@
 name: build-ci
 
 on:
-  schedule:
-    - cron: 0 22 * * *
-  push:
-    branches:
-      - master
   pull_request:
 
 jobs:
@@ -37,16 +32,6 @@ jobs:
         run: |
           make extract_kernel_init_squash
           make ipxe
-      - name: Upload docker image
-        uses: actions/upload-artifact@v3
-        with:
-          name: docker-image
-          path: build/*.tar
-      - name: Upload ISO
-        uses: actions/upload-artifact@v3
-        with:
-          name: iso-image
-          path: build/*.iso
       - name: Upload iPXE
         uses: actions/upload-artifact@v3
         with:
@@ -56,31 +41,56 @@ jobs:
             build/*-initrd
             build/*.squashfs
             build/*.ipxe
-      - name: Send failed status to slack (only on schedule)
-        if: failure() && github.event_name == 'schedule'
-        uses: slackapi/slack-github-action@v1.18.0
+  e2e-tests:
+    runs-on: kvm-host
+    needs: build-all-artifacts
+    container:
+      image: opensuse/leap:latest
+      env:
+        TIMEOUT_SCALE: 2
+        CLUSTER_NAME: cluster-k3s
+        CLUSTER_NS: fleet-default
+        INSTALL_K3S_VERSION: v1.23.9+k3s1
+        INSTALL_K3S_SKIP_ENABLE: true
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+        PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        ARCH: amd64
+      options: --privileged
+    steps:
+      - name: Install dependencies
+        run: zypper -n in -l qemu-kvm libvirt virt-install curl helm git-core tar make gcc
+      - name: Be sure to remove all previous data from worker ♻
+        run: rm -rf ./*
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v3
         with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                    "text": {
-                      "type": "mrkdwn",
-                      "text": "Workflow build-ci ${{ github.job }}"
-                    },
-                    "accessory": {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": ":github:",
-                         "emoji": true
-                        },
-                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                    }
-                  }
-              ]
-            }
+          go-version: '~1.18'
+      - name: Download iPXE
+        uses: actions/download-artifact@v3
+        with:
+          name: ipxe-artifacts
+          path: ./
+      - name: E2E - Clean local Helm repositorie
+        run: |
+          # Clean Helm repo
+          HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
+          [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
+      - name: E2E - Install Rancher
+        run: cd tests && make e2e-install-rancher
+      - name: E2E - Bootstrap node 1 with current build
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          VM_INDEX: 1
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Bootstrap node 2 with current build
+        env:
+          VM_INDEX: 2
+        run: cd tests && make e2e-bootstrap-node
+  cleanup:
+    runs-on: kvm-host
+    if: always()
+    needs: e2e-tests
+    steps:
+      - name: Release space from worker ♻
+        run: sudo docker system prune -f -a --volumes

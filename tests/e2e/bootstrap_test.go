@@ -30,6 +30,8 @@ func checkClusterAgent(client *tools.Client) {
 	// cluster-agent is the pod that communicates to Rancher, wait for it before continuing
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
+		_, _ = fmt.Fprint(GinkgoWriter, out)
+		fmt.Println(out)
 		return out
 	}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(ContainSubstring("Running"))
 }
@@ -40,6 +42,7 @@ func checkClusterState() {
 		clusterStatus, _ := kubectl.Run("get", "cluster",
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
+		fmt.Println(clusterStatus)
 		return clusterStatus
 	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(Equal("True"))
 
