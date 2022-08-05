@@ -29,6 +29,23 @@ theme:
 # Customization
 extra:
   homepage: https://rancher.github.io/elemental
+  elemental:
+    slack:
+      name: \#elemental
+      url: https://rancher-users.slack.com/channels/elemental
+    toolkit:
+      name: Elemental Toolkit
+      url: https://rancher.github.io/elemental-toolkit
+    operator:
+      name: Elemental Operator
+      url: https://github.com/rancher/elemental-operator
+    cli:
+      name: Elemental CLI
+      url: https://github.com/rancher/elemental-cli
+  ranchersystemagent:
+    name: Rancher System Agent
+    url: https://github.com/rancher/system-agent
+
 
 #google_analytics:
 plugins:
