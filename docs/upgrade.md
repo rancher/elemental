@@ -3,102 +3,113 @@
 All components in Elemental are managed using Kubernetes. Below is how
 to use Kubernetes approaches to upgrade the components.
 
-## Elemental Teal
+## Elemental Teal node upgrade
 
 Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
-[{{elemental.operator.name}}]({{elemental.operator.url}}) documentation for complete information, but the
-TL;DR is
+[{{elemental.operator.name}}]({{elemental.operator.url}}) documentation for complete information.
 
-```bash
-kubectl edit -n fleet-local default-os-image
-```
-```yaml
-apiVersion: elemental.cattle.io/v1
-kind: ManagedOSImage
-metadata:
-  name: default-os-image
-  namespace: fleet-local
-spec:
-  # Set to the new Elemental version you would like to upgrade to
-  osImage: quay.io/costoolkit/os2:v0.0.0
-```
+There are two ways of selecting nodes for upgrading. Via a cluster target, which will match ALL nodes in a cluster that matches our
+selector or via node selector, which will match nodes based on the node labels. Node selector allows us to be more targeted with the upgrade
+while cluster selector just selects all the nodes in a matched cluster.
+
+=== "With `#!yaml clusterTarget`"
+    You can target nodes for an upgrade via a `#!yaml clusterTarget` by setting it to the cluster name that you want to upgrade.
+    All nodes in a cluster that matches that name will match and be upgraded.
+
+    ```yaml title="upgrade-cluster-target.yaml"
+    --8<-- "examples/upgrade/upgrade-cluster-target.yaml"
+    ```
+
+=== "With `#!yaml nodeSelector`"
+    You can target nodes for an upgrade via a `#!yaml nodeSelector` by setting it to the label and value that you want to match.
+    Any nodes containing that key with the value will match and be upgraded.
+
+    ```yaml title="upgrade-node-selector.yaml"
+    --8<-- "examples/upgrade/upgrade-node-selector.yaml"
+    ```
+
+
+### Selecting source for upgrade
+
+=== "Via `#!yaml osImage`"
+    
+    Just specify an OCI image on the `#!yaml osImage` field
+
+    ```yaml title="upgrade-cluster-target.yaml"
+    --8<-- "examples/upgrade/upgrade-cluster-target.yaml"
+    ```
+    
+
+=== "Via `#!yaml ManagedOSVersion`"
+    
+    In this case we use the auto populated `#!yaml ManagedOSVersion` resources to set the wanted `#!yaml managedOSVersionName` field.
+    See section [Managing available versions](#managing-available-versions) to understand how the `#!yaml ManagedOSVersion` are managed.
+
+    ```yaml title="upgrade-managedos-version.yaml"
+    --8<-- "examples/upgrade/upgrade-managedos-version.yaml"
+    ```
+
+!!! warning
+    If both `#!yaml osImage` and `#!yaml ManagedOSVersion` are defined in the same `#!yaml ManagedOSImage` be aware that `#!yaml osImage` takes precedence.
 
 ### Managing available versions
 
-An upgrade channel file can be applied in a Kubernetes cluster where the elemental operator is installed to syncronize available version for upgrades.
+An `#!yaml ManagedOSVersionChannel` resource can be created in a Kubernetes cluster where the elemental operator is installed to synchronize available versions for upgrades.
 
+It has a syncer in order to generate `#!yaml ManagedOSVersion` automatically. Currently, we provide a json syncer and a custom one.
 
-For instance an upgrade channel file might look like this and is sufficient to `kubectl apply` it to the Rancher management cluster:
+=== "Json syncer"
 
-```yaml
-apiVersion: elemental.cattle.io/v1
-kind: ManagedOSVersionChannel
-metadata:
-  name: os2-amd64
-  namespace: fleet-default
-spec:
-  options:
-    args:
-    - github
-    command:
-    - /usr/bin/upgradechannel-discovery
-    envs:
-    - name: REPOSITORY
-      value: rancher-sandbox/os2
-    - name: IMAGE_PREFIX
-      value: quay.io/costoolkit/os2-ci
-    - name: VERSION_SUFFIX
-      value: -amd64
-    image: quay.io/costoolkit/upgradechannel-discovery:v0.3-4b83dbe
-  type: custom
+    This syncer will fetch a json from url and parse it into valid `#!yaml ManagedOSVersion` resources.
+
+    ```yaml title="managed-os-version-channel-json.yaml"
+    --8<-- "examples/upgrade/managed-os-version-channel-json.yaml"
+    ```
+
+=== "Custom syncer"
+
+    A custom syncer allows more flexibility on how to gather `#!yaml ManagedOSVersion` by allowing custom commands with custom images.
+    
+    This type of syncer allows to run a given command with arguments and env vars in a custom image and output a json file to `/data/output`
+    `/data/output` is then automounted by the syncer and then parsed so it can gather create the proper versions.
+
+    !!! info
+        The only requirement to make your own custom syncer is to make it output a json file to `/data/output` and keep the correct json structure.
+    
+    See below for an example use of our [discovery plugin](https://github.com/rancher-sandbox/upgradechannel-discovery), 
+    which gathers versions from either git or github releases.
+
+    ```yaml title="managed-os-version-channel-json.yaml"
+    --8<-- "examples/upgrade/managed-os-version-channel-custom.yaml"
+    ```
+
+In both cases the file that the operator expects to parse is a json file with the versions on it as follows
+
+```json
+[
+    {
+        "metadata": {
+            "name": "v0.1.0"
+        },
+        "spec": {
+            "version": "v0.1.0",
+            "type": "container",
+            "metadata": {
+                "upgradeImage": "foo/bar:v0.1.0"
+            }
+        }
+    },
+    {
+        "metadata": {
+            "name": "v0.2.0"
+        },
+        "spec": {
+            "version": "v0.2.0",
+            "type": "container",
+            "metadata": {
+                "upgradeImage": "foo/bar:v0.2.0"
+            }
+        }
+    }
+]
 ```
-
-Note: the namespace here is set by default to `fleet-default`, that can be changed to `fleet-local` to target instead the local clusters.
-
-The operator will syncronize available versions and populate `ManagedOSVersion` accordingly. 
-
-To trigger an upgrade from a `ManagedOSVersion` refer to its name in the `ManagedOSImage` field, instead of an `osImage`: 
-
-```bash
-kubectl edit -n fleet-local default-os-image
-```
-
-```yaml
-apiVersion: elemental.cattle.io/v1
-kind: ManagedOSImage
-metadata:
-  name: default-os-image
-  namespace: fleet-local
-spec:
-  # Set to the new ManagedOSVersion you would like to upgrade to
-  managedOSVersionName: v0.1.0-alpha22-amd64
-```
-
-Note: be sure to have `osImage` empty when refering to a `ManagedOSVersion` as it takes precedence over `ManagedOSVersion`s.
-
-## Rancher
-Rancher is installed as a helm chart following the standard procedure. You can upgrade
-Rancher with the [standard procedure documented](https://rancher.com/docs/rancher/v2.6/en/installation/install-rancher-on-k8s/upgrades/).
-
-## Kubernetes
-To upgrade Kubernetes you will use Rancher to orchestrate the upgrade. This is a matter of changing
-the Kubernetes version on the `fleet-local/local` `Cluster` in the `provisioning.cattle.io/v1`
-apiVersion.  For example
-
-```shell
-kubectl edit clusters.provisioning.cattle.io -n fleet-local local
-```
-```yaml
-apiVersion: provisioning.cattle.io/v1
-kind: Cluster
-metadata:
-  name: local
-  namespace: fleet-local
-spec:
-  # Change to new valid k8s version, >= 1.21
-  # Valid versions are
-  # k3s: curl -sL https://raw.githubusercontent.com/rancher/kontainer-driver-metadata/release-v2.6/data/data.json | jq -r '.k3s.releases[].version'
-  # RKE2: curl -sL https://raw.githubusercontent.com/rancher/kontainer-driver-metadata/release-v2.6/data/data.json | jq -r '.rke2.releases[].version'
-  kubernetesVersion: v1.21.4+k3s1
-```
-
