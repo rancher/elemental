@@ -5,8 +5,8 @@ to use Kubernetes approaches to upgrade the components.
 
 ## Elemental Teal
 
-Elemental Teal is upgraded with the Elemental operator. Refer to the
-[Elemental Operator](https://github.com/rancher/elemental-operator/blob/main/README.md) documentation for complete information, but the
+Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
+[{{elemental.operator.name}}]({{elemental.operator.url}}) documentation for complete information, but the
 TL;DR is
 
 ```bash

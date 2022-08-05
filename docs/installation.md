@@ -10,12 +10,12 @@ comunicate with the Rancher management cluster.
 ## Installation Configuration
 
 The installation configuration is mostly applied and set as part of the registration process.
-The registration process is done by the Elemental-operator client who is the responsible to register
+The registration process is done by the {{elemental.operator.name}} client who is the responsible to register
 the node in a Rancher management cluster and fetch the installation configuration.
 
 ## Elemental Partition Table
 
-Elemental requires the following partitions.  These partitions are required by [Elemental-toolkit](https://rancher.github.io/elemental-toolkit/docs)
+Elemental requires the following partitions.  These partitions are required by [{{elemental.toolkit.name}}]({{elemental.toolkit.url}})
 
 | Label          | Default Size    | Contains                                                    |
 | ---------------|-----------------|------------------------------------------------------------ |
