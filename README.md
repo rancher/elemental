@@ -1,6 +1,6 @@
 # Elemental
 
-Elemental is a software stack enabling a centralized, full cloud-native cluster management solution.
+Elemental is a software stack enabling a centralized, full cloud-native OS management solution with Kubernetes.
 
 Cluster Node OSes are built and mainteined via container images through the [Elemental toolkit](https://rancher.github.io/elemental-toolkit/) and installed on new hosts using the [Elemental cli](https://github.com/rancher/elemental-cli).
 
