@@ -1,0 +1,10 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: ManagedOSVersionChannel
+metadata:
+  name: elemental-versions
+  namespace: fleet-default
+spec:
+  options:
+    URI: "https://raw.githubusercontent.com/rancher-sandbox/upgradechannel-discovery-test-repo/main/sub/beta.json"
+    Timeout: "1m"
+  type: json
