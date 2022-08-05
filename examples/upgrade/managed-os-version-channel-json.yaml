@@ -5,6 +5,6 @@ metadata:
   namespace: fleet-default
 spec:
   options:
-    URI: "https://raw.githubusercontent.com/rancher-sandbox/upgradechannel-discovery-test-repo/main/sub/beta.json"
+    URI: "https://raw.githubusercontent.com/rancher-sandbox/upgradechannel-discovery-test-repo/main/several.json"
     Timeout: "1m"
   type: json
