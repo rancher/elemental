@@ -16,4 +16,4 @@ spec:
         debug: true
   machineName: my-machine
   machineInventoryLabels:
-    - node-location: "europe"
+    location: "europe"

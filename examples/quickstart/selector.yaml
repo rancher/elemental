@@ -8,6 +8,6 @@ spec:
     spec:
       selector:
         matchExpressions:
-          - key: node-location
+          - key: location
             operator: In
             values: [ 'europe' ]
