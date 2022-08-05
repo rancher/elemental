@@ -48,9 +48,9 @@ markdown_extensions:
     permalink: true
 
 nav:
+  - Overview: overview.md
   - Quickstart: quickstart.md
-  - Overview:
-    - architecture.md
+  - Architecture: architecture.md
   - Install/Upgrade:
     - installation.md
     - upgrade.md
