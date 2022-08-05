@@ -10,7 +10,7 @@ Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
 
 There are two ways of selecting nodes for upgrading. Via a cluster target, which will match ALL nodes in a cluster that matches our
 selector or via node selector, which will match nodes based on the node labels. Node selecter allows us to be more targeted with the upgrade
-while cluster selector just select all the nodes in a matched cluster.
+while cluster selector just selects all the nodes in a matched cluster.
 
 === "With `#!yaml clusterTarget`"
     You can target nodes for an upgrade via a `#!yaml clusterTarget` by setting it to the cluster name that you want to upgrade.
