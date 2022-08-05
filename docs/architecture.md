@@ -30,18 +30,18 @@ image that is built using standard Docker build processes. Elemental is
 built using normal `docker build` and if you wish to customize the OS
 image all you need to do is create a new `Dockerfile`.
 
-## Elemental Operator
+## {{elemental.operator.name}}
 
 Elemental includes no container runtime, Kubernetes distribution,
 or Rancher itself. All of these assests are dynamically pulled at runtime. All that
-is included in Elemental is [Elemental Operator](https://github.com/rancher/elemental-operator) which
+is included in Elemental is [{{elemental.operator.name}}]({{elemental.operator.url}}) which
 is responsible for managing OS upgrades and managing a secure device inventory to assist
 with zero touch provisioning.
 
-Elemental Operator includes a Kubernetes operator installed in the management cluster and a client
+{{elemental.operator.name}} includes a Kubernetes operator installed in the management cluster and a client
 side installed in nodes so they can self register into the management cluster. Once a node is
-registered the Elemental Operator will kick start the OS installation and schedule the Kubernetes
-provisioning using the [Rancher System Agent](https://github.com/rancher/system-agent).
+registered the {{elemental.operator.name}} will kick start the OS installation and schedule the Kubernetes
+provisioning using the [{{ranchersystemagent.name}}]({{ranchersystemagent.url}}).
 Rancher System Agent is responsible for bootstrapping RKE2/k3s and Rancher from an OCI registry. This means
 an update of containerd, k3s, RKE2, or Rancher does not require an OS upgrade
 or node reboot.
