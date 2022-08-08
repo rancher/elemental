@@ -28,9 +28,10 @@ The Elemental Stack consists of some packages on top of SLE Micro for Rancher
 
 ## Prerequisites
 
- - A rancher cluster (2.6.6)
+ - A Rancher server (2.6.6) configured (server-url set)
+     - To configure the Rancher server-url please check the [Rancher docs](https://rancher.com/docs/rancher/v2.6/en/admin-settings/#first-log-in)
  - A machine (bare metal or virtualized) with TPM 2.0
-   - Hint: Libvirt allows setting virtual TPMs for virtual machines
+     - Hint: Libvirt allows setting virtual TPMs for virtual machines
  - Helm Package Manager (https://helm.sh/)
  - Docker (for building the iso)
 
@@ -215,6 +216,14 @@ You can now boot your nodes with this ISO, and they will:
  - Auto-deploy the cluster via k3s
 
 After a few minutes your new cluster will be fully provisioned!!
+
+
+## How can I choose rke2/k3s and kubernetes versions for the cluster?
+
+On you cluster.yaml file there is a key in the `#!yaml Spec` called `#!yaml kubernetesVersion`. That sets the version and deployer that will be used for the cluster,
+for example for rke `v1.23.6` while for rke2 would be `v1.23.6+rke2r1` and for k3s `v1.23.6+k3s1`
+
+To see all compatible versions check the [Rancher Support Matrix](https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/) PDF for rke/rke2/k3s versions and their components.
 
 
 ## How can I follow what is going on behind the scenes?
