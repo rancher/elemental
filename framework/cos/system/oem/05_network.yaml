@@ -7,13 +7,20 @@
 # copy the file with a prefix starting by 90, e.g. /oem/91_custom.yaml
 name: "Default network configuration"
 stages:
-   initramfs:
-     - name: "Setup network"
-       files:
-       - path: /etc/sysconfig/network/ifcfg-eth0
-         content: |
-                  BOOTPROTO='dhcp'
-                  STARTMODE='onboot'
-         permissions: 0600
-         owner: 0
-         group: 0
+  initramfs:
+    - name: "Setup network"
+      files:
+      - path: /etc/sysconfig/network/ifcfg-eth0
+        content: |
+                 BOOTPROTO='dhcp'
+                 STARTMODE='onboot'
+        permissions: 0600
+        owner: 0
+        group: 0
+    - if: '[ ! -f /run/cos/recovery_mode ] && [ ! -L /etc/resolv.conf ]'
+      name: "Remove static resolv.conf"
+      commands:
+      - |
+        if [ -f /etc/resolv.conf ]; then
+          rm /etc/resolv.conf
+        fi
