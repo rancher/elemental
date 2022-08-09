@@ -55,6 +55,7 @@ plugins:
 markdown_extensions:
 - codehilite
 - admonition
+- pymdownx.details
 - pymdownx.tabbed:
     alternate_style: true
 - admonition
