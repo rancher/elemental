@@ -85,31 +85,6 @@ It has a syncer in order to generate `#!yaml ManagedOSVersion` automatically. Cu
 
 In both cases the file that the operator expects to parse is a json file with the versions on it as follows
 
-```json
-[
-    {
-        "metadata": {
-            "name": "v0.1.0"
-        },
-        "spec": {
-            "version": "v0.1.0",
-            "type": "container",
-            "metadata": {
-                "upgradeImage": "foo/bar:v0.1.0"
-            }
-        }
-    },
-    {
-        "metadata": {
-            "name": "v0.2.0"
-        },
-        "spec": {
-            "version": "v0.2.0",
-            "type": "container",
-            "metadata": {
-                "upgradeImage": "foo/bar:v0.2.0"
-            }
-        }
-    }
-]
+```json title="versions.json"
+--8<-- "examples/upgrade/versions.json"
 ```
