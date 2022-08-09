@@ -55,6 +55,7 @@ plugins:
 markdown_extensions:
 - codehilite
 - admonition
+- pymdownx.details
 - pymdownx.tabbed:
     alternate_style: true
 - admonition
@@ -72,6 +73,7 @@ nav:
     - installation.md
     - upgrade.md
     - customizing.md
+    - elemental-plans.md
     - dashboard.md
     - mcm.md
   - Reference:
