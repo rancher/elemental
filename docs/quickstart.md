@@ -115,9 +115,9 @@ and your `#!yaml MachineInventory` has that same key with that value, it will ma
         If your node doesnt have that device you will have to manually create the registration.yaml file or download the one from the repo and modify before applying
 
     ```bash
-    kubectl -f apply https://github.com/rancher/elemental/examples/quickstart/selector.yaml
-    kubectl -f apply https://github.com/rancher/elemental/examples/quickstart/cluster.yaml
-    kubectl -f apply https://github.com/rancher/elemental/examples/quickstart/registration.yaml
+    kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/selector.yaml
+    kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/cluster.yaml
+    kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/registration.yaml
     ```
 
 ## Preparing the iso
@@ -218,13 +218,14 @@ You can now boot your nodes with this ISO, and they will:
 After a few minutes your new cluster will be fully provisioned!!
 
 
-## How can I choose rke2/k3s and kubernetes versions for the cluster?
+## How can I choose the kubernetes version and deployer for the cluster?
 
 On you cluster.yaml file there is a key in the `#!yaml Spec` called `#!yaml kubernetesVersion`. That sets the version and deployer that will be used for the cluster,
 for example for rke `v1.23.6` while for rke2 would be `v1.23.6+rke2r1` and for k3s `v1.23.6+k3s1`
 
 To see all compatible versions check the [Rancher Support Matrix](https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/) PDF for rke/rke2/k3s versions and their components.
 
+You can also check our [Version doc](kubernetesversions.md) to know how to obtain those versions.
 
 ## How can I follow what is going on behind the scenes?
 

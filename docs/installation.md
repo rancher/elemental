@@ -18,33 +18,35 @@ the node in a Rancher management cluster and fetch the installation configuratio
 Elemental requires the following partitions.  These partitions are required by [{{elemental.toolkit.name}}]({{elemental.toolkit.url}})
 
 | Label          | Default Size    | Contains                                                    |
-| ---------------|-----------------|------------------------------------------------------------ |
-| COS_BOOT       |          50 MiB | UEFI Boot partition                                         |
-| COS_STATE      |          15 GiB | A/B bootable file system images constructed from OCI images |
-| COS_OEM        |          50 MiB | OEM cloud-config files and other data                       |
-| COS_RECOVERY   |           8 GiB | Recovery file system image if COS_STATE is destroyed        |
+|----------------|-----------------|-------------------------------------------------------------|
+| COS_BOOT       | 50 MiB          | UEFI Boot partition                                         |
+| COS_STATE      | 15 GiB          | A/B bootable file system images constructed from OCI images |
+| COS_OEM        | 50 MiB          | OEM cloud-config files and other data                       |
+| COS_RECOVERY   | 8 GiB           | Recovery file system image if COS_STATE is destroyed        |
 | COS_PERSISTENT | Remaining space | All contents of the persistent folders                      |
 
 ## Folders
 
 | Path              | Read-Only | Ephemeral | Persistent |
-| ------------------|:---------:|:---------:|:----------:|
-| /                 | x         |           |            |
-| /etc              |           | x         |            |
-| /etc/cni          |           |           | x          |
-| /etc/iscsi        |           |           | x          |
-| /etc/rancher      |           |           | x          |
-| /etc/ssh          |           |           | x          |
-| /etc/systemd      |           |           | x          |
-| /srv              |           | x         |            |
-| /home             |           |           | x          |
-| /opt              |           |           | x          |
-| /root             |           |           | x          |
-| /var              |           | x         |            |
-| /usr/libexec      |           |           | x          |
-| /var/lib/cni      |           |           | x          |
-| /var/lib/kubelet  |           |           | x          |
-| /var/lib/longhorn |           |           | x          |
-| /var/lib/rancher  |           |           | x          |
-| /var/lib/wicked   |           |           | x          |
-| /var/log          |           |           | x          |
+|-------------------|:---------:|:---------:|:----------:|
+| /                 |     x     |           |            |
+| /etc              |           |     x     |            |
+| /etc/cni          |           |           |     x      |
+| /etc/iscsi        |           |           |     x      |
+| /etc/rancher      |           |           |     x      |
+| /etc/ssh          |           |           |     x      |
+| /etc/systemd      |           |           |     x      |
+| /srv              |           |     x     |            |
+| /home             |           |           |     x      |
+| /opt              |           |           |     x      |
+| /root             |           |           |     x      |
+| /var              |           |     x     |            |
+| /usr/libexec      |           |           |     x      |
+| /var/lib/cni      |           |           |     x      |
+| /var/lib/kubelet  |           |           |     x      |
+| /var/lib/longhorn |           |           |     x      |
+| /var/lib/rancher  |           |           |     x      |
+| /var/lib/elemetal |           |           |     x      |
+| /var/lib/wicked   |           |           |     x      |
+| /var/lib/calico   |           |           |     x      |
+| /var/log          |           |           |     x      |
