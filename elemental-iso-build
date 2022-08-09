@@ -11,12 +11,12 @@ build() {
     echo "Using custom registration from $CLOUD_CONFIG_FILE"
     cp "$CLOUD_CONFIG_FILE" "$TEMPDIR"/iso/config
   fi
-  curl https://raw.githubusercontent.com/rancher/elemental/master/Dockerfile.iso -fsSL -o "$TEMPDIR"/Dockerfile
-  curl https://raw.githubusercontent.com/rancher/elemental/master/iso/grub.cfg -fsSL -o "$TEMPDIR"/iso/grub.cfg
+  curl https://raw.githubusercontent.com/rancher/elemental/main/Dockerfile.iso -fsSL -o "$TEMPDIR"/Dockerfile
+  curl https://raw.githubusercontent.com/rancher/elemental/main/iso/grub.cfg -fsSL -o "$TEMPDIR"/iso/grub.cfg
   # Did we copy the custom cloud config? Then no need to download the default one
   if [[ -z "$CLOUD_CONFIG_FILE" ]]; then
     echo "No custom registration set, using default"
-    curl https://raw.githubusercontent.com/rancher/elemental/master/iso/config -fsSL -o "$TEMPDIR"/iso/config
+    curl https://raw.githubusercontent.com/rancher/elemental/main/iso/config -fsSL -o "$TEMPDIR"/iso/config
   fi
 
   pushd "$TEMPDIR" || exit 1

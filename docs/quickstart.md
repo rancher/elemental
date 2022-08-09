@@ -195,7 +195,7 @@ Now we can proceed to create the ISO
     We provide a ISO build script for ease of use that can create the final ISO and inject the `initial-registration.yaml`:
     
     ```shell
-    wget -q https://raw.githubusercontent.com/rancher/elemental/master/elemental-iso-build && chmod +x elemental-iso-build
+    wget -q https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build && chmod +x elemental-iso-build
     ```
     
     Now that we have the script we can proceed to build the ISO with our configuration injected:

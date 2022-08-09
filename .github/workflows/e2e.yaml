@@ -5,7 +5,7 @@ on:
     workflows:
       - build-ci
     branches:
-      - master
+      - main
     types:
       - completed
 
