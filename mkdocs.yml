@@ -5,7 +5,7 @@ site_url: https://rancher.github.io/elemental
 # Repository
 repo_name: rancher/elemental
 repo_url: https://github.com/rancher/elemental
-edit_uri: https://github.com/rancher/elemental/edit/master/docs/
+edit_uri: https://github.com/rancher/elemental/edit/main/docs/
 
 theme:
   name: material
