@@ -3,7 +3,7 @@ name: Test build iso from simple script
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
@@ -14,4 +14,4 @@ jobs:
       - name: Build iso from script
         run: |
           # Just a simple run to test the build script, no need to upload the generated iso!
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rancher/elemental/master/elemental-iso-build)"
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build)"

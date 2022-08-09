@@ -3,7 +3,7 @@ name: Build and push elemental docker image
 on:
   push:
     branches:
-      - master
+      - main
 
 concurrency:
   group: docker-images-${{ github.head_ref || github.ref }}-${{ github.repository }}
