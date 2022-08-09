@@ -55,12 +55,14 @@ plugins:
 markdown_extensions:
 - codehilite
 - admonition
+- pymdownx.details
 - pymdownx.tabbed:
     alternate_style: true
 - admonition
 - pymdownx.snippets
 - pymdownx.inlinehilite
 - pymdownx.superfences
+- tables
 - toc:
     permalink: true
 
@@ -75,5 +77,6 @@ nav:
     - dashboard.md
     - mcm.md
   - Reference:
-    - configuration.md
+    - cloud-config-reference.md
+    - machineregistration-reference.md
     - versions.md
