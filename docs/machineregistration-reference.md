@@ -1,5 +1,5 @@
 
-There is several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
+There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
 
 
 ```yaml title="MachineRegistration"
