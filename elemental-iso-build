@@ -26,7 +26,7 @@ build() {
   rm -Rf "$TEMPDIR"
   ISONAME="elemental-$(date "+%FT%TZ")"
   docker run --rm -v "$PWD":/mnt elemental/iso:latest build-iso -o /mnt --squash-no-compression -n "$ISONAME" --overlay-iso overlay dir:rootfs
-  echo "Iso generated at $ISONAME"
+  echo "Iso generated at $ISONAME.iso"
 }
 
 CLOUD_CONFIG_FILE=${1:-}
