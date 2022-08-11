@@ -1,6 +1,0 @@
-#!/bin/bash
-set -e
-
-cd $(dirname $0)
-
-IMAGE_TARGETS=${IMAGE_TARGETS:-qcow} ./package

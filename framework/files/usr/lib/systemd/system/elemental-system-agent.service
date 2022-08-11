@@ -6,11 +6,10 @@ After=network-online.target
 ConditionPathExists=!/run/cos/live_mode
 ConditionPathExists=!/etc/systemd/system/rancher-system-agent.service
 
-[Install]
-WantedBy=multi-user.target
-
 [Service]
-Type=oneshot
+Type=simple
+Restart=always
+RestartSec=5s
 StandardOutput=journal+console
 StandardError=journal+console
 Environment="CATTLE_AGENT_CONFIG=/etc/rancher/elemental/agent/config.yaml"
