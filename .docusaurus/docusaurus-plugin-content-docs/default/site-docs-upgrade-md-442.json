@@ -1,0 +1,26 @@
+{
+  "unversionedId": "upgrade",
+  "id": "upgrade",
+  "title": "",
+  "description": "All components in Elemental are managed using Kubernetes. Below is how",
+  "source": "@site/docs/upgrade.md",
+  "sourceDirName": ".",
+  "slug": "/upgrade",
+  "permalink": "/upgrade",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Upgrade",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Installation",
+    "permalink": "/installation"
+  },
+  "next": {
+    "title": "Custom Images",
+    "permalink": "/customizing"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "unversionedId": "installation",
+  "id": "installation",
+  "title": "",
+  "description": "Overview",
+  "source": "@site/docs/installation.md",
+  "sourceDirName": ".",
+  "slug": "/installation",
+  "permalink": "/installation",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Installation",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Architecture",
+    "permalink": "/architecture"
+  },
+  "next": {
+    "title": "Upgrade",
+    "permalink": "/upgrade"
+  }
+}

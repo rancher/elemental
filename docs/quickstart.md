@@ -1,3 +1,8 @@
+---
+sidebar_label: Quickstart
+title: ''
+---
+
 # Quickstart
 Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher 
 with the only help of an Elemental Teal iso

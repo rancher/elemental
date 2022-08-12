@@ -1,3 +1,9 @@
+---
+slug: /
+sidebar_label: Overview
+title: ''
+---
+
 # Overview
 
 Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.

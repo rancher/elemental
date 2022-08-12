@@ -1,3 +1,8 @@
+---
+sidebar_label: Kubernetesversions
+title: ''
+---
+
 ## Valid Versions
 
 The list of valid versions for the `kubernetesVersion` field can be determined

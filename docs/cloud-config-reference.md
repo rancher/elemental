@@ -1,3 +1,8 @@
+---
+sidebar_label: Cloud-config reference
+title: ''
+---
+
 # Cloud-config Reference
 
 All custom configuration applied on top of a fresh deployment should come

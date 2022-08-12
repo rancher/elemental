@@ -1,3 +1,8 @@
+---
+sidebar_label: Custom Images
+title: ''
+---
+
 # Custom Images
 
 Elemental image can easily be remastered using a docker build.

@@ -1,0 +1,26 @@
+{
+  "unversionedId": "architecture",
+  "id": "architecture",
+  "title": "",
+  "description": "Elemental is a stack, a set of tools, to build an immutable Linux distribution.",
+  "source": "@site/docs/architecture.md",
+  "sourceDirName": ".",
+  "slug": "/architecture",
+  "permalink": "/architecture",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Architecture",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Quickstart",
+    "permalink": "/quickstart"
+  },
+  "next": {
+    "title": "Installation",
+    "permalink": "/installation"
+  }
+}

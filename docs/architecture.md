@@ -1,3 +1,8 @@
+---
+sidebar_label: Architecture
+title: ''
+---
+
 # Architecture
 
 Elemental is a stack, a set of tools, to build an immutable Linux distribution.

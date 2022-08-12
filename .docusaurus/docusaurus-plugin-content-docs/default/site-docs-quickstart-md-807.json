@@ -1,0 +1,26 @@
+{
+  "unversionedId": "quickstart",
+  "id": "quickstart",
+  "title": "",
+  "description": "Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher",
+  "source": "@site/docs/quickstart.md",
+  "sourceDirName": ".",
+  "slug": "/quickstart",
+  "permalink": "/quickstart",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Quickstart",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Overview",
+    "permalink": "/"
+  },
+  "next": {
+    "title": "Architecture",
+    "permalink": "/architecture"
+  }
+}

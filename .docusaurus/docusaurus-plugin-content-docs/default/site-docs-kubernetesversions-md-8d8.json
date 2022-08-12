@@ -1,0 +1,22 @@
+{
+  "unversionedId": "kubernetesversions",
+  "id": "kubernetesversions",
+  "title": "",
+  "description": "Valid Versions",
+  "source": "@site/docs/kubernetesversions.md",
+  "sourceDirName": ".",
+  "slug": "/kubernetesversions",
+  "permalink": "/kubernetesversions",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Kubernetesversions",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Machineregistration reference",
+    "permalink": "/machineregistration-reference"
+  }
+}

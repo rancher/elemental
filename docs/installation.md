@@ -1,3 +1,8 @@
+---
+sidebar_label: Installation
+title: ''
+---
+
 # Installation
 
 ## Overview

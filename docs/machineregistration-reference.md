@@ -1,3 +1,8 @@
+---
+sidebar_label: Machineregistration reference
+title: ''
+---
+
 There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
 
 

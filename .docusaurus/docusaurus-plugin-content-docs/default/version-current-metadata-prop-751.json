@@ -1,0 +1,151 @@
+{
+  "pluginId": "default",
+  "version": "current",
+  "label": "Next",
+  "banner": null,
+  "badge": false,
+  "className": "docs-version-current",
+  "isLast": true,
+  "docsSidebars": {
+    "tutorialSidebar": [
+      {
+        "type": "link",
+        "label": "Overview",
+        "href": "/",
+        "docId": "index"
+      },
+      {
+        "type": "link",
+        "label": "Quickstart",
+        "href": "/quickstart",
+        "docId": "quickstart"
+      },
+      {
+        "type": "link",
+        "label": "Architecture",
+        "href": "/architecture",
+        "docId": "architecture"
+      },
+      {
+        "type": "category",
+        "collapsible": true,
+        "collapsed": false,
+        "label": "Install/Upgrade",
+        "items": [
+          {
+            "type": "link",
+            "label": "Installation",
+            "href": "/installation",
+            "docId": "installation"
+          },
+          {
+            "type": "link",
+            "label": "Upgrade",
+            "href": "/upgrade",
+            "docId": "upgrade"
+          },
+          {
+            "type": "link",
+            "label": "Custom Images",
+            "href": "/customizing",
+            "docId": "customizing"
+          },
+          {
+            "type": "link",
+            "label": "Elemental plans",
+            "href": "/elemental-plans",
+            "docId": "elemental-plans"
+          }
+        ]
+      },
+      {
+        "type": "category",
+        "collapsible": true,
+        "collapsed": false,
+        "label": "Reference",
+        "items": [
+          {
+            "type": "link",
+            "label": "Cloud-config reference",
+            "href": "/cloud-config-reference",
+            "docId": "cloud-config-reference"
+          },
+          {
+            "type": "link",
+            "label": "Machineregistration reference",
+            "href": "/machineregistration-reference",
+            "docId": "machineregistration-reference"
+          },
+          {
+            "type": "link",
+            "label": "Kubernetesversions",
+            "href": "/kubernetesversions",
+            "docId": "kubernetesversions"
+          }
+        ]
+      }
+    ]
+  },
+  "docs": {
+    "architecture": {
+      "id": "architecture",
+      "title": "",
+      "description": "Elemental is a stack, a set of tools, to build an immutable Linux distribution.",
+      "sidebar": "tutorialSidebar"
+    },
+    "cloud-config-reference": {
+      "id": "cloud-config-reference",
+      "title": "",
+      "description": "All custom configuration applied on top of a fresh deployment should come",
+      "sidebar": "tutorialSidebar"
+    },
+    "customizing": {
+      "id": "customizing",
+      "title": "",
+      "description": "Elemental image can easily be remastered using a docker build.",
+      "sidebar": "tutorialSidebar"
+    },
+    "elemental-plans": {
+      "id": "elemental-plans",
+      "title": "",
+      "description": "Introduction",
+      "sidebar": "tutorialSidebar"
+    },
+    "index": {
+      "id": "index",
+      "title": "",
+      "description": "Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.",
+      "sidebar": "tutorialSidebar"
+    },
+    "installation": {
+      "id": "installation",
+      "title": "",
+      "description": "Overview",
+      "sidebar": "tutorialSidebar"
+    },
+    "kubernetesversions": {
+      "id": "kubernetesversions",
+      "title": "",
+      "description": "Valid Versions",
+      "sidebar": "tutorialSidebar"
+    },
+    "machineregistration-reference": {
+      "id": "machineregistration-reference",
+      "title": "",
+      "description": "There are several keys that can be configured under a #!yaml MachineRegistration resource spec.",
+      "sidebar": "tutorialSidebar"
+    },
+    "quickstart": {
+      "id": "quickstart",
+      "title": "",
+      "description": "Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher",
+      "sidebar": "tutorialSidebar"
+    },
+    "upgrade": {
+      "id": "upgrade",
+      "title": "",
+      "description": "All components in Elemental are managed using Kubernetes. Below is how",
+      "sidebar": "tutorialSidebar"
+    }
+  }
+}

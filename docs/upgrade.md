@@ -1,3 +1,8 @@
+---
+sidebar_label: Upgrade
+title: ''
+---
+
 # Upgrade
 
 All components in Elemental are managed using Kubernetes. Below is how

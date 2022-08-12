@@ -1,0 +1,26 @@
+{
+  "unversionedId": "machineregistration-reference",
+  "id": "machineregistration-reference",
+  "title": "",
+  "description": "There are several keys that can be configured under a #!yaml MachineRegistration resource spec.",
+  "source": "@site/docs/machineregistration-reference.md",
+  "sourceDirName": ".",
+  "slug": "/machineregistration-reference",
+  "permalink": "/machineregistration-reference",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Machineregistration reference",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Cloud-config reference",
+    "permalink": "/cloud-config-reference"
+  },
+  "next": {
+    "title": "Kubernetesversions",
+    "permalink": "/kubernetesversions"
+  }
+}

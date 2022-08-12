@@ -1,0 +1,78 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/",
+          "mainDocId": "index",
+          "docs": [
+            {
+              "id": "architecture",
+              "path": "/architecture",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "cloud-config-reference",
+              "path": "/cloud-config-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "customizing",
+              "path": "/customizing",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "elemental-plans",
+              "path": "/elemental-plans",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "index",
+              "path": "/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "installation",
+              "path": "/installation",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "kubernetesversions",
+              "path": "/kubernetesversions",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "machineregistration-reference",
+              "path": "/machineregistration-reference",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "quickstart",
+              "path": "/quickstart",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "upgrade",
+              "path": "/upgrade",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/",
+                "label": "index"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

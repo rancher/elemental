@@ -1,0 +1,26 @@
+{
+  "unversionedId": "customizing",
+  "id": "customizing",
+  "title": "",
+  "description": "Elemental image can easily be remastered using a docker build.",
+  "source": "@site/docs/customizing.md",
+  "sourceDirName": ".",
+  "slug": "/customizing",
+  "permalink": "/customizing",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Custom Images",
+    "title": ""
+  },
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Upgrade",
+    "permalink": "/upgrade"
+  },
+  "next": {
+    "title": "Elemental plans",
+    "permalink": "/elemental-plans"
+  }
+}
