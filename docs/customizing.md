@@ -11,7 +11,7 @@ following Dockerfile
 
 ## Docker image
 
-```Dockerfile
+```docker
 # The version of Elemental to modify
 FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:VERSION
 

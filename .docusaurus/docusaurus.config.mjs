@@ -26,7 +26,11 @@ export default {
       {
         "docs": {
           "routeBasePath": "/",
-          "sidebarPath": "C:\\github\\elemental-docs\\sidebars.js"
+          "sidebarPath": "C:\\github\\elemental-docs\\sidebars.js",
+          "include": [
+            "**/*.md",
+            "**/*.mdx"
+          ]
         },
         "theme": {
           "customCss": "C:\\github\\elemental-docs\\src\\css\\custom.css"
@@ -293,7 +297,9 @@ export default {
           }
         ]
       },
-      "additionalLanguages": [],
+      "additionalLanguages": [
+        "docker"
+      ],
       "magicComments": [
         {
           "className": "theme-code-block-highlighted-line",

@@ -94,11 +94,11 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'e40'),
+    component: ComponentCreator('/', '655'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', '98e'),
+        component: ComponentCreator('/', '7d9'),
         exact: true,
         sidebar: "tutorialSidebar"
       },

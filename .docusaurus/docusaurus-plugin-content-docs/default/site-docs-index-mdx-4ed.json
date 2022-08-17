@@ -3,7 +3,7 @@
   "id": "index",
   "title": "",
   "description": "",
-  "source": "@site/docs/index.md",
+  "source": "@site/docs/index.mdx",
   "sourceDirName": ".",
   "slug": "/",
   "permalink": "/",

@@ -11,7 +11,7 @@ to use Kubernetes approaches to upgrade the components.
 ## Elemental Teal node upgrade
 
 Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
-[{{elemental.operator.name}}]({{elemental.operator.url}}) documentation for complete information.
+[{{elemental.operator.name}}] documentation for complete information.
 
 There are two ways of selecting nodes for upgrading. Via a cluster target, which will match ALL nodes in a cluster that matches our
 selector or via node selector, which will match nodes based on the node labels. Node selector allows us to be more targeted with the upgrade

@@ -20,7 +20,7 @@ the node in a Rancher management cluster and fetch the installation configuratio
 
 ## Elemental Partition Table
 
-Elemental requires the following partitions.  These partitions are required by [{{elemental.toolkit.name}}]({{elemental.toolkit.url}})
+Elemental requires the following partitions.  These partitions are required by [{{elemental.toolkit.name}}]
 
 | Label          | Default Size    | Contains                                                    |
 |----------------|-----------------|-------------------------------------------------------------|

@@ -179,51 +179,51 @@
     "sidebar": "sidebar---blog-814-8ac",
     "content": "content---blog-welcomed-9-f-ffb"
   },
-  "/-e40": {
+  "/-655": {
     "__comp": "__comp---theme-doc-page-1-be-9be",
     "__context": {
-      "plugin": "plugin---docs-810-199"
+      "plugin": "plugin---810-900"
     },
-    "versionMetadata": "versionMetadata---docs-935-398"
+    "versionMetadata": "versionMetadata---935-fcf"
   },
-  "/-98e": {
+  "/-7d9": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-c-37-4d0"
+    "content": "content---4-ed-c51"
   },
   "/architecture-a6e": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-architecture-528-86f"
+    "content": "content---architecture-528-630"
   },
   "/cloud-config-reference-124": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-cloud-config-reference-5-d-5-02e"
+    "content": "content---cloud-config-reference-5-d-5-557"
   },
   "/customizing-93d": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-customizing-5-eb-d5b"
+    "content": "content---customizing-5-eb-8f6"
   },
   "/elemental-plans-bdd": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-elemental-plans-54-d-8da"
+    "content": "content---elemental-plans-54-d-77f"
   },
   "/installation-2e7": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-installation-3-b-8-7c6"
+    "content": "content---installation-3-b-8-fd1"
   },
   "/kubernetesversions-73b": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-kubernetesversions-8-d-8-899"
+    "content": "content---kubernetesversions-8-d-8-3aa"
   },
   "/machineregistration-reference-384": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-machineregistration-referenced-49-bc7"
+    "content": "content---machineregistration-referenced-49-fb7"
   },
   "/quickstart-99e": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-quickstart-807-6cd"
+    "content": "content---quickstart-807-41f"
   },
   "/upgrade-a11": {
     "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---docs-upgrade-442-06f"
+    "content": "content---upgrade-442-31f"
   }
 }

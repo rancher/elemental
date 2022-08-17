@@ -39,14 +39,14 @@ image all you need to do is create a new `Dockerfile`.
 
 Elemental includes no container runtime, Kubernetes distribution,
 or Rancher itself. All of these assets are dynamically pulled at runtime. All that
-is included in Elemental is [{{elemental.operator.name}}]({{elemental.operator.url}}) which
+is included in Elemental is [{{elemental.operator.name}}] which
 is responsible for managing OS upgrades and managing a secure device inventory to assist
 with zero touch provisioning.
 
 {{elemental.operator.name}} includes a Kubernetes operator installed in the management cluster and a client
 side installed in nodes, so they can self register into the management cluster. Once a node is
 registered the {{elemental.operator.name}} will kick-start the OS installation and schedule the Kubernetes
-provisioning using the [{{ranchersystemagent.name}}]({{ranchersystemagent.url}}).
+provisioning using the [{{ranchersystemagent.name}}].
 Rancher System Agent is responsible for bootstrapping RKE2/k3s and Rancher from an OCI registry. This means
 an update of containerd, k3s, RKE2, or Rancher does not require an OS upgrade
 or node reboot.

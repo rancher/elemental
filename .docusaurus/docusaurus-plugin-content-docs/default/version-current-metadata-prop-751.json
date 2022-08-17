@@ -114,7 +114,7 @@
     "index": {
       "id": "index",
       "title": "",
-      "description": "Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.",
+      "description": "",
       "sidebar": "tutorialSidebar"
     },
     "installation": {
