@@ -1,4 +1,4 @@
-# Cloud-config Reference
+# Cloud-config reference
 
 All custom configuration applied on top of a fresh deployment should come
 from the `cloud-config` section in a `#!yaml MachineRegistration`.
