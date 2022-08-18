@@ -1,3 +1,4 @@
+# MachineRegistration reference
 There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
 
 

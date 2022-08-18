@@ -1,4 +1,5 @@
-## Valid Versions
+# Kubernetes versions
+## Valid versions
 
 The list of valid versions for the `kubernetesVersion` field can be determined
 from the Rancher metadata using the following commands.
