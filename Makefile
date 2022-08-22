@@ -139,3 +139,21 @@ update-cos-framework:
 		alpine -c \
 		"$(_FW_CMD)"
 	$(SUDO) chown -R $$(id -u) $(ROOT_DIR)/framework/cos
+
+prepare-ui-e2e-ci:
+# Install k3s
+	curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=${K3S_VERSION}  sh -s - --write-kubeconfig-mode 644
+	## Wait for K3s to start (could be improved?)
+	timeout 2m bash -c "until ! kubectl get pod -A 2>/dev/null | grep -Eq 'ContainerCreating|CrashLoopBackOff'; do sleep 1; done"
+# Install Rancher
+	@./scripts/install_rancher.sh
+# Deploy elemental operator
+	helm repo add elemental-operator https://rancher.github.io/elemental-operator
+	helm upgrade --create-namespace -n cattle-elemental-system \
+		--install elemental-operator elemental-operator/elemental-operator
+
+start-cypress-tests:
+	@./scripts/start_cypress_tests.sh
+
+clean-k3s:
+	/usr/local/bin/k3s-uninstall.sh
