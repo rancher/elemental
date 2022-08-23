@@ -49,9 +49,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 		})
 
 		By("Starting K3s", func() {
-			// Start in background
-			// TODO: use something better to start in background, because this code seems to not write k3s.log file...
-			err := exec.Command("/usr/local/bin/k3s", "server", "--snapshotter=native", ">/tmp/k3s.log", "2>&1").Start()
+			err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Delay few seconds before checking
@@ -213,7 +211,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 
 		By("Starting HTTP server for network installation", func() {
 			// TODO: improve it to run in background!
-			// err := tools.HTTpShare("../..", 8000)
+			// err := tools.HTTPShare("../..", 8000)
 			// Expect(err).To(Not(HaveOccurred()))
 
 			// Use Python for now...
@@ -221,19 +219,14 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Starting libvirtd", func() {
-			cmds := []string{"libvirtd", "virtlogd"}
-			for _, c := range cmds {
-				err := exec.Command(c, "--daemon").Run()
-				Expect(err).To(Not(HaveOccurred()))
-			}
-		})
-
 		By("Starting default network", func() {
-			err := exec.Command("virsh", "net-undefine", "default").Run()
-			Expect(err).To(Not(HaveOccurred()))
+			// Don't check return code, as the default network could be already removed
+			cmds := []string{"net-destroy", "net-undefine"}
+			for _, c := range cmds {
+				_ = exec.Command("sudo", "virsh", c, "default").Run()
+			}
 
-			err = exec.Command("virsh", "net-create", netDefaultFileName).Run()
+			err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
 			Expect(err).To(Not(HaveOccurred()))
 		})
 	})

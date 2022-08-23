@@ -110,7 +110,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		})
 
 		By("Restarting the VM to add it in the cluster", func() {
-			err := exec.Command("virsh", "start", vmName).Run()
+			err := exec.Command("sudo", "virsh", "start", vmName).Run()
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
