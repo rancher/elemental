@@ -7,7 +7,7 @@ VM_NAME=$1
 MAC=$2
 
 # Create VM
-script -e -c "virt-install \
+script -e -c "sudo virt-install \
   --name ${VM_NAME} \
   --os-type Linux \
   --os-variant opensuse-unknown \

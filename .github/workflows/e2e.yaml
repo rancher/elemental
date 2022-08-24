@@ -13,21 +13,17 @@ jobs:
   e2e-tests:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: kvm-host
-    container:
-      image: opensuse/leap:latest
-      env:
-        TIMEOUT_SCALE: 2
-        CLUSTER_NAME: cluster-k3s
-        CLUSTER_NS: fleet-default
-        INSTALL_K3S_VERSION: v1.23.9+k3s1
-        INSTALL_K3S_SKIP_ENABLE: true
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-        PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-        ARCH: amd64
-      options: --privileged
+    env:
+      TIMEOUT_SCALE: 2
+      CLUSTER_NAME: cluster-k3s
+      CLUSTER_NS: fleet-default
+      INSTALL_K3S_VERSION: v1.23.9+k3s1
+      INSTALL_K3S_SKIP_ENABLE: true
+      K3S_KUBECONFIG_MODE: 0644
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      ARCH: amd64
     steps:
-      - name: Install dependencies
-        run: zypper -n in -l qemu-kvm libvirt virt-install curl helm git-core tar make gcc
       - name: Be sure to remove all previous data from worker ♻
         run: rm -rf ./*
       - name: Checkout
@@ -50,7 +46,7 @@ jobs:
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: E2E - Install Rancher
-        run: cd tests && make e2e-install-rancher
+        run: cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
       - name: E2E - Bootstrap node 1 with current build
         env:
           VM_INDEX: 1
@@ -64,5 +60,12 @@ jobs:
     if: always()
     needs: e2e-tests
     steps:
-      - name: Release space from worker ♻
-        run: sudo docker system prune -f -a --volumes
+      - name: Remove all from worker ♻
+        run: |
+          # Remove all VMs
+          for I in {1..10}; do
+            for C in destroy undefine; do
+              sudo virsh ${C} node-${I} >/dev/null 2>&1 || true
+            done
+          done
+          /usr/local/bin/k3s-uninstall.sh || true

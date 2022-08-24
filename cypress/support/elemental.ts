@@ -9,12 +9,12 @@ export class Elemental {
   }
 
   elementalIcon() {
-    return cy.get('.option .icon.group-icon.icon-gear');
+    return cy.get('.option .icon.group-icon.icon-os-management');
   } 
 
   // Go into the Elemental Menu
   accessElementalMenu() {
-    cy.contains('Elemental').click();
+    cy.contains('OS Management').click();
   }
 
   checkElementalNav() {
@@ -28,11 +28,11 @@ export class Elemental {
     expect($lis.eq(0)).to.contain('Dashboard');
     expect($lis.eq(1)).to.contain('Machine Registrations');
     expect($lis.eq(2)).to.contain('Machine Inventories');
-    expect($lis.eq(3)).to.contain('OS Image Upgrades');
-    expect($lis.eq(4)).to.contain('Mach. Inv. Selectors');
-    expect($lis.eq(5)).to.contain('Mach. Inv. Selec. Templates');
-    expect($lis.eq(6)).to.contain('Managed OS Versions');
-    expect($lis.eq(7)).to.contain('Managed OS Version Channels');
+    expect($lis.eq(3)).to.contain('Mach. Inv. Selectors');
+    expect($lis.eq(4)).to.contain('Mach. Inv. Selec. Templates');
+    expect($lis.eq(5)).to.contain('Managed OS Versions');
+    expect($lis.eq(6)).to.contain('Managed OS Version Channels');
+    expect($lis.eq(7)).to.contain('OS Image Upgrades');
     })      
   }
 }
