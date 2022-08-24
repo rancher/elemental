@@ -15,13 +15,14 @@ jobs:
     runs-on: kvm-host
     env:
       TIMEOUT_SCALE: 2
-      CLUSTER_NAME: cluster-k3s
+      CLUSTER_NAME: cluster-rke2
       CLUSTER_NS: fleet-default
-      INSTALL_K3S_VERSION: v1.23.9+k3s1
+      K8S_VERSION: v1.23.8+rke2r1
+      INSTALL_K3S_VERSION: v1.23.8+k3s2
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      #PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
       ARCH: amd64
     steps:
       - name: Be sure to remove all previous data from worker ♻
@@ -72,4 +73,5 @@ jobs:
               sudo virsh ${C} node-${I} >/dev/null 2>&1 || true
             done
           done
+          # Remove K3s and Rancher Manager
           /usr/local/bin/k3s-uninstall.sh || true

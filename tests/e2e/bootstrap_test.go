@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -114,15 +115,44 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Checking VM connection and cluster state", func() {
-			/* Disable this check for now, until https://github.com/rancher/elemental-operator/issues/90 is fixed!
+		By("Checking VM connection", func() {
+			id, err := misc.GetServerId(clusterNS, vmIndex)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(id).To(Not(BeEmpty()))
+
 			// Retry the SSH connection, as it can takes time for the user to be created
 			Eventually(func() string {
 				out, _ := client.RunSSH("uname -n")
+				out = strings.Trim(out, "\n")
 				return out
-			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(vmNameRoot))
-			*/
+			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(Equal(id))
+		})
 
+		By("Configuring kubectl command on the VM", func() {
+			if strings.Contains(k8sVersion, "rke2") {
+				dir := "/var/lib/rancher/rke2/bin"
+				kubeCfg := "export KUBECONFIG=/etc/rancher/rke2/rke2.yaml"
+
+				// Wait a little to be sure that RKE2 installation has started
+				// Otherwise the directory is not available!
+				Eventually(func() string {
+					out, _ := client.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
+					return out
+				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal("OK"))
+
+				// Configure kubectl
+				_, err := client.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			// Check if kubectl works
+			Eventually(func() string {
+				out, _ := client.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
+				return out
+			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+		})
+
+		By("Checking cluster state", func() {
 			// Check agent and cluster state
 			checkClusterAgent(client)
 			checkClusterState()
