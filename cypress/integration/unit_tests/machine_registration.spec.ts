@@ -70,6 +70,7 @@ describe('Machine registration testing', () => {
 
   it('Clone a machine registration', () => {
     cy.createMachReg({machRegName: 'clone-test', checkLabels: true, checkAnnotations: true});
+    cy.contains('clone-test').click();
     cy.get('div.actions > .role-multi-action').click()
     cy.contains('li', 'Clone').click();
     cy.typeValue({label: 'Name', value: 'cloned-machine-reg'});
@@ -78,11 +79,14 @@ describe('Machine registration testing', () => {
     
     // Check that we got the same label and annotation in both machine registration
     cy.checkMachRegLabel({machRegName: 'cloned-machine-reg', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
+    cy.contains('cloned-machine-reg').click();
     cy.checkMachRegAnnotation({machRegName: 'cloned-machine-reg', annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
+    cy.contains('cloned-machine-reg').click();
   });
 
   it('Download Machine registration YAML', () => {
     cy.createMachReg({machRegName: 'download-yaml-test'});
+    cy.contains('download-yaml-test').click();
     cy.get('div.actions > .role-multi-action').click()
     cy.contains('li', 'Download YAML').click();
     cy.verifyDownload('download-yaml-test.yaml');
