@@ -63,9 +63,14 @@ describe('Machine registration testing', () => {
     cy.checkMachRegAnnotation({machRegName: 'edit-config-test', annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
   });
 
-  it.skip('Edit a machine registration with edit YAML button', () => {
-    //cy.createMachReg({machRegName: 'edit-yaml-test'});
-    // TBD
+  it('Edit a machine registration with edit YAML button', () => {
+    cy.createMachReg({machRegName: 'edit-yaml-test'});
+    cy.editMachReg({machRegName: 'edit-yaml-test', addLabel: true, addAnnotation: true, withYAML: true });
+    cy.clickButton('Save');
+
+    // Check that we can see our label and annotation in the YAML
+    cy.checkMachRegLabel({machRegName: 'edit-yaml-test', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
+    cy.checkMachRegAnnotation({machRegName: 'edit-yaml-test', annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
   });
 
   it('Clone a machine registration', () => {
