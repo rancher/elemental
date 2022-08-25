@@ -55,7 +55,7 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	k8sVersion = os.Getenv("K8S_VERSION")
+	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
