@@ -1,4 +1,4 @@
-apiVersion: rancheros.cattle.io/v1
+apiVersion: elemental.cattle.io/v1beta1
 kind: ManagedOSImage
 metadata:
   name: default-os-image
@@ -8,4 +8,4 @@ metadata:
 spec:
   %OS_IMAGE%
   clusterTargets:
-  - clusterName: %CLUSTER_NAME%
+    - clusterName: %CLUSTER_NAME%

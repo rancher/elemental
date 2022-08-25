@@ -34,3 +34,8 @@
 - Triggering Upgrade in Rancher with <upgradeType> | Triggering Manual Upgrade
 - Checking VM upgrade
 - Cleaning upgrade orders
+
+Upgrade methods are:
+- managedOSVersionName
+- osImage
+- manual

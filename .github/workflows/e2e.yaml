@@ -60,6 +60,12 @@ jobs:
         env:
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 1 (with osImage method) to latest build
+        env:
+          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
+          UPGRADE_TYPE: osImage
+          VM_INDEX: 1
+        run: cd tests && make e2e-upgrade-node
       - name: E2E - Bootstrap node 2 with current build
         env:
           VM_INDEX: 2
@@ -68,6 +74,12 @@ jobs:
         env:
           VM_INDEX: 3
         run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 2 (with manual method) to latest build
+        env:
+          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
+          UPGRADE_TYPE: manual
+          VM_INDEX: 2
+        run: cd tests && make e2e-upgrade-node
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
