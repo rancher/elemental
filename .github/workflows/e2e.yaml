@@ -9,6 +9,10 @@ on:
     types:
       - completed
 
+concurrency:
+  group: e2e-test-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  cancel-in-progress: true
+
 jobs:
   e2e-tests:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -64,12 +68,8 @@ jobs:
         env:
           VM_INDEX: 3
         run: cd tests && make e2e-bootstrap-node
-  cleanup:
-    runs-on: kvm-host
-    if: always()
-    needs: e2e-tests
-    steps:
-      - name: Remove all from worker ♻
+      - name: Remove VMs and K3s/RancherManager from worker ♻
+        if: always()
         run: |
           # Remove all VMs
           for I in {1..10}; do
@@ -79,3 +79,34 @@ jobs:
           done
           # Remove K3s and Rancher Manager
           /usr/local/bin/k3s-uninstall.sh || true
+      - name: Remove remaining stuff from worker ♻
+        if: always()
+        uses: colpal/actions-clean@v1
+      - name: Send failed status to slack (if needed)
+        if: failure()
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Workflow build-ci ${{ github.job }}"
+                    },
+                    "accessory": {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":github:",
+                         "emoji": true
+                        },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
