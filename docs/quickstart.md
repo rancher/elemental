@@ -31,7 +31,7 @@ The Elemental Stack consists of some packages on top of SLE Micro for Rancher
  - A Rancher server (2.6.6) configured (server-url set)
      - To configure the Rancher server-url please check the [Rancher docs](https://rancher.com/docs/rancher/v2.6/en/admin-settings/#first-log-in)
  - A machine (bare metal or virtualized) with TPM 2.0
-     - Hint: Libvirt allows setting virtual TPMs for virtual machines
+     - Hint: Libvirt allows setting virtual TPMs for virtual machines [example here](https://rancher.github.io/elemental/tpm/)
  - Helm Package Manager (https://helm.sh/)
  - Docker (for building the iso)
 
