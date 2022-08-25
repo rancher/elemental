@@ -177,7 +177,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + clusterName))
+			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + clusterName))
 		})
 
 		By("Adding MachineRegistration", func() {

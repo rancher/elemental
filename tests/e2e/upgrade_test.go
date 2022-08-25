@@ -103,7 +103,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, misc.SetTimeout(30*time.Minute), 30*time.Second).Should(Equal(osVersion))
+			}, misc.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(osVersion))
 		})
 
 		if upgradeType != "manual" {

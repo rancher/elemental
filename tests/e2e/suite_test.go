@@ -40,6 +40,7 @@ var (
 	osImage     string
 	vmName      string
 	upgradeType string
+	arch        string
 	vmIndex     int
 )
 
@@ -54,11 +55,12 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	k8sVersion = os.Getenv("INSTALL_K3S_VERSION")
+	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
+	arch = os.Getenv("ARCH")
 	index, set := os.LookupEnv("VM_INDEX")
 
 	// Only if VM_INDEX is set
