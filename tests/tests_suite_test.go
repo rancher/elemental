@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package os2_test
+package elemental_test
 
 import (
 	"testing"
@@ -25,5 +25,5 @@ import (
 
 func TestTests(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "os2 Test Suite")
+	RunSpecs(t, "Elemental Test Suite")
 }

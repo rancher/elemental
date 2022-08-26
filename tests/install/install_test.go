@@ -19,28 +19,28 @@ package smoke_test
 import (
 	"os"
 
-	"gopkg.in/yaml.v2"
-
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/rancher/elemental/tests/sut"
+	sut "github.com/rancher-sandbox/ele-testhelpers/vm"
 )
 
-type RancherOsConfig struct {
-	Rancheros Rancheros `yaml:"rancheros,omitempty"`
+func checkOsAfterReboot(s *sut.SUT) {
+	// Reboot to check the installed OS
+	s.Reboot()
+
+	By("Checking we booted from the installed OS")
+	ExpectWithOffset(1, s.BootFrom()).To(Equal(sut.Active))
+
+	By("Checking config file was run")
+	_, err := s.Command("stat /oem/90_custom.yaml")
+	Expect(err).ToNot(HaveOccurred())
+
+	out, err := s.Command("hostname")
+	Expect(err).ToNot(HaveOccurred())
+	Expect(out).To(ContainSubstring("my-own-name"))
 }
 
-type Rancheros struct {
-	Install Install `yaml:"install,omitempty"`
-}
-
-type Install struct {
-	Device         string `yaml:"device,omitempty"`
-	Automatic      bool   `yaml:"automatic,omitempty"`
-	ContainerImage string `yaml:"containerImage,omitempty"`
-}
-
-var _ = Describe("os2 installation", Label("setup"), func() {
+var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
 	var s *sut.SUT
 	BeforeEach(func() {
 		s = sut.NewSUT()
@@ -50,31 +50,26 @@ var _ = Describe("os2 installation", Label("setup"), func() {
 	// This is used to setup the machine that will run other tests
 	Context("First boot", func() {
 		It("can install", func() {
-			cfg := RancherOsConfig{
-				Rancheros: Rancheros{
-					Install: Install{
-						Device:    "/dev/sda",
-						Automatic: true,
-					},
-				},
-			}
+			err := s.SendFile("../assets/cloud_init.yaml", "/tmp/cloud_init.yaml", "0640")
+			Expect(err).ToNot(HaveOccurred())
 
-			yamlData, err := yaml.Marshal(&cfg)
-			s.WriteInlineFile(string(yamlData), "/oem/userdata")
-
-			out, err := s.Command("ros-installer --automatic --no-reboot-automatic && sync")
+			out, err := s.Command("elemental install /dev/sda --cloud-init /tmp/cloud_init.yaml && sync")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
-				ContainSubstring("Finished copying COS_PASSIVE"),
+				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
 				ContainSubstring("Grub install to device /dev/sda complete"),
 			))
-			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("has customization applied", func() {
+			checkOsAfterReboot(s)
 		})
 	})
 })
 
-var _ = Describe("os2 setup tests", func() {
+var _ = Describe("Elemental installation from container", func() {
 	var s *sut.SUT
 	BeforeEach(func() {
 		s = sut.NewSUT()
@@ -88,28 +83,22 @@ var _ = Describe("os2 setup tests", func() {
 				Skip("No CONTAINER_IMAGE defined")
 			}
 
-			cfg := RancherOsConfig{
-				Rancheros: Rancheros{
-					Install: Install{
-						Device:         "/dev/sda",
-						Automatic:      true,
-						ContainerImage: containerImage,
-					},
-				},
-			}
+			err := s.SendFile("../assets/cloud_init.yaml", "/tmp/cloud_init.yaml", "0640")
+			Expect(err).ToNot(HaveOccurred())
 
-			yamlData, err := yaml.Marshal(&cfg)
-			s.WriteInlineFile(string(yamlData), "/oem/userdata")
-
-			out, err := s.Command("ros-installer --automatic --no-reboot-automatic && sync")
+			out, err := s.Command("elemental install /dev/sda --cloud-init /tmp/cloud_init.yaml --system.uri docker:" + containerImage + " && sync")
+			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
-				ContainSubstring("Finished copying COS_PASSIVE"),
+				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
 				ContainSubstring("Unpacking a container image: "+containerImage),
 				ContainSubstring("Grub install to device /dev/sda complete"),
 			), out)
-			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("has customization applied", func() {
+			checkOsAfterReboot(s)
 		})
 	})
 })

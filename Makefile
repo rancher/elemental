@@ -41,6 +41,7 @@ build:
 		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
 		-t ${REPO}:${FINAL_TAG} \
 		.
+	@DOCKER_BUILDKIT=1 docker push ${REPO}:${FINAL_TAG}
 
 .PHONY: dump_image
 dump_image:
@@ -122,9 +123,6 @@ build_all: build iso extract_kernel_init_squash ipxe
 .PHONY: docs
 docs:
 	mkdocs build
-
-integration-tests: 
-	$(MAKE) -C tests/ integration-tests
 
 _FW_CMD=apk add curl && ( curl -L https://raw.githubusercontent.com/rancher-sandbox/cOS-toolkit/master/scripts/get_luet.sh | sh ) && luet install --system-target /framework -y $(FRAMEWORK_PACKAGES) && rm -rf /framework/var/luet
 update-cos-framework:

@@ -18,11 +18,10 @@ package smoke_test
 
 import (
 	"fmt"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/rancher/elemental/tests/sut"
+	sut "github.com/rancher-sandbox/ele-testhelpers/vm"
 )
 
 func systemdUnitIsStarted(s string, st *sut.SUT) {
@@ -34,7 +33,7 @@ func systemdUnitIsStarted(s string, st *sut.SUT) {
 	))
 }
 
-var _ = Describe("os2 Smoke tests", func() {
+var _ = Describe("Elemental Smoke tests", func() {
 	var s *sut.SUT
 	BeforeEach(func() {
 		s = sut.NewSUT()
@@ -42,37 +41,21 @@ var _ = Describe("os2 Smoke tests", func() {
 	})
 
 	AfterEach(func() {
-		if CurrentGinkgoTestDescription().Failed {
-			s.Command("k3s kubectl get pods -A -o json > /tmp/pods.json")
-			s.Command("k3s kubectl get events -A -o json > /tmp/events.json")
-			s.Command("k3s kubectl get helmcharts -A -o json > /tmp/helm.json")
-			s.Command("k3s kubectl get ingress -A -o json > /tmp/ingress.json")
+		if CurrentSpecReport().Failed() {
+			cmds := []string{"pods", "events", "helmcharts", "ingress"}
+			for _, c := range cmds {
+				s.Command("k3s kubectl get " + c + " -A -o json > /tmp/" + c + ".json")
+			}
 			s.Command("df -h > /tmp/disk")
 			s.Command("mount > /tmp/mounts")
 			s.Command("blkid > /tmp/blkid")
 
-			s.GatherAllLogs(
-				[]string{
-					"ros-installer",
-					"cos-setup-boot",
-					"cos-setup-network",
-					"rancherd",
-					"k3s",
-				},
-				[]string{
-					"/tmp/pods.json",
-					"/tmp/disk",
-					"/tmp/mounts",
-					"/tmp/blkid",
-					"/tmp/events.json",
-					"/tmp/helm.json",
-					"/tmp/ingress.json",
-				})
+			s.GatherAllLogs()
 		}
 	})
 
 	Context("First boot", func() {
-		for _, unit := range []string{"ros-installer", "rancherd", "cos-setup-rootfs"} {
+		for _, unit := range []string{"cos-setup-initramfs", "cos-setup-network", "cos-setup-rootfs", "cos-setup-boot", "cos-setup-fs"} {
 			It(fmt.Sprintf("starts successfully %s on boot", unit), func() {
 				systemdUnitIsStarted(unit, s)
 			})
@@ -90,16 +73,7 @@ var _ = Describe("os2 Smoke tests", func() {
 		It("has default cmdline", func() {
 			out, _ := s.Command("cat /proc/cmdline")
 			Expect(out).To(And(
-				ContainSubstring("rd.neednet=1"),
-			))
-		})
-
-		// This test is flaky as it relies on dmesg output
-		PIt("correctly starts cos services", func() {
-			out, _ := s.Command("dmesg | grep cos")
-			Expect(out).To(And(
-				ContainSubstring("cos-immutable-rootfs.service: Succeeded"),
-				ContainSubstring("cos-setup-rootfs.service: Succeeded"),
+				ContainSubstring("rd.neednet=0"),
 			))
 		})
 
@@ -112,25 +86,6 @@ var _ = Describe("os2 Smoke tests", func() {
 			Expect(out).To(ContainSubstring("ssh-rsa"))
 			out, _ = s.Command(`sudo cat /root/.ssh/authorized_keys`)
 			Expect(out).To(ContainSubstring("ssh-rsa"))
-		})
-	})
-
-	Context("rancherd", func() {
-		It("starts a single-node cluster", func() {
-			err := s.SendFile("../assets/rancherd.yaml", "/oem/99_custom.yaml", "0770")
-			Expect(err).ToNot(HaveOccurred())
-			s.Command("systemctl restart --no-block rancherd")
-			Eventually(func() string {
-				out, _ := s.Command("ps aux")
-				return out
-			}, 230*time.Second, 1*time.Second).Should(ContainSubstring("k3s server"))
-
-			systemdUnitIsStarted("k3s", s)
-
-			Eventually(func() string {
-				out, _ := s.Command("k3s kubectl get nodes -o wide")
-				return out
-			}, 230*time.Second, 1*time.Second).Should(ContainSubstring("Ready"))
 		})
 	})
 })
