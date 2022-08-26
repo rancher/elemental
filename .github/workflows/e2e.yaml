@@ -22,6 +22,7 @@ jobs:
       INSTALL_K3S_VERSION: v1.23.8+k3s2
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
+      DASHBOARD_VERSION: latest
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: v1.23.8+rke2r1
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
@@ -42,13 +43,15 @@ jobs:
           name: ipxe-artifacts
           # Force the path, this is a security hint!
           path: ./
-      - name: E2E - Clean local Helm repositorie
+      - name: E2E - Clean local Helm repositories
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: E2E - Install Rancher
         run: cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
+      - name: E2E - Configure Rancher & Libvirt
+        run: cd tests && make e2e-configure-rancher
       - name: E2E - Bootstrap node 1 with current build
         env:
           VM_INDEX: 1

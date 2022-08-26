@@ -85,7 +85,13 @@ installer-tests: build-box/sda.vdi deps
 # e2e CI tests
 e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e
+e2e-configure-rancher: deps
+	ginkgo --label-filter configure -r -v ./e2e
 e2e-bootstrap-node: deps
 	ginkgo --label-filter bootstrap -r -v ./e2e
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade -r -v ./e2e
+
+# e2e UI tests
+start-cypress-tests:
+	@./scripts/start_cypress_tests.sh
