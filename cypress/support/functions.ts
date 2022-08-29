@@ -130,9 +130,10 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   cy.contains('.mt-40 > .col', /https:\/\/.*elemental\/registration/);
 
   // Try to download the registration file and check it
-  cy.clickButton("Download");
-  cy.verifyDownload('generate_iso_image.zip');
-  cy.contains('Saving').should('not.exist');
+  // Download check disabled due to this bug: https://github.com/rancher/dashboard/issues/6710
+  //cy.clickButton("Download");
+  //cy.verifyDownload('generate_iso_image.zip');
+  //cy.contains('Saving').should('not.exist');
   
   // Check label and annotation in YAML
   // For now, we can only check in YAML because the fields are disabled and we cannot check their content
@@ -151,7 +152,7 @@ Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
   cy.contains('.row', 'Labels').within(() => {
     cy.get('.kv-item.key').type(labelName);
     cy.get('.kv-item.value').type(labelValue);
-  })
+  });
 });
 
 // Add Annotation to machine registration
@@ -160,7 +161,7 @@ Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue})
   cy.contains('.row', 'Annotations').within(() => {
     cy.get('.kv-item.key').type(annotationName);
     cy.get('.kv-item.value').type(annotationValue);
-  })
+  });
 });
 
 // Check machine registration label in YAML
@@ -184,18 +185,20 @@ Cypress.Commands.add('checkMachRegAnnotation', ({machRegName, annotationName, an
 });
 
 // Edit a machine registration
-Cypress.Commands.add('editMachReg', ({machRegName, addLabel=false, addAnnotation=false}) => {
+Cypress.Commands.add('editMachReg', ({machRegName, addLabel=false, addAnnotation=false, withYAML=false}) => {
   cy.contains(machRegName).click();
 
   // Select the 3dots button and edit configuration
   cy.get('div.actions > .role-multi-action').click()
-  cy.contains('li', 'Edit Config').click();
-
-  // Add Label
-  if (addLabel) {cy.addMachRegLabel({labelName: 'myLabel1', labelValue: 'myLabelValue1'})};
-
-  // Add Annotation
-  if (addAnnotation) {cy.addMachRegAnnotation({annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'})};
+  if (withYAML) {
+    cy.contains('li', 'Edit YAML').click();
+    cy.contains('metadata').click(0,0).type('{end}{enter}  labels:{enter}  myLabel1: myLabelValue1');
+    cy.contains('metadata').click(0,0).type('{end}{enter}  annotations:{enter}  myAnnotation1: myAnnotationValue1');
+  } else {
+    cy.contains('li', 'Edit Config').click();
+    if (addLabel) {cy.addMachRegLabel({labelName: 'myLabel1', labelValue: 'myLabelValue1', withYAML: withYAML})};
+    if (addAnnotation) {cy.addMachRegAnnotation({annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1', withYAML: withYAML})};
+  }
 });
 
 // Delete a machine registration

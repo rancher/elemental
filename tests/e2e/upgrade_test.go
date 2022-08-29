@@ -27,8 +27,7 @@ import (
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	var (
-		client    *tools.Client
-		osVersion string
+		client *tools.Client
 	)
 
 	BeforeEach(func() {
@@ -40,8 +39,6 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			Username: userName,
 			Password: userPassword,
 		}
-
-		osVersion = strings.Split(osImage, ":")[1]
 	})
 
 	It("Upgrade node", func() {
@@ -55,19 +52,22 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 		if upgradeType != "manual" {
 			By("Triggering Upgrade in Rancher with "+upgradeType, func() {
-				upgradeOsYaml := "../assets/upgrade.yaml"
+				upgradeOsYaml := "../assets/upgrade_clusterTargets.yaml"
 				upgradeTypeValue := osImage // Default to osImage
 
-				if upgradeType == "managedOSVersionName" {
-					upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
-					Expect(err).To(Not(HaveOccurred()))
-					Expect(upgradeChannelFile).To(Not(BeEmpty()))
+				// NOTE: this will be changed in a future PR, not used for now
+				/*
+					if upgradeType == "managedOSVersionName" {
+						upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
+						Expect(err).To(Not(HaveOccurred()))
+						Expect(upgradeChannelFile).To(Not(BeEmpty()))
 
-					err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
-					Expect(err).To(Not(HaveOccurred()))
+						err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
+						Expect(err).To(Not(HaveOccurred()))
 
-					upgradeTypeValue = osVersion
-				}
+						upgradeTypeValue = osVersion
+					}
+				*/
 
 				// We don't know what is the previous type of upgrade, so easier to replace all here
 				// as there is only one in the yaml file anyway
@@ -87,7 +87,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 		if upgradeType == "manual" {
 			By("Triggering Manual Upgrade", func() {
-				out, err := client.RunSSH("elemental upgrade -d " + osImage)
+				out, err := client.RunSSH("elemental upgrade --system.uri docker:" + osImage)
 				Expect(err).To(Not(HaveOccurred()), out)
 				Expect(out).To((ContainSubstring("Upgrade completed")))
 
@@ -100,10 +100,10 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 		By("Checking VM upgrade", func() {
 			Eventually(func() string {
 				// Use grep here in case of comment in the file!
-				out, _ := client.RunSSH("eval $(grep -v ^# /usr/lib/os-release) && echo ${VERSION}")
+				out, _ := client.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
 				out = strings.Trim(out, "\n")
 				return out
-			}, misc.SetTimeout(30*time.Minute), 30*time.Second).Should(Equal(osVersion))
+			}, misc.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(osImage))
 		})
 
 		if upgradeType != "manual" {

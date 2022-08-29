@@ -21,7 +21,7 @@ declare global {
       checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
-      editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean): Chainable<Element>;
+      editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
     }
 }}
 
