@@ -1,4 +1,7 @@
 # Elemental
+[![Elemental End-To-End tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/e2e.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e.yaml)
+
+[![Elemental UI End-To-End tests](https://github.com/rancher/elemental/actions/workflows/ui-e2e.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e.yaml)
 
 Elemental is a software stack enabling a centralized, full cloud-native OS management solution with Kubernetes.
 
