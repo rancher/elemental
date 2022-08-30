@@ -18,6 +18,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.password = process.env.RANCHER_PASSWORD;
   config.env.cluster = process.env.CLUSTER_NAME;
   config.env.cache_session = process.env.CACHE_SESSION || false;
+  config.env.k8s_version = process.env.K8S_VERSION_TO_PROVISION;
 
   return config;
 };

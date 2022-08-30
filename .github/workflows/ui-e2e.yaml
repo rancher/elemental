@@ -2,12 +2,25 @@ name: Elemental UI End-To-End tests
 
 on:
   workflow_dispatch:
+  pull_request:
   schedule:
     - cron: '0 4 * * *'
 
 jobs:
   ui-e2e-tests:
     runs-on: ui-e2e
+    env:
+      ARCH: amd64
+      CLUSTER_NAME: cluster-rke2
+      CLUSTER_NS: fleet-default
+      DASHBOARD_VERSION: elemental-dev
+      INSTALL_K3S_VERSION: v1.23.9+k3s1
+      INSTALL_K3S_SKIP_ENABLE: true
+      K3S_KUBECONFIG_MODE: 0644
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: v1.23.10+k3s1
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      TIMEOUT_SCALE: 2
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,23 +30,23 @@ jobs:
         with:
           go-version: '~1.18'
 
+      - name: Download iPXE
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-ci.yaml
+          workflow_conclusion: success
+          name: ipxe-artifacts
+          # Force the path, this is a security hint!
+          path: ./
+
       - name: E2E - Install Rancher
         id: installation
-        env:
-          TIMEOUT_SCALE: 2
-          ARCH: amd64
-          CLUSTER_NS: fleet-default
-          KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-          INSTALL_K3S_SKIP_ENABLE: true
-          K3S_KUBECONFIG_MODE: 0644
-          INSTALL_K3S_VERSION: v1.23.9+k3s1
-          DASHBOARD_VERSION: elemental-dev
         run: |
           export MY_HOSTNAME=$(hostname).prairie.suse.net
           echo '::set-output name=MY_HOSTNAME::'${MY_HOSTNAME}
           cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
 
-      - name: Start Cypress tests
+      - name: Cypress tests - Basics
         env:
           BROWSER: chrome
           CYPRESS_DOCKER: 'cypress/included:9.7.0'
@@ -47,6 +60,24 @@ jobs:
         run: |
           make -f tests/Makefile start-cypress-tests
 
+      - name: E2E - Deploy a node to join Rancher manager
+        run: |
+          cd tests && make e2e-ui-rancher
+        env:
+          VM_INDEX: 1
+
+      - name: Cypress tests - Cluster creation
+        env:
+          BROWSER: firefox
+          CYPRESS_DOCKER: 'cypress/included:9.7.0'
+          RANCHER_PASSWORD: rancherpassword
+          RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
+          RANCHER_USER: admin
+          SPEC: |
+            cypress/integration/unit_tests/machine_inventory.spec.ts
+        run: |
+          make -f tests/Makefile start-cypress-tests
+      
       - name: Upload Cypress screenshots
         uses: actions/upload-artifact@v2
         if: failure()
@@ -64,9 +95,16 @@ jobs:
           path: cypress/videos
           retention-days: 7
 
-      - name: Delete k3s cluster
+      - name: Remove VMs and K3s/RancherManager from worker
         if: always()
         run: |
+          # Remove all VMs
+          for I in {1..10}; do
+            for C in destroy undefine; do
+              sudo virsh ${C} node-${I} >/dev/null 2>&1 || true
+            done
+          done
+          # Remove K3s and Rancher Manager
           /usr/local/bin/k3s-uninstall.sh || true
 
       - name: Clean all
