@@ -84,6 +84,20 @@
           }
         ]
       }
+    ],
+    "operator": [
+      {
+        "type": "link",
+        "label": "Operator overview",
+        "href": "/operator/",
+        "docId": "operator/index"
+      },
+      {
+        "type": "link",
+        "label": "Inventory Management",
+        "href": "/operator/inventory-management",
+        "docId": "operator/inventory-management"
+      }
     ]
   },
   "docs": {
@@ -134,6 +148,18 @@
       "title": "",
       "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
       "sidebar": "elemental"
+    },
+    "operator/index": {
+      "id": "operator/index",
+      "title": "",
+      "description": "elemental-operator The Elemental operator is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
+      "sidebar": "operator"
+    },
+    "operator/inventory-management": {
+      "id": "operator/inventory-management",
+      "title": "",
+      "description": "Inventory Management",
+      "sidebar": "operator"
     },
     "quickstart": {
       "id": "quickstart",

@@ -179,7 +179,7 @@
     "sidebar": "sidebar---blog-814-8ac",
     "content": "content---blog-welcomed-9-f-ffb"
   },
-  "/-36d": {
+  "/-ef2": {
     "__comp": "__comp---theme-doc-page-1-be-9be",
     "__context": {
       "plugin": "plugin---810-900"
@@ -217,6 +217,14 @@
   "/machineregistration-reference-a3f": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---machineregistration-referenced-49-fb7"
+  },
+  "/operator/-ec5": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---operator-7-c-5-206"
+  },
+  "/operator/inventory-management-d30": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---operator-inventory-management-5-f-0-336"
   },
   "/quickstart-ac3": {
     "__comp": "__comp---theme-doc-item-178-a40",

@@ -94,7 +94,7 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '36d'),
+    component: ComponentCreator('/', 'ef2'),
     routes: [
       {
         path: '/',
@@ -143,6 +143,18 @@ export default [
         component: ComponentCreator('/machineregistration-reference', 'a3f'),
         exact: true,
         sidebar: "elemental"
+      },
+      {
+        path: '/operator/',
+        component: ComponentCreator('/operator/', 'ec5'),
+        exact: true,
+        sidebar: "operator"
+      },
+      {
+        path: '/operator/inventory-management',
+        component: ComponentCreator('/operator/inventory-management', 'd30'),
+        exact: true,
+        sidebar: "operator"
       },
       {
         path: '/quickstart',

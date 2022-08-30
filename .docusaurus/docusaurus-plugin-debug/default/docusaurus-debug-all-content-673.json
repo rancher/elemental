@@ -218,6 +218,50 @@
               }
             },
             {
+              "unversionedId": "operator/index",
+              "id": "operator/index",
+              "title": "",
+              "description": "elemental-operator The Elemental operator is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
+              "source": "@site/docs/operator/index.md",
+              "sourceDirName": "operator",
+              "slug": "/operator/",
+              "permalink": "/operator/",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "sidebar_label": "Operator overview",
+                "title": ""
+              },
+              "sidebar": "operator",
+              "next": {
+                "title": "Inventory Management",
+                "permalink": "/operator/inventory-management"
+              }
+            },
+            {
+              "unversionedId": "operator/inventory-management",
+              "id": "operator/inventory-management",
+              "title": "",
+              "description": "Inventory Management",
+              "source": "@site/docs/operator/inventory-management.md",
+              "sourceDirName": "operator",
+              "slug": "/operator/inventory-management",
+              "permalink": "/operator/inventory-management",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "sidebar_label": "Inventory Management",
+                "title": ""
+              },
+              "sidebar": "operator",
+              "previous": {
+                "title": "Operator overview",
+                "permalink": "/operator/"
+              }
+            },
+            {
               "unversionedId": "quickstart",
               "id": "quickstart",
               "title": "",
@@ -342,6 +386,16 @@
                     "id": "kubernetesversions"
                   }
                 ]
+              }
+            ],
+            "operator": [
+              {
+                "type": "doc",
+                "id": "operator/index"
+              },
+              {
+                "type": "doc",
+                "id": "operator/inventory-management"
               }
             ]
           }

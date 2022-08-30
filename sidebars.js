@@ -43,6 +43,11 @@ const sidebars = {
     },
   ],
 
+  operator: [
+    'operator/index',
+    'operator/inventory-management',
+  ]
+
   // But you can create a sidebar manually
   /*
   tutorialSidebar: [

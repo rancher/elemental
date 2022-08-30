@@ -53,6 +53,12 @@ export default {
           "label": "Elemental"
         },
         {
+          "type": "doc",
+          "docId": "operator/index",
+          "position": "left",
+          "label": "Operator"
+        },
+        {
           "href": "https://github.com/rancher/elemental",
           "label": "GitHub",
           "position": "right"
@@ -69,6 +75,10 @@ export default {
             {
               "label": "Elemental",
               "to": "/"
+            },
+            {
+              "label": "Operator",
+              "to": "operator/"
             }
           ]
         },

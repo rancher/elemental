@@ -1,0 +1,22 @@
+{
+  "unversionedId": "operator/index",
+  "id": "operator/index",
+  "title": "",
+  "description": "elemental-operator The Elemental operator is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
+  "source": "@site/docs/operator/index.md",
+  "sourceDirName": "operator",
+  "slug": "/operator/",
+  "permalink": "/operator/",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Operator overview",
+    "title": ""
+  },
+  "sidebar": "operator",
+  "next": {
+    "title": "Inventory Management",
+    "permalink": "/operator/inventory-management"
+  }
+}

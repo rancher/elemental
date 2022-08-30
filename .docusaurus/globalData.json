@@ -51,6 +51,16 @@
               "sidebar": "elemental"
             },
             {
+              "id": "operator/index",
+              "path": "/operator/",
+              "sidebar": "operator"
+            },
+            {
+              "id": "operator/inventory-management",
+              "path": "/operator/inventory-management",
+              "sidebar": "operator"
+            },
+            {
               "id": "quickstart",
               "path": "/quickstart",
               "sidebar": "elemental"
@@ -71,6 +81,12 @@
               "link": {
                 "path": "/",
                 "label": "index"
+              }
+            },
+            "operator": {
+              "link": {
+                "path": "/operator/",
+                "label": "operator/index"
               }
             }
           }
