@@ -94,67 +94,72 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '655'),
+    component: ComponentCreator('/', '36d'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', '7d9'),
+        component: ComponentCreator('/', 'f5a'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/architecture',
-        component: ComponentCreator('/architecture', 'a6e'),
+        component: ComponentCreator('/architecture', '9db'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/cloud-config-reference',
-        component: ComponentCreator('/cloud-config-reference', '124'),
+        component: ComponentCreator('/cloud-config-reference', 'c7a'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/customizing',
-        component: ComponentCreator('/customizing', '93d'),
+        component: ComponentCreator('/customizing', '2cc'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/elemental-plans',
-        component: ComponentCreator('/elemental-plans', 'bdd'),
+        component: ComponentCreator('/elemental-plans', '039'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/installation',
-        component: ComponentCreator('/installation', '2e7'),
+        component: ComponentCreator('/installation', '649'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/kubernetesversions',
-        component: ComponentCreator('/kubernetesversions', '73b'),
+        component: ComponentCreator('/kubernetesversions', '91c'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/machineregistration-reference',
-        component: ComponentCreator('/machineregistration-reference', '384'),
+        component: ComponentCreator('/machineregistration-reference', 'a3f'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       },
       {
         path: '/quickstart',
-        component: ComponentCreator('/quickstart', '99e'),
+        component: ComponentCreator('/quickstart', 'ac3'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
+      },
+      {
+        path: '/tpm',
+        component: ComponentCreator('/tpm', '61f'),
+        exact: true
       },
       {
         path: '/upgrade',
-        component: ComponentCreator('/upgrade', 'a11'),
+        component: ComponentCreator('/upgrade', '244'),
         exact: true,
-        sidebar: "tutorialSidebar"
+        sidebar: "elemental"
       }
     ]
   },

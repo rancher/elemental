@@ -14,7 +14,7 @@
     "sidebar_label": "Cloud-config reference",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "previous": {
     "title": "Elemental plans",
     "permalink": "/elemental-plans"

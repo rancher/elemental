@@ -13,57 +13,61 @@
             {
               "id": "architecture",
               "path": "/architecture",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "cloud-config-reference",
               "path": "/cloud-config-reference",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "customizing",
               "path": "/customizing",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "elemental-plans",
               "path": "/elemental-plans",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "index",
               "path": "/",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "installation",
               "path": "/installation",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "kubernetesversions",
               "path": "/kubernetesversions",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "machineregistration-reference",
               "path": "/machineregistration-reference",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             },
             {
               "id": "quickstart",
               "path": "/quickstart",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
+            },
+            {
+              "id": "tpm",
+              "path": "/tpm"
             },
             {
               "id": "upgrade",
               "path": "/upgrade",
-              "sidebar": "tutorialSidebar"
+              "sidebar": "elemental"
             }
           ],
           "draftIds": [],
           "sidebars": {
-            "tutorialSidebar": {
+            "elemental": {
               "link": {
                 "path": "/",
                 "label": "index"

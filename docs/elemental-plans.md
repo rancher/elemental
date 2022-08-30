@@ -77,7 +77,6 @@ spec:
     location: "europe"
 ```
 
-
 ## Plan examples
 
 The following plans are provided as a quick reference and are not guaranteed to work in your environment. To learn more about plans please check [Rancher System Agent](https://github.com/rancher/system-agent).

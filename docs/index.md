@@ -4,8 +4,6 @@ sidebar_label: Overview
 title: ''
 ---
 
-export const year = 2018
-
 # Overview
 
 Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.
@@ -17,5 +15,3 @@ The [{elemental_operator_name}] and the [{ranchersystemagent_name}] enable Ranch
 Ready to give it a try? Get an Elemental Cluster up and running following the [Quickstart](quickstart.md) section.
 
 Want more details? Take a look at the [Architecture](architecture.md) section or reach out to the [{elemental_slack_name}] Slack channel.
-
-Variable test: {year}

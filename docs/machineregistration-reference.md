@@ -3,10 +3,10 @@ sidebar_label: Machineregistration reference
 title: ''
 ---
 
-There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
-
+There are several keys that can be configured under a `MachineRegistration` resource spec.
 
 ```yaml title="MachineRegistration"
+
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -50,77 +50,90 @@ Supports the following values:
 | reboot      | bool   | Reboot the system after install                                                                                                            |
 | eject-cd    | bool   | Try to eject the cd on reboot                                                                                                              |
 
-!!! warning
-    In case of using both `iso` and `system-uri` the `iso` value takes precedence
+:::warning warning
+In case of using both `iso` and `system-uri` the `iso` value takes precedence
+:::
 
 The only required value for a successful installation is the `device` key as we need a target disk to install to. The rest of the parameters are all optional.
 
-??? example
-    ```yaml
-    apiVersion: elemental.cattle.io/v1beta1
-    kind: MachineRegistration
-    metadata:
-      name: my-nodes
-      namespace: fleet-default
-    spec:
-      config:
-        elemental:
-          install:
-            device: /dev/sda
-            debug: true
-            reboot: true
-            eject-cd: true
-            system-uri: registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest
-    ```
+<details>
+<summary>Example</summary>
+
+  ```yaml showLineNumbers
+  apiVersion: elemental.cattle.io/v1beta1
+  kind: MachineRegistration
+  metadata:
+    name: my-nodes
+    namespace: fleet-default
+  spec:
+    config:
+      elemental:
+        install:
+          device: /dev/sda
+          debug: true
+          reboot: true
+          eject-cd: true
+          system-uri: registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest
+  ```
+</details>
 
 #### machineName
 
 This refers to the name that will be set to the node and the kubernetes resources that require a hostname (rke2 deployed pods for example, they use the node hostname as part of the pod names)
 `String` type.
 
-??? example
-    ```yaml
-    apiVersion: elemental.cattle.io/v1beta1
-    kind: MachineRegistration
-    metadata:
-      name: my-nodes
-      namespace: fleet-default
-    spec:
-      machineName: hostname-test-4
-    ```
+<details>
+<summary>Example</summary>
+
+  ```yaml showLineNumbers
+  apiVersion: elemental.cattle.io/v1beta1
+  kind: MachineRegistration
+  metadata:
+    name: my-nodes
+    namespace: fleet-default
+  spec:
+    machineName: hostname-test-4
+  ```
+</details>
 
 #### machineInventoryLabels
 
 Labels that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
 `Key: value` type
 
-??? example
-    ```yaml
-    apiVersion: elemental.cattle.io/v1beta1
-    kind: MachineRegistration
-    metadata:
-      name: my-nodes
-      namespace: fleet-default
-    spec:
-      machineInventoryLabels:
-        my.prefix.io/location: europe
-        my.prefix.io/cpus: 32
-    ```
+<details>
+<summary>Example</summary>
+
+  ```yaml showLineNumbers
+  apiVersion: elemental.cattle.io/v1beta1
+  kind: MachineRegistration
+  metadata:
+    name: my-nodes
+    namespace: fleet-default
+  spec:
+    machineInventoryLabels:
+      my.prefix.io/location: europe
+      my.prefix.io/cpus: 32
+  ```
+</details>
 
 #### machineInventoryAnnotations
 
 Annotations that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
 `Key: value` type
 
-??? example
-    ```yaml
-    apiVersion: elemental.cattle.io/v1beta1
-    kind: MachineRegistration
-    metadata:
-      name: my-nodes
-      namespace: fleet-default
-    spec:
-      machineInventoryAnnotations:
-        owner: bob
-        version: 1.0.0
-    ```
+<details>
+<summary>Example</summary>
+
+  ```yaml
+  apiVersion: elemental.cattle.io/v1beta1
+  kind: MachineRegistration
+  metadata:
+    name: my-nodes
+    namespace: fleet-default
+  spec:
+    machineInventoryAnnotations:
+      owner: bob
+      version: 1.0.0
+  ```
+</details>

@@ -2,7 +2,7 @@
   "unversionedId": "index",
   "id": "index",
   "title": "",
-  "description": "",
+  "description": "Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.",
   "source": "@site/docs/index.md",
   "sourceDirName": ".",
   "slug": "/",
@@ -15,7 +15,7 @@
     "sidebar_label": "Overview",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "next": {
     "title": "Quickstart",
     "permalink": "/quickstart"

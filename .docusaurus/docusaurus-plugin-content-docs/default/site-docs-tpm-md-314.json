@@ -1,0 +1,14 @@
+{
+  "unversionedId": "tpm",
+  "id": "tpm",
+  "title": "Trusted Platform Module 2.0 (TPM)",
+  "description": "Trusted Platform Module (TPM, also known as ISO/IEC 11889) is an international standard for a secure cryptoprocessor, a dedicated microcontroller designed to secure hardware through integrated cryptographic keys. The term can also refer to a chip conforming to the standard.",
+  "source": "@site/docs/tpm.md",
+  "sourceDirName": ".",
+  "slug": "/tpm",
+  "permalink": "/tpm",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

@@ -2,7 +2,7 @@
   "unversionedId": "quickstart",
   "id": "quickstart",
   "title": "",
-  "description": "Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher",
+  "description": "",
   "source": "@site/docs/quickstart.md",
   "sourceDirName": ".",
   "slug": "/quickstart",
@@ -14,7 +14,7 @@
     "sidebar_label": "Quickstart",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "previous": {
     "title": "Overview",
     "permalink": "/"

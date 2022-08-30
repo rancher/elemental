@@ -6,7 +6,7 @@ title: ''
 # Cloud-config Reference
 
 All custom configuration applied on top of a fresh deployment should come
-from the `cloud-config` section in a `#!yaml MachineRegistration`.
+from the `cloud-config` section in a `MachineRegistration`.
 
 This will get run by [`elemental-cli run-stage`](https://github.com/rancher/elemental-cli/blob/main/docs/elemental_run-stage.md) during the `boot` stage, and
 it will be stored in the node under the `/oem` dir.

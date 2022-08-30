@@ -14,7 +14,7 @@
     "sidebar_label": "Elemental plans",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "previous": {
     "title": "Custom Images",
     "permalink": "/customizing"

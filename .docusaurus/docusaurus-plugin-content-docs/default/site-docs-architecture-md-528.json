@@ -14,7 +14,7 @@
     "sidebar_label": "Architecture",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "previous": {
     "title": "Quickstart",
     "permalink": "/quickstart"

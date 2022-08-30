@@ -2,7 +2,7 @@
   "unversionedId": "machineregistration-reference",
   "id": "machineregistration-reference",
   "title": "",
-  "description": "There are several keys that can be configured under a #!yaml MachineRegistration resource spec.",
+  "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
   "source": "@site/docs/machineregistration-reference.md",
   "sourceDirName": ".",
   "slug": "/machineregistration-reference",
@@ -14,7 +14,7 @@
     "sidebar_label": "Machineregistration reference",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "previous": {
     "title": "Cloud-config reference",
     "permalink": "/cloud-config-reference"

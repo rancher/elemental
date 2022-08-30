@@ -7,7 +7,7 @@
   "className": "docs-version-current",
   "isLast": true,
   "docsSidebars": {
-    "tutorialSidebar": [
+    "elemental": [
       {
         "type": "link",
         "label": "Overview",
@@ -91,61 +91,66 @@
       "id": "architecture",
       "title": "",
       "description": "Elemental is a stack, a set of tools, to build an immutable Linux distribution.",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "cloud-config-reference": {
       "id": "cloud-config-reference",
       "title": "",
       "description": "All custom configuration applied on top of a fresh deployment should come",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "customizing": {
       "id": "customizing",
       "title": "",
       "description": "Elemental image can easily be remastered using a docker build.",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "elemental-plans": {
       "id": "elemental-plans",
       "title": "",
       "description": "Introduction",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "index": {
       "id": "index",
       "title": "",
-      "description": "",
-      "sidebar": "tutorialSidebar"
+      "description": "Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.",
+      "sidebar": "elemental"
     },
     "installation": {
       "id": "installation",
       "title": "",
       "description": "Overview",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "kubernetesversions": {
       "id": "kubernetesversions",
       "title": "",
       "description": "Valid Versions",
-      "sidebar": "tutorialSidebar"
+      "sidebar": "elemental"
     },
     "machineregistration-reference": {
       "id": "machineregistration-reference",
       "title": "",
-      "description": "There are several keys that can be configured under a #!yaml MachineRegistration resource spec.",
-      "sidebar": "tutorialSidebar"
+      "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
+      "sidebar": "elemental"
     },
     "quickstart": {
       "id": "quickstart",
       "title": "",
-      "description": "Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher",
-      "sidebar": "tutorialSidebar"
+      "description": "",
+      "sidebar": "elemental"
+    },
+    "tpm": {
+      "id": "tpm",
+      "title": "Trusted Platform Module 2.0 (TPM)",
+      "description": "Trusted Platform Module (TPM, also known as ISO/IEC 11889) is an international standard for a secure cryptoprocessor, a dedicated microcontroller designed to secure hardware through integrated cryptographic keys. The term can also refer to a chip conforming to the standard."
     },
     "upgrade": {
       "id": "upgrade",
       "title": "",
-      "description": "All components in Elemental are managed using Kubernetes. Below is how",
-      "sidebar": "tutorialSidebar"
+      "description": "",
+      "sidebar": "elemental"
     }
   }
 }

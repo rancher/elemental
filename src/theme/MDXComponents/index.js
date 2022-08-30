@@ -10,6 +10,7 @@ import MDXImg from '@theme/MDXComponents/Img';
 import Admonition from '@theme/Admonition';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock'
 const MDXComponents = {
   head: MDXHead,
   code: MDXCode,
@@ -27,5 +28,6 @@ const MDXComponents = {
   admonition: Admonition,
   Tabs: Tabs,
   TabItem: TabItem,
+  CodeBlock: CodeBlock,
 };
 export default MDXComponents;

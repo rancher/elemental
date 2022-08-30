@@ -32,7 +32,7 @@
                 "sidebar_label": "Architecture",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Quickstart",
                 "permalink": "/quickstart"
@@ -58,7 +58,7 @@
                 "sidebar_label": "Cloud-config reference",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Elemental plans",
                 "permalink": "/elemental-plans"
@@ -84,7 +84,7 @@
                 "sidebar_label": "Custom Images",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Upgrade",
                 "permalink": "/upgrade"
@@ -110,7 +110,7 @@
                 "sidebar_label": "Elemental plans",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Custom Images",
                 "permalink": "/customizing"
@@ -124,8 +124,8 @@
               "unversionedId": "index",
               "id": "index",
               "title": "",
-              "description": "",
-              "source": "@site/docs/index.mdx",
+              "description": "Elemental is a software stack enabling a centralized, full cloud-native OS management with Kubernetes.",
+              "source": "@site/docs/index.md",
               "sourceDirName": ".",
               "slug": "/",
               "permalink": "/",
@@ -137,7 +137,7 @@
                 "sidebar_label": "Overview",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "next": {
                 "title": "Quickstart",
                 "permalink": "/quickstart"
@@ -159,7 +159,7 @@
                 "sidebar_label": "Installation",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Architecture",
                 "permalink": "/architecture"
@@ -185,7 +185,7 @@
                 "sidebar_label": "Kubernetesversions",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Machineregistration reference",
                 "permalink": "/machineregistration-reference"
@@ -195,7 +195,7 @@
               "unversionedId": "machineregistration-reference",
               "id": "machineregistration-reference",
               "title": "",
-              "description": "There are several keys that can be configured under a #!yaml MachineRegistration resource spec.",
+              "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
               "source": "@site/docs/machineregistration-reference.md",
               "sourceDirName": ".",
               "slug": "/machineregistration-reference",
@@ -207,7 +207,7 @@
                 "sidebar_label": "Machineregistration reference",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Cloud-config reference",
                 "permalink": "/cloud-config-reference"
@@ -221,7 +221,7 @@
               "unversionedId": "quickstart",
               "id": "quickstart",
               "title": "",
-              "description": "Follow this guide to have an auto-deployed cluster via rke2/k3s and managed by Rancher",
+              "description": "",
               "source": "@site/docs/quickstart.md",
               "sourceDirName": ".",
               "slug": "/quickstart",
@@ -233,7 +233,7 @@
                 "sidebar_label": "Quickstart",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Overview",
                 "permalink": "/"
@@ -244,10 +244,24 @@
               }
             },
             {
+              "unversionedId": "tpm",
+              "id": "tpm",
+              "title": "Trusted Platform Module 2.0 (TPM)",
+              "description": "Trusted Platform Module (TPM, also known as ISO/IEC 11889) is an international standard for a secure cryptoprocessor, a dedicated microcontroller designed to secure hardware through integrated cryptographic keys. The term can also refer to a chip conforming to the standard.",
+              "source": "@site/docs/tpm.md",
+              "sourceDirName": ".",
+              "slug": "/tpm",
+              "permalink": "/tpm",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {}
+            },
+            {
               "unversionedId": "upgrade",
               "id": "upgrade",
               "title": "",
-              "description": "All components in Elemental are managed using Kubernetes. Below is how",
+              "description": "",
               "source": "@site/docs/upgrade.md",
               "sourceDirName": ".",
               "slug": "/upgrade",
@@ -259,7 +273,7 @@
                 "sidebar_label": "Upgrade",
                 "title": ""
               },
-              "sidebar": "tutorialSidebar",
+              "sidebar": "elemental",
               "previous": {
                 "title": "Installation",
                 "permalink": "/installation"
@@ -272,7 +286,7 @@
           ],
           "drafts": [],
           "sidebars": {
-            "tutorialSidebar": [
+            "elemental": [
               {
                 "type": "doc",
                 "id": "index"
