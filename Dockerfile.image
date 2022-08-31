@@ -29,7 +29,7 @@ FROM $TOOL_IMAGE as elemental-cli
 
 
 # Base os
-FROM registry.suse.com/suse/sle-micro-rancher/5.2:latest as default
+FROM registry.suse.com/suse/sle-micro-rancher/5.3:latest as default
 
 # Copy installed files from the luet repos
 COPY --from=framework-build /framework /
