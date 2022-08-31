@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows:
       - build-ci
+      - build-ci-next
     branches:
       - main
     types:
