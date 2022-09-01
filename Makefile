@@ -123,10 +123,6 @@ build_all: build iso extract_kernel_init_squash ipxe
 docs:
 	mkdocs build
 
-deps:
-	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo@latest
-	go get github.com/onsi/gomega/...
-
 integration-tests: 
 	$(MAKE) -C tests/ integration-tests
 
