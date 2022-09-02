@@ -79,3 +79,4 @@ nav:
     - cloud-config-reference.md
     - machineregistration-reference.md
     - kubernetesversions.md
+    - smbios.md

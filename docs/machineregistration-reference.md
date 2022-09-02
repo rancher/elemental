@@ -74,6 +74,11 @@ The only required value for a successful installation is the `device` key as we 
 This refers to the name that will be set to the node and the kubernetes resources that require a hostname (rke2 deployed pods for example, they use the node hostname as part of the pod names)
 `String` type.
 
+!!! info
+    machineName is interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data which allows you to store hardware
+    information.
+    See our [SMBIOS docs](smbios.md) for more information
+
 ??? example
     ```yaml
     apiVersion: elemental.cattle.io/v1beta1
@@ -90,6 +95,11 @@ This refers to the name that will be set to the node and the kubernetes resource
 Labels that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
 `Key: value` type
 
+!!! info
+    Labels are interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data which allows you to store hardware
+    information
+    See our [SMBIOS docs](smbios.md) for more information
+
 ??? example
     ```yaml
     apiVersion: elemental.cattle.io/v1beta1
@@ -101,6 +111,10 @@ Labels that will be set to the `#!yaml MachineInventory` that is created from th
       machineInventoryLabels:
         my.prefix.io/location: europe
         my.prefix.io/cpus: 32
+        my.prefix.io/manufacturer: "${System Information/Manufacturer}"
+        my.prefix.io/productName: "${System Information/Product Name}"
+        my.prefix.io/serialNumber: "${System Information/Serial Number}"
+        my.prefix.io/machineUUID: "${System Information/UUID}"
     ```
 
 #### machineInventoryAnnotations
