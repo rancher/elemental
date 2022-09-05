@@ -32,7 +32,7 @@ System Information
 And setting the `#!yaml machineName` to `serial-${System Information/Serial Number}` would result in the final value of `serial-THX1138`
 
 This is useful to generate automatic names for machines based on their hardware values, for example using the UUID or the Product name.
-Our default `#!yaml machineName` when the registration values are empty is `"m-${System Information/Manufacturer}-${System Information/Product Name}-${System Information/UUID}"`
+Our default `#!yaml machineName` when the registration values are empty is `"m-${System Information/UUID}"`.
 
 
 !!! warning

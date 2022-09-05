@@ -18,6 +18,8 @@ spec:
     cloud-config:
         ...
     elemental:
+        registration:
+            ...
         install:
             ... 
 ```
@@ -25,6 +27,20 @@ spec:
 #### config.cloud-config
 
 Contains the cloud-configuration to be injected in the node. See the [Cloud Config Reference](cloud-config-reference.md) for full information.
+
+#### config.elemental.registration
+Contains the configuration used for the connection and the initial registration to the {{elemental.operator.name}}.
+
+Supports the following values:
+
+| Key               | Type              | Description                                                                                                                       |
+|-------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| url               | string            | URL to connect to the {{elemental.operator.name}}                                                                                 |
+| ca-cert           | string            | CA to validate the certificate provided by the server at 'url' (required if the certificate is not signed by a public CA)         |
+| emulate-tpm       | bool              | this will use software emulation of the TPM (required for hosts without TPM hardware)                                             |
+| emulated-tpm-seed | int64             | fixed seed to use with 'emulate-tpm': use for debug purposes only                                                                 |
+| no-smbios         | bool              | wheter SMBIOS data should be sent to the {{elemental.operator.name}} (see the [SMBIOS reference](smbios.md) for more information) |
+| labels            | map[string]string | labels to be added to the `#!yaml MachineInventory` tracking the registered machine                                               |
 
 #### config.elemental.install
 
@@ -75,9 +91,10 @@ This refers to the name that will be set to the node and the kubernetes resource
 `String` type.
 
 !!! info
-    machineName is interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data which allows you to store hardware
-    information.
-    See our [SMBIOS docs](smbios.md) for more information
+    When `elemental:registration:no-smbios` is set to `false` (default), machineName is interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data which allows you to store hardware information.
+    See our [SMBIOS docs](smbios.md) for more information.
+    If no `machineName` is specified, a default one in the form `m-$UUID` will be set.
+    The UUID will be retrieved from the SMBIOS data if available, otherwise a random UUID will be generated.
 
 ??? example
     ```yaml
@@ -96,9 +113,8 @@ Labels that will be set to the `#!yaml MachineInventory` that is created from th
 `Key: value` type
 
 !!! info
-    Labels are interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data which allows you to store hardware
-    information
-    See our [SMBIOS docs](smbios.md) for more information
+    When `elemental:registration:no-smbios` is set to `false` (default), Labels are interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data. This allows to store hardware information in custom labels.
+    See our [SMBIOS docs](smbios.md) for more information.
 
 ??? example
     ```yaml
