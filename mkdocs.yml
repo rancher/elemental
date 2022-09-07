@@ -28,7 +28,7 @@ theme:
 
 # Customization
 extra:
-  homepage: https://rancher.github.io/elemental
+  homepage: https://rancher.github.io/elementalvim 
   elemental:
     slack:
       name: \#elemental
@@ -78,5 +78,7 @@ nav:
   - Reference:
     - cloud-config-reference.md
     - machineregistration-reference.md
+    - machineinventoryselectortemplate-reference.md
+    - elementaloperatorchart-reference.md
     - kubernetesversions.md
     - smbios.md

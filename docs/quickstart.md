@@ -21,9 +21,10 @@ and available through the [openSUSE Registry](http://registry.opensuse.org/isv/r
 
 The Elemental Stack consists of some packages on top of SLE Micro for Rancher
 
+- **elemental-toolkit** - includes a set of OS utilities to enable OS management via containers. Includes dracut modules, bootloader configuration, cloud-init style configuration services, etc.
 - **elemental-operator** - this connects to Rancher Manager and handles machineRegistration and machineInventory CRDs
 - **elemental-register** - this registers machines via machineRegistrations and installs them via elemental-cli
-- **elemental-cli** - This installs any elemental-toolkit based derivative. Basically an installer based on our A/B install and upgrade system
+- **elemental-cli** - this installs any elemental-toolkit based derivative. Basically an installer based on our A/B install and upgrade system
 - **rancher-system-agent** - runs on the installed system and gets instructions ("Plans") from Rancher Manager what to install and run on the system
 
 ## Prerequisites
@@ -45,7 +46,7 @@ cluster and taking care of creating inventories, registrations for machines and 
 We will use the Helm package manager to install the elemental-operator chart into our cluster
 
 ```shell
-helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator`
+helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
 ```
 
 There is a few options that can be set in the chart install but that is out of scope for this document. You can see all the values on the chart [values.yaml](https://github.com/rancher/elemental-operator/blob/main/chart/values.yaml)
