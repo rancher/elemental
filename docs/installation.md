@@ -71,13 +71,12 @@ folder and they would be seen by the system agent at firstboot.
 
 The installation starts by booting the installation media on a node. Once the installation media has booted it will
 attempt to contact the management cluster and register to it by calling `elemental-register` command.
-For unattended installation the registration yaml configuration should have been already included as
-part of the ISO. However the `elemental-register` utility could also be called manually from the
-command line of the installation media.
+As the registration yaml configuration is already included into the ISO `elemental-register` knows the registration URL and
+any other required data for the registration.
 
-On succeeded registration the installation media will start the Elemental Teal installation into the host based
+On a succeeded registration the installation media will start the Elemental Teal installation into the host based
 on the configuration already included in the media and the MachineRegistration parameters. As soon as the installation
-is done the node is ready to reboot. The deployed Elemental Teal will already include the system agent plans to
+is done the node is ready to reboot. The deployed Elemental Teal includes a system agent plan to
 kick start a regular rancher provisioning process to install the selected kubernetes version, once booted, after
 some minutes the node installation is finalized and the node is included into the cluster and visible through
 the Rancher UI.
