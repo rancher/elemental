@@ -86,6 +86,34 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(numberOfFile).To(BeNumerically(">=", 1))
 		})
 
+		By("Configuring emulated TPM if needed", func() {
+			// Set correct value for TPM emulation
+			value := "false"
+			if emulateTPM == "true" {
+				value = "true"
+			}
+
+			// Patch the yaml file
+			err := tools.Sed("emulate-tpm:.*", "emulate-tpm: "+value, emulatedTPMYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			out, err := kubectl.Run("patch", "MachineRegistration",
+				"--namespace", clusterNS, "machine-registration",
+				"--type", "merge", "--patch-file", emulatedTPMYaml,
+			)
+			Expect(err).To(Not(HaveOccurred()), out)
+
+			// Download the new YAML installation config file
+			tokenURL, err := kubectl.Run("get", "MachineRegistration",
+				"--namespace", clusterNS,
+				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
+			Expect(err).To(Not(HaveOccurred()))
+
+			fileName := "../../install-config.yaml"
+			err = tools.GetFileFromURL(tokenURL, fileName, false)
+			Expect(err).To(Not(HaveOccurred()))
+		})
+
 		By("Creating and installing VM", func() {
 			// Install VM
 			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)

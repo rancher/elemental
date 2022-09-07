@@ -56,8 +56,9 @@ jobs:
         run: cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
       - name: E2E - Configure Rancher & Libvirt
         run: cd tests && make e2e-configure-rancher
-      - name: E2E - Bootstrap node 1 with current build
+      - name: E2E - Bootstrap node 1 with current build (use Emulated TPM)
         env:
+          EMULATE_TPM: true
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
       - name: E2E - Upgrade node 1 (with osImage method) to latest build

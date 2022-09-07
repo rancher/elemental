@@ -31,6 +31,8 @@ const (
 	netDefaultFileName = "../assets/net-default.xml"
 	clusterYaml        = "../assets/cluster.yaml"
 	selectorYaml       = "../assets/selector.yaml"
+	registrationYaml   = "../assets/machineregistration.yaml"
+	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
 )
 
 var (
@@ -41,6 +43,7 @@ var (
 	vmName      string
 	upgradeType string
 	arch        string
+	emulateTPM  string
 	vmIndex     int
 )
 
@@ -61,6 +64,7 @@ var _ = BeforeSuite(func() {
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 	arch = os.Getenv("ARCH")
+	emulateTPM = os.Getenv("EMULATE_TPM")
 	index, set := os.LookupEnv("VM_INDEX")
 
 	// Only if VM_INDEX is set
