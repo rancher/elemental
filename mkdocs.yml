@@ -28,7 +28,7 @@ theme:
 
 # Customization
 extra:
-  homepage: https://rancher.github.io/elementalvim 
+  homepage: https://rancher.github.io/elemental
   elemental:
     slack:
       name: \#elemental

@@ -52,7 +52,7 @@ or by using the `elemental build-iso` command line utility included as part of t
 [Elemental Toolkit]({{elemental.toolkit.url}}/docs/creating-derivatives/build_iso).
 
 Within MachineRegistration only a subset of OS installation parameters can be configured, all available parameters listed
-at MachineRegistration reference page.
+at [MachineRegistration](machineregistration-reference.md) reference page.
 
 In order to configure the installation beyond the common options provided within the
 [`elemental.install`](machineregistration-reference.md#configelementalinstall) section a `/etc/elemental/config.yaml`
