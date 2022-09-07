@@ -6,6 +6,11 @@ set -e -x
 VM_NAME=$1
 MAC=$2
 
+# Don't configure TPM if software emulation (EMULATE_TPM=true) is used
+if [[ ${EMULATE_TPM} != "true" ]]; then
+  EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
+fi
+
 # Create VM
 script -e -c "sudo virt-install \
   --name ${VM_NAME} \
@@ -23,7 +28,7 @@ script -e -c "sudo virt-install \
   --serial pty \
   --console pty,target_type=virtio \
   --rng random \
-  --tpm emulator,model=tpm-crb,version=2.0 \
+  ${EMULATED_TPM} \
   --noreboot \
   --pxe \
   --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"

@@ -1,0 +1,5 @@
+spec:
+  config:
+    elemental:
+      registration:
+        emulate-tpm: %EMULATE_TPM%

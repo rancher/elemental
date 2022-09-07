@@ -63,8 +63,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 		})
 
 		By("Adding MachineRegistration", func() {
-			registrationYaml := "../assets/machineregistration.yaml"
-
 			err := tools.Sed("%VM_NAME%", vmNameRoot, registrationYaml)
 			Expect(err).To(Not(HaveOccurred()))
 
@@ -78,16 +76,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.Apply(clusterNS, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			tokenURL, err := kubectl.Run("get", "MachineRegistration",
-				"--namespace", clusterNS,
-				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
-			Expect(err).To(Not(HaveOccurred()))
-
-			// Get the YAML config file
-			fileName := "../../install-config.yaml"
-			err = tools.GetFileFromURL(tokenURL, fileName, false)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
