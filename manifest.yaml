@@ -1,0 +1,6 @@
+iso:
+  uefi:
+    - oci:registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-live-grub2-efi-image/5.3
+  image:
+    - oci:registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-live-grub2/5.3
+    - oci:registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-live-grub2-efi-image/5.3

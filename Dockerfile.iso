@@ -7,7 +7,6 @@ FROM $TOOL_IMAGE as tools
 FROM tools AS default
 WORKDIR /iso
 COPY --from=os / rootfs
-COPY iso/grub.cfg overlay/boot/grub2/grub.cfg
 ARG CLOUD_CONFIG_FILE=iso/config
 COPY $CLOUD_CONFIG_FILE overlay/livecd-cloud-config.yaml
 ARG ELEMENTAL_VERSION=""
