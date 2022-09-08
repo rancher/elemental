@@ -88,6 +88,8 @@ e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
+e2e-ui-rancher: deps
+	ginkgo --label-filter ui -r -v ./e2e
 e2e-bootstrap-node: deps
 	ginkgo --label-filter bootstrap -r -v ./e2e
 e2e-upgrade-node: deps
