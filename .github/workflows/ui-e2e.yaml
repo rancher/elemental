@@ -2,7 +2,6 @@ name: Elemental UI End-To-End tests
 
 on:
   workflow_dispatch:
-  pull_request:
   schedule:
     - cron: '0 4 * * *'
 
