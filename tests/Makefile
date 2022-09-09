@@ -12,6 +12,11 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 export CLOUD_INIT_ISO?=$(ROOT_DIR)/build/ci.iso
 
+clean: clean_vm_from_iso
+	(vagrant destroy -f) 2> /dev/null || true
+	(vagrant box remove $(BOX_IMAGE)) 2> /dev/null || true
+	rm -rf build-box build || true
+
 .PHONY: up
 up: build/ci.iso
 	@echo "Cloud init iso at $(CLOUD_INIT_ISO)"
@@ -55,6 +60,11 @@ iso-to-vm: build-box/sda.vdi deps
 	VBoxManage storageattach 'test' --storagectl 'sata controller' --port 1 --device 0 --type dvddrive --medium emptydrive --forceunmount
 	VBoxManage storageattach "test" --storagectl "sata controller" --port 1 --device 0 --type dvddrive --medium $(CLOUD_INIT_ISO)
 	VBoxManage startvm "test" --type headless
+
+clean_vm_from_iso:
+	VBoxManage controlvm "test" poweroff &>/dev/null || true
+	VBoxManage unregistervm "test" --delete &>/dev/null || true
+	VBoxManage closemedium disk sda.vdi --delete &>/dev/null || true
 
 installer-tests: build-box/sda.vdi deps
 	VBoxManage createvm --name "test" --register
