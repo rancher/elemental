@@ -37,6 +37,8 @@ COPY --from=framework-build /framework /
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
 # Copy elemental-register
 COPY --from=elemental-register /usr/sbin/elemental-register /usr/sbin/elemental-register
+# Copy elemental-support
+COPY --from=elemental-register /usr/sbin/elemental-support /usr/sbin/elemental-support
 # Copy rancher-system-agent as elemental-system-agent to avoid clashes
 COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/elemental-system-agent
 # Copy elemental
