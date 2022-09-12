@@ -17,6 +17,7 @@ limitations under the License.
 package smoke_test
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -29,7 +30,7 @@ func checkOsAfterReboot(s *sut.SUT) {
 	s.Reboot()
 
 	By("Checking we booted from the installed OS")
-	ExpectWithOffset(1, s.BootFrom()).To(Equal(sut.Active))
+	s.AssertBootedFrom(sut.Active)
 
 	By("Checking config file was run")
 	_, err := s.Command("stat /oem/90_custom.yaml")
@@ -53,7 +54,8 @@ var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
 			err := s.SendFile("../assets/cloud_init.yaml", "/tmp/cloud_init.yaml", "0640")
 			Expect(err).ToNot(HaveOccurred())
 
-			out, err := s.Command("elemental install /dev/sda --cloud-init /tmp/cloud_init.yaml && sync")
+			out, err := s.Command(s.ElementalCmd("install", "/dev/sda", "--cloud-init", "/tmp/cloud_init.yaml"))
+			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
@@ -86,7 +88,8 @@ var _ = Describe("Elemental installation from container", func() {
 			err := s.SendFile("../assets/cloud_init.yaml", "/tmp/cloud_init.yaml", "0640")
 			Expect(err).ToNot(HaveOccurred())
 
-			out, err := s.Command("elemental install /dev/sda --cloud-init /tmp/cloud_init.yaml --system.uri docker:" + containerImage + " && sync")
+			out, err := s.Command(s.ElementalCmd("install", "/dev/sda", "--cloud-init", "/tmp/cloud_init.yaml", "--system.uri", "docker:"+containerImage))
+			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
