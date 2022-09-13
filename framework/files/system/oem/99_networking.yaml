@@ -1,7 +1,0 @@
-name: "Enable NetworkManager"
-stages:
-  initramfs:
-    - name: "Enable NetworkManager"
-      systemctl:
-        enable:
-          - NetworkManager
