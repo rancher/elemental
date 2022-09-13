@@ -5,7 +5,7 @@ export COS_PASS?=ros
 export COS_HOST?=192.168.122.50:22
 export COS_TIMEOUT?=360
 
-BOX_IMAGE?=os2
+BOX_IMAGE?=elemental
 BOX?=
 ISO?=
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -17,21 +17,15 @@ clean: clean_vm_from_iso
 	(vagrant box remove $(BOX_IMAGE)) 2> /dev/null || true
 	rm -rf build-box build || true
 
-add:
-	vagrant box add --force $(BOX_IMAGE) $(BOX)
-	
 .PHONY: up
 up: build/ci.iso
 	@echo "Cloud init iso at $(CLOUD_INIT_ISO)"
 	ls -liah $(CLOUD_INIT_ISO)
-	vagrant up $(BOX_IMAGE) --provider=libvirt
 
 deps: 
 	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
 	go install -mod=mod github.com/onsi/gomega
 	go mod tidy
-
-integration-tests: clean add up deps run
 
 run:
 	ginkgo -r -v ./smoke
