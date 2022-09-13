@@ -10,6 +10,8 @@ COPY --from=os / rootfs
 COPY iso/grub.cfg overlay/boot/grub2/grub.cfg
 ARG CLOUD_CONFIG_FILE=iso/config
 COPY $CLOUD_CONFIG_FILE overlay/livecd-cloud-config.yaml
+COPY iso/manifest.yaml /etc/elemental/manifest.yaml
+COPY iso/efipackage efipackage
 ARG ELEMENTAL_VERSION=""
 RUN echo $ELEMENTAL_VERSION
 RUN grub2-editenv overlay/boot/grub2/elementalversion set version=$ELEMENTAL_VERSION

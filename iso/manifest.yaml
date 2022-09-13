@@ -1,0 +1,8 @@
+iso:
+  rootfs:
+    - channel:system/cos
+  uefi:
+    - dir:/iso/efipackage
+  image:
+    - channel:live/grub2
+    - dir:/iso/efipackage
