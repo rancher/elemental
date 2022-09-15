@@ -9,6 +9,7 @@ spec:
   # Labels to be added to the created MachineInventory object
   machineInventoryLabels:
     cluster-id: id-%CLUSTER_NAME%
+    cypress: uitesting
   # Annotations to be added to the created MachineInventory object
   machineInventoryAnnotations: {}
   # The config that will be used to provision the node
