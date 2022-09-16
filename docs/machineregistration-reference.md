@@ -40,7 +40,6 @@ Supports the following values:
 | emulate-tpm       | bool              | this will use software emulation of the TPM (required for hosts without TPM hardware)                                             |
 | emulated-tpm-seed | int64             | fixed seed to use with 'emulate-tpm': use for debug purposes only                                                                 |
 | no-smbios         | bool              | wheter SMBIOS data should be sent to the {{elemental.operator.name}} (see the [SMBIOS reference](smbios.md) for more information) |
-| labels            | map[string]string | labels to be added to the `#!yaml MachineInventory` tracking the registered machine                                               |
 
 #### config.elemental.install
 
