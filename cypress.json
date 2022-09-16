@@ -5,6 +5,7 @@
     "unit_tests/first_connection.spec.ts",
     "unit_tests/menu.spec.ts",
     "unit_tests/machine_registration.spec.ts",
+    "unit_tests/machine_selector.spec.ts",
     "unit_tests/machine_inventory.spec.ts"
   ]
 }
