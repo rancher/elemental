@@ -42,7 +42,7 @@ A Rancher Cluster resource is also required to deploy Elemental, it can be manua
 the [Quick Start](quickstart.md) guide or created from the Rancher 2.6 UI.
 
 
-## Perpare Installation Media
+## Prepare Installation Media
 
 The installation media is the media that will be used to kick start an Elemental Teal deployment. Currently
 the supported media is a live ISO. The live ISO must include the registration configuration yaml hence it must
