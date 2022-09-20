@@ -1,4 +1,4 @@
-ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest
+ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-node-image/5.3:latest
 ARG TOOL_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-builder-image
 
 FROM $OS_IMAGE AS os
