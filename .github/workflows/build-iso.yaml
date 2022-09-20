@@ -1,7 +1,6 @@
 name: Test build iso from simple script
 
 on:
-  pull_request:
   push:
     branches:
       - main
@@ -16,14 +15,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mkisofs
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Build iso from script
         run: |
           # Just a simple run to test the build script, no need to upload the generated iso!
           echo "TEST" > config.yaml
+          curl -fsSL https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build -o elemental-iso-build
+          chmod +x ./elemental-iso-build
           ./elemental-iso-build config.yaml
       - name: Check config was inserted
         run: |
