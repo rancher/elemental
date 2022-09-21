@@ -36,15 +36,16 @@ const (
 )
 
 var (
-	k8sVersion  string
-	clusterName string
-	clusterNS   string
-	osImage     string
-	vmName      string
-	upgradeType string
-	arch        string
-	emulateTPM  string
-	vmIndex     int
+	k8sVersion   string
+	clusterName  string
+	clusterNS    string
+	osImage      string
+	vmName       string
+	upgradeType  string
+	arch         string
+	emulateTPM   string
+	imageVersion string
+	vmIndex      int
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -65,6 +66,7 @@ var _ = BeforeSuite(func() {
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 	arch = os.Getenv("ARCH")
 	emulateTPM = os.Getenv("EMULATE_TPM")
+	imageVersion = os.Getenv("IMAGE_VERSION")
 	index, set := os.LookupEnv("VM_INDEX")
 
 	// Only if VM_INDEX is set

@@ -2,13 +2,20 @@ package misc
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"gopkg.in/yaml.v3"
+)
+
+const (
+	httpSrv = "http://192.168.122.1:8000"
 )
 
 func GetServerId(clusterNS string, index int) (string, error) {
@@ -30,7 +37,7 @@ func ConfigureiPXE() (int, error) {
 
 	// NOTE: always use the first ipxe file found!
 	if len(ipxeScript) >= 1 {
-		err = tools.Sed("set url.*", "set url http://192.168.122.1:8000", ipxeScript[0])
+		err = tools.Sed("set url.*", "set url "+httpSrv, ipxeScript[0])
 		if err != nil {
 			return 0, err
 		}
@@ -77,4 +84,62 @@ func SetTimeout(timeout time.Duration) time.Duration {
 
 	// Nothing to do
 	return timeout
+}
+
+func AddSelector(key, value string) ([]byte, error) {
+	type selectorYaml struct {
+		MatchLabels map[string]string `yaml:"matchLabels,omitempty"`
+	}
+
+	type selector struct {
+		SelectorYaml selectorYaml `yaml:"nodeSelector,omitempty"`
+	}
+
+	v := selectorYaml{map[string]string{key: value}}
+	s := selector{v}
+	out, err := yaml.Marshal(s)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add indent at the beginning
+	out = append([]byte("  "), out...)
+
+	return out, nil
+}
+
+func ConcateFiles(srcfile, dstfile string, data []byte) error {
+	// Open source file
+	f, err := os.Open(srcfile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Open/create destination file
+	d, err := os.OpenFile(dstfile, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+
+	// Copy source to dest
+	if _, err = io.Copy(d, f); err != nil {
+		return err
+	}
+
+	// Add data to dest
+	if _, err = d.Write([]byte(data)); err != nil {
+		return err
+	}
+
+	// All good!
+	return nil
+}
+
+func TrimStringFromChar(s, c string) string {
+	if idx := strings.Index(s, c); idx != -1 {
+		return s[:idx]
+	}
+	return s
 }
