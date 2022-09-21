@@ -3,7 +3,7 @@
 set -e
 export DOCKER_BUILDKIT=1
 
-BASEDIR=$(dirname $(realpath $0))
+TAG=${TAG:-main}
 
 build() {
   TEMPDIR=$(mktemp -d)
@@ -13,12 +13,12 @@ build() {
     echo "Using custom registration from $CLOUD_CONFIG_FILE"
     cp "$CLOUD_CONFIG_FILE" "${TEMPDIR}/iso/config"
   fi
-  curl https://raw.githubusercontent.com/rancher/elemental/main/Dockerfile.iso -fsSL -o "$TEMPDIR"/Dockerfile
-  curl https://raw.githubusercontent.com/rancher/elemental/main/iso/manifest.yaml -fsSL -o "$TEMPDIR"/Dockerfile "${TEMPDIR}/iso/manifest.yaml"
+  curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/Dockerfile.iso -fsSL -o "$TEMPDIR"/Dockerfile
+  curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/iso/manifest.yaml -fsSL -o "${TEMPDIR}/iso/manifest.yaml"
   # Did we copy the custom cloud config? Then no need to download the default one
   if [[ -z "$CLOUD_CONFIG_FILE" ]]; then
     echo "No custom registration set, using default"
-    curl https://raw.githubusercontent.com/rancher/elemental/main/iso/config -fsSL -o "$TEMPDIR"/iso/config
+    curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/iso/config -fsSL -o "$TEMPDIR"/iso/config
   fi
 
   pushd "$TEMPDIR" || exit 1
@@ -26,7 +26,7 @@ build() {
   popd || exit 1
 
   rm -Rf "$TEMPDIR"
-  ISONAME="elemental-$(date "+%FT%TZ")"
+  ISONAME="elemental-${TAG}-$(date "+%FT%TZ")"
   docker run --privileged --rm -v "$PWD":/mnt elemental/iso:latest --config-dir . build-iso -o /mnt -n "$ISONAME" --overlay-iso /iso/overlay dir:rootfs
   echo "Iso generated at $ISONAME.iso"
 }
