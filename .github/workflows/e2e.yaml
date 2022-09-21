@@ -81,6 +81,12 @@ jobs:
           UPGRADE_TYPE: manual
           VM_INDEX: 2
         run: cd tests && make e2e-upgrade-node
+      - name: E2E - Upgrade node 3 (with managedOSVersionName method) to specified Teal version
+        env:
+          IMAGE_VERSION: teal-5.3
+          UPGRADE_TYPE: managedOSVersionName
+          VM_INDEX: 3
+        run: cd tests && make e2e-upgrade-node
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |

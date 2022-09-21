@@ -6,6 +6,8 @@ metadata:
 spec:
   # Set to the new Elemental version you would like to upgrade to
   osImage: "registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest"
+  clusterTargets:
+    - clusterName: my-cluster
   nodeSelector:
     matchLabels:
       location: "europe"

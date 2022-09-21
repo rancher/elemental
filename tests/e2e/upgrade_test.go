@@ -54,20 +54,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			By("Triggering Upgrade in Rancher with "+upgradeType, func() {
 				upgradeOsYaml := "../assets/upgrade_clusterTargets.yaml"
 				upgradeTypeValue := osImage // Default to osImage
+				if upgradeType == "managedOSVersionName" {
+					upgradeTypeValue = imageVersion
+				}
 
-				// NOTE: this will be changed in a future PR, not used for now
-				/*
-					if upgradeType == "managedOSVersionName" {
-						upgradeChannelFile, err := tools.GetFiles("../..", "rancheros-*.upgradechannel-*.yaml")
-						Expect(err).To(Not(HaveOccurred()))
-						Expect(upgradeChannelFile).To(Not(BeEmpty()))
-
-						err = kubectl.Apply(clusterNS, upgradeChannelFile[0])
-						Expect(err).To(Not(HaveOccurred()))
-
-						upgradeTypeValue = osVersion
-					}
-				*/
+				// We should have a version defined
+				Expect(upgradeTypeValue).NotTo(BeNil())
 
 				// We don't know what is the previous type of upgrade, so easier to replace all here
 				// as there is only one in the yaml file anyway
@@ -79,6 +71,44 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 				err := tools.Sed("%CLUSTER_NAME%", clusterName, upgradeOsYaml)
 				Expect(err).To(Not(HaveOccurred()))
+
+				if upgradeType == "managedOSVersionName" {
+					// Add OS list
+					osListYaml := "../assets/managedOSVersionChannel.yaml"
+					err = kubectl.Apply(clusterNS, osListYaml)
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Wait for ManagedOSVersion to be populated from ManagedOSVersionChannel
+					Eventually(func() string {
+						out, _ := kubectl.Run("get", "ManagedOSVersion",
+							"--namespace", clusterNS, imageVersion)
+						return out
+					}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
+
+					// Get *REAL* hostname
+					hostname, err := client.RunSSH("hostname")
+					Expect(err).To(Not(HaveOccurred()))
+					hostname = strings.Trim(hostname, "\n")
+
+					label := "kubernetes.io/hostname"
+					selector, err := misc.AddSelector(label, hostname)
+					Expect(err).To(Not(HaveOccurred()), selector)
+
+					// Create new file for this specific upgrade
+					dst := "../assets/upgrade_managedOSVersionName.yaml"
+					err = misc.ConcateFiles(upgradeOsYaml, dst, selector)
+					Expect(err).To(Not(HaveOccurred()), selector)
+
+					// Swap yaml file
+					upgradeOsYaml = dst
+
+					// Set correct value for os osImage
+					out, err := kubectl.Run("get", "ManagedOSVersion",
+						"--namespace", clusterNS, imageVersion,
+						"-o", "jsonpath={.spec.metadata.upgradeImage}")
+					Expect(err).To(Not(HaveOccurred()))
+					osImage = misc.TrimStringFromChar(out, ":")
+				}
 
 				err = kubectl.Apply(clusterNS, upgradeOsYaml)
 				Expect(err).To(Not(HaveOccurred()))
@@ -102,12 +132,25 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				// Use grep here in case of comment in the file!
 				out, _ := client.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
 				out = strings.Trim(out, "\n")
+
+				// Re-format the output if needed
+				if upgradeType == "managedOSVersionName" {
+					// NOTE: this remove the version and keep only the repo,
+					// as 'latest' is set and in the file we have the exact version
+					out = misc.TrimStringFromChar(out, ":")
+				}
+
 				return out
-			}, misc.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(osImage))
+			}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(osImage))
 		})
 
 		if upgradeType != "manual" {
 			By("Cleaning upgrade orders", func() {
+				if upgradeType == "managedOSVersionName" {
+					err := kubectl.DeleteResource(clusterNS, "ManagedOSVersionChannel", "os-versions")
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
 				err := kubectl.DeleteResource(clusterNS, "ManagedOSImage", "default-os-image")
 				Expect(err).To(Not(HaveOccurred()))
 			})

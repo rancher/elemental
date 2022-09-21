@@ -59,7 +59,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + clusterName))
+			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + clusterName))
 		})
 
 		By("Adding MachineRegistration", func() {
