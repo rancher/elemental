@@ -1,7 +1,6 @@
 name: Test build iso from simple script
 
 on:
-  pull_request:
   push:
     branches:
       - main

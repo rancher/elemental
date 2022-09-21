@@ -1,5 +1,5 @@
-ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest
-ARG TOOL_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-builder-image
+ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-node-image/5.3:latest
+ARG TOOL_IMAGE=registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-builder-image/5.3:latest
 
 FROM $OS_IMAGE AS os
 FROM $TOOL_IMAGE as tools
@@ -7,10 +7,10 @@ FROM $TOOL_IMAGE as tools
 FROM tools AS default
 WORKDIR /iso
 COPY --from=os / rootfs
-COPY iso/grub.cfg overlay/boot/grub2/grub.cfg
 ARG CLOUD_CONFIG_FILE=iso/config
+ARG MANIFEST_FILE=iso/manifest.yaml
 COPY $CLOUD_CONFIG_FILE overlay/livecd-cloud-config.yaml
+COPY $MANIFEST_FILE /iso/manifest.yaml
 ARG ELEMENTAL_VERSION=""
 RUN echo $ELEMENTAL_VERSION
-RUN grub2-editenv overlay/boot/grub2/elementalversion set version=$ELEMENTAL_VERSION
 ENTRYPOINT ["/usr/bin/elemental"]
