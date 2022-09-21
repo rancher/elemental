@@ -27,6 +27,13 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
+func getClusterVersion(client *tools.Client) string {
+	out, err := client.RunSSH("kubectl version")
+	Expect(err).To(Not(HaveOccurred()))
+
+	return out
+}
+
 func checkClusterAgent(client *tools.Client) {
 	// cluster-agent is the pod that communicates to Rancher, wait for it before continuing
 	Eventually(func() string {
@@ -186,6 +193,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			// Check agent and cluster state
 			checkClusterAgent(client)
 			checkClusterState()
+		})
+
+		By("Checking cluster version", func() {
+			// Show cluster version, could be useful for debugging purposes
+			version := getClusterVersion(client)
+			GinkgoWriter.Printf("K8s version:\n%s\n", version)
 		})
 
 		By("Rebooting the VM and checking that cluster is still healthy after", func() {
