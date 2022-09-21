@@ -6,25 +6,22 @@ on:
       - 'v*'
 jobs:
   build:
-    runs-on: build-host
-    container:
-      image: ubuntu:latest
-      env:
-        DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
-        DOCKER_REGISTRY: quay.io
-        REPO: quay.io/costoolkit/elemental
-        NO_KVM: 1
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Build Artifacts
-        run: echo "Build"
+        run: |
+          # Replace default TAG with our tag
+          sed "s/\${TAG:-main}/${{ github.ref_name }}/g" .github/elemental-iso-build
+          mkdir release
+          cp .github/elemental-iso-build release/elemental-iso-build
+          chmod +x release/elemental-iso-build
       - name: Release
         uses: rancher-sandbox/github-action-ghr@v1
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          GHR_PATH: build/
+          GHR_PATH: release/
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHR_PARALLELISM: "1"
       - name: Release space from worker ♻
