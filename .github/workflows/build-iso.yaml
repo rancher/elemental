@@ -1,4 +1,7 @@
-name: Test build iso from simple script
+name: Build iso from elemental-iso-build as external user
+# Test building the iso from an external point of view
+# This tests doesn't clone the repo, just interacts with the script as an external user would do
+# Gets the script only and runs it to see if the building is done properly
 
 on:
   push:
@@ -19,7 +22,7 @@ jobs:
         run: |
           # Just a simple run to test the build script, no need to upload the generated iso!
           echo "TEST" > config.yaml
-          curl -fsSL https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build -o elemental-iso-build
+          curl -fsSL https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-build -o elemental-iso-build
           chmod +x ./elemental-iso-build
           ./elemental-iso-build config.yaml
       - name: Check config was inserted
