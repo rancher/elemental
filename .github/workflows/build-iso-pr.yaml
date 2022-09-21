@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  deploy:
+  elemental-iso-build:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ github.SHA }}
