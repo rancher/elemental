@@ -44,13 +44,6 @@ COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/elemental-syste
 # Copy elemental
 COPY --from=elemental-cli /usr/bin/elemental /usr/bin/elemental
 
-# DELETEME once syslinux is added in to the base image or no longer needed
-RUN zypper ar --refresh http://download.opensuse.org/distribution/leap/15.4/repo/oss/ Main && \
-    rpm --import http://download.opensuse.org/distribution/leap/15.3/repo/oss/gpg-pubkey-3dbdc284-53674dd4.asc && \
-    zypper in -y --no-recommends syslinux
-    
-# DELETEME ends
-
 # Copy local framework files
 COPY framework/cos/ /
 COPY framework/files/ /
