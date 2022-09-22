@@ -27,7 +27,7 @@ build() {
 
   rm -Rf "$TEMPDIR"
   ISONAME="elemental-${TAG}-$(date "+%FT%TZ")"
-  docker run --privileged --rm -v "$PWD":/mnt elemental/iso:latest --config-dir . build-iso -o /mnt -n "$ISONAME" --overlay-iso /iso/overlay dir:rootfs
+  docker run --rm -v "$PWD":/mnt elemental/iso:latest --config-dir . build-iso -o /mnt -n "$ISONAME" --overlay-iso overlay dir:rootfs
   echo "Iso generated at $ISONAME.iso"
 }
 
