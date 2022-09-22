@@ -71,10 +71,11 @@ endif
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg MANIFEST_FILE=${MANIFEST_FILE} \
 		-t iso:${FINAL_TAG} .
-	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
+	@DOCKER_BUILDKIT=1 docker run --privileged --rm -v $(PWD)/build:/mnt \
 		iso:${FINAL_TAG} \
 		--config-dir . \
 		--debug build-iso \
+		--firmware bios \
 		-o /mnt \
 		-n elemental-${FINAL_TAG} \
 		--overlay-iso overlay dir:rootfs
