@@ -46,6 +46,7 @@ jobs:
           cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
 
       - name: Cypress tests - Basics
+      # Basics means tests without an extra elemental node needed
         env:
           BROWSER: chrome
           CYPRESS_DOCKER: 'cypress/included:9.7.0'
@@ -65,7 +66,8 @@ jobs:
         env:
           VM_INDEX: 1
 
-      - name: Cypress tests - Cluster creation
+      - name: Cypress tests - Advanced
+      # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
         env:
           BROWSER: firefox
           CYPRESS_DOCKER: 'cypress/included:9.7.0'
@@ -75,6 +77,7 @@ jobs:
           SPEC: |
             cypress/integration/unit_tests/machine_selector.spec.ts
             cypress/integration/unit_tests/machine_inventory.spec.ts
+            cypress/integration/unit_tests/upgrade.spec.ts
         run: |
           make -f tests/Makefile start-cypress-tests
       
