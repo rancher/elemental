@@ -71,14 +71,13 @@ endif
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg MANIFEST_FILE=${MANIFEST_FILE} \
 		-t iso:${FINAL_TAG} .
-	@DOCKER_BUILDKIT=1 docker run --privileged --rm -v $(PWD)/build:/mnt \
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
 		iso:${FINAL_TAG} \
 		--config-dir . \
 		--debug build-iso \
 		-o /mnt \
-		--squash-no-compression \
 		-n elemental-${FINAL_TAG} \
-		--overlay-iso /iso/overlay dir:rootfs
+		--overlay-iso overlay dir:rootfs
 	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 # Build an iso with the OBS base containers
@@ -98,13 +97,13 @@ endif
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg MANIFEST_FILE=${MANIFEST_FILE} \
 		-t iso:latest .
-	@DOCKER_BUILDKIT=1 docker run --privileged --rm -v $(PWD)/build:/mnt \
+	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
 		iso:latest \
 		--config-dir . \
 		--debug build-iso \
 		-o /mnt \
 		-n elemental-${FINAL_TAG} \
-		--overlay-iso /iso/overlay dir:rootfs
+		--overlay-iso overlay dir:rootfs
 	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
 
 .PHONY: extract_kernel_init_squash
