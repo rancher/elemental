@@ -61,7 +61,7 @@ var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
-				ContainSubstring("Grub install to device /dev/sda complete"),
+				ContainSubstring("Setting default grub entry to Elemental"),
 			))
 		})
 
@@ -96,7 +96,7 @@ var _ = Describe("Elemental installation from container", func() {
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
 				ContainSubstring("Unpacking a container image: "+containerImage),
-				ContainSubstring("Grub install to device /dev/sda complete"),
+				ContainSubstring("Setting default grub entry to Elemental"),
 			), out)
 		})
 
