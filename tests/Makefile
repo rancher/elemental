@@ -49,7 +49,7 @@ build-box/sda.vdi: build-box
 
 iso-to-vm: build-box/sda.vdi deps
 	VBoxManage createvm --name "test" --register
-	VBoxManage modifyvm "test" --memory 10240 --cpus 3
+	VBoxManage modifyvm "test" --firmware efi --memory 10240 --cpus 3
 	VBoxManage modifyvm "test" --nic1 nat --boot1 disk --boot2 dvd --natpf1 "guestssh,tcp,,2222,,22"
 	VBoxManage storagectl "test" --name "sata controller" --add sata --portcount 2 --hostiocache off
 	VBoxManage storageattach "test" --storagectl "sata controller" --port 0 --device 0 --type hdd --medium build-box/sda.vdi
@@ -68,7 +68,7 @@ clean_vm_from_iso:
 
 installer-tests: build-box/sda.vdi deps
 	VBoxManage createvm --name "test" --register
-	VBoxManage modifyvm "test" --memory 10240 --cpus 3
+	VBoxManage modifyvm "test" --firmware efi --memory 10240 --cpus 3
 	VBoxManage modifyvm "test" --nic1 nat --boot1 disk --boot2 dvd --natpf1 "guestssh,tcp,,2222,,22"
 	VBoxManage storagectl "test" --name "sata controller" --add sata --portcount 2 --hostiocache off
 	VBoxManage storageattach "test" --storagectl "sata controller" --port 0 --device 0 --type hdd --medium build-box/sda.vdi
