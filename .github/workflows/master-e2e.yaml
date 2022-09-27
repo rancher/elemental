@@ -5,10 +5,6 @@ on:
   workflow_call:
   # Variables to set when calling this reusable workflow
     inputs:
-      runner:
-        description: Runner on which to execute tests
-        required: true
-        type: string
       cluster_name:
         description: Name of the provisioned cluster
         required: true
@@ -17,10 +13,30 @@ on:
         description: Name and version of installed K8s distribution
         required: true
         type: string
+      runner:
+        description: Runner on which to execute tests
+        required: true
+        type: string
+      zone:
+        description: GCP zone to host the runner
+        required: true
+        type: string
 
 jobs:
-  e2e:
+  start-runner:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Start runner
+        run: gcloud compute instances start --zone ${{ inputs.zone }} ${{ inputs.runner }}
+  e2e:
+    needs: start-runner
     runs-on: ${{ inputs.runner }}
     env:
       TIMEOUT_SCALE: 2
@@ -28,7 +44,7 @@ jobs:
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
       # For K3s installation used to host Rancher Manager
-      INSTALL_K3S_VERSION: v1.23.8+k3s2
+      INSTALL_K3S_VERSION: v1.23.10+k3s2
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
@@ -134,3 +150,16 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  stop-runner:
+    if: always()
+    needs: e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Stop runner
+        run: gcloud compute instances stop --zone ${{ inputs.zone }} ${{ inputs.runner }}
