@@ -1,6 +1,7 @@
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
 import '~/cypress/support/functions';
 import { Elemental } from '../../support/elemental';
+import 'cypress-file-upload';
 
 Cypress.config();
 describe('Upgrade tests', () => {
@@ -17,6 +18,31 @@ describe('Upgrade tests', () => {
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
 
+  });
+
+  it('Create an OS Version Channels', () => {
+    // Create ManagedOSVersionChannel resource
+    cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' tests/assets/managedOSVersionChannel.yaml`)
+    cy.get('.nav').contains('Advanced').click();
+    cy.get('.nav').contains('Managed OS Version Channels').click();
+    cy.clickButton('Create from YAML');
+    // Wait needed to avoid crash with the upload
+    cy.wait(2000);
+    cy.get('input[type="file"]').attachFile({filePath: '../../tests/assets/managedOSVersionChannel.yaml'});
+    // Wait needed to avoid crash with the upload
+    cy.wait(2000);
+    // Wait for os-versions to be printed, that means the upload is done
+    cy.contains('os-versions');
+    cy.clickButton('Create');
+    // The new resource must be active
+    cy.contains('Active');
+  });
+
+  it('Check OS Versions', () => {
+    cy.get('.nav').contains('Advanced').click();
+    cy.get('.nav').contains('Managed OS Versions').click();
+    cy.contains('Active teal-5.2', {timeout: 120000});
+    cy.contains('Active teal-5.3');
   });
 
   it('Upgrade one node with OS Image Upgrades', () => {
