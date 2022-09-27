@@ -2,6 +2,7 @@
 name: Elemental End-To-End tests with Rancher Manager
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows:
       - build-ci
