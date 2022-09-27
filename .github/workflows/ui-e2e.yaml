@@ -13,7 +13,7 @@ jobs:
       CLUSTER_NAME: cluster-rke2
       CLUSTER_NS: fleet-default
       DASHBOARD_VERSION: elemental-dev
-      INSTALL_K3S_VERSION: v1.23.9+k3s1
+      INSTALL_K3S_VERSION: v1.23.10+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       # For K8s cluster to provision with Rancher Manager
