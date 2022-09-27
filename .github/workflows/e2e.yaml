@@ -18,12 +18,12 @@ jobs:
   k3s:
     uses: ./.github/workflows/master-e2e.yaml
     with:
-      runner: kvm-host
+      runner: e2e
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.23.10+k3s1
   rke2:
     uses: ./.github/workflows/master-e2e.yaml
     with:
-      runner: kvm-host
+      runner: e2e
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.23.10+rke2r1
