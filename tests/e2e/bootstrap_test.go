@@ -61,7 +61,7 @@ func checkClusterState() {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[*].reason}")
 		return reason
-	}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
