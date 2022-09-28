@@ -3,7 +3,11 @@ name: Elemental End-To-End tests with Rancher Manager (template)
 
 on:
   workflow_call:
-  # Variables to set when calling this reusable workflow
+    # Variables to set when calling this reusable workflow
+    secrets:
+      credentials:
+        description: Credentials to use to connect
+        required: true
     inputs:
       cluster_name:
         description: Name of the provisioned cluster
@@ -27,10 +31,13 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          credentials_json: ${{ secrets.credentials }}
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v0
       - name: Start runner
@@ -155,10 +162,13 @@ jobs:
     needs: e2e
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          credentials_json: ${{ secrets.credentials }}
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v0
       - name: Stop runner

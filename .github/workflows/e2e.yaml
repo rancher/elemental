@@ -18,13 +18,19 @@ concurrency:
 jobs:
   k3s:
     uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.23.10+k3s1
       runner: elemental-e2e-ci-runner-x86-64-1
       zone: us-central1-a
   rke2:
+    if: always()
+    needs: k3s
     uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.23.10+rke2r1
