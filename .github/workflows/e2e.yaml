@@ -21,9 +21,12 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-k3s
+      dashboard_version: latest
       k8s_version_to_provision: v1.23.10+k3s1
       runner: elemental-e2e-ci-runner-x86-64-1
+      test_type: cli
       zone: us-central1-a
+      workflow_download: ${{ github.event.workflow_run.workflow_id }}
   rke2:
     if: always()
     needs: k3s
@@ -32,6 +35,9 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-rke2
+      dashboard_version: latest
       k8s_version_to_provision: v1.23.10+rke2r1
       runner: elemental-e2e-ci-runner-x86-64-1
+      test_type: cli
       zone: us-central1-a
+      workflow_download: ${{ github.event.workflow_run.workflow_id }}
