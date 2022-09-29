@@ -26,7 +26,7 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
-var _ = Describe("E2E - Install Rancher", Label("install"), func() {
+var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Create kubectl context
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
@@ -35,7 +35,7 @@ var _ = Describe("E2E - Install Rancher", Label("install"), func() {
 		PollInterval: 500 * time.Millisecond,
 	}
 
-	It("Install and configure Rancher and libvirt", func() {
+	It("Install Rancher Manager", func() {
 		By("Installing K3s", func() {
 			// Get K3s installation script
 			fileName := "k3s-install.sh"
