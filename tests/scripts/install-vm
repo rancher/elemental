@@ -21,6 +21,7 @@ fi
 
 # Create symlink for iPXE binary
 pushd ../..
+rm -f ipxe.efi  # Force remove, to avoid issue with 'ln'
 ln -s ${IPXE_BIN} ipxe.efi
 popd
 
