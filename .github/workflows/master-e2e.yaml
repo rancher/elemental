@@ -137,20 +137,22 @@ jobs:
             cypress/integration/unit_tests/upgrade.spec.ts
         run: make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots
-        if: ${{ inputs.test_type == 'ui' }} && failure()
-        uses: actions/upload-artifact@v2
+        if: failure()
+        uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots
           path: cypress/screenshots
           retention-days: 7
+          if-no-files-found: ignore
       - name: Upload Cypress videos
         # Test run video is always captured, so this action uses "always()" condition
-        if: ${{ inputs.test_type == 'ui' }} && always()
-        uses: actions/upload-artifact@v2
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: cypress-videos
           path: cypress/videos
           retention-days: 7
+          if-no-files-found: ignore
       - name: E2E - Configure Rancher & Libvirt
         if: ${{ inputs.test_type == 'cli' }}
         run: cd tests && make e2e-configure-rancher

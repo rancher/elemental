@@ -175,7 +175,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Eventually(func() string {
 					out, _ := client.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
 					return out
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal("OK"))
+				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal("OK"))
 
 				// Configure kubectl
 				_, err := client.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
