@@ -25,6 +25,10 @@ on:
         description: Runner on which to execute tests
         required: true
         type: string
+      start_condition:
+        description: Start condition of the runner
+        required: true
+        type: string
       test_type:
         description: Type of test to run (cli or ui)
         required: true

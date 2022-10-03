@@ -24,6 +24,7 @@ jobs:
       dashboard_version: latest
       k8s_version_to_provision: v1.23.10+k3s1
       runner: elemental-e2e-ci-runner-x86-64-1
+      start_condition: ${{ github.event.workflow_run.conclusion == 'success' }}
       test_type: cli
       zone: us-central1-a
       workflow_download: ${{ github.event.workflow_run.workflow_id }}
@@ -38,6 +39,7 @@ jobs:
       dashboard_version: latest
       k8s_version_to_provision: v1.23.10+rke2r1
       runner: elemental-e2e-ci-runner-x86-64-1
+      start_condition: ${{ github.event.workflow_run.conclusion == 'success' }}
       test_type: cli
       zone: us-central1-a
       workflow_download: ${{ github.event.workflow_run.workflow_id }}
