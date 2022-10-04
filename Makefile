@@ -137,13 +137,3 @@ build_all: build iso extract_kernel_init_squash ipxe
 .PHONY: docs
 docs:
 	mkdocs build
-
-_FW_CMD=apk add curl && ( curl -L https://raw.githubusercontent.com/rancher-sandbox/cOS-toolkit/master/scripts/get_luet.sh | sh ) && luet install --system-target /framework -y $(FRAMEWORK_PACKAGES) && rm -rf /framework/var/luet
-update-cos-framework:
-	@echo "Cleanup generated files"
-	$(SUDO) rm -rf $(ROOT_DIR)/framework/cos
-	docker run --rm --entrypoint /bin/sh \
-		-v $(ROOT_DIR)/framework/cos:/framework \
-		alpine -c \
-		"$(_FW_CMD)"
-	$(SUDO) chown -R $$(id -u) $(ROOT_DIR)/framework/cos

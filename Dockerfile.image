@@ -10,11 +10,22 @@ COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
 ENV LUET_NOLOCK=true
 SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
 
+# elemental-toolkit essentials
+RUN system/immutable-rootfs
+RUN system/cos-setup
+RUN cloud-config/network
+RUN cloud-config/recovery
+RUN cloud-config/live
+RUN cloud-config/boot-assessment
+RUN cloud-config/default-services
+RUN system/grub2-config
+RUN system/base-dracut-modules
+
+# elemental-toolkit utilities
 RUN utils/k9s
 RUN utils/nerdctl
 RUN toolchain/cosign
 RUN selinux/rancher
-
 
 # elemental-operator
 FROM $OPERATOR_IMAGE as elemental-operator
@@ -45,11 +56,10 @@ COPY --from=system-agent /usr/bin/rancher-system-agent /usr/sbin/elemental-syste
 COPY --from=elemental-cli /usr/bin/elemental /usr/bin/elemental
 
 # Copy local framework files
-COPY framework/cos/ /
 COPY framework/files/ /
 
 # Enable services
-RUN systemctl enable NetworkManager
+RUN systemctl enable NetworkManager sshd elemental-populate-node-labels 
 
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
