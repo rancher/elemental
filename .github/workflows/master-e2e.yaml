@@ -193,6 +193,16 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
+      - name: E2E - Bootstrap node 4 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 4
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Bootstrap node 5 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 5
+        run: cd tests && make e2e-bootstrap-node
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
