@@ -25,4 +25,4 @@ spec:
         poweroff: true
         device: /dev/sda
         debug: true
-  #machineName: %VM_NAME%-{{ trunc 4 .MachineID }}
+  machineName: %VM_NAME%-${System Information/UUID}
