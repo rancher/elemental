@@ -19,7 +19,7 @@ jobs:
       cluster_name: cluster-k3s
       dashboard_version: elemental-dev
       k8s_version_to_provision: v1.23.10+k3s1
-      runner: elemental-e2e-ci-runner-x86-64-1
+      runner: elemental-e2e-ci-runner-spot-x86-64-1
       start_condition: success
       test_type: ui
       zone: us-central1-a
