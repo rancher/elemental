@@ -22,7 +22,7 @@
   "homepage": "https://github.com/epinio/epinio-end-to-end-tests#readme",
   "dependencies": {
     "cy-verify-downloads": "^0.1.8",
-    "cypress": "^9.0.0",
+    "cypress": "^10.0.0",
     "cypress-dark": "^1.8.3",
     "cypress-file-upload": "^5.0.8",
     "dotenv": "^10.0.0",
