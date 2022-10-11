@@ -121,6 +121,20 @@
               }
             },
             {
+              "unversionedId": "elementaloperatorchart-reference",
+              "id": "elementaloperatorchart-reference",
+              "title": "Elemental Operator Helm Chart",
+              "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations.",
+              "source": "@site/docs/elementaloperatorchart-reference.md",
+              "sourceDirName": ".",
+              "slug": "/elementaloperatorchart-reference",
+              "permalink": "/elementaloperatorchart-reference",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {}
+            },
+            {
               "unversionedId": "index",
               "id": "index",
               "title": "",
@@ -192,10 +206,24 @@
               }
             },
             {
+              "unversionedId": "machineinventoryselectortemplate-reference",
+              "id": "machineinventoryselectortemplate-reference",
+              "title": "MachineInventorySelectorTemplate reference",
+              "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource.",
+              "source": "@site/docs/machineinventoryselectortemplate-reference.md",
+              "sourceDirName": ".",
+              "slug": "/machineinventoryselectortemplate-reference",
+              "permalink": "/machineinventoryselectortemplate-reference",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {}
+            },
+            {
               "unversionedId": "machineregistration-reference",
               "id": "machineregistration-reference",
               "title": "",
-              "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
+              "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
               "source": "@site/docs/machineregistration-reference.md",
               "sourceDirName": ".",
               "slug": "/machineregistration-reference",
@@ -286,6 +314,20 @@
                 "title": "Architecture",
                 "permalink": "/architecture"
               }
+            },
+            {
+              "unversionedId": "smbios",
+              "id": "smbios",
+              "title": "smbios",
+              "description": "Introduction",
+              "source": "@site/docs/smbios.md",
+              "sourceDirName": ".",
+              "slug": "/smbios",
+              "permalink": "/smbios",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {}
             },
             {
               "unversionedId": "tpm",

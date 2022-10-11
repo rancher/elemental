@@ -31,6 +31,10 @@
               "sidebar": "elemental"
             },
             {
+              "id": "elementaloperatorchart-reference",
+              "path": "/elementaloperatorchart-reference"
+            },
+            {
               "id": "index",
               "path": "/",
               "sidebar": "elemental"
@@ -44,6 +48,10 @@
               "id": "kubernetesversions",
               "path": "/kubernetesversions",
               "sidebar": "elemental"
+            },
+            {
+              "id": "machineinventoryselectortemplate-reference",
+              "path": "/machineinventoryselectortemplate-reference"
             },
             {
               "id": "machineregistration-reference",
@@ -64,6 +72,10 @@
               "id": "quickstart",
               "path": "/quickstart",
               "sidebar": "elemental"
+            },
+            {
+              "id": "smbios",
+              "path": "/smbios"
             },
             {
               "id": "tpm",

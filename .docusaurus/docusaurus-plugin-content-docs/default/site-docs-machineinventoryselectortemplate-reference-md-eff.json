@@ -1,0 +1,14 @@
+{
+  "unversionedId": "machineinventoryselectortemplate-reference",
+  "id": "machineinventoryselectortemplate-reference",
+  "title": "MachineInventorySelectorTemplate reference",
+  "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource.",
+  "source": "@site/docs/machineinventoryselectortemplate-reference.md",
+  "sourceDirName": ".",
+  "slug": "/machineinventoryselectortemplate-reference",
+  "permalink": "/machineinventoryselectortemplate-reference",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

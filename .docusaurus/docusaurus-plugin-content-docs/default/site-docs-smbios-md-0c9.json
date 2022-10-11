@@ -1,0 +1,14 @@
+{
+  "unversionedId": "smbios",
+  "id": "smbios",
+  "title": "smbios",
+  "description": "Introduction",
+  "source": "@site/docs/smbios.md",
+  "sourceDirName": ".",
+  "slug": "/smbios",
+  "permalink": "/smbios",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

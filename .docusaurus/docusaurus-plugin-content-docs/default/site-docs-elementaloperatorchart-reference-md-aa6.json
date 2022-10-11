@@ -1,0 +1,14 @@
+{
+  "unversionedId": "elementaloperatorchart-reference",
+  "id": "elementaloperatorchart-reference",
+  "title": "Elemental Operator Helm Chart",
+  "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations.",
+  "source": "@site/docs/elementaloperatorchart-reference.md",
+  "sourceDirName": ".",
+  "slug": "/elementaloperatorchart-reference",
+  "permalink": "/elementaloperatorchart-reference",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {}
+}

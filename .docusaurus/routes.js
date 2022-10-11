@@ -94,7 +94,7 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'ef2'),
+    component: ComponentCreator('/', 'c41'),
     routes: [
       {
         path: '/',
@@ -127,6 +127,11 @@ export default [
         sidebar: "elemental"
       },
       {
+        path: '/elementaloperatorchart-reference',
+        component: ComponentCreator('/elementaloperatorchart-reference', 'c53'),
+        exact: true
+      },
+      {
         path: '/installation',
         component: ComponentCreator('/installation', '649'),
         exact: true,
@@ -137,6 +142,11 @@ export default [
         component: ComponentCreator('/kubernetesversions', '91c'),
         exact: true,
         sidebar: "elemental"
+      },
+      {
+        path: '/machineinventoryselectortemplate-reference',
+        component: ComponentCreator('/machineinventoryselectortemplate-reference', 'b0b'),
+        exact: true
       },
       {
         path: '/machineregistration-reference',
@@ -161,6 +171,11 @@ export default [
         component: ComponentCreator('/quickstart', 'ac3'),
         exact: true,
         sidebar: "elemental"
+      },
+      {
+        path: '/smbios',
+        component: ComponentCreator('/smbios', '944'),
+        exact: true
       },
       {
         path: '/tpm',

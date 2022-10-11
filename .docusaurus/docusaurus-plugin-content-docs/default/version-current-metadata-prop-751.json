@@ -125,6 +125,11 @@
       "description": "Introduction",
       "sidebar": "elemental"
     },
+    "elementaloperatorchart-reference": {
+      "id": "elementaloperatorchart-reference",
+      "title": "Elemental Operator Helm Chart",
+      "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations."
+    },
     "index": {
       "id": "index",
       "title": "",
@@ -143,10 +148,15 @@
       "description": "Valid Versions",
       "sidebar": "elemental"
     },
+    "machineinventoryselectortemplate-reference": {
+      "id": "machineinventoryselectortemplate-reference",
+      "title": "MachineInventorySelectorTemplate reference",
+      "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource."
+    },
     "machineregistration-reference": {
       "id": "machineregistration-reference",
       "title": "",
-      "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
+      "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
       "sidebar": "elemental"
     },
     "operator/index": {
@@ -166,6 +176,11 @@
       "title": "",
       "description": "",
       "sidebar": "elemental"
+    },
+    "smbios": {
+      "id": "smbios",
+      "title": "smbios",
+      "description": "Introduction"
     },
     "tpm": {
       "id": "tpm",

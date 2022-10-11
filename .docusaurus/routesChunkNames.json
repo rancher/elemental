@@ -179,7 +179,7 @@
     "sidebar": "sidebar---blog-814-8ac",
     "content": "content---blog-welcomed-9-f-ffb"
   },
-  "/-ef2": {
+  "/-c41": {
     "__comp": "__comp---theme-doc-page-1-be-9be",
     "__context": {
       "plugin": "plugin---810-900"
@@ -206,6 +206,10 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---elemental-plans-54-d-77f"
   },
+  "/elementaloperatorchart-reference-c53": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---elementaloperatorchart-referenceaa-6-c07"
+  },
   "/installation-649": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---installation-3-b-8-fd1"
@@ -213,6 +217,10 @@
   "/kubernetesversions-91c": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---kubernetesversions-8-d-8-3aa"
+  },
+  "/machineinventoryselectortemplate-reference-b0b": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---machineinventoryselectortemplate-referenceeff-6c8"
   },
   "/machineregistration-reference-a3f": {
     "__comp": "__comp---theme-doc-item-178-a40",
@@ -229,6 +237,10 @@
   "/quickstart-ac3": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---quickstart-807-41f"
+  },
+  "/smbios-944": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---smbios-0-c-9-082"
   },
   "/tpm-61f": {
     "__comp": "__comp---theme-doc-item-178-a40",

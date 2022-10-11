@@ -2,7 +2,7 @@
   "unversionedId": "machineregistration-reference",
   "id": "machineregistration-reference",
   "title": "",
-  "description": "There are several keys that can be configured under a MachineRegistration resource spec.",
+  "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
   "source": "@site/docs/machineregistration-reference.md",
   "sourceDirName": ".",
   "slug": "/machineregistration-reference",
