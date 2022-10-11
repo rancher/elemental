@@ -27,8 +27,8 @@
 - Increasing 'quantity' node of predefined cluster
 - Restarting the VM to add it in the cluster
 - Checking VM connection
-- Chekcing cluster state
-- Chekcing cluster version
+- Checking cluster state
+- Checking cluster version
 - Rebooting the VM and checking that cluster is still healthy after
 
 ## upgrade_test.go (E2E - Upgrading node)
