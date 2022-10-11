@@ -31,17 +31,21 @@ const (
 	netDefaultFileName = "../assets/net-default.xml"
 	clusterYaml        = "../assets/cluster.yaml"
 	selectorYaml       = "../assets/selector.yaml"
+	registrationYaml   = "../assets/machineregistration.yaml"
+	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
 )
 
 var (
-	k8sVersion  string
-	clusterName string
-	clusterNS   string
-	osImage     string
-	vmName      string
-	upgradeType string
-	arch        string
-	vmIndex     int
+	k8sVersion   string
+	clusterName  string
+	clusterNS    string
+	osImage      string
+	vmName       string
+	upgradeType  string
+	arch         string
+	emulateTPM   string
+	imageVersion string
+	vmIndex      int
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -61,6 +65,8 @@ var _ = BeforeSuite(func() {
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 	arch = os.Getenv("ARCH")
+	emulateTPM = os.Getenv("EMULATE_TPM")
+	imageVersion = os.Getenv("IMAGE_VERSION")
 	index, set := os.LookupEnv("VM_INDEX")
 
 	// Only if VM_INDEX is set

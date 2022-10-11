@@ -35,4 +35,12 @@ export class Elemental {
     expect($lis.eq(7)).to.contain('OS Image Upgrades');
     })      
   }
+
+  // Go into the cluster creation menu
+  accessClusterMenu() {
+    cy.contains('.title', 'Dashboard').should('exist');
+    cy.contains('Dashboard').click();
+    cy.contains('Create Elemental Cluster').should('exist');
+    cy.contains('Create Elemental Cluster').click();
+  }
 }

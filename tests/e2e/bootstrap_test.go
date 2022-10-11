@@ -27,12 +27,19 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
+func getClusterVersion(client *tools.Client) string {
+	out, err := client.RunSSH("kubectl version")
+	Expect(err).To(Not(HaveOccurred()))
+
+	return out
+}
+
 func checkClusterAgent(client *tools.Client) {
 	// cluster-agent is the pod that communicates to Rancher, wait for it before continuing
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, misc.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("Running"))
+	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 func checkClusterState() {
@@ -54,7 +61,7 @@ func checkClusterState() {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[*].reason}")
 		return reason
-	}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
@@ -84,6 +91,34 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			numberOfFile, err := misc.ConfigureiPXE()
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(numberOfFile).To(BeNumerically(">=", 1))
+		})
+
+		By("Configuring emulated TPM if needed", func() {
+			// Set correct value for TPM emulation
+			value := "false"
+			if emulateTPM == "true" {
+				value = "true"
+			}
+
+			// Patch the yaml file
+			err := tools.Sed("emulate-tpm:.*", "emulate-tpm: "+value, emulatedTPMYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			out, err := kubectl.Run("patch", "MachineRegistration",
+				"--namespace", clusterNS, "machine-registration",
+				"--type", "merge", "--patch-file", emulatedTPMYaml,
+			)
+			Expect(err).To(Not(HaveOccurred()), out)
+
+			// Download the new YAML installation config file
+			tokenURL, err := kubectl.Run("get", "MachineRegistration",
+				"--namespace", clusterNS,
+				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
+			Expect(err).To(Not(HaveOccurred()))
+
+			fileName := "../../install-config.yaml"
+			err = tools.GetFileFromURL(tokenURL, fileName, false)
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Creating and installing VM", func() {
@@ -140,7 +175,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Eventually(func() string {
 					out, _ := client.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
 					return out
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal("OK"))
+				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal("OK"))
 
 				// Configure kubectl
 				_, err := client.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
@@ -151,13 +186,19 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
 				return out
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
 		})
 
 		By("Checking cluster state", func() {
 			// Check agent and cluster state
 			checkClusterAgent(client)
 			checkClusterState()
+		})
+
+		By("Checking cluster version", func() {
+			// Show cluster version, could be useful for debugging purposes
+			version := getClusterVersion(client)
+			GinkgoWriter.Printf("K8s version:\n%s\n", version)
 		})
 
 		By("Rebooting the VM and checking that cluster is still healthy after", func() {

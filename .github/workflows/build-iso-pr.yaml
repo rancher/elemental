@@ -1,16 +1,13 @@
-name: Build iso from elemental-iso-build as external user
-# Test building the iso from an external point of view
-# This tests doesn't clone the repo, just interacts with the script as an external user would do
-# Gets the script only and runs it to see if the building is done properly
+name: Test build iso from simple script - PR edition
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
-  deploy:
+  elemental-iso-build:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.SHA }}
     steps:
       - name: Install Docker
         uses: docker-practice/actions-setup-docker@v1
@@ -18,13 +15,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y mkisofs
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Build iso from script
         run: |
           # Just a simple run to test the build script, no need to upload the generated iso!
           echo "TEST" > config.yaml
-          curl -fsSL https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-build -o elemental-iso-build
-          chmod +x ./elemental-iso-build
-          ./elemental-iso-build config.yaml
+          chmod +x .github/elemental-iso-build
+          .github/elemental-iso-build config.yaml
       - name: Check config was inserted
         run: |
           ISO=$(find . -name "elemental-*.iso" -print)

@@ -1,0 +1,264 @@
+# This workflow is a reusable one called by other workflows
+name: Elemental End-To-End tests with Rancher Manager (template)
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    secrets:
+      credentials:
+        description: Credentials to use to connect
+        required: true
+    inputs:
+      cluster_name:
+        description: Name of the provisioned cluster
+        required: true
+        type: string
+      dashboard_version:
+        description: Version of the dashboard UI to use
+        required: true
+        type: string
+      k8s_version_to_provision:
+        description: Name and version of installed K8s distribution
+        required: true
+        type: string
+      runner:
+        description: Runner on which to execute tests
+        required: true
+        type: string
+      start_condition:
+        description: Start condition of the runner
+        required: true
+        type: string
+      test_type:
+        description: Type of test to run (cli or ui)
+        required: true
+        type: string
+      zone:
+        description: GCP zone to host the runner
+        required: true
+        type: string
+      workflow_download:
+        description: build-ci workflow to use for artifacts
+        required: true
+        type: string
+
+jobs:
+  start-runner:
+    if: ${{ inputs.start_condition == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.credentials }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Start runner
+        run: gcloud compute instances start --zone ${{ inputs.zone }} ${{ inputs.runner }}
+  e2e:
+    needs: start-runner
+    runs-on: ${{ inputs.runner }}
+    env:
+      TIMEOUT_SCALE: 2
+      ARCH: amd64
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NS: fleet-default
+      # For K3s installation used to host Rancher Manager
+      INSTALL_K3S_VERSION: v1.23.10+k3s1
+      INSTALL_K3S_SKIP_ENABLE: true
+      K3S_KUBECONFIG_MODE: 0644
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      DASHBOARD_VERSION: ${{ inputs.dashboard_version }}
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+    steps:
+      - name: Be sure to remove all previous data from worker ♻
+        run: rm -rf ./*
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '~1.18'
+      - name: Download iPXE
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: ${{ inputs.workflow_download }}
+          workflow_conclusion: success
+          name: ipxe-artifacts
+          # Force the path, this is a security hint!
+          path: ./
+      - name: E2E - Clean local Helm repositories
+        if: ${{ inputs.test_type == 'cli' }}
+        run: |
+          # Clean Helm repo
+          HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
+          [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
+      - name: E2E - Install Rancher
+        id: installation
+        run: |
+          export MY_HOSTNAME=$(hostname -f)
+          echo '::set-output name=MY_HOSTNAME::'${MY_HOSTNAME}
+          cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
+      - name: Cypress tests - Basics
+        # Basics means tests without an extra elemental node needed
+        if: ${{ inputs.test_type == 'ui' }}
+        env:
+          BROWSER: chrome
+          CYPRESS_DOCKER: 'cypress/included:9.7.0'
+          RANCHER_PASSWORD: rancherpassword
+          RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
+          RANCHER_USER: admin
+          SPEC: |
+            cypress/integration/unit_tests/first_connection.spec.ts
+            cypress/integration/unit_tests/menu.spec.ts
+            cypress/integration/unit_tests/machine_registration.spec.ts
+        run: make -f tests/Makefile start-cypress-tests
+      - name: E2E - Deploy a node to join Rancher manager
+        if: ${{ inputs.test_type == 'ui' }}
+        env:
+          VM_INDEX: 1
+        run: cd tests && make e2e-ui-rancher
+      - name: Cypress tests - Advanced
+        # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
+        if: ${{ inputs.test_type == 'ui' }}
+        env:
+          BROWSER: firefox
+          CYPRESS_DOCKER: 'cypress/included:9.7.0'
+          RANCHER_PASSWORD: rancherpassword
+          RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
+          RANCHER_USER: admin
+          SPEC: |
+            cypress/integration/unit_tests/machine_selector.spec.ts
+            cypress/integration/unit_tests/machine_inventory.spec.ts
+            cypress/integration/unit_tests/upgrade.spec.ts
+        run: make -f tests/Makefile start-cypress-tests
+      - name: Upload Cypress screenshots
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Upload Cypress videos
+        # Test run video is always captured, so this action uses "always()" condition
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: cypress/videos
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: E2E - Configure Rancher & Libvirt
+        if: ${{ inputs.test_type == 'cli' }}
+        run: cd tests && make e2e-configure-rancher
+      - name: E2E - Bootstrap node 1 with current build (use Emulated TPM)
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          EMULATE_TPM: true
+          VM_INDEX: 1
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 1 (with osImage method) to latest build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
+          UPGRADE_TYPE: osImage
+          VM_INDEX: 1
+        run: cd tests && make e2e-upgrade-node
+      - name: E2E - Bootstrap node 2 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 2
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Bootstrap node 3 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 3
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Upgrade node 2 (with manual method) to latest build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
+          UPGRADE_TYPE: manual
+          VM_INDEX: 2
+        run: cd tests && make e2e-upgrade-node
+      - name: E2E - Upgrade node 3 (with managedOSVersionName method) to specified Teal version
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          IMAGE_VERSION: teal-5.3
+          UPGRADE_TYPE: managedOSVersionName
+          VM_INDEX: 3
+        run: cd tests && make e2e-upgrade-node
+      - name: E2E - Bootstrap node 4 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 4
+        run: cd tests && make e2e-bootstrap-node
+      - name: E2E - Bootstrap node 5 with current build
+        if: ${{ inputs.test_type == 'cli' }}
+        env:
+          VM_INDEX: 5
+        run: cd tests && make e2e-bootstrap-node
+      - name: Remove VMs and K3s/RancherManager from worker ♻
+        if: always()
+        run: |
+          # Remove all VMs
+          for I in {1..10}; do
+            for C in destroy undefine; do
+              [[ "${C}" == "undefine" ]] && OPT="--nvram" || unset OPT
+              sudo virsh ${C} ${OPT} node-${I} >/dev/null 2>&1 || true
+            done
+          done
+          # Remove K3s and Rancher Manager
+          /usr/local/bin/k3s-uninstall.sh || true
+      - name: Remove remaining stuff from worker ♻
+        if: always()
+        uses: colpal/actions-clean@v1
+      - name: Send failed status to slack (if needed)
+        if: failure()
+        uses: slackapi/slack-github-action@v1.18.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "Workflow build-ci ${{ github.job }}"
+                    },
+                    "accessory": {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":github:",
+                         "emoji": true
+                        },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  stop-runner:
+    if: always()
+    needs: e2e
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.credentials }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Stop runner
+        run: gcloud compute instances stop --zone ${{ inputs.zone }} ${{ inputs.runner }}

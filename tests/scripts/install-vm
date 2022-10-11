@@ -5,15 +5,33 @@ set -e -x
 # Variable(s)
 VM_NAME=$1
 MAC=$2
+ARCH=$(uname -m)
+IPXE_BIN=/usr/share/ipxe/ipxe-${ARCH}.efi
+FW=/usr/share/qemu/ovmf-x86_64-4m
+
+# Don't configure TPM if software emulation (EMULATE_TPM=true) is used
+if [[ ${EMULATE_TPM} != "true" ]]; then
+  EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
+fi
+
+# Exit if iPXE binary is not available
+[[ ! -f ${IPXE_BIN} ]] \
+  && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
+  && exit 1
+
+# Create symlink for iPXE binary
+pushd ../..
+rm -f ipxe.efi  # Force remove, to avoid issue with 'ln'
+ln -s ${IPXE_BIN} ipxe.efi
+popd
 
 # Create VM
 script -e -c "sudo virt-install \
   --name ${VM_NAME} \
-  --os-type Linux \
   --os-variant opensuse-unknown \
   --virt-type kvm \
   --machine q35 \
-  --boot bios.useserial=on \
+  --boot loader=${FW}-code.bin,loader.readonly=on,loader.secure=off,loader.type=pflash \
   --ram=4096 \
   --vcpus=4 \
   --cpu host \
@@ -23,7 +41,7 @@ script -e -c "sudo virt-install \
   --serial pty \
   --console pty,target_type=virtio \
   --rng random \
-  --tpm emulator,model=tpm-crb,version=2.0 \
+  ${EMULATED_TPM} \
   --noreboot \
   --pxe \
   --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"

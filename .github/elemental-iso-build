@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -e
+export DOCKER_BUILDKIT=1
+
+TAG=${TAG:-main}
+
+build() {
+  TEMPDIR=$(mktemp -d)
+  mkdir "$TEMPDIR"/iso
+  # passing a config file? Copy it to the target that will get copied inside the build
+  if [[ -n "$CLOUD_CONFIG_FILE" ]]; then
+    echo "Using custom registration from $CLOUD_CONFIG_FILE"
+    cp "$CLOUD_CONFIG_FILE" "${TEMPDIR}/iso/config"
+  fi
+  curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/Dockerfile.iso -fsSL -o "$TEMPDIR"/Dockerfile
+  curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/iso/manifest.yaml -fsSL -o "${TEMPDIR}/iso/manifest.yaml"
+  # Did we copy the custom cloud config? Then no need to download the default one
+  if [[ -z "$CLOUD_CONFIG_FILE" ]]; then
+    echo "No custom registration set, using default"
+    curl https://raw.githubusercontent.com/rancher/elemental/"${TAG}"/iso/config -fsSL -o "$TEMPDIR"/iso/config
+  fi
+
+  pushd "$TEMPDIR" || exit 1
+  docker build -f "$TEMPDIR"/Dockerfile -t elemental/iso:latest .
+  popd || exit 1
+
+  rm -Rf "$TEMPDIR"
+  ISONAME="elemental-${TAG}-$(date "+%FT%TZ")"
+  docker run --rm -v "$PWD":/mnt elemental/iso:latest --config-dir . build-iso -o /mnt -n "$ISONAME" --overlay-iso overlay dir:rootfs
+  echo "Iso generated at $ISONAME.iso"
+}
+
+CLOUD_CONFIG_FILE=${1:-}
+
+build
+
+

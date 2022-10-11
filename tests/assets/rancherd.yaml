@@ -1,6 +1,0 @@
-#cloud-config
-rancherd:
-  role: server
-  rancherValues:
-    features:
-    - multi-cluster-management=true
