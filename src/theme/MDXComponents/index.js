@@ -10,7 +10,9 @@ import MDXImg from '@theme/MDXComponents/Img';
 import Admonition from '@theme/Admonition';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import CodeBlock from '@theme/CodeBlock'
+import CodeBlock from '@theme/CodeBlock';
+import { Vars } from '@site/Vars';
+
 const MDXComponents = {
   head: MDXHead,
   code: MDXCode,
@@ -26,8 +28,9 @@ const MDXComponents = {
   h5: (props) => <MDXHeading as="h5" {...props} />,
   h6: (props) => <MDXHeading as="h6" {...props} />,
   admonition: Admonition,
-  Tabs: Tabs,
-  TabItem: TabItem,
-  CodeBlock: CodeBlock,
+  Tabs,
+  TabItem,
+  CodeBlock,
+  Vars
 };
 export default MDXComponents;
