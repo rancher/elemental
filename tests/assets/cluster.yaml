@@ -16,4 +16,6 @@ spec:
       quantity: 1
       unhealthyNodeTimeout: 0s
       workerRole: true
+    etcd:
+      disableSnapshots: true
   kubernetesVersion: %K8S_VERSION%
