@@ -2,8 +2,25 @@
 
 set -e
 
+usage() {
+me=$(basename "$0")
+cat << EOF
+
+usage: 
+   $me REGISTRATION_CONFIG_FILE [ISO_URL]
+
+REGISTRATION_CONFIG_FILE is the yaml file required by elemental-register in
+order to self register against the elemental-operator.
+
+ISO_URL is the URL of an elemental ISO, defaults to community Elemental Teal
+ISO releases if not set. I can also be a local path.
+
+EOF
+}
+
 abort() {
-    >&2 echo "$@"
+    >&2 echo "Error: $@"
+    usage
     exit 1
 }
 
