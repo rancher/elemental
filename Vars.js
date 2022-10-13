@@ -1,37 +1,20 @@
 import React from 'react';
 
-export default function Vars({children, props}) {
+export default function Vars({children, name}) {
+  const data = {
+    elemental_slack_name: "#elemental",
+    elemental_slack_url: <a href="https://rancher-users.slack.com/channels/elemental">{children}</a>,
+    elemental_toolkit_name: "Elemental Toolkit",
+    elemental_toolkit_url: <a href="https://rancher.github.io/elemental-toolkit">{children}</a>,
+    elemental_operator_name: "Elemental Operator",
+    elemental_operator_url: <a href="https://github.com/rancher/elemental-operator">{children}</a>,
+    elemental_cli_name: "Elemental CLI",
+    elemental_cli_url: <a href="https://github.com/rancher/elemental-cli">{children}</a>,
+    ranchersystemagent_name: "Rancher System Agent",
+    ranchersystemagent_url: <a href="https://github.com/rancher/system-agent">{children}</a>,
+  }
+
   return (
-    <span>{children}</span>
+    <span>{data[name]}</span>
   )
 }
-// export default function vars() {
-//   return (
-//     {
-//       slackName: '#elemental'
-//     }
-//   )
-// /*   slackName: function slackName() {
-//     return (
-//       '#elemental'
-//     )
-//   },
-
-//   slackUrl: function slackUrl() {
-//     return (
-//       'https://rancher-users.slack.com/channels/elemental'
-//     )
-//   } */
-// }
-
-
-/* export const elemental_slack_name = "#elemental"
-export const elemental_slack_url = "https://rancher-users.slack.com/channels/elemental";
-export const elemental_toolkit_name = "Elemental Toolkit";
-export const elemental_toolkit_url = "https://rancher.github.io/elemental-toolkit";
-export const elemental_operator_name = "Elemental Operator";
-export const elemental_operator_url = "https://github.com/rancher/elemental-operator";
-export const elemental_cli_name = "Elemental CLI";
-export const elemental_cli_url = "https://github.com/rancher/elemental-cli";
-export const ranchersystemagent_name = "Rancher System Agent";
-export const ranchersystemagent_url = "https://github.com/rancher/system-agent"; */

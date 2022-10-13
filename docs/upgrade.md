@@ -9,7 +9,6 @@ import ManagedOSVersion from "!!raw-loader!../examples/upgrade/upgrade-managedos
 import MangedOSVersionChannelJson from "!!raw-loader!../examples/upgrade/managed-os-version-channel-json.yaml"
 import ManagedOSVersionChannelCustom from "!!raw-loader!../examples/upgrade/managed-os-version-channel-custom.yaml"
 import Versions from "../examples/upgrade/versions.raw!=!raw-loader!../examples/upgrade/versions.json"
-import Vars from '@site/Vars';
 
 # Upgrade
 
@@ -18,7 +17,7 @@ to use Kubernetes approaches to upgrade the components.
 
 ## Elemental Teal node upgrade
 
-test: <Vars thing1="slack" thing2="name">Thing here</Vars>
+test: <Vars name="elemental_slack_url"><Vars name="elemental_slack_name" /></Vars>
 
 Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
 [{{elemental.operator.name}}] documentation for complete information.

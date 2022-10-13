@@ -105,7 +105,7 @@
     "architecture": {
       "id": "architecture",
       "title": "",
-      "description": "Elemental is a stack, a set of tools, to build an immutable Linux distribution.",
+      "description": "The Elemental stack can be divided in two main parts: the Elemental OS, which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
       "sidebar": "elemental"
     },
     "cloud-config-reference": {
