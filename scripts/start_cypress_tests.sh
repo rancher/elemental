@@ -13,5 +13,4 @@ docker run -v $PWD:/e2e -w /e2e                            \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION  \
     --add-host host.docker.internal:host-gateway           \
     $CYPRESS_DOCKER                                        \
-    -b $BROWSER                                            \
     -s /e2e/$SPEC

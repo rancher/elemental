@@ -19,7 +19,7 @@
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.2.1",
     "cy-verify-downloads": "^0.1.8",
-    "cypress": "^9.0.0",
+    "cypress": "^10.0.0",
     "cypress-dark": "^1.8.3",
     "cypress-file-upload": "^5.0.8",
     "docusaurus2-dotenv": "^1.4.0",
