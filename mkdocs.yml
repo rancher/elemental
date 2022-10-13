@@ -39,9 +39,13 @@ extra:
     operator:
       name: Elemental Operator
       url: https://github.com/rancher/elemental-operator
+    register:
+      name: Elemental Register client
     cli:
       name: Elemental CLI
       url: https://github.com/rancher/elemental-cli
+    iso:
+      name: Elemental ISO
   ranchersystemagent:
     name: Rancher System Agent
     url: https://github.com/rancher/system-agent
