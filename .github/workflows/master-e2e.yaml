@@ -62,7 +62,7 @@ jobs:
     needs: start-runner
     runs-on: ${{ inputs.runner }}
     env:
-      TIMEOUT_SCALE: 3
+      TIMEOUT_SCALE: 2
       ARCH: amd64
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
