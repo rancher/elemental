@@ -86,3 +86,5 @@ nav:
     - elementaloperatorchart-reference.md
     - kubernetesversions.md
     - smbios.md
+  - Backup:
+    - backup.md
