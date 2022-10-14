@@ -128,6 +128,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			err = k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
 			Expect(err).To(Not(HaveOccurred()))
+
+			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher-webhook")
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Installing Elemental Operator", func() {
