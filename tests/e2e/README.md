@@ -24,7 +24,9 @@
 - Configuring emulated TPM if needed
 - Creating and installing VM
 - Checking that the VM is available in Rancher
+- Ensuring that the cluster is in healthy state (not on 1st node)
 - Increasing 'quantity' node of predefined cluster
+- Waiting for known cluster state before adding the node
 - Restarting the VM to add it in the cluster
 - Checking VM connection
 - Checking cluster state
