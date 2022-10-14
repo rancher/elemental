@@ -17,8 +17,6 @@ to use Kubernetes approaches to upgrade the components.
 
 ## Elemental Teal node upgrade
 
-test: <Vars name="elemental_slack_url"><Vars name="elemental_slack_name" /></Vars>
-
 Elemental Teal is upgraded with the {{elemental.operator.name}}. Refer to the
 [{{elemental.operator.name}}] documentation for complete information.
 
