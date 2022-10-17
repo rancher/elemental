@@ -1,14 +1,8 @@
 # This workflow calls the master E2E workflow with custom variables
-name: Elemental E2E tests with Rancher Manager
+name: OBS Staging - Elemental E2E tests with Rancher Manager
 
 on:
-  workflow_run:
-    workflows:
-      - build-ci
-    branches:
-      - main
-    types:
-      - completed
+  workflow_dispatch:
 
 concurrency:
   group: e2e-tests-${{ github.head_ref || github.ref }}-${{ github.repository }}
@@ -20,16 +14,16 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
       dashboard_version: latest
       k8s_version_to_provision: v1.24.6+k3s1
-      rancher_channel: stable
-      rancher_version: latest
+      rancher_channel: latest
+      rancher_version: 2.6.9-rc4
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      start_condition: ${{ github.event.workflow_run.conclusion }}
+      start_condition: success
       test_type: cli
       zone: us-central1-a
-      workflow_download: ${{ github.event.workflow_run.workflow_id }}
   rke2:
     if: always()
     needs: k3s
@@ -37,13 +31,13 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-rke2
       dashboard_version: latest
       k8s_version_to_provision: v1.24.6+rke2r1
-      rancher_channel: stable
-      rancher_version: latest
+      rancher_channel: latest
+      rancher_version: 2.6.9-rc4
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      start_condition: ${{ github.event.workflow_run.conclusion }}
+      start_condition: success
       test_type: cli
       zone: us-central1-a
-      workflow_download: ${{ github.event.workflow_run.workflow_id }}

@@ -1,5 +1,5 @@
 # This workflow is a reusable one called by other workflows
-name: Elemental End-To-End tests with Rancher Manager (template)
+name: (template) Elemental E2E tests with Rancher Manager
 
 on:
   workflow_call:
@@ -16,6 +16,10 @@ on:
       dashboard_version:
         description: Version of the dashboard UI to use
         required: true
+        type: string
+      iso_to_test:
+        description: ISO to test (default built one is empty)
+        required: false
         type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
@@ -47,7 +51,7 @@ on:
         type: string
       workflow_download:
         description: build-ci workflow to use for artifacts
-        required: true
+        required: false
         type: string
 
 jobs:
@@ -94,7 +98,8 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
-      - name: Download iPXE
+      - name: Download iPXE (if needed)
+        if: ${{ inputs.iso_to_test == '' }}
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ${{ inputs.workflow_download }}
@@ -102,13 +107,24 @@ jobs:
           name: ipxe-artifacts
           # Force the path, this is a security hint!
           path: ./
-      - name: E2E - Clean local Helm repositories
+      - name: Extract iPXE data from ISO (if needed)
+        if: ${{ inputs.iso_to_test != '' }}
+        env:
+          ISO_TO_TEST: ${{ inputs.iso_to_test }}
+          TAG: from-obs
+        run: |
+          mkdir -p build
+          curl ${ISO_TO_TEST} -fsSL -o build/elemental-${TAG}.iso
+          make extract_kernel_init_squash
+          make ipxe
+          mv build/* .
+      - name: Clean local Helm repositories
         if: ${{ inputs.test_type == 'cli' }}
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
-      - name: E2E - Install Rancher
+      - name: Install Rancher
         id: installation
         run: |
           export MY_HOSTNAME=$(hostname -f)
@@ -128,7 +144,7 @@ jobs:
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
         run: make -f tests/Makefile start-cypress-tests
-      - name: E2E - Deploy a node to join Rancher manager
+      - name: Deploy a node to join Rancher manager
         if: ${{ inputs.test_type == 'ui' }}
         env:
           VM_INDEX: 1
@@ -164,52 +180,52 @@ jobs:
           path: cypress/videos
           retention-days: 7
           if-no-files-found: ignore
-      - name: E2E - Configure Rancher & Libvirt
+      - name: Configure Rancher & Libvirt
         if: ${{ inputs.test_type == 'cli' }}
         run: cd tests && make e2e-configure-rancher
-      - name: E2E - Bootstrap node 1 with current build (use Emulated TPM)
+      - name: Bootstrap node 1 with current build (use Emulated TPM)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           EMULATE_TPM: true
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
-      - name: E2E - Upgrade node 1 (with osImage method) to latest build
+      - name: Upgrade node 1 (with osImage method) to latest build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
-      - name: E2E - Bootstrap node 2 with current build
+      - name: Bootstrap node 2 with current build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 2
         run: cd tests && make e2e-bootstrap-node
-      - name: E2E - Bootstrap node 3 with current build
+      - name: Bootstrap node 3 with current build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 3
         run: cd tests && make e2e-bootstrap-node
-      - name: E2E - Upgrade node 2 (with manual method) to latest build
+      - name: Upgrade node 2 (with manual method) to latest build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: manual
           VM_INDEX: 2
         run: cd tests && make e2e-upgrade-node
-      - name: E2E - Upgrade node 3 (with managedOSVersionName method) to specified Teal version
+      - name: Upgrade node 3 (with managedOSVersionName method) to specified Teal version
         if: ${{ inputs.test_type == 'cli' }}
         env:
           IMAGE_VERSION: teal-5.3
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: E2E - Bootstrap node 4 with current build
+      - name: Bootstrap node 4 with current build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 4
         run: cd tests && make e2e-bootstrap-node
-      - name: E2E - Bootstrap node 5 with current build
+      - name: Bootstrap node 5 with current build
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 5
