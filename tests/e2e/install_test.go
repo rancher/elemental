@@ -109,7 +109,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			hostname := os.Getenv("HOSTNAME")
 			uiVersion := os.Getenv("DASHBOARD_VERSION")
-			err = kubectl.RunHelmBinaryWithCustomErr("upgrade ", "--install", "rancher", "rancher/rancher",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "rancher", "rancher/rancher",
 				"--namespace", "cattle-system",
 				"--create-namespace",
 				"--set", "hostname="+hostname,

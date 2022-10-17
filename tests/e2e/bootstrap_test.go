@@ -188,6 +188,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
 		})
 
+		By("Showing OS version", func() {
+			out, err := client.RunSSH("cat /etc/os-release")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("OS Version:\n%s\n", out)
+		})
+
 		By("Configuring kubectl command on the VM", func() {
 			if strings.Contains(k8sVersion, "rke2") {
 				dir := "/var/lib/rancher/rke2/bin"

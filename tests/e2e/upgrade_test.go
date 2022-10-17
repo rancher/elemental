@@ -50,6 +50,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})
 
+		By("Showing OS version before upgrade", func() {
+			out, err := client.RunSSH("cat /etc/os-release")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("OS Version:\n%s\n", out)
+		})
+
 		if upgradeType != "manual" {
 			By("Triggering Upgrade in Rancher with "+upgradeType, func() {
 				upgradeOsYaml := "../assets/upgrade_clusterTargets.yaml"
@@ -142,6 +148,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 				return out
 			}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(osImage))
+		})
+
+		By("Showing OS version after upgrade", func() {
+			out, err := client.RunSSH("cat /etc/os-release")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("OS Version:\n%s\n", out)
 		})
 
 		if upgradeType != "manual" {
