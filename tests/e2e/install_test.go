@@ -81,7 +81,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "cert-manager", "jetstack/cert-manager",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "cert-manager", "jetstack/cert-manager",
 				"--namespace", "cert-manager",
 				"--create-namespace",
 				"--set", "installCRDs=true",
@@ -99,7 +99,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		})
 
 		By("Installing Rancher", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher-stable", "https://releases.rancher.com/server-charts/stable")
+			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher",
+				"https://releases.rancher.com/server-charts/"+rancherChannel,
+			)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
@@ -107,7 +109,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			hostname := os.Getenv("HOSTNAME")
 			uiVersion := os.Getenv("DASHBOARD_VERSION")
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "rancher", "rancher-stable/rancher",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade ", "--install", "rancher", "rancher/rancher",
 				"--namespace", "cattle-system",
 				"--create-namespace",
 				"--set", "hostname="+hostname,
@@ -115,11 +117,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				"--set", "extraEnv[0].value=https://"+hostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
-				"--set", "replicas=1",
 				"--set", "extraEnv[2].name=CATTLE_UI_DASHBOARD_INDEX",
 				"--set", "extraEnv[2].value=https://releases.rancher.com/dashboard/"+uiVersion+"/index.html",
 				"--set", "extraEnv[3].name=CATTLE_UI_OFFLINE_PREFERRED",
 				"--set", "extraEnv[3].value=Remote",
+				"--set", "replicas=1",
+				"--version", rancherVersion,
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
@@ -143,7 +146,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "elemental-operator", "elemental-operator/elemental-operator",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", "elemental-operator/elemental-operator",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)

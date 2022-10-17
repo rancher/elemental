@@ -21,6 +21,14 @@ on:
         description: Name and version of installed K8s distribution
         required: true
         type: string
+      rancher_channel:
+        description: Rancher Manager channel to use for installation (alpha/latest/stable)
+        required: true
+        type: string
+      rancher_version:
+        description: Rancher Manager version to use for installation (fixed version or latest)
+        required: true
+        type: string
       runner:
         description: Runner on which to execute tests
         required: true
@@ -71,6 +79,9 @@ jobs:
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      # For Rancher Manager
+      RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
+      RANCHER_VERSION: ${{ inputs.rancher_version }}
       DASHBOARD_VERSION: ${{ inputs.dashboard_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
