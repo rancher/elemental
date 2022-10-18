@@ -162,6 +162,25 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
+
+			// Check if an upgrade to a specific version is configured
+			if upgradeOperator != "" {
+				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", upgradeOperator,
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+
+				k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			// Check elemental-operator version
+			operatorVersion, err := kubectl.Run("get", "pod",
+				"--namespace", "cattle-elemental-system",
+				"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("Operator Version:\n%s\n", operatorVersion)
 		})
 	})
 })
