@@ -1,6 +1,7 @@
 # Custom Images
 
-Elemental Teal images can be customized in different ways, one option is to provide
+Elemental Teal images can be customized in different ways.
+One option is to provide
 additiontal resources within the installation media so that during installation, or
 eventually at boot time, additional binaries such as drivers can be included.
 
@@ -16,16 +17,18 @@ is added.
 
 ### Additional configuration files
 
-Elemental Teal installation can be customized in three different non-exclisive ways. First, including
-some custom elemental client configuration file, second, by including additional cloud-init files to execute at
+Elemental Teal installation can be customized in three different, non-exclusive ways. First, including
+some custom Elemental client configuration file, second, by including additional cloud-init files to execute at
 boot time, and finally, by including installation hooks.
 
 #### Custom elemental client configuration file
 
 [Elemental client](https://github.com/rancher/elemental-cli) `install`, `upgrade` and `reset` commands can be configured with a
-custom [configuration file](https://rancher.github.io/elemental-toolkit/docs/customizing/general_configuration/). In order to set a custom configuration file in the installation
+custom [configuration file](https://rancher.github.io/elemental-toolkit/docs/customizing/general_configuration/).
+
+In order to set a custom configuration file in the installation
 media the MachineRegistration resource associated with this ISO should also include
-the elemental client configuration directory, for that purpose, the `install` field
+the elemental client configuration directory. For that purpose, the `install` field
 supports the `config-dir` field. See [MachineRegistration reference](../machineregistration-reference#configelementalinstall) and the example
 below:
 
@@ -46,23 +49,23 @@ spec:
         config-dir: "/run/initramfs/live/elemental.conf.d"
 ```
 
-Elemental Teal live ISOs, when booted, the ISO root is mounted at `/run/initramfs/live`.
-So in that case, the ISO should contain the custom elemental client configuration file
+Elemental Teal live ISOs, when booted, have the ISO root mounted at `/run/initramfs/live`.
+So in that case, the ISO will contain the custom elemental client configuration file
 as `/elemental.conf.d/config.yaml`.
 
 #### Adding additional cloud-init files at boot
 
 In order to include additional cloud-init files during the installation they need
 to be added to the installation data into the MachineRegistration resource. More specific
-the `config-urls` field it used for this exact purpose. See [MachineRegistration reference](../machineregistration-reference) page.
+the `config-urls` field is used for this exact purpose. See [MachineRegistration reference](../machineregistration-reference) page.
 
 `config-urls` is a list of string literals where each item is an http url pointing to a
 cloud-init file or a local path of a cloud init file. Note the local path is evaluated at the
 time of execution by the installation media, hence the local path must exist within
 the installation media, commonly an ISO image.
 
-Elemental Teal live ISOs, when booted, the ISO root is mounted at `/run/initramfs/live`,
-so the local paths for `config-url` in MachineRegistrations are likely to point there.
+Since in Elemental Teal live systems the ISO root is mounted at `/run/initramfs/live`,
+the local paths for `config-url` in MachineRegistrations are likely to point there.
 See the example below:
 
 ```yaml
@@ -165,7 +168,7 @@ For that a `xorriso` equal or higher than version 1.5 is required.
 
 ## Remastering a custom docker image
 
-Since Elemental Teal image is a docker image it can also be used as a base image
+Since Elemental Teal image is a Docker image it can also be used as a base image
 in a Dockerfile in order to create a new container image.
 
 Imagine some additional package from an extra repository is required, the following example
@@ -200,7 +203,7 @@ docker build --build-arg IMAGE_REPO=myrepo/custom-build \
 docker push myrepo/custom-build:v1.1.1
 ```
 
-The new customized OS is available as the docker image `myrepo/custom-build:v1.1.1` and it can
+The new customized OS is available as the Docker image `myrepo/custom-build:v1.1.1` and it can
 be run and verified using docker with
 
 ```bash
