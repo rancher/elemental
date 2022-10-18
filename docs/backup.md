@@ -77,7 +77,7 @@ kubectl get ResourceSet rancher-resource-set -o yaml > rancher-resource-set.yaml
       namespaceRegexp: ^cattle-fleet-|^fleet-|^cluster-fleet-
     ```
 
-=== Using yq to auto merge yaml files
+=== "Using yq to auto merge yaml files"
 
     You can use yq to auto merge `rancher-resource-set.yaml` and `elemental-resource-set.yaml`. Please go and install [yq v4.x](https://github.com/mikefarah/yq/#install) version
 
