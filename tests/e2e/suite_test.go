@@ -36,18 +36,19 @@ const (
 )
 
 var (
-	k8sVersion     string
+	arch           string
 	clusterName    string
 	clusterNS      string
-	osImage        string
-	vmName         string
-	upgradeType    string
-	arch           string
 	emulateTPM     string
 	imageVersion   string
+	isoBoot        string
+	k8sVersion     string
+	osImage        string
 	rancherChannel string
 	rancherVersion string
+	upgradeType    string
 	vmIndex        int
+	vmName         string
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -61,17 +62,18 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
+	arch = os.Getenv("ARCH")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
-	osImage = os.Getenv("CONTAINER_IMAGE")
-	upgradeType = os.Getenv("UPGRADE_TYPE")
-	arch = os.Getenv("ARCH")
 	emulateTPM = os.Getenv("EMULATE_TPM")
 	imageVersion = os.Getenv("IMAGE_VERSION")
+	index, set := os.LookupEnv("VM_INDEX")
+	isoBoot = os.Getenv("ISO_BOOT")
+	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
+	osImage = os.Getenv("CONTAINER_IMAGE")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
-	index, set := os.LookupEnv("VM_INDEX")
+	upgradeType = os.Getenv("UPGRADE_TYPE")
 
 	// Only if VM_INDEX is set
 	if set {

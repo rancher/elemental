@@ -98,26 +98,38 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
-      - name: Download iPXE (if needed)
+      - name: Download default ISO (if needed)
+        # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: ${{ inputs.workflow_download }}
           workflow_conclusion: success
-          name: ipxe-artifacts
+          name: iso-image
           # Force the path, this is a security hint!
           path: ./
-      - name: Extract iPXE data from ISO (if needed)
+      - name: Download specified ISO (if needed)
         if: ${{ inputs.iso_to_test != '' }}
         env:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
         run: |
+          curl ${ISO_TO_TEST} -fsSL -o elemental-${TAG}.iso
+      - name: Extract iPXE artifacts from ISO
+        run: |
+          # Extract TAG
+          ISO=$(ls elemental-*.iso 2>/dev/null)
+          TAG=${ISO#*-}
+          export TAG=${TAG%.iso}
+          # Move ISO to build for next step
           mkdir -p build
-          curl ${ISO_TO_TEST} -fsSL -o build/elemental-${TAG}.iso
+          mv -f ${ISO} build/
+          # Extract iPXE artifacts
           make extract_kernel_init_squash
           make ipxe
-          mv build/* .
+          mv -f build/* .
+          # Looks a little bit weird but we have to keep the ISO in build!
+          mv -f elemental-*.iso build/
       - name: Clean local Helm repositories
         if: ${{ inputs.test_type == 'cli' }}
         run: |
@@ -183,7 +195,7 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: ${{ inputs.test_type == 'cli' }}
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1 with current build (use Emulated TPM)
+      - name: Bootstrap node 1 with current build (use Emulated TPM and iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           EMULATE_TPM: true
@@ -196,14 +208,16 @@ jobs:
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap node 2 with current build
+      - name: Bootstrap node 2 with current build (use ISO)
         if: ${{ inputs.test_type == 'cli' }}
         env:
+          ISO_BOOT: true
           VM_INDEX: 2
         run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 3 with current build
+      - name: Bootstrap node 3 with current build (use ISO)
         if: ${{ inputs.test_type == 'cli' }}
         env:
+          ISO_BOOT: true
           VM_INDEX: 3
         run: cd tests && make e2e-bootstrap-node
       - name: Upgrade node 2 (with manual method) to latest build
@@ -220,12 +234,12 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap node 4 with current build
+      - name: Bootstrap node 4 with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 4
         run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 5 with current build
+      - name: Bootstrap node 5 with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           VM_INDEX: 5
