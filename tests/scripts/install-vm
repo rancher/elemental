@@ -14,16 +14,34 @@ if [[ ${EMULATE_TPM} != "true" ]]; then
   EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
 fi
 
-# Exit if iPXE binary is not available
-[[ ! -f ${IPXE_BIN} ]] \
-  && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
-  && exit 1
+# iPXE stuff will not be used if ISO is set
+if [[ ${ISO_BOOT} == "true" ]]; then
+  pushd ../..
+  ISO=$(ls ${PWD}/elemental-*.iso 2>/dev/null)
+  popd
 
-# Create symlink for iPXE binary
-pushd ../..
-rm -f ipxe.efi  # Force remove, to avoid issue with 'ln'
-ln -s ${IPXE_BIN} ipxe.efi
-popd
+  # Exit if ISO is not available
+  [[ ! -f ${ISO} ]] \
+    && echo "File ${ISO} not found! Exiting!" >&2 \
+    && exit 1
+
+  # Force ISO boot
+  INSTALL_FLAG="--cdrom ${ISO}"
+else
+  # Exit if iPXE binary is not available
+  [[ ! -f ${IPXE_BIN} ]] \
+    && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
+    && exit 1
+
+  # Create symlink for iPXE binary
+  pushd ../..
+  rm -f ipxe.efi  # Force remove, to avoid issue with 'ln'
+  ln -s ${IPXE_BIN} ipxe.efi
+  popd
+
+  # Force PXE boot
+  INSTALL_FLAG="--pxe"
+fi
 
 # Create VM
 script -e -c "sudo virt-install \
@@ -43,5 +61,5 @@ script -e -c "sudo virt-install \
   --rng random \
   ${EMULATED_TPM} \
   --noreboot \
-  --pxe \
+  ${INSTALL_FLAG} \
   --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"
