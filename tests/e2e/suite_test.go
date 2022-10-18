@@ -36,19 +36,20 @@ const (
 )
 
 var (
-	arch           string
-	clusterName    string
-	clusterNS      string
-	emulateTPM     string
-	imageVersion   string
-	isoBoot        string
-	k8sVersion     string
-	osImage        string
-	rancherChannel string
-	rancherVersion string
-	upgradeType    string
-	vmIndex        int
-	vmName         string
+	arch            string
+	clusterName     string
+	clusterNS       string
+	emulateTPM      string
+	imageVersion    string
+	isoBoot         string
+	k8sVersion      string
+	osImage         string
+	rancherChannel  string
+	rancherVersion  string
+	upgradeType     string
+	upgradeOperator string
+	vmIndex         int
+	vmName          string
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -74,6 +75,7 @@ var _ = BeforeSuite(func() {
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
+	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
 
 	// Only if VM_INDEX is set
 	if set {

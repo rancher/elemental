@@ -45,6 +45,10 @@ on:
         description: Type of test to run (cli or ui)
         required: true
         type: string
+      upgrade_operator:
+        description: URL to elemental-operator version to upgrade to
+        required: false
+        type: string
       zone:
         description: GCP zone to host the runner
         required: true
@@ -87,6 +91,7 @@ jobs:
       RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
       DASHBOARD_VERSION: ${{ inputs.dashboard_version }}
+      UPGRADE_OPERATOR: ${{ inputs.upgrade_operator }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
     steps:

@@ -23,6 +23,7 @@ jobs:
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
+      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/elemental/elemental-operator
       zone: us-central1-a
   rke2:
     if: always()
@@ -40,4 +41,5 @@ jobs:
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
+      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/elemental/elemental-operator
       zone: us-central1-a
