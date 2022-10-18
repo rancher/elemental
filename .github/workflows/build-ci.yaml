@@ -33,10 +33,6 @@ jobs:
       - name: Build iso
         run: |
           make iso
-      - name: Build ipxe artifacts
-        run: |
-          make extract_kernel_init_squash
-          make ipxe
       - name: Upload docker image
         uses: actions/upload-artifact@v3
         with:
@@ -47,15 +43,6 @@ jobs:
         with:
           name: iso-image
           path: build/*.iso
-      - name: Upload iPXE
-        uses: actions/upload-artifact@v3
-        with:
-          name: ipxe-artifacts
-          path: |
-            build/*-kernel
-            build/*-initrd
-            build/*.squashfs
-            build/*.ipxe
       - name: Send failed status to slack (only on schedule)
         if: failure() && github.event_name == 'schedule'
         uses: slackapi/slack-github-action@v1.18.0
