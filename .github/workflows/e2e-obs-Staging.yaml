@@ -19,7 +19,7 @@ jobs:
       dashboard_version: latest
       k8s_version_to_provision: v1.24.6+k3s1
       rancher_channel: latest
-      rancher_version: 2.6.9-rc4
+      rancher_version: 2.6.9-rc6
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
@@ -36,7 +36,7 @@ jobs:
       dashboard_version: latest
       k8s_version_to_provision: v1.24.6+rke2r1
       rancher_channel: latest
-      rancher_version: 2.6.9-rc4
+      rancher_version: 2.6.9-rc6
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
