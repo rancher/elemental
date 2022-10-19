@@ -86,7 +86,7 @@ spec:
         - "/run/initramfs/live/oem/10_install_extra_drivers.yaml"
 ```
 
-In that case the ISO root is exected to include the `/oem/10_install_extra_drivers.yaml` file.
+In that case the ISO root is expected to include the `/oem/10_install_extra_drivers.yaml` file.
 
 #### Installation hooks
 
