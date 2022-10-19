@@ -142,6 +142,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher-webhook")
 			Expect(err).To(Not(HaveOccurred()))
+
+			// Check Rancher version
+			operatorVersion, err := kubectl.Run("get", "pod",
+				"--namespace", "cattle-system",
+				"-l", "app=rancher", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
 
 		By("Installing Elemental Operator", func() {
