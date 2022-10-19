@@ -83,7 +83,7 @@ jobs:
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
       # For K3s installation used to host Rancher Manager
-      INSTALL_K3S_VERSION: v1.24.6+k3s1
+      INSTALL_K3S_VERSION: v1.24.4+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
