@@ -168,7 +168,7 @@ so we can use that url to obtain the proper yaml needed for the iso.
           -----END CERTIFICATE-----
     ```
 
-    As you can see we obtained the proper initial registration needed by `elemental-register` to register the node properly and continue wiht the automated installation
+    As you can see we obtained the proper initial registration needed by `elemental-register` to register the node properly and continue with the automated installation
 
     Now we can write down the data returned for that url into a file that we will inject into the iso
 

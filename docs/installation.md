@@ -23,7 +23,7 @@ uninstall, upgrade and configuration details.
 
 ## Prepare Kubernetes Resources
 
-Once the {{elemental.operator.name}} is up and running within the management cluster a couple of kuberentes
+Once the {{elemental.operator.name}} is up and running within the management cluster a couple of kubernetes
 resources are required in order to prepare an Elemental based cluster deployment.
 
 * [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md): 
