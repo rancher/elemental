@@ -119,7 +119,7 @@ jobs:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
         run: |
-          curl ${ISO_TO_TEST} -fsSL -o elemental-${TAG}.iso
+          curl -fsSL --http1.1 ${ISO_TO_TEST} -o elemental-${TAG}.iso
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
