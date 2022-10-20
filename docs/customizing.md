@@ -2,7 +2,7 @@
 
 Elemental Teal images can be customized in different ways.
 One option is to provide
-additiontal resources within the installation media so that during installation, or
+additional resources within the installation media so that during installation, or
 eventually at boot time, additional binaries such as drivers can be included.
 
 Another option would be to remaster the Elemental Teal by simply using a docker build.
