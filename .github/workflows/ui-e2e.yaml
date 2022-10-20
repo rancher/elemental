@@ -7,7 +7,7 @@ on:
     - cron: '0 4 * * *'
 
 concurrency:
-  group: e2e-tests-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  group: ui-e2e-tests-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
