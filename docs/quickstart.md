@@ -14,8 +14,8 @@ SLE Micro for Rancher is a containerized and "stripped to the bones" operating s
 
 Its sole purpose is to run Kubernetes (k3s or RKE2), with everything controlled through Rancher Manager.
 
-Elemental Teal is built in the [openSUSE Build Service](https://build.opensuse.org/package/show/isv:Rancher:Elemental:Teal52/node-image)
-and available through the [openSUSE Registry](http://registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest)
+Elemental Teal is built in the [openSUSE Build Service](https://build.opensuse.org/package/show/isv:Rancher:Elemental:Staging:Teal53/node-image)
+and available through the [openSUSE Registry](http://registry.opensuse.org/isv/rancher/elemental/staging/teal53/15.4/rancher/elemental-node-image/5.3:latest)
 
 #### What is the Rancher Elemental Stack ?
 
@@ -46,7 +46,7 @@ cluster and taking care of creating inventories, registrations for machines and 
 We will use the Helm package manager to install the elemental-operator chart into our cluster
 
 ```shell
-helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/elemental/elemental-operator
 ```
 
 There is a few options that can be set in the chart install but that is out of scope for this document. You can see all the values on the chart [values.yaml](https://github.com/rancher/elemental-operator/blob/main/chart/values.yaml)
