@@ -1,11 +1,11 @@
 # This workflow calls the master E2E workflow with custom variables
-name: OBS Dev - Elemental E2E tests with Rancher Manager
+name: OBS Stable - Elemental E2E tests with Rancher Manager
 
 on:
   workflow_dispatch:
 
 concurrency:
-  group: e2e-tests-obs-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  group: e2e-tests-obs-stable-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
       dashboard_version: latest
       k8s_version_to_provision: v1.24.4+k3s1
@@ -23,7 +23,7 @@ jobs:
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
-      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/elemental/elemental-operator
+      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
       zone: us-central1-a
   rke2:
     if: always()
@@ -32,7 +32,7 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-rke2
       dashboard_version: latest
       k8s_version_to_provision: v1.24.4+rke2r1
@@ -41,5 +41,5 @@ jobs:
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: success
       test_type: cli
-      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/elemental/elemental-operator
+      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
       zone: us-central1-a
