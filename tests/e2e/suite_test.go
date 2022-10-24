@@ -43,6 +43,7 @@ var (
 	imageVersion    string
 	isoBoot         string
 	k8sVersion      string
+	caType          string
 	osImage         string
 	rancherChannel  string
 	rancherVersion  string
@@ -71,6 +72,7 @@ var _ = BeforeSuite(func() {
 	index, set := os.LookupEnv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
+	caType = os.Getenv("CA_TYPE")
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherVersion = os.Getenv("RANCHER_VERSION")

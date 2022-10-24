@@ -21,6 +21,10 @@ on:
         description: Name and version of installed K8s distribution
         required: true
         type: string
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        required: true
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         required: true
@@ -138,6 +142,8 @@ jobs:
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: Install Rancher
         id: installation
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
         run: |
           export MY_HOSTNAME=$(hostname -f)
           echo "MY_HOSTNAME=$MY_HOSTNAME" >> $GITHUB_OUTPUT

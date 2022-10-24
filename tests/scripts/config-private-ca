@@ -1,0 +1,89 @@
+#!/bin/bash
+
+set -e -x
+
+# Variable(s)
+EMAIL=elemental@suse.de
+CA_NAME=elementalCA
+DOMAIN=$(hostname -d)
+FQDN=$(hostname -f)
+VALUE=Elemental
+
+# Generate CA private key
+openssl genrsa -des3 -passout pass:${VALUE} -out ${CA_NAME}.key 2048
+
+# Create CA config file
+cat > ${CA_NAME}.config <<EOF
+[req]
+distinguished_name = dn
+prompt = no
+
+[dn]
+CN = ${CA_NAME}
+C = DE
+L = Nuremberg
+O = ${VALUE}
+OU = ${VALUE} Team
+emailAddress = ${EMAIL}
+EOF
+
+# Generate the Root CA
+openssl req -x509 -new -nodes -sha256 -days 1 \
+  -passin pass:${VALUE} \
+  -key ${CA_NAME}.key \
+  -config ${CA_NAME}.config \
+  -out ${CA_NAME}.pem
+
+# Generate private key for FQDN certificate
+openssl genrsa -out ${FQDN}.key 2048
+
+# Create FQDN certificate config file
+cat > ${FQDN}.config <<EOF
+[req]
+req_extensions = v3_req
+distinguished_name = dn
+prompt = no
+
+[dn]
+CN = *.${DOMAIN}
+C = DE
+L = Nuremberg
+O = ${VALUE}
+OU = ${VALUE} Team
+emailAddress = ${EMAIL}
+
+[v3_req]
+subjectAltName = DNS:${FQDN}
+EOF
+
+# Generate Certificate Signing Request (CSR)
+openssl req -new -key ${FQDN}.key -config ${FQDN}.config -out ${FQDN}.csr
+
+# Create Certificate Extension file
+cat > ${FQDN}.ext <<EOF
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = ${FQDN}
+EOF
+
+# Generate the final certificate
+openssl x509 -req -sha256 -days 1 -CAcreateserial \
+  -passin pass:${VALUE} \
+  -CAkey ${CA_NAME}.key \
+  -CA ${CA_NAME}.pem \
+  -extfile ${FQDN}.ext \
+  -in ${FQDN}.csr \
+  -out ${FQDN}.crt
+
+# Check certificate
+openssl verify -CAfile ${CA_NAME}.pem ${FQDN}.crt
+openssl x509 -noout -subject -issuer -in ${FQDN}.crt
+
+# Create links
+for I in crt key; do
+  ln -s ${FQDN}.${I} tls.${I}
+done
+ln -s ${CA_NAME}.pem cacerts.pem
