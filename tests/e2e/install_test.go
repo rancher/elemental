@@ -74,29 +74,38 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Installing CertManager", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "jetstack", "https://charts.jetstack.io")
-			Expect(err).To(Not(HaveOccurred()))
+		if caType == "private" {
+			By("Configuring Private CA", func() {
+				cmd := exec.Command("../scripts/config-private-ca")
+				out, err := cmd.CombinedOutput()
+				GinkgoWriter.Printf("%s\n", out)
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		} else {
+			By("Installing CertManager", func() {
+				err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "jetstack", "https://charts.jetstack.io")
+				Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
-			Expect(err).To(Not(HaveOccurred()))
+				err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
+				Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "cert-manager", "jetstack/cert-manager",
-				"--namespace", "cert-manager",
-				"--create-namespace",
-				"--set", "installCRDs=true",
-			)
-			Expect(err).To(Not(HaveOccurred()))
+				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "cert-manager", "jetstack/cert-manager",
+					"--namespace", "cert-manager",
+					"--create-namespace",
+					"--set", "installCRDs=true",
+				)
+				Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
-			Expect(err).To(Not(HaveOccurred()))
+				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
+				Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=webhook")
-			Expect(err).To(Not(HaveOccurred()))
+				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=webhook")
+				Expect(err).To(Not(HaveOccurred()))
 
-			err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=cainjector")
-			Expect(err).To(Not(HaveOccurred()))
-		})
+				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=cainjector")
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 
 		By("Installing Rancher", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher",
@@ -130,8 +139,34 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}
 			}
 
+			// For Private CA
+			if caType == "private" {
+				flags = append(flags,
+					"--set", "ingress.tls.source=secret",
+					"--set", "privateCA=true",
+				)
+			}
+
 			err = kubectl.RunHelmBinaryWithCustomErr(flags...)
 			Expect(err).To(Not(HaveOccurred()))
+
+			// Inject secret for Private CA
+			if caType == "private" {
+				_, err := kubectl.Run("create", "secret",
+					"--namespace", "cattle-system",
+					"tls", "tls-rancher-ingress",
+					"--cert=tls.crt",
+					"--key=tls.key",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+
+				_, err = kubectl.Run("create", "secret",
+					"--namespace", "cattle-system",
+					"generic", "tls-ca",
+					"--from-file=cacerts.pem=./cacerts.pem",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+			}
 
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher")
 			Expect(err).To(Not(HaveOccurred()))
@@ -142,10 +177,19 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher-webhook")
 			Expect(err).To(Not(HaveOccurred()))
 
+			// Check issuer for Private CA
+			if caType == "private" {
+				out, err := exec.Command("bash", "-c", "curl -vk https://$(hostname -f)").CombinedOutput()
+				GinkgoWriter.Printf("%s\n", out)
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
 			// Check Rancher version
 			operatorVersion, err := kubectl.Run("get", "pod",
 				"--namespace", "cattle-system",
-				"-l", "app=rancher", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+				"-l", "app=rancher",
+				"-o", "jsonpath={.items[*].status.containerStatuses[*].image}",
+			)
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
@@ -160,7 +204,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", "elemental-operator/elemental-operator",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
+				"elemental-operator/elemental-operator",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)
@@ -171,7 +216,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			// Check if an upgrade to a specific version is configured
 			if upgradeOperator != "" {
-				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", upgradeOperator,
+				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
+					upgradeOperator,
 					"--namespace", "cattle-elemental-system",
 					"--create-namespace",
 				)

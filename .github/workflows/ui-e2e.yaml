@@ -18,6 +18,7 @@ jobs:
     with:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.4+k3s1
+      ca_type: selfsigned
       rancher_channel: latest
       rancher_version: devel
       runner: elemental-e2e-ci-runner-spot-x86-64-1
