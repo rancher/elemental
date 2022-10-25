@@ -57,7 +57,7 @@ iso_repack() {
   echo "ISO generated at $(pwd)/${ISO_FILE}"
 }
 
-: ${REPO:=Staging}
+: ${REPO:=Stable}
 : ${ARCH:=$(uname -m)}
 : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPO,,}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
 REG_CONFIG_FILE=${1:-}

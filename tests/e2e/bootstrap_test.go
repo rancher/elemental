@@ -64,6 +64,15 @@ func checkClusterState() {
 	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
+func waitForKnownState(condition, msg string) {
+	Eventually(func() string {
+		clusterMsg, _ := kubectl.Run("get", "cluster",
+			"--namespace", clusterNS, clusterName,
+			"-o", "jsonpath={"+condition+"}")
+		return clusterMsg
+	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
+}
+
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
 		client  *tools.Client
@@ -85,12 +94,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	It("Install node and add it in Rancher", func() {
 		By("Checking if VM name is set", func() {
 			Expect(vmName).To(Not(BeEmpty()))
-		})
-
-		By("Configuring iPXE boot script for network installation", func() {
-			numberOfFile, err := misc.ConfigureiPXE()
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(numberOfFile).To(BeNumerically(">=", 1))
 		})
 
 		By("Configuring emulated TPM if needed", func() {
@@ -121,8 +124,37 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
+		By("Configuring iPXE boot script for network installation (if needed)", func() {
+			if isoBoot != "true" {
+				numberOfFile, err := misc.ConfigureiPXE()
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(numberOfFile).To(BeNumerically(">=", 1))
+			}
+		})
+
+		By("Adding registration file to ISO (if needed)", func() {
+			if isoBoot == "true" {
+				// Check if generated ISO is already here
+				isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
+
+				// No need to recreate the ISO twice
+				if len(isIso) == 0 {
+					cmd := exec.Command(
+						"bash", "-c",
+						"../../.github/elemental-iso-add-registration ../../install-config.yaml ../../build/elemental-*.iso",
+					)
+					out, err := cmd.CombinedOutput()
+					GinkgoWriter.Printf("%s\n", out)
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Move generated ISO to the destination directory
+					err = exec.Command("bash", "-c", "mv -f elemental-*.iso ../..").Run()
+					Expect(err).To(Not(HaveOccurred()))
+				}
+			}
+		})
+
 		By("Creating and installing VM", func() {
-			// Install VM
 			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
@@ -135,6 +167,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(id).To(Not(BeEmpty()))
 		})
 
+		By("Ensuring that the cluster is in healthy state (not on 1st node)", func() {
+			if vmIndex > 1 {
+				checkClusterState()
+			}
+		})
+
 		By("Increasing 'quantity' node of predefined cluster", func() {
 			// Patch the already-created yaml file directly
 			err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
@@ -145,6 +183,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				"--type", "merge", "--patch-file", clusterYaml,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
+		})
+
+		By("Waiting for known cluster state before adding the node", func() {
+			if vmIndex > 1 {
+				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", "WaitingForBootstrapReason")
+			} else {
+				waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message", "waiting for viable init node")
+			}
 		})
 
 		By("Restarting the VM to add it in the cluster", func() {
@@ -163,6 +209,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				out = strings.Trim(out, "\n")
 				return out
 			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
+		})
+
+		By("Showing OS version", func() {
+			out, err := client.RunSSH("cat /etc/os-release")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("OS Version:\n%s\n", out)
 		})
 
 		By("Configuring kubectl command on the VM", func() {

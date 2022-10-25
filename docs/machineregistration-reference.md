@@ -43,13 +43,13 @@ Contains the configuration used for the connection and the initial registration 
 
 Supports the following values:
 
-| Key               | Type              | Description                                                                                                                       |
-|-------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| url               | string            | URL to connect to the {{elemental.operator.name}}                                                                                 |
-| ca-cert           | string            | CA to validate the certificate provided by the server at 'url' (required if the certificate is not signed by a public CA)         |
-| emulate-tpm       | bool              | this will use software emulation of the TPM (required for hosts without TPM hardware)                                             |
-| emulated-tpm-seed | int64             | fixed seed to use with 'emulate-tpm': use for debug purposes only                                                                 |
-| no-smbios         | bool              | wheter SMBIOS data should be sent to the {{elemental.operator.name}} (see the [SMBIOS reference](smbios.md) for more information) |
+| Key               | Type   | Default value | Description                                                                                                                        |
+|-------------------|--------|---------------|------------------------------------------------------------------------------------------------------------------------------------|
+| url               | string | empty         | URL to connect to the {{elemental.operator.name}}                                                                                  |
+| ca-cert           | string | empty         | CA to validate the certificate provided by the server at 'url' (required if the certificate is not signed by a public CA)          |
+| emulate-tpm       | bool   | false         | this will use software emulation of the TPM (required for hosts without TPM hardware)                                              |
+| emulated-tpm-seed | int64  | 1             | fixed seed to use with 'emulate-tpm': use for debug purposes only                                                                  |
+| no-smbios         | bool   | false         | whether SMBIOS data should be sent to the {{elemental.operator.name}} (see the [SMBIOS reference](smbios.md) for more information) |
 
 #### config.elemental.install
 
@@ -57,19 +57,19 @@ Contains the installation configuration that would be applied via `operator-regi
 
 Supports the following values:
 
-| Key         | Type   | Description                                                                                                                                |
-|-------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| firmware    | string | Firmware to install ('efi' or 'bios') (default "efi")                                                                                      |
-| device      | string | Device to install the system to                                                                                                            |
-| no-format   | bool   | Don’t format disks. It is implied that COS_STATE, COS_RECOVERY, COS_PERSISTENT, COS_OEM partitions are already existing on the target disk |
-| config-urls | list   | Cloud-init config files locations                                                                                                          |
-| iso         | string | Performs an installation from the ISO url instead of the running ISO                                                                       |
-| system-uri  | string | Sets the system image source and its type (e.g. 'docker:registry.org/image:tag') instead of using the running ISO                          |
-| debug       | bool   | Enable debug output                                                                                                                        |
-| tty         | string | Add named tty to grub                                                                                                                      |
-| poweroff    | bool   | Shutdown the system after install                                                                                                          |
-| reboot      | bool   | Reboot the system after install                                                                                                            |
-| eject-cd    | bool   | Try to eject the cd on reboot                                                                                                              |
+| Key         | Type   | Default value | Description                                                                                                                                |
+|-------------|--------|---------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| firmware    | string | efi           | Firmware to install ('efi' or 'bios')                                                                                                      |
+| device      | string | empty         | Device to install the system to                                                                                                            |
+| no-format   | bool   | false         | Don’t format disks. It is implied that COS_STATE, COS_RECOVERY, COS_PERSISTENT, COS_OEM partitions are already existing on the target disk |
+| config-urls | list   | empty         | Cloud-init config files locations                                                                                                          |
+| iso         | string | empty         | Performs an installation from the ISO url instead of the running ISO                                                                       |
+| system-uri  | string | empty         | Sets the system image source and its type (e.g. 'docker:registry.org/image:tag') instead of using the running ISO                          |
+| debug       | bool   | false         | Enable debug output                                                                                                                        |
+| tty         | string | empty         | Add named tty to grub                                                                                                                      |
+| poweroff    | bool   | false         | Shutdown the system after install                                                                                                          |
+| reboot      | bool   | false         | Reboot the system after install                                                                                                            |
+| eject-cd    | bool   | false         | Try to eject the cd on reboot                                                                                                              |
 
 :::warning warning
 In case of using both `iso` and `system-uri` the `iso` value takes precedence

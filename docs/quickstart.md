@@ -23,8 +23,8 @@ SLE Micro for Rancher is a containerized and "stripped to the bones" operating s
 
 Its sole purpose is to run Kubernetes (k3s or RKE2), with everything controlled through Rancher Manager.
 
-Elemental Teal is built in the [openSUSE Build Service](https://build.opensuse.org/package/show/isv:Rancher:Elemental:Teal52/node-image)
-and available through the [openSUSE Registry](http://registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest)
+Elemental Teal is built in the [openSUSE Build Service](https://build.opensuse.org/package/show/isv:Rancher:Elemental:Stable:Teal53/node-image)
+and available through the [openSUSE Registry](http://registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-node-image/5.3:latest)
 
 ### What is the Rancher Elemental Stack ?
 
@@ -54,7 +54,7 @@ cluster and taking care of creating inventories, registrations for machines and 
 We will use the Helm package manager to install the elemental-operator chart into our cluster
 
 ```shell
-helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 There is a few options that can be set in the chart install but that is out of scope for this document. You can see all the values on the chart [values.yaml](https://github.com/rancher/elemental-operator/blob/main/chart/values.yaml)
@@ -154,6 +154,8 @@ First we need to obtain the `RegistrationURL` that was generated for our `Machin
 $ kubectl get machineregistration -n fleet-default my-test-registration -o jsonpath="{.status.registrationURL}"
 https://172.18.0.2.sslip.io/elemental/registration/gsh4n8nj9gvbsjk4x7hxvnr5l6hmhbdbdffrmkwzrss2dtfbnpbmqp
 ```
+
+As you can see we obtained the proper initial registration needed by `elemental-register` to register the node properly and continue with the automated installation
 
 Then we need to visit that URL as that will provide the URL and CA certificate for unauthenticated requests:
 

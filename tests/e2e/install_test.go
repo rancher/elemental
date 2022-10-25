@@ -81,7 +81,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "cert-manager", "jetstack/cert-manager",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "cert-manager", "jetstack/cert-manager",
 				"--namespace", "cert-manager",
 				"--create-namespace",
 				"--set", "installCRDs=true",
@@ -99,28 +99,39 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		})
 
 		By("Installing Rancher", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher-stable", "https://releases.rancher.com/server-charts/stable")
+			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher",
+				"https://releases.rancher.com/server-charts/"+rancherChannel,
+			)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
+			// Set flags for Rancher Manager installation
 			hostname := os.Getenv("HOSTNAME")
 			uiVersion := os.Getenv("DASHBOARD_VERSION")
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "rancher", "rancher-stable/rancher",
+			flags := []string{
+				"upgrade", "--install", "rancher", "rancher/rancher",
 				"--namespace", "cattle-system",
 				"--create-namespace",
-				"--set", "hostname="+hostname,
+				"--set", "hostname=" + hostname,
 				"--set", "extraEnv[0].name=CATTLE_SERVER_URL",
-				"--set", "extraEnv[0].value=https://"+hostname,
+				"--set", "extraEnv[0].value=https://" + hostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
-				"--set", "replicas=1",
 				"--set", "extraEnv[2].name=CATTLE_UI_DASHBOARD_INDEX",
-				"--set", "extraEnv[2].value=https://releases.rancher.com/dashboard/"+uiVersion+"/index.html",
+				"--set", "extraEnv[2].value=https://releases.rancher.com/dashboard/" + uiVersion + "/index.html",
 				"--set", "extraEnv[3].name=CATTLE_UI_OFFLINE_PREFERRED",
 				"--set", "extraEnv[3].value=Remote",
-			)
+				"--set", "replicas=1",
+			}
+
+			// Set specified version if needed
+			if rancherVersion != "" && rancherVersion != "latest" {
+				flags = append(flags, "--version", rancherVersion)
+			}
+
+			err = kubectl.RunHelmBinaryWithCustomErr(flags...)
 			Expect(err).To(Not(HaveOccurred()))
 
 			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher")
@@ -128,6 +139,16 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			err = k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
 			Expect(err).To(Not(HaveOccurred()))
+
+			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher-webhook")
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Check Rancher version
+			operatorVersion, err := kubectl.Run("get", "pod",
+				"--namespace", "cattle-system",
+				"-l", "app=rancher", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
 
 		By("Installing Elemental Operator", func() {
@@ -140,7 +161,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = kubectl.RunHelmBinaryWithCustomErr("install", "elemental-operator", "elemental-operator/elemental-operator",
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", "elemental-operator/elemental-operator",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)
@@ -148,6 +169,25 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
+
+			// Check if an upgrade to a specific version is configured
+			if upgradeOperator != "" {
+				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator", upgradeOperator,
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+
+				k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			// Check elemental-operator version
+			operatorVersion, err := kubectl.Run("get", "pod",
+				"--namespace", "cattle-elemental-system",
+				"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			Expect(err).To(Not(HaveOccurred()))
+			GinkgoWriter.Printf("Operator Version:\n%s\n", operatorVersion)
 		})
 	})
 })
