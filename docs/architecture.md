@@ -2,6 +2,7 @@
 
 The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.
 
+![Elemental Architecture](images/elemental-arch-v1.3_nobg.png)
 ----
 ## Elemental OS
 In order to deploy the Elemental OS we need:
