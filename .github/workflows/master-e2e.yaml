@@ -106,7 +106,7 @@ jobs:
       - name: Download default ISO (if needed)
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2.24.0
         with:
           workflow: ${{ inputs.workflow_download }}
           workflow_conclusion: success
@@ -145,7 +145,7 @@ jobs:
         id: installation
         run: |
           export MY_HOSTNAME=$(hostname -f)
-          echo '::set-output name=MY_HOSTNAME::'${MY_HOSTNAME}
+          echo "MY_HOSTNAME=$MY_HOSTNAME" >> $GITHUB_OUTPUT
           cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
@@ -266,7 +266,7 @@ jobs:
         uses: colpal/actions-clean@v1
       - name: Send failed status to slack (if needed)
         if: failure()
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {

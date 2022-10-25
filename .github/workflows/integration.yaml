@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: brew install cdrtools jq
       - name: Wait for build
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         id: wait-for-build
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           timeoutSeconds: 1800
       - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2.24.0
         with:
           #workflow: ${{ github.event.workflow_run.workflow_id }}
           #workflow_conclusion: success
@@ -78,7 +78,7 @@ jobs:
         run: |
           git describe --abbrev=0 --tags
           TAG=`git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0"`
-          echo "::set-output name=elemental_tag::$TAG"
+          echo "elemental_tag=$TAG" >> $GITHUB_OUTPUT
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -86,7 +86,7 @@ jobs:
       - name: Install dependencies
         run: brew install cdrtools jq
       - name: Wait for build
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         id: wait-for-build
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -94,7 +94,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           timeoutSeconds: 1800
       - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2.24.0
         with:
           #workflow: ${{ github.event.workflow_run.workflow_id }}
           #workflow_conclusion: success
