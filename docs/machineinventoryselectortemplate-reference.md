@@ -21,7 +21,7 @@ spec:
 
 #### template.spec.selector.matchLabels
 
-It is a map of {key,value} pairs (map[string]string). When multiple labels provided all must match.
+It is a map of {key,value} pairs (map[string]string). When multiple labels are provided all labels must match.
 
 ??? example
     ```yaml
@@ -35,7 +35,7 @@ It is a map of {key,value} pairs (map[string]string). When multiple labels provi
               manufacturer: somevalue
     ```
 
-In a Cluster defined with the above selector will only attempt to provision nodes inventoriarized including these two labels.
+A Cluster defined with the above selector will only attempt to provision nodes inventoried including these two labels.
 
 #### template.spec.selector.matchExpressions
 
@@ -62,4 +62,4 @@ It is a list of label selectors, each label selectors can be defined as:
                 operator: Exists
     ```
     
-In a Cluster defined with the above selector will only attempt to provision nodes inventoriarized the `location=europe` label and including a `manufacturer` label defined with any value.
+A Cluster defined with the above selector will only attempt to provision nodes inventoried with the `location=europe` label and including a `manufacturer` label defined with any value.

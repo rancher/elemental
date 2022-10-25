@@ -1,6 +1,6 @@
 # Elemental Operator Helm Chart
 
-The [{{elemental.operator.name}}]({{elemental.operator.url}}) is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations.
+The [{{elemental.operator.name}}]({{elemental.operator.url}}) is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.
 
 The associated chart bootstraps an elemental-operator deployment on the [Rancher Manager v2.6](https://rancher.com/docs/rancher/v2.6/) cluster using the [Helm](https://helm.sh) package manager.
 
