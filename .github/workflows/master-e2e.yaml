@@ -119,7 +119,7 @@ jobs:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
         run: |
-          curl -fsSL \
+          curl -vfsSL \
                --http1.1 \
                --connect-timeout 30 \
                --retry 100 \
