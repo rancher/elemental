@@ -83,9 +83,9 @@ nav:
     - cloud-config-reference.md
     - machineregistration-reference.md
     - machineinventoryselectortemplate-reference.md
+    - cluster-reference.md
     - elementaloperatorchart-reference.md
     - kubernetesversions.md
     - smbios.md
-    - cluster-reference.md
   - Backup:
     - backup.md
