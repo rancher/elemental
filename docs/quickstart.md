@@ -122,6 +122,9 @@ and your `#!yaml MachineInventory` has that same key with that value, it will ma
     kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/registration.yaml
     ```
 
+!!! info
+    To know more about the `#!yaml Cluster` resource check [here](cluster-reference.md)
+
 ## Preparing the iso
 
 Now this is the last step, we need to prepare an Elemental Teal iso that includes the initial registration config, so
