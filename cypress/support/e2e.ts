@@ -11,6 +11,7 @@ declare global {
       confirmDelete(): Chainable<Element>;
       clickNavMenu(listLabel: string[],): Chainable<Element>;
       clickElementalMenu(label: string,): Chainable<Element>;
+      clickClusterMenu(listLabel: string[],): Chainable<Element>;
       typeValue(label: string, value: string, noLabel?: boolean, log?: boolean): Chainable<Element>;
       typeKeyValue(key: string, value: string,): Chainable<Element>;
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
@@ -22,6 +23,7 @@ declare global {
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
+      addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
     }
 }}
 

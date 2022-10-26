@@ -16,7 +16,6 @@ jobs:
     with:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
-      dashboard_version: latest
       k8s_version_to_provision: v1.24.4+k3s1
       rancher_channel: stable
       rancher_version: latest
@@ -34,7 +33,6 @@ jobs:
     with:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-rke2
-      dashboard_version: latest
       k8s_version_to_provision: v1.24.4+rke2r1
       rancher_channel: stable
       rancher_version: latest

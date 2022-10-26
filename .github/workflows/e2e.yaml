@@ -21,7 +21,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-k3s
-      dashboard_version: latest
       k8s_version_to_provision: v1.24.4+k3s1
       rancher_channel: stable
       rancher_version: latest
@@ -38,7 +37,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-rke2
-      dashboard_version: latest
       k8s_version_to_provision: v1.24.4+rke2r1
       rancher_channel: stable
       rancher_version: latest
