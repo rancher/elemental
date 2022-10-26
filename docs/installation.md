@@ -14,8 +14,10 @@ provide the OS into the Cluster Nodes. See [Architecture](architecture.md) secti
 interaction of the components.
 
 The installation configuration is mostly applied and set as part of the registration process.
-The registration process is done by the {{elemental.operator.name}} client who is the responsible
-to register nodes in a Rancher management cluster and fetch the installation configuration.
+The registration process is done by the `elemental-register` (the {{elemental.operator.name}} client part)
+who is the responsible to register nodes in a Rancher management cluster and fetch the installation configuration.
+
+Plese refer to the [Quick Start](quickstart.md) guide for simple step by step deployment instructions.
 
 ## Elemental Operator Installation
 
@@ -33,7 +35,7 @@ resources are required in order to prepare an Elemental based cluster deployment
 
 * [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md): 
   This resource identifies the criteria to match registered boxes (listed as part of the MachineInventory)
-  against available Rancher 2.6 Clusters. As soon as there is a match the matching kubernetes cluster takes
+  against available Rancher 2.6 Clusters. As soon as there is a match the selected kubernetes cluster takes
   ownership of the registered box.
   
 * [MachineRegistration](machineregistration-reference.md):
@@ -51,23 +53,23 @@ the [Quick Start](quickstart.md) guide or created from the Rancher 2.6 UI.
 
 The installation media is the media that will be used to kick start an Elemental Teal deployment. Currently
 the supported media is a live ISO. The live ISO must include the registration configuration yaml hence it must
-crafted once the MachineRegistration is created. The installation media is created by using the `elemental-iso-build`
+crafted once the MachineRegistration is created. The installation media is created by using the `elemental-iso-add-registration`
 helper script (see [quick start](quickstart.md#preparing-the-iso) guide)
 or by using the `elemental build-iso` command line utility included as part of the
 [Elemental Toolkit]({{elemental.toolkit.url}}/docs/creating-derivatives/build_iso).
 
-Within MachineRegistration only a subset of OS installation parameters can be configured, all available parameters listed
+Within MachineRegistration only a subset of OS installation parameters can be configured, all available parameters are listed
 at [MachineRegistration](machineregistration-reference.md) reference page.
 
 In order to configure the installation beyond the common options provided within the
-[`elemental.install`](machineregistration-reference.md#configelementalinstall) section a `/etc/elemental/config.yaml`
-config file can be included into the squashed rootfs of the installation media. Note any configuration applied as
-part of `elemental.install` section of the MachineRegistration will be applied on top of the
-settings included in `/etc/elemental/config.yaml`.
+[`elemental.install`](machineregistration-reference.md#configelementalinstall) section a `config.yaml`
+configuration file can be included into the ISO (see [Custom Images](customizing.md#custom-elemental-client-configuration-file)).
+Note any configuration applied as part of `elemental.install` section of the MachineRegistration will be
+applied on top of the settings included in any custom `config.yaml` file.
 
 Most likely the cloud-init configuration is enough to configure and set the deployed node at boot, however
-if for some reason some sort of firstboot actions or scripts are required it is possible to also include
-Rancher System Agent plans into the installation media. Refer to the [Elemental Plans](elemental-plans.md) section for details for
+if for some reason firstboot actions or scripts are required it is possible to also include
+Rancher System Agent plans into the installation media. Refer to the [Elemental Plans](elemental-plans.md) section for details and
 some example plans. The plans could be included into the squashed rootfs at `/var/lib/elemental/agent/plans`
 folder and they would be seen by the system agent at firstboot.
 

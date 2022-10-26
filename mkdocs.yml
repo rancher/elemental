@@ -43,7 +43,7 @@ extra:
       name: Elemental Register client
     cli:
       name: Elemental CLI
-      url: https://github.com/rancher/elemental-cli
+      url: https://github.com/rancher/elemental-cli/blob/main/docs/elemental.md
     iso:
       name: Elemental ISO
   ranchersystemagent:
@@ -83,6 +83,7 @@ nav:
     - cloud-config-reference.md
     - machineregistration-reference.md
     - machineinventoryselectortemplate-reference.md
+    - cluster-reference.md
     - elementaloperatorchart-reference.md
     - kubernetesversions.md
     - smbios.md

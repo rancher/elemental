@@ -84,8 +84,8 @@ This syncer will fetch a json from url and parse it into valid `ManagedOSVersion
 
 A custom syncer allows more flexibility on how to gather `ManagedOSVersion` by allowing custom commands with custom images.
 
-This type of syncer allows to run a given command with arguments and env vars in a custom image and output a json file to `/data/output`
-`/data/output` is then automounted by the syncer and then parsed so it can gather create the proper versions.
+This type of syncer allows to run a given command with arguments and env vars in a custom image and output a json file to `/data/output`.
+The generated data is then automounted by the syncer and then parsed so it can gather create the proper versions.
 
 :::info
 The only requirement to make your own custom syncer is to make it output a json file to `/data/output` and keep the correct json structure.

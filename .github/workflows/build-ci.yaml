@@ -21,7 +21,7 @@ jobs:
         run: |
           git describe --abbrev=0 --tags
           TAG=`git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0"`
-          echo "::set-output name=elemental_tag::$TAG"
+          echo "elemental_tag=$TAG" >> $GITHUB_OUTPUT
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -45,7 +45,7 @@ jobs:
           path: build/*.iso
       - name: Send failed status to slack (only on schedule)
         if: failure() && github.event_name == 'schedule'
-        uses: slackapi/slack-github-action@v1.18.0
+        uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
             {

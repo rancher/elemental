@@ -38,13 +38,13 @@ The Elemental Stack consists of some packages on top of SLE Micro for Rancher
 
 ## Prerequisites
 
-- A Rancher server (2.6.6) configured (server-url set)
-  - To configure the Rancher server-url please check the [Rancher docs](https://rancher.com/docs/rancher/v2.6/en/admin-settings/#first-log-in)
-- A machine (bare metal or virtualized) with TPM 2.0
-  - Hint 1: Libvirt allows setting virtual TPMs for virtual machines [example here](https://rancher.github.io/elemental/tpm/#add-tpm-module-to-virtual-machine)
-  - Hint 2: You can enable TPM emulation on bare metal machines missing the TPM 2.0 module [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine)
-- Helm Package Manager (https://helm.sh/)
-- Docker (for building the iso)
+ - A Rancher server (2.6.9) configured (server-url set)
+     - To configure the Rancher server-url please check the [Rancher docs](https://rancher.com/docs/rancher/v2.6/en/admin-settings/#first-log-in)
+ - A machine (bare metal or virtualized) with TPM 2.0
+     - Hint 1: Libvirt allows setting virtual TPMs for virtual machines [example here](https://rancher.github.io/elemental/tpm/#add-tpm-module-to-virtual-machine)
+     - Hint 2: You can enable TPM emulation on bare metal machines missing the TPM 2.0 module [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine)
+ - Helm Package Manager (https://helm.sh/)
+ - Docker (for iso manipulation)
 
 ## Preparing the cluster
 
@@ -209,19 +209,23 @@ Now we can proceed to create the ISO
 <Tabs>
 <TabItem value="script" label="Via script">
 
-We provide a ISO build script for ease of use that can create the final ISO and inject the `initial-registration.yaml`:
-
-```shell
-wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-build && chmod +x elemental-iso-build
-```
-
-Now that we have the script we can proceed to build the ISO with our configuration injected:
-
-```shell
-./elemental-iso-build initial-registration.yaml
-```
-
-This will generate an ISO on the current directory with the name `elemental-<timestamp>.iso`
+    We provide a ISO build script for ease of use that can get the final ISO and inject the `initial-registration.yaml`:
+    
+    ```shell
+    wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-add-registration && chmod +x elemental-iso-add-registration
+    ```
+    
+    Now that we have the script we can proceed to download the ISO and inject our configuration injected:
+    
+    ```shell
+    ./elemental-iso-add-registration initial-registration.yaml
+    ```
+    
+    This will generate an ISO on the current directory with the name `elemental-teal-<ARCH>.iso`
+    
+    !!! info
+        The script uses the iso for the arch based on the system is being run from. If you want to cross build for another system,
+        you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be build for that architecture.
 
 ```shell
 wget -q https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build && chmod +x elemental-iso-build
@@ -256,6 +260,8 @@ for example for rke `v1.23.6` while for rke2 would be `v1.23.6+rke2r1` and for k
 To see all compatible versions check the [Rancher Support Matrix](https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/) PDF for rke/rke2/k3s versions and their components.
 
 You can also check our [Version doc](kubernetesversions.md) to know how to obtain those versions.
+
+Check our [Cluster Spec](cluster-reference.md) page for more info about the `#!yaml Cluster` resource.
 
 ## How can I follow what is going on behind the scenes?
 

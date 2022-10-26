@@ -5,8 +5,9 @@ title: ''
 
 # Architecture
 
-The Elemental stack can be divided in two main parts: the Elemental OS, which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.
+The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.
 
+----
 ## Elemental OS
 In order to deploy the Elemental OS we need:
 
@@ -24,10 +25,16 @@ In order to provision a machine with an Elemental OS image, installation configu
 ### {{elemental.cli.name}}
 {{elemental.cli.name}} is the tool that allows to turn the Elemental OS image in a bootable and installed OS: it can generate an {{elemental.iso.name}} image from the provided Elemental OS container image. The generated {{elemental.iso.name}} image can be used to boot a virtual machine or a bare metal host and start the Elemental OS installation.
 
-The {{elemental.cli.name}} allows also the Elemental OS installation on the storage device of the live booted host, applying the Elemental installation configuration passed in inout. For the list and syntax of the commands available in the {{elemental.cli.name}}, check the [online documentation]({{elemental.cli.url}}).
+The {{elemental.cli.name}} allows also to install the Elemental OS on the storage device of the live booted host, applying the provided Elemental installation configuration. For the list and syntax of the commands available in the {{elemental.cli.name}}, check the [online documentation]({{elemental.cli.url}}).
+
+### {{elemental.iso.name}}
+The {{elemental.iso.name}} is a live ISO based on the Elemental OS (an Elemental live ISO).
+It includes all the tools needed to perform a full node provisioning, from the OS to Kubernetes, including the [{{elemental.cli.name}}](#elemental-cli) and the [{{elemental.register.name}}](#elemental-register).
+
+----
 
 ## {{elemental.operator.name}}
-The {{elemental.operator.name}} is responsible for managing OS upgrades and managing a secure device inventory to assist
+The {{elemental.operator.name}} is responsible for managing OS upgrades and a secure device inventory to assist
 with zero touch provisioning.
 It provides an {{elemental.operator.name}} Helm Chart and an {{elemental.register.name}}.
 
@@ -35,7 +42,7 @@ It provides an {{elemental.operator.name}} Helm Chart and an {{elemental.registe
 The {{elemental.operator.name}} Helm Chart must be installed on a Rancher Cluster. It enables new hosts to:
 
 - register against the {{elemental.operator.name}}.
-- retrieve the Elemental installation configuration required for the Elemental OS installation from Kubernetes resources.
+- retrieve the Elemental installation configuration (which is stored in custom Kubernetes resources) to start the Elemental OS installation.
 - download and install the [{{ranchersystemagent.name}}]({{ranchersystemagent.url}}), which enables Rancher to provision and manage K3s and RKE2 on the Elemental nodes.
 
 The {{elemental.operator.name}} allows control of the Elemental Nodes by extending the Kubernetes APIs with a set of _elemental.cattle.io_ [Kubernetes CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/):
@@ -56,7 +63,7 @@ The registration URL is the way through which an host can access the {{elemental
 The MachineRegistration has a `Ready` condition which turns to true when the {{elemental.operator.name}} has successfully generated the registration URL and an associated ServiceAccount. From this point on the target host can connect to the registration URL to kick off the provisioning process.
 
 An HTTP GET request against the registration URL returns the _registration file_: a .yaml file containing the registration data (i.e., the _spec:config:elemental:registration_ section only from the just created MachineRegistration).
-The registration file contains all the required data to allow the target host to perform self registration and start the Elemental provisioning. See the [config:elemental:registration section in the MachineRegistration reference](machineregistration-reference#configelementalregistration)) for more details on the available registration options.
+The registration file contains all the required data to allow the target host to perform self registration and start the Elemental provisioning. See the [{{elemental.register}} section](#elemental-register-client) for more info on the registration process and the [config:elemental:registration section in the MachineRegistration reference](machineregistration-reference.md#configelementalregistration) for more details on the available registration options.
 
 
 #### MachineInventory
@@ -83,25 +90,16 @@ The MachineInventorySelectorTemplate is a user defined resource that will be use
 
 
 ### {{elemental.register.name}}
-New hosts start the Elemental provisioning process through the {{elemental.register.name}}: this tool requires a valid elemental-operator registration URL as input, and performs the following steps:
+New hosts start the Elemental provisioning process through the {{elemental.register.name}}: this tool requires a valid elemental-operator registration URL as input (see the [MachineRegistration section](#machineregistration)), and performs the following steps:
 
 - setups a websocket connection to the registration URL
-- authenticates itself using the registration token and the onboard TPM<sup>1</sup>
+- authenticates itself using the registration token and the onboard [TPM (Trusted Platform Module)](https://en.wikipedia.org/wiki/Trusted_Platform_Module)
 - sends [SMBIOS data](smbios.md) to the {{elemental.operator.name}}
 - retrieves the Elemental installation configuration
-- starts the {{elemental.cli.name}} and performs the Elemental OS installation
-- reboots in the newly installed Elemental OS
+- starts the [{{elemental.cli.name}}](#elemental-cli) and performs the Elemental OS installation
 
-<sup>1</sup> _if no TPM 2.0 is available on the host, TPM can be emulated by software: see the `emulate-tpm` key in the [config.elemental.register reference document](machineregistration-reference.md#configelementalregistration)_
-
-
-{{elemental.iso.name}}
-The {{elemental.iso.name}} is a temporary OS based on Elemental (an Elemental live ISO).
-Elemental is a set of tools to provide and manage the OS of Kubernetes nodes.
-The OS is:
-
-- immutable and customizable, built on the [{{elemental.toolkit.name}}](https://rancher.github.io/elemental-toolkit/)
-- centrally managed via [Rancher](https://rancher.com)
+**Note**
+if no TPM 2.0 is available on the host, TPM can be emulated by software: see the `emulate-tpm` key in the [config.elemental.register reference document](machineregistration-reference.md#configelementalregistration).
 
 
 {{elemental.operator.name}} includes a Kubernetes operator installed in the management cluster and a client
@@ -112,10 +110,8 @@ Rancher System Agent is responsible for bootstrapping RKE2/k3s and Rancher from 
 an update of containerd, k3s, RKE2, or Rancher does not require an OS upgrade
 or node reboot.
 
+----
+
 ## Elemental Teal
 
-Elemental Teal is the OS, based on SUSE Linux Enterprise (SLE) Micro for Rancher,
-built using the Elemental stack. The only assumption from the Elemental stack is that
-the underlying distribution is based on Systemd. We choose SLE Micro for Rancher for
-obvious reasons, but beyond that Elemental provides a stable layer to build upon
-that is well tested and has paths to commercial support, if one chooses.
+Elemental Teal is Elemental OS built on top of SUSE Linux Enterprise (SLE) Micro for Rancher using the Elemental stack.

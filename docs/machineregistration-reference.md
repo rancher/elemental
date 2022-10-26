@@ -5,7 +5,7 @@ title: ''
 
 # MachineRegistration reference
 
-The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.
+The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.
 
 There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
 
@@ -128,7 +128,7 @@ The UUID will be retrieved from the SMBIOS data if available, otherwise a random
 #### machineInventoryLabels
 
 Labels that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
-`Key: value` type. These labels will be used to stablish a selection criteria in [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md).
+`Key: value` type. These labels will be used to establish a selection criteria in [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md).
 
 :::info
 When `elemental:registration:no-smbios` is set to `false` (default), Labels are interpolated with [SMBIOS](https://www.dmtf.org/standards/smbios) data. This allows to store hardware information in custom labels.
