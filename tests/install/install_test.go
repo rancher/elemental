@@ -41,7 +41,7 @@ func checkOsAfterReboot(s *sut.SUT) {
 	Expect(out).To(ContainSubstring("my-own-name"))
 }
 
-var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
+var _ = Describe("Elemental Installation tests", func() {
 	var s *sut.SUT
 	BeforeEach(func() {
 		s = sut.NewSUT()
@@ -49,7 +49,7 @@ var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
 	})
 
 	// This is used to setup the machine that will run other tests
-	Context("First boot", func() {
+	Context("From ISO", Label("iso"), func() {
 		It("can install", func() {
 			err := s.SendFile("../assets/cloud_init.yaml", "/tmp/cloud_init.yaml", "0640")
 			Expect(err).ToNot(HaveOccurred())
@@ -62,24 +62,12 @@ var _ = Describe("Elemental installation from ISO", Label("setup"), func() {
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
 				ContainSubstring("Setting default grub entry to Elemental"),
-			))
-		})
-
-		It("has customization applied", func() {
-			checkOsAfterReboot(s)
+			), out)
 		})
 	})
-})
 
-var _ = Describe("Elemental installation from container", func() {
-	var s *sut.SUT
-	BeforeEach(func() {
-		s = sut.NewSUT()
-		s.EventuallyConnects()
-	})
-
-	Context("First boot", func() {
-		It("can install from a container image", func() {
+	Context("From container", Label("container"), func() {
+		It("can install", func() {
 			containerImage := os.Getenv("CONTAINER_IMAGE")
 			if containerImage == "" {
 				Skip("No CONTAINER_IMAGE defined")
@@ -99,9 +87,9 @@ var _ = Describe("Elemental installation from container", func() {
 				ContainSubstring("Setting default grub entry to Elemental"),
 			), out)
 		})
+	})
 
-		It("has customization applied", func() {
-			checkOsAfterReboot(s)
-		})
+	It("has customization applied", Label("iso", "container"), func() {
+		checkOsAfterReboot(s)
 	})
 })
