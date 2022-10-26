@@ -13,10 +13,6 @@ on:
         description: Name of the provisioned cluster
         required: true
         type: string
-      dashboard_version:
-        description: Version of the dashboard UI to use
-        required: true
-        type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
         required: false
@@ -136,7 +132,6 @@ jobs:
           # Looks a little bit weird but we have to keep the ISO in build!
           mv -f elemental-*.iso build/
       - name: Clean local Helm repositories
-        if: ${{ inputs.test_type == 'cli' }}
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
@@ -158,6 +153,7 @@ jobs:
           RANCHER_USER: admin
           SPEC: |
             cypress/e2e/unit_tests/first_connection.spec.ts
+            cypress/e2e/unit_tests/elemental_plugin.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
         run: make -f tests/Makefile start-cypress-tests
