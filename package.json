@@ -1,7 +1,7 @@
 {
-  "name": "epinio-end-to-end-tests",
+  "name": "elemental-ui-e2e",
   "version": "1.0.0",
-  "description": "Cypress tests to test the Epinio UI",
+  "description": "Cypress tests to test the Elemental UI",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -11,15 +11,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/epinio/epinio-end-to-end-tests.git"
+    "url": "git+https://github.com/rancher/elemental.git"
   },
   "keywords": [],
-  "author": "Epinio team",
+  "author": "Elemental team",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/epinio/epinio-end-to-end-tests/issues"
+    "url": "https://github.com/rancher/elemental/issues"
   },
-  "homepage": "https://github.com/epinio/epinio-end-to-end-tests#readme",
+  "homepage": "https://github.com/rancher/elemental#readme",
   "dependencies": {
     "cy-verify-downloads": "^0.1.8",
     "cypress": "^10.0.0",
