@@ -69,7 +69,7 @@ var _ = BeforeSuite(func() {
 	clusterNS = os.Getenv("CLUSTER_NS")
 	emulateTPM = os.Getenv("EMULATE_TPM")
 	imageVersion = os.Getenv("IMAGE_VERSION")
-	index, set := os.LookupEnv("VM_INDEX")
+	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	caType = os.Getenv("CA_TYPE")
@@ -80,12 +80,17 @@ var _ = BeforeSuite(func() {
 	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
 
 	// Only if VM_INDEX is set
-	if set {
+	if index != "" {
 		var err error
 		vmIndex, err = strconv.Atoi(index)
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Now we can set the VM name
 		vmName = vmNameRoot + "-" + fmt.Sprint(vmIndex)
+	}
+
+	// Force a correct value
+	if emulateTPM != "true" {
+		emulateTPM = "false"
 	}
 })
