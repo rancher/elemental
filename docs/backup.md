@@ -5,7 +5,7 @@ title: ''
 
 # Backup
 
-Follow this guide to create backup for elemental configuration installed together with Rancher.
+Follow this guide to create backup for Elemental configuration installed together with Rancher.
 
 ## Install rancher-backup operator for Rancher
 
@@ -16,7 +16,7 @@ For Rancher v2.7 and below it is needed to edit ResourceSet for rancher-backup o
 For Rancher v2.7.1+ backup will be done automatically by rancher-backup operator and no further operation are needed.
 :::
 
-## Backup elemental with rancher-backup operator (only for Rancher v2.7 and below)
+## Backup Elemental with rancher-backup operator (only for Rancher v2.7 and below)
 
 Fetch `rancher-resource-set` object from Kubernetes cluster
 
@@ -27,7 +27,7 @@ kubectl get ResourceSet rancher-resource-set -o yaml > rancher-resource-set.yaml
 <Tabs>
 <TabItem value="manualEdit" label="Manually editing the resource set yaml">
 
-At the end of `rancher-resource-set.yaml` file add the definition of elemental resources
+At the end of `rancher-resource-set.yaml` file add the definition of Elemental resources
 
 ```yaml showLineNumbers
 - apiVersion: apiextensions.k8s.io/v1

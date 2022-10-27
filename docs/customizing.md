@@ -26,14 +26,14 @@ Elemental Teal installation can be customized in three different, non-exclusive 
 some custom Elemental client configuration file, second, by including additional cloud-init files to execute at
 boot time, and finally, by including installation hooks.
 
-#### Custom elemental client configuration file
+#### Custom Elemental client configuration file
 
 [Elemental client](https://github.com/rancher/elemental-cli) `install`, `upgrade` and `reset` commands can be configured with a
 custom [configuration file](https://rancher.github.io/elemental-toolkit/docs/customizing/general_configuration/).
 
 In order to set a custom configuration file in the installation
 media the MachineRegistration resource associated with this ISO should also include
-the elemental client configuration directory. For that purpose, the `install` field
+the Elemental client configuration directory. For that purpose, the `install` field
 supports the `config-dir` field. See [MachineRegistration reference](../machineregistration-reference#configelementalinstall) and the example
 below:
 
@@ -55,7 +55,7 @@ spec:
 ```
 
 Elemental Teal live ISOs, when booted, have the ISO root mounted at `/run/initramfs/live`.
-So in that case, the ISO will contain the custom elemental client configuration file
+So in that case, the ISO will contain the custom Elemental client configuration file
 as `/elemental.conf.d/config.yaml`.
 
 #### Adding additional cloud-init files at boot
@@ -104,7 +104,7 @@ In that case the ISO root is expected to include the `/oem/10_install_extra_driv
 Hooks are provided as cloud-init stages. Equivalent hooks exist for `reset` and `upgrade` procedures.
 
 Hooks are evaluated at `install`,`reset` and `upgrade` processes from `/oem`, `/system/oem` and `/usr/local/cloud-config`, however
-additional paths can be provided with the `cloud-init-paths` flag in [elemental client configuration](https://rancher.github.io/elemental-toolkit/docs/customizing/general_configuration/).
+additional paths can be provided with the `cloud-init-paths` flag in [Elemental client configuration](https://rancher.github.io/elemental-toolkit/docs/customizing/general_configuration/).
 
 ### Adding extra driver binaries into the ISO example
 
@@ -115,7 +115,7 @@ For that use case the following files are required:
 
 * additional binaries to install (they could be in the form of RPMs)
 * additional hooks file to copy binaries into the persistent storage and to install them
-* additional elemental client configuration file to point hooks file location
+* additional Elemental client configuration file to point hooks file location
 
 Lets create an `overlay` directory to include the overlay root-tree that needs to be
 applied over the ISO root. In that case the `overlay` directory could contain:
@@ -131,14 +131,14 @@ overlay/
     config.yaml
 ```
 
-The elemental client config file in `overlay/elemental` could be as:
+The Elemental client config file in `overlay/elemental` could be as:
 
 ```yaml showLineNumbers
 cloud-init-paths:
   - "/run/initramfs/live/hooks"
 ```
 
-This is just to let elemental client know where to find installation hooks.
+This is just to let Elemental client know where to find installation hooks.
 
 Finally, the `overlay/hooks/install_hooks.yaml` could be as:
 
