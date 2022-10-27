@@ -6,7 +6,6 @@
 *.swp
 .idea
 /tests/build
-/tests/.vagrant
 /tests/build-box
 /cypress/videos/*
 /cypress/screenshots/*
