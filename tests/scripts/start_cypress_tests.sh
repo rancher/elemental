@@ -12,5 +12,6 @@ docker run -v $PWD:/e2e -w /e2e                            \
     -e RANCHER_URL=$RANCHER_URL                            \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION  \
     --add-host host.docker.internal:host-gateway           \
+    --ipc=host                                             \
     $CYPRESS_DOCKER                                        \
     -s /e2e/$SPEC
