@@ -132,18 +132,14 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
 
   if (checkLabels) {
     cy.clickButton('Add Label');
-    cy.contains('.row', 'Labels').within(() => {
-      cy.get(':nth-child(2) > [data-layer="Content"]').type('myLabel1');
-      cy.get(':nth-child(1) > .key-value > .kv-container > .value > .no-resize').type('myLabelValue1');
-    })
-  }
+    cy.get('#machine-inventory > .row > :nth-child(1) > .key-value > .kv-container > .kv-item.key').type('myLabel1');
+    cy.get('#machine-inventory > .row > :nth-child(1) > .key-value > .kv-container > .kv-item.value').type('myLabelValue1');
+    }
 
   if (checkAnnotations) {
     cy.clickButton('Add Annotation')
-    cy.contains('.row', 'Annotations').within(() => {
-      cy.get(':nth-child(3) > [data-layer="Content"]').type('myAnnotation1');
-      cy.get(':nth-child(3) > .key-value > .kv-container > .value > .no-resize').type('myAnnotationValue1');
-    })
+    cy.get('#machine-inventory > .row > :nth-child(3) > .key-value > .kv-container > .kv-item.key').type('myAnnotation1');
+    cy.get('#machine-inventory > .row > :nth-child(3) > .key-value > .kv-container > .kv-item.value').type('myAnnotationValue1');
   }
 
   cy.clickButton("Create");
@@ -177,19 +173,15 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
 // Add Label to machine registration
 Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
   cy.clickButton('Add Label');
-  cy.contains('.row', 'Labels').within(() => {
-    cy.get('.kv-item.key').type(labelName);
-    cy.get('.kv-item.value').type(labelValue);
-  });
+  cy.get('#machine-inventory > .row > :nth-child(1) > .key-value > .kv-container > .kv-item.key').type(labelName);
+  cy.get('#machine-inventory > .row > :nth-child(1) > .key-value > .kv-container > .kv-item.value').type(labelValue);
 });
 
 // Add Annotation to machine registration
 Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue}) => {
   cy.clickButton('Add Annotation');
-  cy.contains('.row', 'Annotations').within(() => {
-    cy.get('.kv-item.key').type(annotationName);
-    cy.get('.kv-item.value').type(annotationValue);
-  });
+  cy.get('#machine-inventory > .row > :nth-child(3) > .key-value > .kv-container > .kv-item.key').type(annotationName);
+  cy.get('#machine-inventory > .row > :nth-child(3) > .key-value > .kv-container > .kv-item.value').type(annotationValue);
 });
 
 // Check machine registration label in YAML
