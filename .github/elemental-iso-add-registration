@@ -59,8 +59,22 @@ iso_repack() {
 
 : ${REPO:=Stable}
 : ${ARCH:=$(uname -m)}
-: ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPO,,}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
+# Docker repos only in lowercase
+REPOINLOWER=$(echo $REPO | tr '[:upper:]' '[:lower:]')
+# This image needs to have xorriso >= 5
+: ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
 REG_CONFIG_FILE=${1:-}
+
+# Some systems may report aarch64 as arm64 (darwin for example), so lets consolidate here
+# Images on OBS are set as aarch64 so use that for the image link
+if [ "$ARCH" == "arm64" ]; then
+  ARCH="aarch64"
+fi
+# Same for amd64 -> x86_64 althougth Im not sure this can happen
+if [ "$ARCH" == "amd64" ]; then
+  ARCH="x86_64"
+fi
+
 ISO_URL=${2:-https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/${REPO}:/Teal53/media/iso/elemental-teal.${ARCH}.iso}
 
 [ "${REPO}" == "Dev" ] || [ "${REPO}" == "Staging" ] || [ "${REPO}" == "Stable" ] || abort "REPO=${REPO} variable has to match Dev|Staging|Stable, aborting"
