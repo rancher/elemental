@@ -103,7 +103,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
-      - name: Download default ISO (if needed)
+      - name: Download default ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
         uses: dawidd6/action-download-artifact@v2.24.0
@@ -113,7 +113,7 @@ jobs:
           name: iso-image
           # Force the path, this is a security hint!
           path: ./
-      - name: Download specified ISO (if needed)
+      - name: Download specified ISO
         if: ${{ inputs.iso_to_test != '' }}
         env:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
@@ -266,7 +266,7 @@ jobs:
       - name: Remove remaining stuff from worker ♻
         if: always()
         uses: colpal/actions-clean@v1
-      - name: Send failed status to slack (if needed)
+      - name: Send failed status to slack
         if: failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:

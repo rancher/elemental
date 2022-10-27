@@ -96,7 +96,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(vmName).To(Not(BeEmpty()))
 		})
 
-		By("Configuring emulated TPM if needed", func() {
+		By("Setting emulated TPM to "+emulateTPM, func() {
 			// Set correct value for TPM emulation
 			value := "false"
 			if emulateTPM == "true" {
@@ -112,7 +112,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				"--type", "merge", "--patch-file", emulatedTPMYaml,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
+		})
 
+		By("Downloading installation config file", func() {
 			// Download the new YAML installation config file
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
 				"--namespace", clusterNS,
@@ -124,16 +126,16 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Configuring iPXE boot script for network installation (if needed)", func() {
-			if isoBoot != "true" {
+		if isoBoot != "true" {
+			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := misc.ConfigureiPXE()
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(numberOfFile).To(BeNumerically(">=", 1))
-			}
-		})
+			})
+		}
 
-		By("Adding registration file to ISO (if needed)", func() {
-			if isoBoot == "true" {
+		if isoBoot == "true" {
+			By("Adding registration file to ISO", func() {
 				// Check if generated ISO is already here
 				isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
 
@@ -151,8 +153,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					err = exec.Command("bash", "-c", "mv -f elemental-*.iso ../..").Run()
 					Expect(err).To(Not(HaveOccurred()))
 				}
-			}
-		})
+			})
+		}
 
 		By("Creating and installing VM", func() {
 			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)
