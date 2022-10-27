@@ -1,8 +1,8 @@
 {
   "unversionedId": "elementaloperatorchart-reference",
   "id": "elementaloperatorchart-reference",
-  "title": "Elemental Operator Helm Chart",
-  "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations.",
+  "title": "",
+  "description": "The  is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
   "source": "@site/docs/elementaloperatorchart-reference.md",
   "sourceDirName": ".",
   "slug": "/elementaloperatorchart-reference",
@@ -10,5 +10,17 @@
   "draft": false,
   "tags": [],
   "version": "current",
-  "frontMatter": {}
+  "frontMatter": {
+    "sidebar_label": "Elemental Operator Helm Chart",
+    "title": ""
+  },
+  "sidebar": "elemental",
+  "previous": {
+    "title": "Cluster reference",
+    "permalink": "/cluster-reference"
+  },
+  "next": {
+    "title": "Kubernetes versions",
+    "permalink": "/kubernetesversions"
+  }
 }

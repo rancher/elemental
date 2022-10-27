@@ -1,3 +1,8 @@
+---
+sidebar_label: Smbios
+title: ''
+---
+
 ## Introduction
 
 The System Management BIOS (SMBIOS) specification defines data structures (and access methods) that can be used to read management information produced by the BIOS of a computer.
@@ -20,7 +25,7 @@ This can be mixed with normal strings so `my-prefix-${KEY/VALUE}` would result i
 
 For example, having the following SMBIOS data:
 
-```
+```console showLineNumbers
 System Information
 	Manufacturer: My manufacturer
 	Product Name: Awesome PC
@@ -34,11 +39,10 @@ And setting the `#!yaml machineName` to `serial-${System Information/Serial Numb
 This is useful to generate automatic names for machines based on their hardware values, for example using the UUID or the Product name.
 Our default `#!yaml machineName` when the registration values are empty is `"m-${System Information/UUID}"`.
 
-
-!!! warning
-    All non-valid characters will be changed into `-` automatically on parse. Valid characters for labels are alphanumeric and `-`,`_` and `.`
-    For machineName the constraints are stricter as that value is used for the hostname so valid values are lowercase alphanumeric and `-` only.
-
+:::warning warning
+All non-valid characters will be changed into `-` automatically on parse. Valid characters for labels are alphanumeric and `-`,`_` and `.`
+For machineName the constraints are stricter as that value is used for the hostname so valid values are lowercase alphanumeric and `-` only.
+:::
 
 A good use of SMBIOS data is to set up different labels for all your machines and get those values from the hardware directly.
 
@@ -47,7 +51,6 @@ you to use selectors down the line to select similar machines.
 
 For example using the following label `cpuFamily: "${Processor Information/Family}` would allow you to use a selector to search for i7 cpus in your machine fleet.
 
-
-```yaml title="registration example with smbios labels"
+```yaml title="registration example with smbios labels" showLineNumbers
     --8<-- "examples/quickstart/registration.yaml"
 ```

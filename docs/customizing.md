@@ -37,7 +37,7 @@ the elemental client configuration directory. For that purpose, the `install` fi
 supports the `config-dir` field. See [MachineRegistration reference](../machineregistration-reference#configelementalinstall) and the example
 below:
 
-```yaml
+```yaml showLineNumbers
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -73,7 +73,7 @@ Since in Elemental Teal live systems the ISO root is mounted at `/run/initramfs/
 the local paths for `config-url` in MachineRegistrations are likely to point there.
 See the example below:
 
-```yaml
+```yaml showLineNumbers
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -113,14 +113,14 @@ and during the installation they are installed over the OS image.
 
 For that use case the following files are required:
 
-* additional binares to install (they could be in the form of RPMs)
+* additional binaries to install (they could be in the form of RPMs)
 * additional hooks file to copy binaries into the persistent storage and to install them
 * additional elemental client configuration file to point hooks file location
 
 Lets create an `overlay` directory to include the overlay root-tree that needs to be
 applied over the ISO root. In that case the `overlay` directory could contain:
 
-```
+```yaml showLineNumbers
 overlay/
   data/
     extra_drivers/
@@ -133,17 +133,16 @@ overlay/
 
 The elemental client config file in `overlay/elemental` could be as:
 
-```yaml
+```yaml showLineNumbers
 cloud-init-paths:
   - "/run/initramfs/live/hooks"
 ```
 
 This is just to let elemental client know where to find installation hooks.
 
-
 Finally, the `overlay/hooks/install_hooks.yaml` could be as:
 
-```yaml
+```yaml showLineNumbers
 name: "Install extra drivers"
 stages:
   before-install:
@@ -165,7 +164,7 @@ Note the installation hooks only cover installation procedures, for upgrades equ
 Assuming an `overlay` folder was created in the current directory containing all
 additional files to be appended, the following `xorriso` command adds the extra files:
 
-```bash
+```bash showLineNumbers
 xorriso -indev elemental-teal.x86_64.iso -outdev elemental-teal.custom.x86_64.iso -map overlay / -boot_image any replay
 ```
 
@@ -179,7 +178,7 @@ in a Dockerfile in order to create a new container image.
 Imagine some additional package from an extra repository is required, the following example
 show case how this could be added:
 
-```docker
+```docker showLineNumbers
 # The version of Elemental to modify
 FROM registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:VERSION
 
@@ -201,7 +200,7 @@ Where VERSION is the base version we want to customize.
 
 And then the following commands
 
-```bash
+```bash showLineNumbers
 docker build --build-arg IMAGE_REPO=myrepo/custom-build \
              --build-arg IMAGE_TAG=v1.1.1 \
              -t myrepo/custom-build:v1.1.1 .
@@ -211,6 +210,6 @@ docker push myrepo/custom-build:v1.1.1
 The new customized OS is available as the Docker image `myrepo/custom-build:v1.1.1` and it can
 be run and verified using docker with
 
-```bash
+```bash showLineNumbers
 docker run -it myrepo/custom-build:v1.1.1 bash
 ```

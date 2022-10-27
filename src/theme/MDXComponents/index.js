@@ -31,6 +31,6 @@ const MDXComponents = {
   Tabs,
   TabItem,
   CodeBlock,
-  Vars
+  Vars,
 };
 export default MDXComponents;

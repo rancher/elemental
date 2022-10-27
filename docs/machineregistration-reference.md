@@ -11,8 +11,7 @@ There are several keys that can be configured under a `#!yaml MachineRegistratio
 
 There are several keys that can be configured under a `MachineRegistration` resource spec.
 
-```yaml title="MachineRegistration"
-
+```yaml title="MachineRegistration" showLineNumbers
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -163,7 +162,7 @@ Annotations that will be set to the `#!yaml MachineInventory` that is created fr
 <details>
 <summary>Example</summary>
 
-  ```yaml
+  ```yaml showLineNumbers
   apiVersion: elemental.cattle.io/v1beta1
   kind: MachineRegistration
   metadata:

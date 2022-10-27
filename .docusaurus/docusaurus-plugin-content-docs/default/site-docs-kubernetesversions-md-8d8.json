@@ -11,12 +11,16 @@
   "tags": [],
   "version": "current",
   "frontMatter": {
-    "sidebar_label": "Kubernetesversions",
+    "sidebar_label": "Kubernetes versions",
     "title": ""
   },
   "sidebar": "elemental",
   "previous": {
-    "title": "Machineregistration reference",
-    "permalink": "/machineregistration-reference"
+    "title": "Elemental Operator Helm Chart",
+    "permalink": "/elementaloperatorchart-reference"
+  },
+  "next": {
+    "title": "Smbios",
+    "permalink": "/smbios"
   }
 }

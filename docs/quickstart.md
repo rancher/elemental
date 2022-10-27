@@ -53,7 +53,7 @@ cluster and taking care of creating inventories, registrations for machines and 
 
 We will use the Helm package manager to install the elemental-operator chart into our cluster
 
-```shell
+```shell showLineNumbers
 helm upgrade --create-namespace -n cattle-elemental-system --install elemental-operator oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
@@ -61,7 +61,7 @@ There is a few options that can be set in the chart install but that is out of s
 
 Now after a few seconds you should see the operator pod appear on the `cattle-elemental-system` namespace.
 
-```shell
+```shell showLineNumbers
 kubectl get pods -n cattle-elemental-system
 NAME                                  READY   STATUS    RESTARTS   AGE
 elemental-operator-64f88fc695-b8qhn   1/1     Running   0          16s
@@ -101,7 +101,7 @@ Make sure to modify the registration.yaml above to set the proper install device
 
 Now that we have all the configuration to create the proper resources in Kubernetes just apply them
 
-```shell
+```shell showLineNumbers
 kubectl apply -f selector.yaml 
 kubectl apply -f cluster.yaml 
 kubectl apply -f registration.yaml
@@ -117,7 +117,7 @@ This assumes that your Node will have a `/dev/sda` disk available as that is the
 If your node doesnt have that device you will have to manually create the registration.yaml file or download the one from the repo and modify before applying
 :::
 
-```bash
+```bash showLineNumbers
 kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/selector.yaml
 kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/cluster.yaml
 kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/registration.yaml
@@ -139,7 +139,7 @@ so we can use that url to obtain the proper yaml needed for the iso.
 <Tabs>
 <TabItem value="oneLiner" label="One liner">
 
-```shell
+```shell showLineNumbers
 wget --no-check-certificate `kubectl get machineregistration -n fleet-default my-nodes -o jsonpath="{.status.registrationURL}"` -O initial-registration.yaml
 ```
 
@@ -150,7 +150,7 @@ This will download the proper yaml from the registration URL and store it on the
 
 First we need to obtain the `RegistrationURL` that was generated for our `MachineRegistration`
 
-```bash
+```bash showLineNumbers
 $ kubectl get machineregistration -n fleet-default my-test-registration -o jsonpath="{.status.registrationURL}"
 https://172.18.0.2.sslip.io/elemental/registration/gsh4n8nj9gvbsjk4x7hxvnr5l6hmhbdbdffrmkwzrss2dtfbnpbmqp
 ```
@@ -159,7 +159,7 @@ As you can see we obtained the proper initial registration needed by `elemental-
 
 Then we need to visit that URL as that will provide the URL and CA certificate for unauthenticated requests:
 
-```bash
+```bash showLineNumbers
 $ curl --insecure https://172.18.0.2.sslip.io/elemental/registration/gsh4n8nj9gvbsjk4x7hxvnr5l6hmhbdbdffrmkwzrss2dtfbnpbmqp
 
 elemental:
@@ -183,7 +183,7 @@ As you can see we obtained the proper initial registration needed by `elemental-
 
 Now we can write down the data returned for that url into a file that we will inject into the iso
 
-```yaml title="initial-registration.yaml"
+```yaml title="initial-registration.yaml" showLineNumbers
 elemental:
   registration:
     url: https://172.18.0.2.sslip.io/elemental/registration/gsh4n8nj9gvbsjk4x7hxvnr5l6hmhbdbdffrmkwzrss2dtfbnpbmqp
@@ -209,31 +209,32 @@ Now we can proceed to create the ISO
 <Tabs>
 <TabItem value="script" label="Via script">
 
-    We provide a ISO build script for ease of use that can get the final ISO and inject the `initial-registration.yaml`:
-    
-    ```shell
-    wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-add-registration && chmod +x elemental-iso-add-registration
-    ```
-    
-    Now that we have the script we can proceed to download the ISO and inject our configuration injected:
-    
-    ```shell
-    ./elemental-iso-add-registration initial-registration.yaml
-    ```
-    
-    This will generate an ISO on the current directory with the name `elemental-teal-<ARCH>.iso`
-    
-    !!! info
-        The script uses the iso for the arch based on the system is being run from. If you want to cross build for another system,
-        you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be build for that architecture.
+We provide a ISO build script for ease of use that can get the final ISO and inject the `initial-registration.yaml`:
 
-```shell
+```shell showLineNumbers
+wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-add-registration && chmod +x elemental-iso-add-registration
+```
+
+Now that we have the script we can proceed to download the ISO and inject our configuration injected:
+
+```shell showLineNumbers
+./elemental-iso-add-registration initial-registration.yaml
+```
+
+This will generate an ISO on the current directory with the name `elemental-teal-<ARCH>.iso`
+
+:::info
+The script uses the iso for the arch based on the system is being run from. If you want to cross build for another system,
+you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be build for that architecture.
+:::
+
+```shell showLineNumbers
 wget -q https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build && chmod +x elemental-iso-build
 ```
 
 Now that we have the script we can proceed to build the ISO with our configuration injected:
 
-```shell
+```shell showLineNumbers
 ./elemental-iso-build initial-registration.yaml
 ```
 

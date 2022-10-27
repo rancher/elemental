@@ -1,0 +1,26 @@
+{
+  "unversionedId": "cluster-reference",
+  "id": "cluster-reference",
+  "title": "",
+  "description": "",
+  "source": "@site/docs/cluster-reference.md",
+  "sourceDirName": ".",
+  "slug": "/cluster-reference",
+  "permalink": "/cluster-reference",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Cluster reference",
+    "title": ""
+  },
+  "sidebar": "elemental",
+  "previous": {
+    "title": "MachineInventorySelectorTemplate reference",
+    "permalink": "/machineinventoryselectortemplate-reference"
+  },
+  "next": {
+    "title": "Elemental Operator Helm Chart",
+    "permalink": "/elementaloperatorchart-reference"
+  }
+}

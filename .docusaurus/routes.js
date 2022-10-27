@@ -94,7 +94,7 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', 'c41'),
+    component: ComponentCreator('/', '1b5'),
     routes: [
       {
         path: '/',
@@ -109,8 +109,20 @@ export default [
         sidebar: "elemental"
       },
       {
+        path: '/backup',
+        component: ComponentCreator('/backup', 'f90'),
+        exact: true,
+        sidebar: "elemental"
+      },
+      {
         path: '/cloud-config-reference',
         component: ComponentCreator('/cloud-config-reference', 'c7a'),
+        exact: true,
+        sidebar: "elemental"
+      },
+      {
+        path: '/cluster-reference',
+        component: ComponentCreator('/cluster-reference', '090'),
         exact: true,
         sidebar: "elemental"
       },
@@ -128,8 +140,9 @@ export default [
       },
       {
         path: '/elementaloperatorchart-reference',
-        component: ComponentCreator('/elementaloperatorchart-reference', 'c53'),
-        exact: true
+        component: ComponentCreator('/elementaloperatorchart-reference', '1e8'),
+        exact: true,
+        sidebar: "elemental"
       },
       {
         path: '/installation',
@@ -145,8 +158,9 @@ export default [
       },
       {
         path: '/machineinventoryselectortemplate-reference',
-        component: ComponentCreator('/machineinventoryselectortemplate-reference', 'b0b'),
-        exact: true
+        component: ComponentCreator('/machineinventoryselectortemplate-reference', '0a6'),
+        exact: true,
+        sidebar: "elemental"
       },
       {
         path: '/machineregistration-reference',
@@ -174,8 +188,9 @@ export default [
       },
       {
         path: '/smbios',
-        component: ComponentCreator('/smbios', '944'),
-        exact: true
+        component: ComponentCreator('/smbios', 'b56'),
+        exact: true,
+        sidebar: "elemental"
       },
       {
         path: '/tpm',

@@ -79,9 +79,47 @@
           },
           {
             "type": "link",
-            "label": "Kubernetesversions",
+            "label": "MachineInventorySelectorTemplate reference",
+            "href": "/machineinventoryselectortemplate-reference",
+            "docId": "machineinventoryselectortemplate-reference"
+          },
+          {
+            "type": "link",
+            "label": "Cluster reference",
+            "href": "/cluster-reference",
+            "docId": "cluster-reference"
+          },
+          {
+            "type": "link",
+            "label": "Elemental Operator Helm Chart",
+            "href": "/elementaloperatorchart-reference",
+            "docId": "elementaloperatorchart-reference"
+          },
+          {
+            "type": "link",
+            "label": "Kubernetes versions",
             "href": "/kubernetesversions",
             "docId": "kubernetesversions"
+          },
+          {
+            "type": "link",
+            "label": "Smbios",
+            "href": "/smbios",
+            "docId": "smbios"
+          }
+        ]
+      },
+      {
+        "type": "category",
+        "collapsible": true,
+        "collapsed": false,
+        "label": "Backup",
+        "items": [
+          {
+            "type": "link",
+            "label": "Backup",
+            "href": "/backup",
+            "docId": "backup"
           }
         ]
       }
@@ -105,7 +143,13 @@
     "architecture": {
       "id": "architecture",
       "title": "",
-      "description": "The Elemental stack can be divided in two main parts: the Elemental OS, which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
+      "description": "The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
+      "sidebar": "elemental"
+    },
+    "backup": {
+      "id": "backup",
+      "title": "",
+      "description": "Follow this guide to create backup for elemental configuration installed together with Rancher.",
       "sidebar": "elemental"
     },
     "cloud-config-reference": {
@@ -114,10 +158,16 @@
       "description": "All custom configuration applied on top of a fresh deployment should come",
       "sidebar": "elemental"
     },
+    "cluster-reference": {
+      "id": "cluster-reference",
+      "title": "",
+      "description": "",
+      "sidebar": "elemental"
+    },
     "customizing": {
       "id": "customizing",
       "title": "",
-      "description": "Elemental image can easily be remastered using a docker build.",
+      "description": "Elemental Teal images can be customized in different ways.",
       "sidebar": "elemental"
     },
     "elemental-plans": {
@@ -128,8 +178,9 @@
     },
     "elementaloperatorchart-reference": {
       "id": "elementaloperatorchart-reference",
-      "title": "Elemental Operator Helm Chart",
-      "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations."
+      "title": "",
+      "description": "The  is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
+      "sidebar": "elemental"
     },
     "index": {
       "id": "index",
@@ -151,13 +202,14 @@
     },
     "machineinventoryselectortemplate-reference": {
       "id": "machineinventoryselectortemplate-reference",
-      "title": "MachineInventorySelectorTemplate reference",
-      "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource."
+      "title": "",
+      "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource.",
+      "sidebar": "elemental"
     },
     "machineregistration-reference": {
       "id": "machineregistration-reference",
       "title": "",
-      "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
+      "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.",
       "sidebar": "elemental"
     },
     "operator/index": {
@@ -180,8 +232,9 @@
     },
     "smbios": {
       "id": "smbios",
-      "title": "smbios",
-      "description": "Introduction"
+      "title": "",
+      "description": "Introduction",
+      "sidebar": "elemental"
     },
     "tpm": {
       "id": "tpm",

@@ -21,7 +21,7 @@
               "unversionedId": "architecture",
               "id": "architecture",
               "title": "",
-              "description": "The Elemental stack can be divided in two main parts: the Elemental OS, which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
+              "description": "The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
               "source": "@site/docs/architecture.md",
               "sourceDirName": ".",
               "slug": "/architecture",
@@ -41,6 +41,28 @@
               "next": {
                 "title": "Installation",
                 "permalink": "/installation"
+              }
+            },
+            {
+              "unversionedId": "backup",
+              "id": "backup",
+              "title": "",
+              "description": "Follow this guide to create backup for elemental configuration installed together with Rancher.",
+              "source": "@site/docs/backup.md",
+              "sourceDirName": ".",
+              "slug": "/backup",
+              "permalink": "/backup",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "sidebar_label": "Backup",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "Smbios",
+                "permalink": "/smbios"
               }
             },
             {
@@ -70,10 +92,36 @@
               }
             },
             {
+              "unversionedId": "cluster-reference",
+              "id": "cluster-reference",
+              "title": "",
+              "description": "",
+              "source": "@site/docs/cluster-reference.md",
+              "sourceDirName": ".",
+              "slug": "/cluster-reference",
+              "permalink": "/cluster-reference",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "sidebar_label": "Cluster reference",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "MachineInventorySelectorTemplate reference",
+                "permalink": "/machineinventoryselectortemplate-reference"
+              },
+              "next": {
+                "title": "Elemental Operator Helm Chart",
+                "permalink": "/elementaloperatorchart-reference"
+              }
+            },
+            {
               "unversionedId": "customizing",
               "id": "customizing",
               "title": "",
-              "description": "Elemental image can easily be remastered using a docker build.",
+              "description": "Elemental Teal images can be customized in different ways.",
               "source": "@site/docs/customizing.md",
               "sourceDirName": ".",
               "slug": "/customizing",
@@ -124,8 +172,8 @@
             {
               "unversionedId": "elementaloperatorchart-reference",
               "id": "elementaloperatorchart-reference",
-              "title": "Elemental Operator Helm Chart",
-              "description": "The {{elemental.operator.name}} is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or baremetal installations.",
+              "title": "",
+              "description": "The  is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
               "source": "@site/docs/elementaloperatorchart-reference.md",
               "sourceDirName": ".",
               "slug": "/elementaloperatorchart-reference",
@@ -133,7 +181,19 @@
               "draft": false,
               "tags": [],
               "version": "current",
-              "frontMatter": {}
+              "frontMatter": {
+                "sidebar_label": "Elemental Operator Helm Chart",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "Cluster reference",
+                "permalink": "/cluster-reference"
+              },
+              "next": {
+                "title": "Kubernetes versions",
+                "permalink": "/kubernetesversions"
+              }
             },
             {
               "unversionedId": "index",
@@ -197,19 +257,23 @@
               "tags": [],
               "version": "current",
               "frontMatter": {
-                "sidebar_label": "Kubernetesversions",
+                "sidebar_label": "Kubernetes versions",
                 "title": ""
               },
               "sidebar": "elemental",
               "previous": {
-                "title": "Machineregistration reference",
-                "permalink": "/machineregistration-reference"
+                "title": "Elemental Operator Helm Chart",
+                "permalink": "/elementaloperatorchart-reference"
+              },
+              "next": {
+                "title": "Smbios",
+                "permalink": "/smbios"
               }
             },
             {
               "unversionedId": "machineinventoryselectortemplate-reference",
               "id": "machineinventoryselectortemplate-reference",
-              "title": "MachineInventorySelectorTemplate reference",
+              "title": "",
               "description": "The MachineInventorySelectorTemplate is the resource responsible of defining the matching criteria to pair an inventoried machine with a Cluster resource.",
               "source": "@site/docs/machineinventoryselectortemplate-reference.md",
               "sourceDirName": ".",
@@ -218,13 +282,25 @@
               "draft": false,
               "tags": [],
               "version": "current",
-              "frontMatter": {}
+              "frontMatter": {
+                "sidebar_label": "MachineInventorySelectorTemplate reference",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "Machineregistration reference",
+                "permalink": "/machineregistration-reference"
+              },
+              "next": {
+                "title": "Cluster reference",
+                "permalink": "/cluster-reference"
+              }
             },
             {
               "unversionedId": "machineregistration-reference",
               "id": "machineregistration-reference",
               "title": "",
-              "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
+              "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.",
               "source": "@site/docs/machineregistration-reference.md",
               "sourceDirName": ".",
               "slug": "/machineregistration-reference",
@@ -242,8 +318,8 @@
                 "permalink": "/cloud-config-reference"
               },
               "next": {
-                "title": "Kubernetesversions",
-                "permalink": "/kubernetesversions"
+                "title": "MachineInventorySelectorTemplate reference",
+                "permalink": "/machineinventoryselectortemplate-reference"
               }
             },
             {
@@ -319,7 +395,7 @@
             {
               "unversionedId": "smbios",
               "id": "smbios",
-              "title": "smbios",
+              "title": "",
               "description": "Introduction",
               "source": "@site/docs/smbios.md",
               "sourceDirName": ".",
@@ -328,7 +404,19 @@
               "draft": false,
               "tags": [],
               "version": "current",
-              "frontMatter": {}
+              "frontMatter": {
+                "sidebar_label": "Smbios",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "Kubernetes versions",
+                "permalink": "/kubernetesversions"
+              },
+              "next": {
+                "title": "Backup",
+                "permalink": "/backup"
+              }
             },
             {
               "unversionedId": "tpm",
@@ -426,7 +514,35 @@
                   },
                   {
                     "type": "doc",
+                    "id": "machineinventoryselectortemplate-reference"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "cluster-reference"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "elementaloperatorchart-reference"
+                  },
+                  {
+                    "type": "doc",
                     "id": "kubernetesversions"
+                  },
+                  {
+                    "type": "doc",
+                    "id": "smbios"
+                  }
+                ]
+              },
+              {
+                "type": "category",
+                "collapsible": true,
+                "collapsed": false,
+                "label": "Backup",
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "backup"
                   }
                 ]
               }

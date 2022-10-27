@@ -16,8 +16,18 @@
               "sidebar": "elemental"
             },
             {
+              "id": "backup",
+              "path": "/backup",
+              "sidebar": "elemental"
+            },
+            {
               "id": "cloud-config-reference",
               "path": "/cloud-config-reference",
+              "sidebar": "elemental"
+            },
+            {
+              "id": "cluster-reference",
+              "path": "/cluster-reference",
               "sidebar": "elemental"
             },
             {
@@ -32,7 +42,8 @@
             },
             {
               "id": "elementaloperatorchart-reference",
-              "path": "/elementaloperatorchart-reference"
+              "path": "/elementaloperatorchart-reference",
+              "sidebar": "elemental"
             },
             {
               "id": "index",
@@ -51,7 +62,8 @@
             },
             {
               "id": "machineinventoryselectortemplate-reference",
-              "path": "/machineinventoryselectortemplate-reference"
+              "path": "/machineinventoryselectortemplate-reference",
+              "sidebar": "elemental"
             },
             {
               "id": "machineregistration-reference",
@@ -75,7 +87,8 @@
             },
             {
               "id": "smbios",
-              "path": "/smbios"
+              "path": "/smbios",
+              "sidebar": "elemental"
             },
             {
               "id": "tpm",

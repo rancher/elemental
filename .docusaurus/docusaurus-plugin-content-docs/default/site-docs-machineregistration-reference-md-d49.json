@@ -2,7 +2,7 @@
   "unversionedId": "machineregistration-reference",
   "id": "machineregistration-reference",
   "title": "",
-  "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created in generates a registration URL used by nodes to register so they are inventoried.",
+  "description": "The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.",
   "source": "@site/docs/machineregistration-reference.md",
   "sourceDirName": ".",
   "slug": "/machineregistration-reference",
@@ -20,7 +20,7 @@
     "permalink": "/cloud-config-reference"
   },
   "next": {
-    "title": "Kubernetesversions",
-    "permalink": "/kubernetesversions"
+    "title": "MachineInventorySelectorTemplate reference",
+    "permalink": "/machineinventoryselectortemplate-reference"
   }
 }

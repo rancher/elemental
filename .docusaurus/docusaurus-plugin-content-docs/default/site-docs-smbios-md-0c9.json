@@ -1,7 +1,7 @@
 {
   "unversionedId": "smbios",
   "id": "smbios",
-  "title": "smbios",
+  "title": "",
   "description": "Introduction",
   "source": "@site/docs/smbios.md",
   "sourceDirName": ".",
@@ -10,5 +10,17 @@
   "draft": false,
   "tags": [],
   "version": "current",
-  "frontMatter": {}
+  "frontMatter": {
+    "sidebar_label": "Smbios",
+    "title": ""
+  },
+  "sidebar": "elemental",
+  "previous": {
+    "title": "Kubernetes versions",
+    "permalink": "/kubernetesversions"
+  },
+  "next": {
+    "title": "Backup",
+    "permalink": "/backup"
+  }
 }

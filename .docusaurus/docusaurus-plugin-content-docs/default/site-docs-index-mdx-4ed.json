@@ -15,7 +15,7 @@
     "sidebar_label": "Overview",
     "title": ""
   },
-  "sidebar": "tutorialSidebar",
+  "sidebar": "elemental",
   "next": {
     "title": "Quickstart",
     "permalink": "/quickstart"

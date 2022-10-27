@@ -8,32 +8,32 @@ title: ''
 ## Overview
 
 Elemental stack provides OS management using OCI containers and Kubernetes. The Elemental
-stack installation encompasses the installation of the {{elemental.operator.name}} into the
+stack installation encompasses the installation of the <Vars name="elemental_operator_name" /> into the
 management cluster and the creation and use of Elemental Teal installation media to
 provide the OS into the Cluster Nodes. See [Architecture](architecture.md) section to read about the
 interaction of the components.
 
 The installation configuration is mostly applied and set as part of the registration process.
-The registration process is done by the `elemental-register` (the {{elemental.operator.name}} client part)
+The registration process is done by the `elemental-register` (the <Vars name="elemental_operator_name" /> client part)
 who is the responsible to register nodes in a Rancher management cluster and fetch the installation configuration.
 
-Plese refer to the [Quick Start](quickstart.md) guide for simple step by step deployment instructions.
+Please refer to the [Quick Start](quickstart.md) guide for simple step by step deployment instructions.
 
 ## Elemental Operator Installation
 
-The {{elemental.operator.name}} is responsible for managing the Elemental versions and
-maintaining a machine inventory to assist with edge or baremetal installations. {{elemental.operator.name}}
+The <Vars name="elemental_operator_name" /> is responsible for managing the Elemental versions and
+maintaining a machine inventory to assist with edge or bare metal installations. <Vars name="elemental_operator_name" />
 requires a cluster including the Rancher Manager and it can be installed with a helm chart.
 
-See {{elemental.operator.name}} [helm chart reference](elementaloperatorchart-reference.md) for install,
+See <Vars name="elemental_operator_name" /> [helm chart reference](elementaloperatorchart-reference.md) for install,
 uninstall, upgrade and configuration details.
 
 ## Prepare Kubernetes Resources
 
-Once the {{elemental.operator.name}} is up and running within the management cluster a couple of kubernetes
+Once the <Vars name="elemental_operator_name" /> is up and running within the management cluster a couple of kubernetes
 resources are required in order to prepare an Elemental based cluster deployment.
 
-* [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md): 
+* [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md):
   This resource identifies the criteria to match registered boxes (listed as part of the MachineInventory)
   against available Rancher 2.6 Clusters. As soon as there is a match the selected kubernetes cluster takes
   ownership of the registered box.
@@ -47,7 +47,6 @@ resources are required in order to prepare an Elemental based cluster deployment
 
 A Rancher Cluster resource is also required to deploy Elemental, it can be manually created as exemplified in
 the [Quick Start](quickstart.md) guide or created from the Rancher 2.6 UI.
-
 
 ## Prepare Installation Media
 
@@ -73,7 +72,6 @@ Rancher System Agent plans into the installation media. Refer to the [Elemental 
 some example plans. The plans could be included into the squashed rootfs at `/var/lib/elemental/agent/plans`
 folder and they would be seen by the system agent at firstboot.
 
-
 ## Start Installation Process
 
 The installation starts by booting the installation media on a node. Once the installation media has booted it will
@@ -88,7 +86,6 @@ kick start a regular rancher provisioning process to install the selected kubern
 some minutes the node installation is finalized and the node is included into the cluster and visible through
 the Rancher UI.
 
-
 ## Deployed Elemental Teal Partition Table
 
 Once Elemental Teal is installed the OS partition table, according to default values, will look like
@@ -101,13 +98,12 @@ Once Elemental Teal is installed the OS partition table, according to default va
 | COS_RECOVERY   | 8 GiB           | Recovery file system image if COS_STATE is destroyed        |
 | COS_PERSISTENT | Remaining space | All contents of the persistent folders                      |
 
-Note this is the basic structure of any OS built by the [{{elemental.toolkit.name}}]({{elemental.toolkit.url}})
-
+Note this is the basic structure of any OS built by the <Vars name="elemental_toolkit_name" link="elemental_toolkit_url" />
 
 ## Elemental Teal Immutable Root
 
 One of the characteristics of Elemental OSes is the setup of an immutable root filesystem where some ephemeral or
-persistent locations are applied on top of it. Elemental Teal default folders structre is listed in the
+persistent locations are applied on top of it. Elemental Teal default folders structure is listed in the
 matrix below.
 
 | Path              | Read-Only | Ephemeral | Persistent |
@@ -133,5 +129,3 @@ matrix below.
 | /var/lib/wicked   |           |           |     x      |
 | /var/lib/calico   |           |           |     x      |
 | /var/log          |           |           |     x      |
-
-

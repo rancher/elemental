@@ -38,7 +38,20 @@ const sidebars = {
       items: [
         'cloud-config-reference',
         'machineregistration-reference',
+        'machineinventoryselectortemplate-reference',
+        'cluster-reference',
+        'elementaloperatorchart-reference',
         'kubernetesversions',
+        'smbios',
+      ]
+    },
+    {
+      type: 'category',
+      collapsible: true,
+      collapsed: false,
+      label: 'Backup',
+      items: [
+        'backup',
       ]
     },
   ],

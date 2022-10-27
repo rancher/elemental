@@ -105,7 +105,7 @@ if no TPM 2.0 is available on the host, TPM can be emulated by software: see the
 {{elemental.operator.name}} includes a Kubernetes operator installed in the management cluster and a client
 side installed in nodes, so they can self register into the management cluster. Once a node is
 registered the {{elemental.operator.name}} will kick-start the OS installation and schedule the Kubernetes
-provisioning using the [{{ranchersystemagent.name}}].
+provisioning using the [{{ranchersystemagent.name}}]({{ranchersystemagent.url}}).
 Rancher System Agent is responsible for bootstrapping RKE2/k3s and Rancher from an OCI registry. This means
 an update of containerd, k3s, RKE2, or Rancher does not require an OS upgrade
 or node reboot.

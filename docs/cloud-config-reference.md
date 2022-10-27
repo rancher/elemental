@@ -58,4 +58,5 @@ Below is an example of the supported configuration on a `MachineRegistration` re
     machineInventoryLabels:
       location: "europe"
   ```
+  
 </details>

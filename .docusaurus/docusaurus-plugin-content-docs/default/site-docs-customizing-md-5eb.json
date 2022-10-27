@@ -2,7 +2,7 @@
   "unversionedId": "customizing",
   "id": "customizing",
   "title": "",
-  "description": "Elemental image can easily be remastered using a docker build.",
+  "description": "Elemental Teal images can be customized in different ways.",
   "source": "@site/docs/customizing.md",
   "sourceDirName": ".",
   "slug": "/customizing",

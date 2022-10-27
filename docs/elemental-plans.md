@@ -37,7 +37,7 @@ Both one time instructions and periodic instructions can run either a direct com
 
 You can add local plans to Elemental as part of the `MachineRegistration` CRD, in the `cloud-config` section as follows:
 
-```yaml
+```yaml showLineNumbers
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -84,7 +84,7 @@ The following plans are provided as a quick reference and are not guaranteed to 
 <Tabs>
 <TabItem value="example1" label="Example 1: one time instructions" default>
 
-```json
+```json showLineNumbers
 {"instructions":
     [
         {
@@ -104,7 +104,7 @@ The following plans are provided as a quick reference and are not guaranteed to 
 </TabItem>
 <TabItem value="example2" label="Example 2: periodic instructions">
 
-```json
+```json showLineNumbers
 {"periodicInstructions":
     [
         {
@@ -119,7 +119,7 @@ The following plans are provided as a quick reference and are not guaranteed to 
 </TabItem>
 <TabItem value="example3" label="Example 3: files">
 
-```json
+```json showLineNumbers
 {"files":
     [
         {
@@ -134,7 +134,7 @@ The following plans are provided as a quick reference and are not guaranteed to 
 </TabItem>
 <TabItem value="example4" label="Example 4: probes">
 
-```json
+```json showLineNumbers
 {"probes":
     "probe1": {
         "name": "Service Up",

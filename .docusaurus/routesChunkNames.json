@@ -179,7 +179,7 @@
     "sidebar": "sidebar---blog-814-8ac",
     "content": "content---blog-welcomed-9-f-ffb"
   },
-  "/-c41": {
+  "/-1b5": {
     "__comp": "__comp---theme-doc-page-1-be-9be",
     "__context": {
       "plugin": "plugin---810-900"
@@ -194,9 +194,17 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---architecture-528-630"
   },
+  "/backup-f90": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---backup-1-b-0-97a"
+  },
   "/cloud-config-reference-c7a": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---cloud-config-reference-5-d-5-557"
+  },
+  "/cluster-reference-090": {
+    "__comp": "__comp---theme-doc-item-178-a40",
+    "content": "content---cluster-reference-9-ff-4ed"
   },
   "/customizing-2cc": {
     "__comp": "__comp---theme-doc-item-178-a40",
@@ -206,7 +214,7 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---elemental-plans-54-d-77f"
   },
-  "/elementaloperatorchart-reference-c53": {
+  "/elementaloperatorchart-reference-1e8": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---elementaloperatorchart-referenceaa-6-c07"
   },
@@ -218,7 +226,7 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---kubernetesversions-8-d-8-3aa"
   },
-  "/machineinventoryselectortemplate-reference-b0b": {
+  "/machineinventoryselectortemplate-reference-0a6": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---machineinventoryselectortemplate-referenceeff-6c8"
   },
@@ -238,7 +246,7 @@
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---quickstart-807-41f"
   },
-  "/smbios-944": {
+  "/smbios-b56": {
     "__comp": "__comp---theme-doc-item-178-a40",
     "content": "content---smbios-0-c-9-082"
   },
