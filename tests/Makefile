@@ -64,4 +64,4 @@ e2e-bootstrap-node: deps
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade -r -v ./e2e
 start-cypress-tests:
-	@./scripts/start_cypress_tests.sh
+	@./tests/scripts/start_cypress_tests.sh
