@@ -59,13 +59,7 @@ const config = {
             type: 'doc',
             docId: 'index',
             position: 'left',
-            label: 'Elemental',
-          },
-          {
-            type: 'doc',
-            docId: 'operator/index',
-            position: 'left',
-            label: 'Operator',
+            label: 'Documentation',
           },
           {
             href: 'https://github.com/rancher/elemental',
@@ -83,10 +77,6 @@ const config = {
               {
                 label: 'Elemental',
                 to: '/',
-              },
-              {
-                label: 'Operator',
-                to: 'operator/',
               },
             ],
           },

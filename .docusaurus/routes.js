@@ -94,7 +94,7 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '1b5'),
+    component: ComponentCreator('/', 'd4c'),
     routes: [
       {
         path: '/',
@@ -151,6 +151,12 @@ export default [
         sidebar: "elemental"
       },
       {
+        path: '/inventory-management',
+        component: ComponentCreator('/inventory-management', 'f0e'),
+        exact: true,
+        sidebar: "elemental"
+      },
+      {
         path: '/kubernetesversions',
         component: ComponentCreator('/kubernetesversions', '91c'),
         exact: true,
@@ -167,18 +173,6 @@ export default [
         component: ComponentCreator('/machineregistration-reference', 'a3f'),
         exact: true,
         sidebar: "elemental"
-      },
-      {
-        path: '/operator/',
-        component: ComponentCreator('/operator/', 'ec5'),
-        exact: true,
-        sidebar: "operator"
-      },
-      {
-        path: '/operator/inventory-management',
-        component: ComponentCreator('/operator/inventory-management', 'd30'),
-        exact: true,
-        sidebar: "operator"
       },
       {
         path: '/quickstart',

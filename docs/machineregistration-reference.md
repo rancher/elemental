@@ -7,7 +7,7 @@ title: ''
 
 The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.
 
-There are several keys that can be configured under a `#!yaml MachineRegistration` resource spec.
+There are several keys that can be configured under a `MachineRegistration` resource spec.
 
 There are several keys that can be configured under a `MachineRegistration` resource spec.
 
@@ -38,17 +38,17 @@ spec:
 Contains the cloud-configuration to be injected in the node. See the [Cloud Config Reference](cloud-config-reference.md) for full information.
 
 #### config.elemental.registration
-Contains the configuration used for the connection and the initial registration to the {{elemental.operator.name}}.
+Contains the configuration used for the connection and the initial registration to the <Vars name="elemental_operator_name" />.
 
 Supports the following values:
 
 | Key               | Type   | Default value | Description                                                                                                                        |
 |-------------------|--------|---------------|------------------------------------------------------------------------------------------------------------------------------------|
-| url               | string | empty         | URL to connect to the {{elemental.operator.name}}                                                                                  |
+| url               | string | empty         | URL to connect to the <Vars name="elemental_operator_name" />                                                                                  |
 | ca-cert           | string | empty         | CA to validate the certificate provided by the server at 'url' (required if the certificate is not signed by a public CA)          |
 | emulate-tpm       | bool   | false         | this will use software emulation of the TPM (required for hosts without TPM hardware)                                              |
 | emulated-tpm-seed | int64  | 1             | fixed seed to use with 'emulate-tpm': use for debug purposes only                                                                  |
-| no-smbios         | bool   | false         | whether SMBIOS data should be sent to the {{elemental.operator.name}} (see the [SMBIOS reference](smbios.md) for more information) |
+| no-smbios         | bool   | false         | whether SMBIOS data should be sent to the <Vars name="elemental_operator_name" /> (see the [SMBIOS reference](smbios.md) for more information) |
 
 #### config.elemental.install
 
@@ -126,7 +126,7 @@ The UUID will be retrieved from the SMBIOS data if available, otherwise a random
 
 #### machineInventoryLabels
 
-Labels that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
+Labels that will be set to the `MachineInventory` that is created from this `MachineRegistration`
 `Key: value` type. These labels will be used to establish a selection criteria in [MachineInventorySelectorTemplate](machineinventoryselectortemplate-reference.md).
 
 :::info
@@ -152,11 +152,12 @@ See our [SMBIOS docs](smbios.md) for more information.
       my.prefix.io/serialNumber: "${System Information/Serial Number}"
       my.prefix.io/machineUUID: "${System Information/UUID}"
   ```
+
 </details>
 
 #### machineInventoryAnnotations
 
-Annotations that will be set to the `#!yaml MachineInventory` that is created from this `#!yaml MachineRegistration`
+Annotations that will be set to the `MachineInventory` that is created from this `MachineRegistration`
 `Key: value` type
 
 <details>
@@ -173,4 +174,5 @@ Annotations that will be set to the `#!yaml MachineInventory` that is created fr
       owner: bob
       version: 1.0.0
   ```
+
 </details>

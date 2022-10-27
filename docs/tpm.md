@@ -12,7 +12,7 @@ After starting virt-manager create new virtual machine
 
 ![Create new VM](images/tpm1.png)
 
-### Vedify and edit hardware module list
+### Verify and edit hardware module list
 
 On the hardware configuration screen, verify list of modules and click ***Add Hardware*** button
 
@@ -29,7 +29,6 @@ From the list of emulated devices choose TPM module and add it to VM
 On the last screen verify once again if TPM module was added properly
 
 ![Verify TPM](images/tpm4.png)
-
 
 ## Add TPM emulation to bare metal machine
 

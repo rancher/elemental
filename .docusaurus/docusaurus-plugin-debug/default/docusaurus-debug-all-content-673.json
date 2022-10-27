@@ -21,7 +21,7 @@
               "unversionedId": "architecture",
               "id": "architecture",
               "title": "",
-              "description": "The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the {{elemental.operator.name}}, that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
+              "description": "The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the , that allows central management of the Elemental OS via Rancher, the Kubernetes way.",
               "source": "@site/docs/architecture.md",
               "sourceDirName": ".",
               "slug": "/architecture",
@@ -61,8 +61,8 @@
               },
               "sidebar": "elemental",
               "previous": {
-                "title": "Smbios",
-                "permalink": "/smbios"
+                "title": "Inventory Management",
+                "permalink": "/inventory-management"
               }
             },
             {
@@ -245,6 +245,32 @@
               }
             },
             {
+              "unversionedId": "inventory-management",
+              "id": "inventory-management",
+              "title": "",
+              "description": "Inventory Management",
+              "source": "@site/docs/inventory-management.md",
+              "sourceDirName": ".",
+              "slug": "/inventory-management",
+              "permalink": "/inventory-management",
+              "draft": false,
+              "tags": [],
+              "version": "current",
+              "frontMatter": {
+                "sidebar_label": "Inventory Management",
+                "title": ""
+              },
+              "sidebar": "elemental",
+              "previous": {
+                "title": "Smbios",
+                "permalink": "/smbios"
+              },
+              "next": {
+                "title": "Backup",
+                "permalink": "/backup"
+              }
+            },
+            {
               "unversionedId": "kubernetesversions",
               "id": "kubernetesversions",
               "title": "",
@@ -323,50 +349,6 @@
               }
             },
             {
-              "unversionedId": "operator/index",
-              "id": "operator/index",
-              "title": "",
-              "description": "elemental-operator The Elemental operator is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.",
-              "source": "@site/docs/operator/index.md",
-              "sourceDirName": "operator",
-              "slug": "/operator/",
-              "permalink": "/operator/",
-              "draft": false,
-              "tags": [],
-              "version": "current",
-              "frontMatter": {
-                "sidebar_label": "Operator overview",
-                "title": ""
-              },
-              "sidebar": "operator",
-              "next": {
-                "title": "Inventory Management",
-                "permalink": "/operator/inventory-management"
-              }
-            },
-            {
-              "unversionedId": "operator/inventory-management",
-              "id": "operator/inventory-management",
-              "title": "",
-              "description": "Inventory Management",
-              "source": "@site/docs/operator/inventory-management.md",
-              "sourceDirName": "operator",
-              "slug": "/operator/inventory-management",
-              "permalink": "/operator/inventory-management",
-              "draft": false,
-              "tags": [],
-              "version": "current",
-              "frontMatter": {
-                "sidebar_label": "Inventory Management",
-                "title": ""
-              },
-              "sidebar": "operator",
-              "previous": {
-                "title": "Operator overview",
-                "permalink": "/operator/"
-              }
-            },
-            {
               "unversionedId": "quickstart",
               "id": "quickstart",
               "title": "",
@@ -396,7 +378,7 @@
               "unversionedId": "smbios",
               "id": "smbios",
               "title": "",
-              "description": "Introduction",
+              "description": "",
               "source": "@site/docs/smbios.md",
               "sourceDirName": ".",
               "slug": "/smbios",
@@ -414,8 +396,8 @@
                 "permalink": "/kubernetesversions"
               },
               "next": {
-                "title": "Backup",
-                "permalink": "/backup"
+                "title": "Inventory Management",
+                "permalink": "/inventory-management"
               }
             },
             {
@@ -538,6 +520,18 @@
                 "type": "category",
                 "collapsible": true,
                 "collapsed": false,
+                "label": "Operator",
+                "items": [
+                  {
+                    "type": "doc",
+                    "id": "inventory-management"
+                  }
+                ]
+              },
+              {
+                "type": "category",
+                "collapsible": true,
+                "collapsed": false,
                 "label": "Backup",
                 "items": [
                   {
@@ -545,16 +539,6 @@
                     "id": "backup"
                   }
                 ]
-              }
-            ],
-            "operator": [
-              {
-                "type": "doc",
-                "id": "operator/index"
-              },
-              {
-                "type": "doc",
-                "id": "operator/inventory-management"
               }
             ]
           }

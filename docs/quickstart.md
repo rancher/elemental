@@ -262,7 +262,7 @@ To see all compatible versions check the [Rancher Support Matrix](https://www.su
 
 You can also check our [Version doc](kubernetesversions.md) to know how to obtain those versions.
 
-Check our [Cluster Spec](cluster-reference.md) page for more info about the `#!yaml Cluster` resource.
+Check our [Cluster Spec](cluster-reference.md) page for more info about the `Cluster` resource.
 
 ## How can I follow what is going on behind the scenes?
 

@@ -49,17 +49,21 @@ const sidebars = {
       type: 'category',
       collapsible: true,
       collapsed: false,
+      label: 'Operator',
+      items: [
+        'inventory-management',
+      ]
+    },
+    {
+      type: 'category',
+      collapsible: true,
+      collapsed: false,
       label: 'Backup',
       items: [
         'backup',
       ]
     },
   ],
-
-  operator: [
-    'operator/index',
-    'operator/inventory-management',
-  ]
 
   // But you can create a sidebar manually
   /*

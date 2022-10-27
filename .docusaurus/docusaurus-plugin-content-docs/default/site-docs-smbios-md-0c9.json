@@ -2,7 +2,7 @@
   "unversionedId": "smbios",
   "id": "smbios",
   "title": "",
-  "description": "Introduction",
+  "description": "",
   "source": "@site/docs/smbios.md",
   "sourceDirName": ".",
   "slug": "/smbios",
@@ -20,7 +20,7 @@
     "permalink": "/kubernetesversions"
   },
   "next": {
-    "title": "Backup",
-    "permalink": "/backup"
+    "title": "Inventory Management",
+    "permalink": "/inventory-management"
   }
 }

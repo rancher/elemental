@@ -56,6 +56,11 @@
               "sidebar": "elemental"
             },
             {
+              "id": "inventory-management",
+              "path": "/inventory-management",
+              "sidebar": "elemental"
+            },
+            {
               "id": "kubernetesversions",
               "path": "/kubernetesversions",
               "sidebar": "elemental"
@@ -69,16 +74,6 @@
               "id": "machineregistration-reference",
               "path": "/machineregistration-reference",
               "sidebar": "elemental"
-            },
-            {
-              "id": "operator/index",
-              "path": "/operator/",
-              "sidebar": "operator"
-            },
-            {
-              "id": "operator/inventory-management",
-              "path": "/operator/inventory-management",
-              "sidebar": "operator"
             },
             {
               "id": "quickstart",
@@ -106,12 +101,6 @@
               "link": {
                 "path": "/",
                 "label": "index"
-              }
-            },
-            "operator": {
-              "link": {
-                "path": "/operator/",
-                "label": "operator/index"
               }
             }
           }

@@ -1,0 +1,26 @@
+{
+  "unversionedId": "inventory-management",
+  "id": "inventory-management",
+  "title": "",
+  "description": "Inventory Management",
+  "source": "@site/docs/inventory-management.md",
+  "sourceDirName": ".",
+  "slug": "/inventory-management",
+  "permalink": "/inventory-management",
+  "draft": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {
+    "sidebar_label": "Inventory Management",
+    "title": ""
+  },
+  "sidebar": "elemental",
+  "previous": {
+    "title": "Smbios",
+    "permalink": "/smbios"
+  },
+  "next": {
+    "title": "Backup",
+    "permalink": "/backup"
+  }
+}
