@@ -19,7 +19,7 @@ Cypress.Commands.add('login', (username = Cypress.env('username'), password = Cy
 
     cy.get('button').click();
     cy.wait('@loginReq');
-    cy.contains("Getting Started", {timeout: 10000}).should('be.visible');
+    cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
     } 
 
   if (cacheSession) {
@@ -60,6 +60,13 @@ Cypress.Commands.add('typeValue', ({label, value, noLabel, log=true}) => {
   }
 });
 
+// Make sure we are in the desired menu inside a cluster (local by default)
+// You can access submenu by giving submenu name in the array
+// ex:  cy.clickClusterMenu(['Menu', 'Submenu'])
+Cypress.Commands.add('clickClusterMenu', (listLabel: string[]) => {
+  listLabel.forEach(label => cy.get('nav').contains(label).click());
+});
+
 // Insert a key/value pair
 Cypress.Commands.add('typeKeyValue', ({key, value}) => {
   cy.get(key).clear().type(value);
@@ -87,6 +94,27 @@ for (const command of ['visit', 'click', 'trigger', 'type', 'clear', 'reload', '
     });
 }; 
 
+// Add Helm repo
+Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
+  cy.clickClusterMenu(['Apps', 'Repositories'])
+
+  // Make sure we are in the 'Repositories' screen (test failed here before)
+  cy.contains('header', 'Repositories', {timeout: 8000}).should('be.visible');
+  cy.contains('Create').should('be.visible');
+
+  cy.clickButton('Create');
+  cy.contains('Repository: Create').should('be.visible');
+  cy.typeValue({label: 'Name', value: repoName});
+  if (repoType === 'git') {
+    cy.contains('Git repository').click();
+    cy.typeValue({label: 'Git Repo URL', value: repoUrl});
+    cy.typeValue({label: 'Git Branch', value: 'main'});
+  } else {
+    cy.typeValue({label: 'Index URL', value: repoUrl});
+  }
+  cy.clickButton('Create');
+});
+
 // Machine registration functions
 
 // Create a machine registration
@@ -105,16 +133,16 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   if (checkLabels) {
     cy.clickButton('Add Label');
     cy.contains('.row', 'Labels').within(() => {
-      cy.get('.kv-item.key').type('myLabel1');
-      cy.get('.kv-item.value').type('myLabelValue1');
+      cy.get(':nth-child(2) > [data-layer="Content"]').type('myLabel1');
+      cy.get(':nth-child(1) > .key-value > .kv-container > .value > .no-resize').type('myLabelValue1');
     })
   }
 
   if (checkAnnotations) {
     cy.clickButton('Add Annotation')
     cy.contains('.row', 'Annotations').within(() => {
-      cy.get('.kv-item.key').type('myAnnotation1');
-      cy.get('.kv-item.value').type('myAnnotationValue1');
+      cy.get(':nth-child(3) > [data-layer="Content"]').type('myAnnotation1');
+      cy.get(':nth-child(3) > .key-value > .kv-container > .value > .no-resize').type('myAnnotationValue1');
     })
   }
 

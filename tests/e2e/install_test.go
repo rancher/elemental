@@ -109,7 +109,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			// Set flags for Rancher Manager installation
 			hostname := os.Getenv("HOSTNAME")
-			uiVersion := os.Getenv("DASHBOARD_VERSION")
 			flags := []string{
 				"upgrade", "--install", "rancher", "rancher/rancher",
 				"--namespace", "cattle-system",
@@ -119,16 +118,16 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				"--set", "extraEnv[0].value=https://" + hostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
-				"--set", "extraEnv[2].name=CATTLE_UI_DASHBOARD_INDEX",
-				"--set", "extraEnv[2].value=https://releases.rancher.com/dashboard/" + uiVersion + "/index.html",
-				"--set", "extraEnv[3].name=CATTLE_UI_OFFLINE_PREFERRED",
-				"--set", "extraEnv[3].value=Remote",
 				"--set", "replicas=1",
 			}
 
 			// Set specified version if needed
 			if rancherVersion != "" && rancherVersion != "latest" {
-				flags = append(flags, "--version", rancherVersion)
+				if rancherVersion == "devel" {
+					flags = append(flags, "--devel")
+				} else {
+					flags = append(flags, "--version", rancherVersion)
+				}
 			}
 
 			err = kubectl.RunHelmBinaryWithCustomErr(flags...)
