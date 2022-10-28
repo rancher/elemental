@@ -68,7 +68,7 @@ If both `osImage` and `ManagedOSVersion` are defined in the same `ManagedOSImage
 
 ### Managing available versions
 
-An `ManagedOSVersionChannel` resource can be created in a Kubernetes cluster where the elemental operator is installed to synchronize available versions for upgrades.
+An `ManagedOSVersionChannel` resource can be created in a Kubernetes cluster where the Elemental operator is installed to synchronize available versions for upgrades.
 
 It has a syncer in order to generate `ManagedOSVersion` automatically. Currently, we provide a json syncer and a custom one.
 
