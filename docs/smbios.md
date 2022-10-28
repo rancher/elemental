@@ -11,7 +11,7 @@ The System Management BIOS (SMBIOS) specification defines data structures (and a
 
 This allows us to gather hardware information about the running system and use that as part of our labels.
 
-## How does elemental uses SMBIOS data?
+## How does Elemental uses SMBIOS data?
 
 The registration client tries to gather SMBIOS data by running `dmidecode` during the initial registration of the node and that data is
 sent to the registration controller to use on interpolating different fields in the inventory that we create for that node.

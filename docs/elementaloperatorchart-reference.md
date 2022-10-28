@@ -17,15 +17,15 @@ The associated chart bootstraps an elemental-operator deployment on the [Rancher
 ## Get Helm chart info
 
 ```console showLineNumbers
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
-helm show all oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+helm pull oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
+helm show all oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 ## Install Chart
 
 ```console showLineNumbers
 helm install --create-namespace -n cattle-elemental-system elemental-operator \
-             oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+             oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 The command deploys elemental-operator on the Kubernetes cluster in the default configuration.
@@ -49,7 +49,7 @@ _See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command doc
 ```console showLineNumbers
 helm upgrade -n cattle-elemental-system \
              --install elemental-operator \
-             oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+             oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 _See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
