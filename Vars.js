@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Global variables to be adapted
 export const data = {
   elemental_slack_name: "#elemental",
   elemental_slack_url: "https://rancher-users.slack.com/channels/elemental",
@@ -15,17 +16,28 @@ export const data = {
   ranchersystemagent_url: "https://github.com/rancher/system-agent",
 }
 
+/***
+ * DO NOT TOUCH -- Docusaurus component logic
+***/
 export default function Vars({children, name, link}) {
-
+  // Check if the link variable is set
   if (link !== undefined) {
+    // Check if the link has a trailing path
+    const linkparts = link.split(/\/(.*)/s)
+    // Sets the URL to the global variable
+    var linkurl = `${data[linkparts[0]]}`
+    // Adds the trailing path if it exists
+    if (linkparts.length > 2) {
+      linkurl = `${data[linkparts[0]]}/${linkparts[1]}`
+    }
     if (children !== undefined) {
       return (
-        <a href={data[link]}>{children}</a>
+        <a href={linkurl}>{children}</a>
       )
     }
     else {
       return (
-        <a href={data[link]}>{data[name]}</a>
+        <a href={linkurl}>{data[name]}</a>
       )
     }
   }

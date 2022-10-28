@@ -54,8 +54,7 @@ The installation media is the media that will be used to kick start an Elemental
 the supported media is a live ISO. The live ISO must include the registration configuration yaml hence it must
 crafted once the MachineRegistration is created. The installation media is created by using the `elemental-iso-add-registration`
 helper script (see [quick start](quickstart.md#preparing-the-iso) guide)
-or by using the `elemental build-iso` command line utility included as part of the
-[Elemental Toolkit]({{elemental.toolkit.url}}/docs/creating-derivatives/build_iso).
+or by using the `elemental build-iso` command line utility included as part of the <Vars name="elemental_toolkit_name" link="elemental_toolkit_url/docs/creating-derivatives/build_iso" />.
 
 Within MachineRegistration only a subset of OS installation parameters can be configured, all available parameters are listed
 at [MachineRegistration](machineregistration-reference.md) reference page.
