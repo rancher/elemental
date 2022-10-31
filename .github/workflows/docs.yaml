@@ -12,10 +12,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup Docusaurus
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: yarn
+          cache-dependency-path: yarn.lock
       - name: Build website
         run: |
           yarn install --frozen-lockfile
