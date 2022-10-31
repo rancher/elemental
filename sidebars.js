@@ -61,6 +61,7 @@ const sidebars = {
       label: 'Backup',
       items: [
         'backup',
+        'restore',
       ]
     },
   ],
