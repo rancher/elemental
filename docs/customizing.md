@@ -34,7 +34,7 @@ custom [configuration file](https://rancher.github.io/elemental-toolkit/docs/cus
 In order to set a custom configuration file in the installation
 media the MachineRegistration resource associated with this ISO should also include
 the Elemental client configuration directory. For that purpose, the `install` field
-supports the `config-dir` field. See [MachineRegistration reference](../machineregistration-reference#configelementalinstall) and the example
+supports the `config-dir` field. See [MachineRegistration reference](/machineregistration-reference#configelementalinstall) and the example
 below:
 
 ```yaml showLineNumbers
@@ -62,7 +62,7 @@ as `/elemental.conf.d/config.yaml`.
 
 In order to include additional cloud-init files during the installation they need
 to be added to the installation data into the MachineRegistration resource. More specific
-the `config-urls` field is used for this exact purpose. See [MachineRegistration reference](../machineregistration-reference) page.
+the `config-urls` field is used for this exact purpose. See [MachineRegistration reference](/machineregistration-reference) page.
 
 `config-urls` is a list of string literals where each item is an http url pointing to a
 cloud-init file or a local path of a cloud init file. Note the local path is evaluated at the
