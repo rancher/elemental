@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
   deploy:
@@ -12,15 +11,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Setup Docusaurus
+        uses: actions/setup-node@v2
         with:
-          python-version: 3.x
-      - name: Install dependencies
-        run: pip install mkdocs-material mkdocs-markdownextradata-plugin
-      - name: Deploy docs
-        if: ${{ github.event_name == 'push' }}
-        run: mkdocs gh-deploy --force --strict
-      - name: Build docs
-        if: ${{ github.event_name == 'pull_request' }}
-        run: mkdocs build --strict
+          node-version: 16.x
+          cache: yarn
+      - name: Build website
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
