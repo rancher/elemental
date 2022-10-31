@@ -17,10 +17,10 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-k3s
-      dashboard_version: elemental-dev
-      k8s_version_to_provision: v1.24.4+k3s1
-      rancher_channel: stable
-      rancher_version: latest
+      k8s_version_to_provision: v1.24.7+k3s1
+      ca_type: selfsigned
+      rancher_channel: latest
+      rancher_version: devel
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       start_condition: success
       test_type: ui

@@ -13,16 +13,16 @@ on:
         description: Name of the provisioned cluster
         required: true
         type: string
-      dashboard_version:
-        description: Version of the dashboard UI to use
-        required: true
-        type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
         required: false
         type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
+        required: true
+        type: string
+      ca_type:
+        description: CA type to use (selfsigned or private)
         required: true
         type: string
       rancher_channel:
@@ -103,7 +103,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
-      - name: Download default ISO (if needed)
+      - name: Download default ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
         uses: dawidd6/action-download-artifact@v2.24.0
@@ -113,7 +113,7 @@ jobs:
           name: iso-image
           # Force the path, this is a security hint!
           path: ./
-      - name: Download specified ISO (if needed)
+      - name: Download specified ISO
         if: ${{ inputs.iso_to_test != '' }}
         env:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
@@ -136,13 +136,14 @@ jobs:
           # Looks a little bit weird but we have to keep the ISO in build!
           mv -f elemental-*.iso build/
       - name: Clean local Helm repositories
-        if: ${{ inputs.test_type == 'cli' }}
         run: |
           # Clean Helm repo
           HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
           [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: Install Rancher
         id: installation
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
         run: |
           export MY_HOSTNAME=$(hostname -f)
           echo "MY_HOSTNAME=$MY_HOSTNAME" >> $GITHUB_OUTPUT
@@ -158,6 +159,7 @@ jobs:
           RANCHER_USER: admin
           SPEC: |
             cypress/e2e/unit_tests/first_connection.spec.ts
+            cypress/e2e/unit_tests/elemental_plugin.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
         run: make -f tests/Makefile start-cypress-tests
@@ -264,7 +266,7 @@ jobs:
       - name: Remove remaining stuff from worker ♻
         if: always()
         uses: colpal/actions-clean@v1
-      - name: Send failed status to slack (if needed)
+      - name: Send failed status to slack
         if: failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:

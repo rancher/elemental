@@ -15,7 +15,7 @@ concurrency:
 env:
   REPO: ttl.sh/elemental-ci
 jobs:
-  tests-installer:
+  container-tests:
     runs-on: macos-12
     steps:
       - name: Checkout code
@@ -39,8 +39,6 @@ jobs:
       - name: Download artifacts
         uses: dawidd6/action-download-artifact@v2.24.0
         with:
-          #workflow: ${{ github.event.workflow_run.workflow_id }}
-          #workflow_conclusion: success
           workflow: build-ci.yaml
           run_id: ${{ github.event.workflow_run.id }}
           name: iso-image
@@ -53,7 +51,7 @@ jobs:
           export CONTAINER_IMAGE=${REPO}:${GIT_TAG}-${GIT_COMMIT_SHORT}
           export COS_HOST=127.0.0.1:2222
           export ISO=$PWD/$(ls elemental-*.iso 2>/dev/null)
-          cd tests && make installer-tests
+          cd tests && make container-tests
       - name: Upload logs
         uses: actions/upload-artifact@v3
         if: failure()
@@ -66,7 +64,7 @@ jobs:
         run: |
           cd tests && make clean || true
           sudo rm -rf build bin dist || true
-  tests-vbox:
+  iso-tests:
     runs-on: macos-12
     steps:
       - name: Checkout code
@@ -96,8 +94,6 @@ jobs:
       - name: Download artifacts
         uses: dawidd6/action-download-artifact@v2.24.0
         with:
-          #workflow: ${{ github.event.workflow_run.workflow_id }}
-          #workflow_conclusion: success
           workflow: build-ci.yaml
           run_id: ${{ github.event.workflow_run.id }}
           name: iso-image
@@ -107,7 +103,7 @@ jobs:
         run: |
           export COS_HOST=127.0.0.1:2222
           export ISO=$PWD/$(ls elemental-*.iso 2>/dev/null)
-          cd tests && make vbox-tests
+          cd tests && make iso-tests
       - name: Upload logs
         uses: actions/upload-artifact@v3
         if: failure()
