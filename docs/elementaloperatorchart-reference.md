@@ -1,6 +1,11 @@
+---
+sidebar_label: Elemental Operator Helm Chart
+title: ''
+---
+
 # Elemental Operator Helm Chart
 
-The [{{elemental.operator.name}}]({{elemental.operator.url}}) is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.
+The <Vars name="elemental_operator_name" link="elemental_operator_url" /> is responsible for managing the Elemental versions and maintaining a machine inventory to assist with edge or bare metal installations.
 
 The associated chart bootstraps an elemental-operator deployment on the [Rancher Manager v2.6](https://rancher.com/docs/rancher/v2.6/) cluster using the [Helm](https://helm.sh) package manager.
 
@@ -11,16 +16,16 @@ The associated chart bootstraps an elemental-operator deployment on the [Rancher
 
 ## Get Helm chart info
 
-```console
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
-helm show all oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+```console showLineNumbers
+helm pull oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
+helm show all oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 ## Install Chart
 
-```console
+```console showLineNumbers
 helm install --create-namespace -n cattle-elemental-system elemental-operator \
-             oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+             oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 The command deploys elemental-operator on the Kubernetes cluster in the default configuration.
@@ -31,7 +36,7 @@ _See [helm install](https://helm.sh/docs/helm/helm_install/) for command documen
 
 ## Uninstall Chart
 
-```console
+```console showLineNumbers
 helm uninstall -n cattle-elemental-system elemental-operator
 ```
 
@@ -41,10 +46,10 @@ _See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command doc
 
 ## Upgrading Chart
 
-```console
+```console showLineNumbers
 helm upgrade -n cattle-elemental-system \
              --install elemental-operator \
-             oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
+             oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/elemental/elemental-operator
 ```
 
 _See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
@@ -53,7 +58,7 @@ _See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documen
 
 See [Customizing the Chart Before Installing](https://helm.sh/docs/intro/using_helm/#customizing-the-chart-before-installing). To see all configurable options with detailed comments, visit the chart's [values](#values), or run these configuration commands:
 
-```console
+```console showLineNumbers
 helm show values oci://registry.opensuse.org/isv/rancher/elemental/charts/elemental/elemental-operator
 ```
 
