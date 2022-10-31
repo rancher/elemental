@@ -136,4 +136,5 @@ build_all: build iso extract_kernel_init_squash ipxe
 
 .PHONY: docs
 docs:
-	mkdocs build
+	yarn install --frozen-lockfile
+	yarn build
