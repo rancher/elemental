@@ -1,0 +1,992 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://rancher.github.io/elemental/installation/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+    
+    
+      
+        <title>Elemental - Immutable Linux for Rancher</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.20d9efc8.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.cbb835fc.min.css">
+        
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#installation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://rancher.github.io/elemental" title="Elemental - Immutable Linux for Rancher" class="md-header__button md-logo" aria-label="Elemental - Immutable Linux for Rancher" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Elemental - Immutable Linux for Rancher
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Dark Mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Dark Mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0Z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="grey" data-md-color-accent=""  aria-label="Light Mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Light Mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0 8a5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5 5 5 0 0 1-5 5m0-12.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5Z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/rancher/elemental" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rancher/elemental
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://rancher.github.io/elemental" title="Elemental - Immutable Linux for Rancher" class="md-nav__button md-logo" aria-label="Elemental - Immutable Linux for Rancher" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Elemental - Immutable Linux for Rancher
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/rancher/elemental" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    rancher/elemental
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        Architecture
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Install/Upgrade
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Install/Upgrade" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Install/Upgrade
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elemental-operator-installation" class="md-nav__link">
+    Elemental Operator Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prepare-kubernetes-resources" class="md-nav__link">
+    Prepare Kubernetes Resources
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prepare-installation-media" class="md-nav__link">
+    Prepare Installation Media
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#start-installation-process" class="md-nav__link">
+    Start Installation Process
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployed-elemental-teal-partition-table" class="md-nav__link">
+    Deployed Elemental Teal Partition Table
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elemental-teal-immutable-root" class="md-nav__link">
+    Elemental Teal Immutable Root
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../upgrade/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../customizing/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../elemental-plans/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5">
+          Reference
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Reference" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud-config-reference/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../machineregistration-reference/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../machineinventoryselectortemplate-reference/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster-reference/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../elementaloperatorchart-reference/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kubernetesversions/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../smbios/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_6">
+          Backup/Restore
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Backup/Restore" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Backup/Restore
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../backup/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../restore/" class="md-nav__link">
+        
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <a href="https://github.com/rancher/elemental/edit/main/docs/installation.md" title="Edit this page" class="md-content__button md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
+  </a>
+
+
+<h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Elemental stack provides OS management using OCI containers and Kubernetes. The Elemental
+stack installation encompasses the installation of the <Vars name="elemental_operator_name" /> into the
+management cluster and the creation and use of Elemental Teal installation media to
+provide the OS into the Cluster Nodes. See <a href="../architecture/">Architecture</a> section to read about the
+interaction of the components.</p>
+<p>The installation configuration is mostly applied and set as part of the registration process.
+The registration process is done by the <code>elemental-register</code> (the <Vars name="elemental_operator_name" /> client part)
+who is the responsible to register nodes in a Rancher management cluster and fetch the installation configuration.</p>
+<p>Please refer to the <a href="../quickstart/">Quick Start</a> guide for simple step by step deployment instructions.</p>
+<h2 id="elemental-operator-installation">Elemental Operator Installation<a class="headerlink" href="#elemental-operator-installation" title="Permanent link">&para;</a></h2>
+<p>The <Vars name="elemental_operator_name" /> is responsible for managing the Elemental versions and
+maintaining a machine inventory to assist with edge or bare metal installations. <Vars name="elemental_operator_name" />
+requires a cluster including the Rancher Manager and it can be installed with a helm chart.</p>
+<p>See <Vars name="elemental_operator_name" /> <a href="../elementaloperatorchart-reference/">helm chart reference</a> for install,
+uninstall, upgrade and configuration details.</p>
+<h2 id="prepare-kubernetes-resources">Prepare Kubernetes Resources<a class="headerlink" href="#prepare-kubernetes-resources" title="Permanent link">&para;</a></h2>
+<p>Once the <Vars name="elemental_operator_name" /> is up and running within the management cluster a couple of kubernetes
+resources are required in order to prepare an Elemental based cluster deployment.</p>
+<ul>
+<li>
+<p><a href="../machineinventoryselectortemplate-reference/">MachineInventorySelectorTemplate</a>:
+  This resource identifies the criteria to match registered boxes (listed as part of the MachineInventory)
+  against available Rancher 2.6 Clusters. As soon as there is a match the selected kubernetes cluster takes
+  ownership of the registered box.</p>
+</li>
+<li>
+<p><a href="../machineregistration-reference/">MachineRegistration</a>:
+  This resource defines OS deployment details for any machine attempting to register. The machine
+  registration is the entrance for Elemental nodes as it handles the authentication (based on TPM),
+  the Elemental Teal deployment and the node inclusion into to the MachineInventory so it can be added
+  to a cluster when there is a match based on a MachineInventorySelectorTemplate. The MachineRegistration
+  object includes the machine registration URL that nodes use to register against it.</p>
+</li>
+</ul>
+<p>A Rancher Cluster resource is also required to deploy Elemental, it can be manually created as exemplified in
+the <a href="../quickstart/">Quick Start</a> guide or created from the Rancher 2.6 UI.</p>
+<h2 id="prepare-installation-media">Prepare Installation Media<a class="headerlink" href="#prepare-installation-media" title="Permanent link">&para;</a></h2>
+<p>The installation media is the media that will be used to kick start an Elemental Teal deployment. Currently
+the supported media is a live ISO. The live ISO must include the registration configuration yaml hence it must
+crafted once the MachineRegistration is created. The installation media is created by using the <code>elemental-iso-add-registration</code>
+helper script (see <a href="../quickstart/#preparing-the-iso">quick start</a> guide)
+or by using the <code>elemental build-iso</code> command line utility included as part of the <Vars name="elemental_toolkit_name" link="elemental_toolkit_url/docs/creating-derivatives/build_iso" />.</p>
+<p>Within MachineRegistration only a subset of OS installation parameters can be configured, all available parameters are listed
+at <a href="../machineregistration-reference/">MachineRegistration</a> reference page.</p>
+<p>In order to configure the installation beyond the common options provided within the
+<a href="../machineregistration-reference/#configelementalinstall"><code>elemental.install</code></a> section a <code>config.yaml</code>
+configuration file can be included into the ISO (see <a href="../customizing/#custom-elemental-client-configuration-file">Custom Images</a>).
+Note any configuration applied as part of <code>elemental.install</code> section of the MachineRegistration will be
+applied on top of the settings included in any custom <code>config.yaml</code> file.</p>
+<p>Most likely the cloud-init configuration is enough to configure and set the deployed node at boot, however
+if for some reason firstboot actions or scripts are required it is possible to also include
+Rancher System Agent plans into the installation media. Refer to the <a href="../elemental-plans/">Elemental Plans</a> section for details and
+some example plans. The plans could be included into the squashed rootfs at <code>/var/lib/elemental/agent/plans</code>
+folder and they would be seen by the system agent at firstboot.</p>
+<h2 id="start-installation-process">Start Installation Process<a class="headerlink" href="#start-installation-process" title="Permanent link">&para;</a></h2>
+<p>The installation starts by booting the installation media on a node. Once the installation media has booted it will
+attempt to contact the management cluster and register to it by calling <code>elemental-register</code> command.
+As the registration yaml configuration is already included into the ISO <code>elemental-register</code> knows the registration URL and
+any other required data for the registration.</p>
+<p>On a succeeded registration the installation media will start the Elemental Teal installation into the host based
+on the configuration already included in the media and the MachineRegistration parameters. As soon as the installation
+is done the node is ready to reboot. The deployed Elemental Teal includes a system agent plan to
+kick start a regular rancher provisioning process to install the selected kubernetes version, once booted, after
+some minutes the node installation is finalized and the node is included into the cluster and visible through
+the Rancher UI.</p>
+<h2 id="deployed-elemental-teal-partition-table">Deployed Elemental Teal Partition Table<a class="headerlink" href="#deployed-elemental-teal-partition-table" title="Permanent link">&para;</a></h2>
+<p>Once Elemental Teal is installed the OS partition table, according to default values, will look like</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Default Size</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COS_BOOT</td>
+<td>64 MiB</td>
+<td>UEFI Boot partition</td>
+</tr>
+<tr>
+<td>COS_STATE</td>
+<td>15 GiB</td>
+<td>A/B bootable file system images constructed from OCI images</td>
+</tr>
+<tr>
+<td>COS_OEM</td>
+<td>64 MiB</td>
+<td>OEM cloud-config files and other data</td>
+</tr>
+<tr>
+<td>COS_RECOVERY</td>
+<td>8 GiB</td>
+<td>Recovery file system image if COS_STATE is destroyed</td>
+</tr>
+<tr>
+<td>COS_PERSISTENT</td>
+<td>Remaining space</td>
+<td>All contents of the persistent folders</td>
+</tr>
+</tbody>
+</table>
+<p>Note this is the basic structure of any OS built by the <Vars name="elemental_toolkit_name" link="elemental_toolkit_url" /></p>
+<h2 id="elemental-teal-immutable-root">Elemental Teal Immutable Root<a class="headerlink" href="#elemental-teal-immutable-root" title="Permanent link">&para;</a></h2>
+<p>One of the characteristics of Elemental OSes is the setup of an immutable root filesystem where some ephemeral or
+persistent locations are applied on top of it. Elemental Teal default folders structure is listed in the
+matrix below.</p>
+<table>
+<thead>
+<tr>
+<th>Path</th>
+<th align="center">Read-Only</th>
+<th align="center">Ephemeral</th>
+<th align="center">Persistent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/</td>
+<td align="center">x</td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr>
+<td>/etc</td>
+<td align="center"></td>
+<td align="center">x</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td>/etc/cni</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/etc/iscsi</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/etc/rancher</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/etc/ssh</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/etc/systemd</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/srv</td>
+<td align="center"></td>
+<td align="center">x</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td>/home</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/opt</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/root</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var</td>
+<td align="center"></td>
+<td align="center">x</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td>/usr/libexec</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/cni</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/kubelet</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/longhorn</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/rancher</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/elemetal</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/wicked</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/lib/calico</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+<tr>
+<td>/var/log</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center">x</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+    <nav class="md-footer__inner md-grid" aria-label="Footer" >
+      
+        
+        <a href="../architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Architecture
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../upgrade/" class="md-footer__link md-footer__link--next" aria-label="Next: " rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["toc.integrate"], "search": "../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      
+    
+  </body>
+</html>
