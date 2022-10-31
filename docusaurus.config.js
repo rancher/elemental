@@ -10,7 +10,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Elemental - Immutable Linux for Rancher',
   url: 'https://rancher.github.io/elemental',
-  baseUrl: '/',
+  baseUrl: '/elemental/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
