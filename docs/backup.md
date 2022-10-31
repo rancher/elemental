@@ -12,7 +12,7 @@ Follow this guide to create backup for Elemental configuration installed togethe
 Go to official [Rancher documentation](https://docs.ranchermanager.rancher.io/how-to-guides/new-user-guides/backup-restore-and-disaster-recovery/back-up-rancher) and install rancher-bakup operator from there.
 
 :::warning warning
-For Rancher v2.7 and below it is needed to edit ResourceSet for rancher-backup operator.
+For Rancher v2.7 and below it is needed to edit `ResourceSet` for rancher-backup operator.
 For Rancher v2.7.1+ backup will be done automatically by rancher-backup operator and no further operation are needed.
 :::
 
