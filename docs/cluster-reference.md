@@ -103,7 +103,7 @@ This allows us to point to more than one object by using the selector.
 
 ### Example
 
-The example below creates a cluster that uses 2 different `machinePools` to set different nodes to control-plane and workers nodes,
+The example below creates a cluster that uses 2 different `machinePool`s to set different nodes to control-plane and workers nodes,
 based on 2 different `MachineInventorySelectorTemplate` that select their nodes based on a `MachineInventory` label (location)
 
 :::warning warning
