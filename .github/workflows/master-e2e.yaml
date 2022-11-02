@@ -162,6 +162,7 @@ jobs:
             cypress/e2e/unit_tests/elemental_plugin.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
+            cypress/e2e/unit_tests/user.spec.ts
         run: make -f tests/Makefile start-cypress-tests
       - name: Deploy a node to join Rancher manager
         if: ${{ inputs.test_type == 'ui' }}
