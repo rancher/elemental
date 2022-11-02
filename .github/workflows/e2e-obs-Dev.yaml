@@ -3,6 +3,11 @@ name: OBS Dev - Elemental E2E tests with Rancher Manager
 
 on:
   workflow_dispatch:
+    inputs:
+      node_number:
+        description: Number of nodes (>3) to deploy on the provisioned cluster
+        required: false
+        type: number
 
 concurrency:
   group: e2e-tests-obs-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
@@ -18,6 +23,7 @@ jobs:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.4+k3s1
       ca_type: selfsigned
+      node_number: ${{ inputs.node_number }}
       rancher_channel: stable
       rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
@@ -36,6 +42,7 @@ jobs:
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.4+rke2r1
       ca_type: private
+      node_number: ${{ inputs.node_number }}
       rancher_channel: stable
       rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
