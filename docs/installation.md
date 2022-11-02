@@ -105,26 +105,26 @@ One of the characteristics of Elemental OSes is the setup of an immutable root f
 persistent locations are applied on top of it. Elemental Teal default folders structure is listed in the
 matrix below.
 
-| Path              | Read-Only | Ephemeral | Persistent |
-|-------------------|:---------:|:---------:|:----------:|
-| /                 |     x     |           |            |
-| /etc              |           |     x     |            |
-| /etc/cni          |           |           |     x      |
-| /etc/iscsi        |           |           |     x      |
-| /etc/rancher      |           |           |     x      |
-| /etc/ssh          |           |           |     x      |
-| /etc/systemd      |           |           |     x      |
-| /srv              |           |     x     |            |
-| /home             |           |           |     x      |
-| /opt              |           |           |     x      |
-| /root             |           |           |     x      |
-| /var              |           |     x     |            |
-| /usr/libexec      |           |           |     x      |
-| /var/lib/cni      |           |           |     x      |
-| /var/lib/kubelet  |           |           |     x      |
-| /var/lib/longhorn |           |           |     x      |
-| /var/lib/rancher  |           |           |     x      |
-| /var/lib/elemetal |           |           |     x      |
-| /var/lib/wicked   |           |           |     x      |
-| /var/lib/calico   |           |           |     x      |
-| /var/log          |           |           |     x      |
+| Path                    | Read-Only | Ephemeral | Persistent |
+|-------------------------|:---------:|:---------:|:----------:|
+| /                       |     x     |           |            |
+| /etc                    |           |     x     |            |
+| /etc/cni                |           |           |     x      |
+| /etc/iscsi              |           |           |     x      |
+| /etc/rancher            |           |           |     x      |
+| /etc/ssh                |           |           |     x      |
+| /etc/systemd            |           |           |     x      |
+| /srv                    |           |     x     |            |
+| /home                   |           |           |     x      |
+| /opt                    |           |           |     x      |
+| /root                   |           |           |     x      |
+| /var                    |           |     x     |            |
+| /usr/libexec            |           |           |     x      |
+| /var/lib/cni            |           |           |     x      |
+| /var/lib/kubelet        |           |           |     x      |
+| /var/lib/longhorn       |           |           |     x      |
+| /var/lib/rancher        |           |           |     x      |
+| /var/lib/elemetal       |           |           |     x      |
+| /var/lib/NetworkManager |           |           |     x      |
+| /var/lib/calico         |           |           |     x      |
+| /var/log                |           |           |     x      |

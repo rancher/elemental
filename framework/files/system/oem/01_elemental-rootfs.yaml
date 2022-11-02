@@ -45,7 +45,7 @@ stages:
           /var/lib/elemental
           /var/lib/rancher
           /var/lib/kubelet
-          /var/lib/wicked
+          /var/lib/NetworkManager
           /var/lib/longhorn
           /var/lib/cni
           /var/lib/calico
