@@ -7,7 +7,7 @@ on:
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster
         required: false
-        type: number
+        type: string
 
 concurrency:
   group: e2e-tests-obs-stable-${{ github.head_ref || github.ref }}-${{ github.repository }}

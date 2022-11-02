@@ -32,7 +32,7 @@ on:
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
         required: false
-        type: number
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         required: true
@@ -269,15 +269,15 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap additional node with current build (use iPXE)
+      - name: Bootstrap additional nodes with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           NODE_NUMBER: ${{ inputs.node_number }}
         run: |
           cd tests
-          export VM_INDEX
-          for ((VM_INDEX=4; VM_INDEX<=NODE_NUMBER; ++VM_INDEX)); do
-            make e2e-bootstrap-node
+          for ((I=4; I<=NODE_NUMBER; ++I)); do
+            echo "=> Bootstrap node ${I}..."
+            VM_INDEX=${I} make e2e-bootstrap-node
           done
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
