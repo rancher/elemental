@@ -29,6 +29,10 @@ on:
         description: CA type to use (selfsigned or private)
         required: true
         type: string
+      node_number:
+        description: Number of nodes to deploy on the provisioned cluster
+        required: false
+        type: number
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         required: true
@@ -265,16 +269,16 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap node 4 with current build (use iPXE)
+      - name: Bootstrap additional node with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
-          VM_INDEX: 4
-        run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 5 with current build (use iPXE)
-        if: ${{ inputs.test_type == 'cli' }}
-        env:
-          VM_INDEX: 5
-        run: cd tests && make e2e-bootstrap-node
+          NODE_NUMBER: ${{ inputs.node_number }}
+        run: |
+          cd tests
+          export VM_INDEX
+          for ((VM_INDEX=4; VM_INDEX<=NODE_NUMBER; ++VM_INDEX)); do
+            make e2e-bootstrap-node
+          done
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
