@@ -4,12 +4,15 @@ import { Elemental } from '../../support/elemental';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const topLevelMenu = new TopLevelMenu();
-  const elemental    = new Elemental();
-  const k8s_version  = Cypress.env('k8s_version');
+  const topLevelMenu   = new TopLevelMenu();
+  const elemental      = new Elemental();
+  const k8s_version    = Cypress.env('k8s_version');
+  const ui_account     = Cypress.env('ui_account');
+  const elemental_user = "elemental-user"
+  const ui_password    = "rancherpassword"
 
   beforeEach(() => {
-    cy.login();
+    (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
     cy.visit('/');
 
     // Open the navigation menu

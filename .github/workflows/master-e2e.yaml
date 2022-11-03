@@ -9,6 +9,10 @@ on:
         description: Credentials to use to connect
         required: true
     inputs:
+      ui_account:
+        description: Account used to test RBAC role in UI
+        required: false
+        type: string
       cluster_name:
         description: Name of the provisioned cluster
         required: true
@@ -152,6 +156,7 @@ jobs:
         # Basics means tests without an extra elemental node needed
         if: ${{ inputs.test_type == 'ui' }}
         env:
+          UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: chrome
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           RANCHER_PASSWORD: rancherpassword
@@ -160,9 +165,9 @@ jobs:
           SPEC: |
             cypress/e2e/unit_tests/first_connection.spec.ts
             cypress/e2e/unit_tests/elemental_plugin.spec.ts
+            cypress/e2e/unit_tests/user.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
-            cypress/e2e/unit_tests/user.spec.ts
         run: make -f tests/Makefile start-cypress-tests
       - name: Deploy a node to join Rancher manager
         if: ${{ inputs.test_type == 'ui' }}
@@ -173,6 +178,7 @@ jobs:
         # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
         if: ${{ inputs.test_type == 'ui' }}
         env:
+          UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: firefox
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           RANCHER_PASSWORD: rancherpassword
