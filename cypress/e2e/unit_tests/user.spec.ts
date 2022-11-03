@@ -46,15 +46,17 @@ describe('User role testing', () => {
     cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
     topLevelMenu.openIfClosed();
     elemental.elementalIcon().should('exist');
-    // Waiting a fix to continue
-    //elemental.accessElementalMenu();
-    //elemental.checkElementalNav();
+    elemental.accessElementalMenu();
+    elemental.checkElementalNav();
   });
 
   it('Standard user should not access the OS management menu', () => {
     cy.login(std_user, ui_password);
     cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
     topLevelMenu.openIfClosed();
-    elemental.elementalIcon().should('not.exist');
+    elemental.elementalIcon().should('exist');
+    elemental.accessElementalMenu();
+    // User without appropriate role will get a specific page
+    cy.contains('The Elemental Operator is required to run the OS Management extension');
   });
 });
