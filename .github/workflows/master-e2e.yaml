@@ -19,7 +19,6 @@ on:
         type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
-        required: false
         type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
@@ -27,19 +26,18 @@ on:
         type: string
       ca_type:
         description: CA type to use (selfsigned or private)
-        required: true
+        default: selfsigned
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
-        required: false
         type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        required: true
+        default: stable
         type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
-        required: true
+        default: latest
         type: string
       runner:
         description: Runner on which to execute tests
@@ -47,23 +45,22 @@ on:
         type: string
       start_condition:
         description: Start condition of the runner
-        required: true
+        default: success
         type: string
       test_type:
         description: Type of test to run (cli or ui)
-        required: true
+        default: cli
         type: string
       upgrade_operator:
         description: URL to elemental-operator version to upgrade to
-        required: false
         type: string
       zone:
         description: GCP zone to host the runner
-        required: true
+        default: us-central1-a
         type: string
       workflow_download:
         description: build-ci workflow to use for artifacts
-        required: false
+        default: build-ci.yaml
         type: string
 
 jobs:
@@ -98,7 +95,6 @@ jobs:
       # For Rancher Manager
       RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
-      DASHBOARD_VERSION: ${{ inputs.dashboard_version }}
       UPGRADE_OPERATOR: ${{ inputs.upgrade_operator }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
