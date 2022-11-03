@@ -15,6 +15,16 @@ with the only help of an Elemental Teal iso
 
 ---
 
+### What is the Rancher Elemental Stack ?
+
+The Elemental Stack consists of some packages on top of SLE Micro for Rancher
+
+- **elemental-toolkit** - includes a set of OS utilities to enable OS management via containers. Includes dracut modules, bootloader configuration, cloud-init style configuration services, etc.
+- **elemental-operator** - this connects to Rancher Manager and handles machineRegistration and machineInventory CRDs
+- **elemental-register** - this registers machines via machineRegistrations and installs them via elemental-cli
+- **elemental-cli** - this installs any elemental-toolkit based derivative. Basically an installer based on our A/B install and upgrade system
+- **rancher-system-agent** - runs on the installed system and gets instructions ("Plans") from Rancher Manager what to install and run on the system
+
 ### What is Elemental Teal ?
 
 Elemental Teal is the combination of "SLE Micro for Rancher" with the Rancher Elemental stack
@@ -26,30 +36,23 @@ Its sole purpose is to run Kubernetes (k3s or RKE2), with everything controlled 
 Elemental Teal is built in the [openSUSE Build Service](https://build.opensuse.org/package/show/isv:Rancher:Elemental:Stable:Teal53/node-image)
 and available through the [openSUSE Registry](http://registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-node-image/5.3:latest)
 
-### What is the Rancher Elemental Stack ?
-
-The Elemental Stack consists of some packages on top of SLE Micro for Rancher
-
-- **elemental-toolkit** - includes a set of OS utilities to enable OS management via containers. Includes dracut modules, bootloader configuration, cloud-init style configuration services, etc.
-- **elemental-operator** - this connects to Rancher Manager and handles machineRegistration and machineInventory CRDs
-- **elemental-register** - this registers machines via machineRegistrations and installs them via elemental-cli
-- **elemental-cli** - this installs any elemental-toolkit based derivative. Basically an installer based on our A/B install and upgrade system
-- **rancher-system-agent** - runs on the installed system and gets instructions ("Plans") from Rancher Manager what to install and run on the system
-
 ## Prerequisites
 
  - A Rancher server (2.6.9) configured (server-url set)
      - To configure the Rancher server-url please check the [Rancher docs](https://rancher.com/docs/rancher/v2.6/en/admin-settings/#first-log-in)
+     - The Rancher server needs to be accessible on port 443 from all nodes that you are provisioning. (However, the requests are only one way so the nodes can be behind a NAT or other firewall)
  - A machine (bare metal or virtualized) with TPM 2.0
      - Hint 1: Libvirt allows setting virtual TPMs for virtual machines [example here](https://rancher.github.io/elemental/tpm/#add-tpm-module-to-virtual-machine)
-     - Hint 2: You can enable TPM emulation on bare metal machines missing the TPM 2.0 module [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine)
+     - Hint 2: You can enable TPM emulation on bare metal machines missing the TPM 2.0 module [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine). There are many caveats to this but it's useful for trying out with a single node. 
  - Helm Package Manager (https://helm.sh/)
  - Docker (for iso manipulation)
 
-## Preparing the cluster
+## Preparing the upstream cluster
 
 `elemental-operator` is the management endpoint, running the management
 cluster and taking care of creating inventories, registrations for machines and much more.
+
+### Install the Operator
 
 We will use the Helm package manager to install the elemental-operator chart into our cluster
 
@@ -67,7 +70,8 @@ NAME                                  READY   STATUS    RESTARTS   AGE
 elemental-operator-64f88fc695-b8qhn   1/1     Running   0          16s
 ```
 
-## Prepare you kubernetes resources
+#### Add a registration configuration 
+
 
 Node deployment starts with a `MachineRegistration`, identifying a set of machines sharing the same configuration (disk drives, network, etc.)
 
@@ -79,31 +83,22 @@ and your `MachineInventory` has that same key with that value, it will match and
 <Tabs>
 <TabItem value="manualYaml" label="Manually creating the resource yamls" default>
 
-You will need to create the following files.
-
-<CodeBlock language="yaml" title="selector.yaml" showLineNumbers>{Selector}</CodeBlock>
-
-As you can see this is a very simple selector that checks the key `node-location` for the value `europe`
-
-<CodeBlock language="yaml" title="cluster.yaml" showLineNumbers>{Cluster}</CodeBlock>
-
-As you can see we are setting that our `machineConfigRef` is of Kind `MachineInventorySelectorTemplate` with the name `my-machine-selector`, which matches the selector we created.
+You will need to create the following file.
 
 <CodeBlock language="yaml" title="registration.yaml" showLineNumbers>{Registration}</CodeBlock>
 
 This creates a `MachineRegistration` which will provide a unique URL which we will use with `elemental-register` to register
-the node during installation, so the operator can create a `MachineInventory` which will be using to bootstrap the node.
-See that we set the label that match our selector here already, although it can always be added later to the `MachineInventory`.
+the node during installation, allowing the operator to create a `MachineInventory`.
+
+See that we set the labels that will match our selector here already, although it can always be added later to the `MachineInventory`.
 
 :::warning warning
 Make sure to modify the registration.yaml above to set the proper install device to point to a valid device based on your node configuration(i.e. /dev/sda, /dev/vda, /dev/nvme0, etc...)
 :::
 
-Now that we have all the configuration to create the proper resources in Kubernetes just apply them
+Now that we have all the configuration to create a MachineRegistration in Kubernetes just apply it
 
 ```shell showLineNumbers
-kubectl apply -f selector.yaml 
-kubectl apply -f cluster.yaml 
 kubectl apply -f registration.yaml
 ```
 
@@ -118,17 +113,15 @@ If your node doesnt have that device you will have to manually create the regist
 :::
 
 ```bash showLineNumbers
-kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/selector.yaml
-kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/cluster.yaml
 kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/registration.yaml
 ```
 
 </TabItem>
 </Tabs>
 
-## Preparing the iso
+### Preparing the iso
 
-Now this is the last step, we need to prepare an Elemental Teal iso that includes the initial registration config, so
+This is the last preparation step before booting nodes, we need to prepare an Elemental Teal iso that includes the initial registration config, so
 it can be auto registered, installed and fully deployed as part of our cluster. The contents of the file are nothing 
 more than the registration url that the node needs to register and the proper server certificate, so it can connect securely.
 This iso then can be used to provision an infinite number of machines
@@ -204,7 +197,7 @@ elemental:
 </TabItem>
 </Tabs>
 
-Now we can proceed to create the ISO
+Now we can proceed to create the bootstrap ISO
 
 <Tabs>
 <TabItem value="script" label="Via script">
@@ -243,6 +236,72 @@ This will generate an ISO on the current directory with the name `elemental-<tim
 </TabItem>
 </Tabs>
 
+
+Note: Much but not all of the configuration provided in a `MachineRegistration` will be read at installation time instead of baked into the installation media. This means that many changes will not require using a new ISO.
+
+
+## Boot your nodes
+You can now boot your nodes with this newly created ISO, and they will:
+
+ - Register with the registrationURL given and create a per-machine `MachineInventory`
+ - Install Elemental Teal to the given device
+ - Shutdown
+ - Call home to your Rancher and wait
+
+After a few minutes you will see your nodes show up in the `MachineInventory` list.
+
+To watch this happen, you can run: 
+```
+kubectl get machineinventory -n fleet-default -w
+```
+
+
+## Build a Cluster
+
+Lastly, we need to build clusters out of our nodes! 
+
+This step can be done at any time (including before the machines were installed)
+
+We need two resources per cluster: a `Cluster` resource and a `MachineInventorySelectorTemplate` to know which machines are contained in the cluster.
+
+This selector is a simple matcher based on labels set in the `MachineInventory`, so if your selector is matching the `cluster-id` key with a value `myId` 
+and your `MachineInventory` has that same key with that value, it will match and be bootstrapped as part of the cluster.
+
+
+<Tabs>
+<TabItem value="manualYaml" label="Manually creating the resource yamls" default>
+
+You will need to create the following files.
+
+<CodeBlock language="yaml" title="selector.yaml" showLineNumbers>{Selector}</CodeBlock>
+
+As you can see this is a very simple selector that checks the key `node-location` for the value `europe`
+
+<CodeBlock language="yaml" title="cluster.yaml" showLineNumbers>{Cluster}</CodeBlock>
+
+As you can see we are setting that our `machineConfigRef` is of Kind `MachineInventorySelectorTemplate` with the name `my-machine-selector`, which matches the selector we created.
+
+Now that we have all the configurations to create a new cluster just apply them
+
+```shell showLineNumbers
+kubectl apply -f selector.yaml 
+kubectl apply -f cluster.yaml 
+```
+
+</TabItem>
+<TabItem value="repofiles" label="Using quickstart files from Elemental repo directly">
+
+You can directly apply the quickstart example resource files from the [Elemental repository](https://github.com/rancher/elemental)
+
+```bash showLineNumbers
+kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/selector.yaml
+kubectl apply -f https://raw.githubusercontent.com/rancher/elemental/main/examples/quickstart/cluster.yaml
+```
+
+</TabItem>
+</Tabs>
+
+
 You can now boot your nodes with this ISO, and they will:
 
 - Boot from the ISO
@@ -277,3 +336,16 @@ You should be able to follow along what the machine is doing via:
     - running `journalctl -f -u elemental-system-agent` will show the output of the initial elemental config and install of `rancher-system-agent`
     - running `journalctl -f -u rancher-system-agent` will show the output of the boostrap of cluster components like k3s
     - running `journalctl -f -u k3s` will show the logs of the k3s deployment
+
+## I rebooted my node and now kubernetes is failing?
+
+It's likely that your ip address changed due to short DHCP leases. This is a known issue in Kubernetes and can be solved with static leases or static ip addresses.
+
+## What next?
+
+For upgrading of nodes, check out: TODO
+
+For customization, check out: TODO
+
+
+Find us on Slack at `rancher-users.slack.io` on the `#elemental` channel!
