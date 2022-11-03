@@ -22,15 +22,9 @@ jobs:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.4+k3s1
-      ca_type: selfsigned
       node_number: ${{ inputs.node_number }}
-      rancher_channel: stable
-      rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      start_condition: success
-      test_type: cli
       upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/elemental/elemental-operator
-      zone: us-central1-a
   rke2:
     if: always()
     needs: k3s
@@ -43,10 +37,5 @@ jobs:
       k8s_version_to_provision: v1.24.4+rke2r1
       ca_type: private
       node_number: ${{ inputs.node_number }}
-      rancher_channel: stable
-      rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      start_condition: success
-      test_type: cli
       upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/elemental/elemental-operator
-      zone: us-central1-a

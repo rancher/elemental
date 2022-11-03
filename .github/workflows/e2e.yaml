@@ -22,13 +22,8 @@ jobs:
     with:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.4+k3s1
-      ca_type: selfsigned
-      rancher_channel: stable
-      rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: ${{ github.event.workflow_run.conclusion }}
-      test_type: cli
-      zone: us-central1-a
       workflow_download: ${{ github.event.workflow_run.workflow_id }}
   rke2:
     if: always()
@@ -40,10 +35,6 @@ jobs:
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.4+rke2r1
       ca_type: private
-      rancher_channel: stable
-      rancher_version: latest
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: ${{ github.event.workflow_run.conclusion }}
-      test_type: cli
-      zone: us-central1-a
       workflow_download: ${{ github.event.workflow_run.workflow_id }}
