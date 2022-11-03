@@ -28,9 +28,9 @@ export class Elemental {
     expect($lis.eq(0)).to.contain('Dashboard');
     expect($lis.eq(1)).to.contain('Machine Registrations');
     expect($lis.eq(2)).to.contain('Machine Inventories');
-    expect($lis.eq(3)).to.contain('Managed OS Versions');
-    expect($lis.eq(4)).to.contain('Managed OS Version Channels');
-    expect($lis.eq(5)).to.contain('OS Image Upgrades');
+    expect($lis.eq(3)).to.contain('OS Image Upgrades');
+    expect($lis.eq(4)).to.contain('Managed OS Versions');
+    expect($lis.eq(5)).to.contain('Managed OS Version Channels');
     })      
   }
 
