@@ -12,8 +12,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Docker
-        uses: docker-practice/actions-setup-docker@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
       - name: Install deps
         run: |
           sudo apt-get update
