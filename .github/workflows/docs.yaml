@@ -1,9 +1,17 @@
 name: docs
 
 on:
+  pull_request:
   push:
     branches:
       - main
+    paths:
+      - docs/**
+      - docusaurus.config.js
+      - package.json
+      - Vars.js
+      - sidebars.js
+      - yarn.lock
 
 jobs:
   deploy:
@@ -21,6 +29,7 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
