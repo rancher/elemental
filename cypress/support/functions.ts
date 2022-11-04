@@ -154,10 +154,9 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   cy.contains('.mt-40 > .col', /https:\/\/.*elemental\/registration/);
 
   // Try to download the registration file and check it
-  // Download check disabled due to this bug: https://github.com/rancher/dashboard/issues/6710
-  //cy.clickButton("Download");
-  //cy.verifyDownload('generate_iso_image.zip');
-  //cy.contains('Saving').should('not.exist');
+  cy.clickButton("Download");
+  cy.verifyDownload(machRegName + '_registrationURL.yaml');
+  cy.contains('Saving').should('not.exist');
   
   // Check label and annotation in YAML
   // For now, we can only check in YAML because the fields are disabled and we cannot check their content
