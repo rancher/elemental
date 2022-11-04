@@ -23,7 +23,7 @@ describe('Machine inventory testing', () => {
   });
 
   it('Check that machine inventory has been created', () => {
-    cy.contains('Manage Machine Inventories').click();
+    cy.clickNavMenu(["Machine Inventories"]);
     cy.contains('.badge-state', 'Active').should('exist');
     cy.contains('Namespace: fleet-default').should('exist');
   });
@@ -35,8 +35,8 @@ describe('Machine inventory testing', () => {
     cy.contains('Kubernetes Version').click();
     cy.contains(k8s_version).click();
     cy.clickButton('Create');
-    cy.contains('Cluster: myelementalcluster', {timeout: 20000});
-    cy.contains('Cluster: myelementalcluster Active', {timeout: 360000});
+    cy.contains('Updating myelementalcluster', {timeout: 20000});
+    cy.contains('Active myelementalcluster', {timeout: 360000});
   });
 
   it('Check Elemental cluster status', () => {
