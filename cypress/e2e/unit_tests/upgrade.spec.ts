@@ -48,7 +48,7 @@ describe('Upgrade tests', () => {
     cy.contains('Active teal-5.3');
   });
 
-  it('Upgrade one node with OS Image Upgrades', () => {
+  it.skip('Upgrade one node with OS Image Upgrades', () => {
     // Create ManagedOSImage resource
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Image Upgrades').click();
