@@ -27,19 +27,18 @@ describe('Machine registration testing', () => {
     cy.exec('kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml delete ns mynamespace', {failOnNonZeroExit: false});
     
     // Delete all existing machine registrations
+    cy.contains('Manage Machine Registrations').click();
+    cy.get('.outlet > header').contains('Machine Registrations');
     cy.get('body').then(($body) => {
-      if ($body.text().includes('Manage Machine Registrations')) {
+      if (!$body.text().includes('There are no rows to show.')) {
         cy.deleteAllMachReg();
       };
     });
   });
+  
 
   it('Create machine registration with default options', () => {
     cy.createMachReg({machRegName: 'default-options-test'});
-  });
-
-  it('Create machine registration in custom namespace', () => {
-    cy.createMachReg({machRegName: 'custom-namespace-test', namespace: 'mynamespace'});
   });
 
   it('Create machine registration with labels and annotations', () => {
