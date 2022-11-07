@@ -52,10 +52,6 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 	})
 
 	It("Configure libvirt and bootstrap a node", func() {
-		By("Checking if VM name is set", func() {
-			Expect(vmName).To(Not(BeEmpty()))
-		})
-
 		By("Adding MachineRegistration", func() {
 			registrationYaml := "../assets/machineregistration.yaml"
 

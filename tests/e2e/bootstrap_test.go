@@ -98,10 +98,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	})
 
 	It("Install node and add it in Rancher", func() {
-		By("Checking if VM name is set", func() {
-			Expect(vmName).To(Not(BeEmpty()))
-		})
-
 		By("Setting emulated TPM to "+emulateTPM, func() {
 			// Set correct value for TPM emulation
 			value := "false"
