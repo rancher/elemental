@@ -6,7 +6,7 @@ on:
     inputs:
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster
-        required: false
+        default: 5
         type: string
 
 concurrency:
