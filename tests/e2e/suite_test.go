@@ -86,7 +86,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Now we can set the VM name
-		vmName = vmNameRoot + "-" + fmt.Sprint(vmIndex)
+		vmName = vmNameRoot + "-" + fmt.Sprintf("%03d", vmIndex)
 	}
 
 	// Force a correct value

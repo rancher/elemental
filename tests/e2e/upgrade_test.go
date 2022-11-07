@@ -31,7 +31,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	)
 
 	BeforeEach(func() {
-		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
+		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
 		client = &tools.Client{
