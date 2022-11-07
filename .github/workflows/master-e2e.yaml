@@ -193,7 +193,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-${{ github.job }}
           path: cypress/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -202,7 +202,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: cypress-videos
+          name: cypress-videos-${{ github.job }}
           path: cypress/videos
           retention-days: 7
           if-no-files-found: ignore
