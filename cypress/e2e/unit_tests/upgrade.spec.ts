@@ -5,11 +5,14 @@ import 'cypress-file-upload';
 
 Cypress.config();
 describe('Upgrade tests', () => {
-  const topLevelMenu = new TopLevelMenu();
-  const elemental    = new Elemental();
+  const topLevelMenu   = new TopLevelMenu();
+  const elemental      = new Elemental();
+  const ui_account     = Cypress.env('ui_account');
+  const elemental_user = "elemental-user"
+  const ui_password    = "rancherpassword"
 
   beforeEach(() => {
-    cy.login();
+    (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
     cy.visit('/');
 
     // Open the navigation menu
@@ -45,7 +48,7 @@ describe('Upgrade tests', () => {
     cy.contains('Active teal-5.3');
   });
 
-  it('Upgrade one node with OS Image Upgrades', () => {
+  it.skip('Upgrade one node with OS Image Upgrades', () => {
     // Create ManagedOSImage resource
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Image Upgrades').click();

@@ -18,8 +18,9 @@ jobs:
             arch: "arm64"
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Install Docker
-        uses: docker-practice/actions-setup-docker@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
       - name: Install deps (${{ matrix.os}})
         if: matrix.os == 'ubuntu-latest'
         run: |

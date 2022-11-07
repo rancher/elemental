@@ -4,12 +4,15 @@ import { Elemental } from '../../support/elemental';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const topLevelMenu = new TopLevelMenu();
-  const elemental    = new Elemental();
-  const k8s_version  = Cypress.env('k8s_version');
+  const topLevelMenu   = new TopLevelMenu();
+  const elemental      = new Elemental();
+  const k8s_version    = Cypress.env('k8s_version');
+  const ui_account     = Cypress.env('ui_account');
+  const elemental_user = "elemental-user"
+  const ui_password    = "rancherpassword"
 
   beforeEach(() => {
-    cy.login();
+    (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
     cy.visit('/');
 
     // Open the navigation menu
@@ -20,7 +23,7 @@ describe('Machine inventory testing', () => {
   });
 
   it('Check that machine inventory has been created', () => {
-    cy.contains('Manage Machine Inventories').click();
+    cy.clickNavMenu(["Machine Inventories"]);
     cy.contains('.badge-state', 'Active').should('exist');
     cy.contains('Namespace: fleet-default').should('exist');
   });
@@ -32,8 +35,8 @@ describe('Machine inventory testing', () => {
     cy.contains('Kubernetes Version').click();
     cy.contains(k8s_version).click();
     cy.clickButton('Create');
-    cy.contains('Cluster: myelementalcluster', {timeout: 20000});
-    cy.contains('Cluster: myelementalcluster Active', {timeout: 360000});
+    cy.contains('Updating myelementalcluster', {timeout: 20000});
+    cy.contains('Active myelementalcluster', {timeout: 360000});
   });
 
   it('Check Elemental cluster status', () => {

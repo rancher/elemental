@@ -9,6 +9,10 @@ on:
         description: Credentials to use to connect
         required: true
     inputs:
+      ui_account:
+        description: Account used to test RBAC role in UI
+        required: false
+        type: string
       cluster_name:
         description: Name of the provisioned cluster
         required: true
@@ -152,6 +156,7 @@ jobs:
         # Basics means tests without an extra elemental node needed
         if: ${{ inputs.test_type == 'ui' }}
         env:
+          UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: chrome
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           RANCHER_PASSWORD: rancherpassword
@@ -160,10 +165,27 @@ jobs:
           SPEC: |
             cypress/e2e/unit_tests/first_connection.spec.ts
             cypress/e2e/unit_tests/elemental_plugin.spec.ts
+            cypress/e2e/unit_tests/user.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
-            cypress/e2e/unit_tests/user.spec.ts
         run: make -f tests/Makefile start-cypress-tests
+      - name: Upload Cypress screenshots (Basics)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-screenshots-basics-${{ inputs.cluster_name }}
+          path: cypress/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Upload Cypress videos (Basics)
+        # Test run video is always captured, so this action uses "always()" condition
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos-basics-${{ inputs.cluster_name }}
+          path: cypress/videos
+          retention-days: 7
+          if-no-files-found: ignore
       - name: Deploy a node to join Rancher manager
         if: ${{ inputs.test_type == 'ui' }}
         env:
@@ -173,6 +195,7 @@ jobs:
         # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
         if: ${{ inputs.test_type == 'ui' }}
         env:
+          UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: firefox
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           RANCHER_PASSWORD: rancherpassword
@@ -183,20 +206,20 @@ jobs:
             cypress/e2e/unit_tests/machine_inventory.spec.ts
             cypress/e2e/unit_tests/upgrade.spec.ts
         run: make -f tests/Makefile start-cypress-tests
-      - name: Upload Cypress screenshots
+      - name: Upload Cypress screenshots (Advanced)
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: cypress-screenshots
+          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
           path: cypress/screenshots
           retention-days: 7
           if-no-files-found: ignore
-      - name: Upload Cypress videos
+      - name: Upload Cypress videos (Advanced)
         # Test run video is always captured, so this action uses "always()" condition
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: cypress-videos
+          name: cypress-videos-advanced-${{ inputs.cluster_name }}
           path: cypress/videos
           retention-days: 7
           if-no-files-found: ignore
