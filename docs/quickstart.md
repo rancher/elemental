@@ -17,13 +17,13 @@ with the only help of an Elemental Teal iso
 
 ### What is the Rancher Elemental Stack ?
 
-The Elemental Stack consists of some packages on top of SLE Micro for Rancher
+The Elemental Stack consists of a few components to allow for onboarding and remote provisioning of clusters.
 
 - **elemental-toolkit** - includes a set of OS utilities to enable OS management via containers. Includes dracut modules, bootloader configuration, cloud-init style configuration services, etc.
 - **elemental-operator** - this connects to Rancher Manager and handles machineRegistration and machineInventory CRDs
 - **elemental-register** - this registers machines via machineRegistrations and installs them via elemental-cli
 - **elemental-cli** - this installs any elemental-toolkit based derivative. Basically an installer based on our A/B install and upgrade system
-- **rancher-system-agent** - runs on the installed system and gets instructions ("Plans") from Rancher Manager what to install and run on the system
+- **elemental-system-agent** - runs on the installed system and gets instructions ("Plans") from Rancher Manager what to install and run on the system
 
 ### What is Elemental Teal ?
 
@@ -47,7 +47,7 @@ and available through the [openSUSE Registry](http://registry.opensuse.org/isv/r
  - Helm Package Manager (https://helm.sh/)
  - Docker (for iso manipulation)
 
-## Preparing the upstream cluster
+## Preparing the management cluster
 
 `elemental-operator` is the management endpoint, running the management
 cluster and taking care of creating inventories, registrations for machines and much more.
@@ -95,6 +95,10 @@ See that we set the labels that will match our selector here already, although i
 :::warning warning
 Make sure to modify the registration.yaml above to set the proper install device to point to a valid device based on your node configuration(i.e. /dev/sda, /dev/vda, /dev/nvme0, etc...)
 :::
+
+:::note note
+When booting from a USB drive, it may be helpful to change `reboot: true` to be `poweroff: true`. This would allow for a chance to remove the drive before booting again.
+::
 
 Now that we have all the configuration to create a MachineRegistration in Kubernetes just apply it
 
@@ -237,23 +241,19 @@ This will generate an ISO on the current directory with the name `elemental-<tim
 </Tabs>
 
 
-Note: Much but not all of the configuration provided in a `MachineRegistration` will be read at installation time instead of baked into the installation media. This means that many changes will not require using a new ISO.
-
-
 ## Boot your nodes
 You can now boot your nodes with this newly created ISO, and they will:
 
- - Register with the registrationURL given and create a per-machine `MachineInventory`
+ - Register with the registrationURL given and create a per-machine `MachineInventory` using the TPM hash as the unique identifier
  - Install Elemental Teal to the given device
- - Shutdown
- - Call home to your Rancher and wait
+ - Shutdown or Reboot (depending on which option is selected in the `MachineRegistration`)
 
-After a few minutes you will see your nodes show up in the `MachineInventory` list.
-
-To watch this happen, you can run: 
+When it calls home, you will see your nodes show up in the `MachineInventory` list. To watch this happen, you can run: 
 ```
 kubectl get machineinventory -n fleet-default -w
 ```
+
+Once the machine is booted again, it will call home to Rancher and wait for further instructions.
 
 
 ## Build a Cluster
@@ -266,6 +266,8 @@ We need two resources per cluster: a `Cluster` resource and a `MachineInventoryS
 
 This selector is a simple matcher based on labels set in the `MachineInventory`, so if your selector is matching the `cluster-id` key with a value `myId` 
 and your `MachineInventory` has that same key with that value, it will match and be bootstrapped as part of the cluster.
+
+More options for the selecting machines can be (found here)[machineinventoryselectortemplate-reference.md].
 
 
 <Tabs>
