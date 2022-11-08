@@ -266,7 +266,7 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap additional nodes with current build (use iPXE)
+      - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
           NODE_NUMBER: ${{ inputs.node_number }}
@@ -279,6 +279,15 @@ jobs:
       - name: List installed nodes
         if: ${{ inputs.test_type == 'cli' }}
         run: sudo virsh list
+      - name: Add summary
+        run: |
+          echo "## General informations" >> $GITHUB_STEP_SUMMARY
+          echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
+          echo "## Versions used" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
