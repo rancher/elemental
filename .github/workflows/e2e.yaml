@@ -21,8 +21,7 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.4+k3s1
-      node_number: 5
+      k8s_version_to_provision: v1.24.7+k3s1
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: ${{ github.event.workflow_run.conclusion }}
       workflow_download: ${{ github.event.workflow_run.workflow_id }}
@@ -34,8 +33,7 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
       cluster_name: cluster-rke2
-      k8s_version_to_provision: v1.24.4+rke2r1
-      node_number: 5
+      k8s_version_to_provision: v1.24.7+rke2r1
       ca_type: private
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       start_condition: ${{ github.event.workflow_run.conclusion }}
