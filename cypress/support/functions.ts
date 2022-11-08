@@ -131,15 +131,11 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   }
 
   if (checkLabels) {
-    cy.clickButton('Add Label');
-    cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.key').type('myLabel1');
-    cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.value').type('myLabelValue1');
+    cy.addMachRegLabel({labelName: 'myLabel1', labelValue: 'myLabelValue1'});
     }
 
   if (checkAnnotations) {
-    cy.clickButton('Add Annotation')
-    cy.get('#machine-inventory > .mb-10 > .key-value > .kv-container > .kv-item.key').type('myAnnotation1');
-    cy.get('#machine-inventory > .mb-10 > .key-value > .kv-container > .kv-item.value').type('myAnnotationValue1');
+    cy.addMachRegAnnotation({annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});
   }
 
   cy.clickButton("Create");
@@ -171,16 +167,18 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
 
 // Add Label to machine registration
 Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
-  cy.clickButton('Add Label');
-  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.key').type(labelName);
-  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.value').type(labelValue);
+  cy.get('#machine-reg').contains('Machine Registration').click();
+  cy.get('#machine-reg > .mb-30 > .key-value > .footer > .btn').click();
+  cy.get('#machine-reg > .mb-30 > .key-value > .kv-container > .kv-item.key').type(labelName);
+  cy.get('#machine-reg > .mb-30 > .key-value > .kv-container > .kv-item.value').type(labelValue);
 });
 
 // Add Annotation to machine registration
 Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue}) => {
-  cy.clickButton('Add Annotation');
-  cy.get('#machine-inventory > .mb-10 > .key-value > .kv-container > .kv-item.key').type(annotationName);
-  cy.get('#machine-inventory > .mb-10 > .key-value > .kv-container > .kv-item.value').type(annotationValue);
+  cy.get('#machine-reg').contains('Machine Registration').click();
+  cy.get('#machine-reg > .mb-10 > .key-value > .footer > .btn').click(); 
+  cy.get('#machine-reg > .mb-10 > .key-value > .kv-container > .kv-item.key').type(annotationName);
+  cy.get('#machine-reg > .mb-10 > .key-value > .kv-container > .kv-item.value').type(annotationValue);
 });
 
 // Check machine registration label in YAML
