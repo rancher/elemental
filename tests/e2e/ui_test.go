@@ -32,25 +32,6 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		client  *tools.Client
 	)
 
-	BeforeEach(func() {
-		// Add node in network configuration if needed
-		if macAdrs == "" {
-			err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
-			Expect(err).To(Not(HaveOccurred()))
-		}
-
-		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
-		Expect(err).To(Not(HaveOccurred()))
-
-		client = &tools.Client{
-			Host:     string(hostData.IP) + ":22",
-			Username: userName,
-			Password: userPassword,
-		}
-
-		macAdrs = hostData.Mac
-	})
-
 	It("Configure libvirt and bootstrap a node", func() {
 		By("Adding MachineRegistration", func() {
 			registrationYaml := "../assets/machineregistration.yaml"
@@ -106,6 +87,25 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			numberOfFile, err := misc.ConfigureiPXE()
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(numberOfFile).To(BeNumerically(">=", 1))
+		})
+
+		By("Adding VM in default network", func() {
+			// Add node in network configuration if needed
+			if macAdrs == "" {
+				err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
+			Expect(err).To(Not(HaveOccurred()))
+
+			client = &tools.Client{
+				Host:     string(hostData.IP) + ":22",
+				Username: userName,
+				Password: userPassword,
+			}
+
+			macAdrs = hostData.Mac
 		})
 
 		By("Creating and installing VM", func() {
