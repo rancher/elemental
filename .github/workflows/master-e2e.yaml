@@ -275,6 +275,9 @@ jobs:
             echo "=> Bootstrap node ${I}..."
             VM_INDEX=${I} make e2e-bootstrap-node
           done
+      - name: List installed nodes
+        if: ${{ inputs.test_type == 'cli' }}
+        run: sudo virsh list
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
