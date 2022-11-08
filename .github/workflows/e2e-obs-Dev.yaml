@@ -21,7 +21,7 @@ jobs:
     with:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.4+k3s1
+      k8s_version_to_provision: v1.24.7+k3s1
       node_number: ${{ inputs.node_number }}
       runner: elemental-e2e-ci-runner-spot-x86-64-2
       upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/elemental/elemental-operator
@@ -34,7 +34,7 @@ jobs:
     with:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-rke2
-      k8s_version_to_provision: v1.24.4+rke2r1
+      k8s_version_to_provision: v1.24.7+rke2r1
       ca_type: private
       node_number: ${{ inputs.node_number }}
       runner: elemental-e2e-ci-runner-spot-x86-64-2
