@@ -282,7 +282,9 @@ jobs:
       - name: Add summary
         run: |
           echo "## General informations" >> $GITHUB_STEP_SUMMARY
-          echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
+          if ${{ inputs.test_type == 'cli' }}; then
+            echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
           echo "## Versions used" >> $GITHUB_STEP_SUMMARY
           echo "Rancher Manager: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
