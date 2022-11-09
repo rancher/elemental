@@ -10,4 +10,4 @@ spec:
     - clusterName: my-cluster
   nodeSelector:
     matchLabels:
-      location: "europe"
+      kubernetes.io/hostname: my-machine
