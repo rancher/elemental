@@ -294,7 +294,7 @@ jobs:
         if: always()
         run: |
           # Remove all VMs
-          for I in $(sudo virsh list | awk '/node-/ { print $2 }'); do
+          for I in $(sudo virsh list --all| awk '/node-/ { print $2 }'); do
             for C in destroy undefine; do
               [[ "${C}" == "undefine" ]] && OPT="--nvram" || unset OPT
               sudo virsh ${C} ${OPT} ${I} >/dev/null 2>&1 || true
