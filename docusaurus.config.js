@@ -9,7 +9,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Elemental - Immutable Linux for Rancher',
-  url: 'https://rancher.github.io/elemental',
+  url: 'https://rancher.github.io',
   baseUrl: '/elemental/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -48,6 +48,12 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: {
+        appId: 'QLF01IU46G',
+        apiKey: '68a970916bcccd030e13eb07260af56f',
+        indexName: 'elemental',
+        contextualSearch: true,
+      },
       navbar: {
         title: 'Elemental',
         logo: {
