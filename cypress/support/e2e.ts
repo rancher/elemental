@@ -15,13 +15,17 @@ declare global {
       typeValue(label: string, value: string, noLabel?: boolean, log?: boolean): Chainable<Element>;
       typeKeyValue(key: string, value: string,): Chainable<Element>;
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
-      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean): Chainable<Element>;
+      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, customCloudConfig?: string): Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
       deleteAllMachReg():Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
       checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
+      addMachInvLabel(labelName: string, labelValue: string):Chainable<Element>;
+      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
+      checkMachInvAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
+      addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
     }

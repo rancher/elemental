@@ -33,24 +33,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 	)
 
 	It("Configure libvirt and bootstrap a node", func() {
-		By("Adding MachineRegistration", func() {
-			registrationYaml := "../assets/machineregistration.yaml"
-
-			err := tools.Sed("%VM_NAME%", vmNameRoot, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%USER%", userName, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%PASSWORD%", userPassword, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%CLUSTER_NAME%", clusterName, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.Apply(clusterNS, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
+		By("Downloading MachineRegistration", func() {
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
 				"--namespace", clusterNS,
 				"machine-registration", "-o", "jsonpath={.status.registrationURL}")

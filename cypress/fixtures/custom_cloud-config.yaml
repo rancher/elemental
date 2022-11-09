@@ -1,0 +1,10 @@
+config:
+  cloud-config:
+    users:
+    - name: root
+      passwd: root
+  elemental:
+    install:
+      poweroff: true
+      device: /dev/sda
+      debug: true
