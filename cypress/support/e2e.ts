@@ -15,7 +15,7 @@ declare global {
       typeValue(label: string, value: string, noLabel?: boolean, log?: boolean): Chainable<Element>;
       typeKeyValue(key: string, value: string,): Chainable<Element>;
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
-      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, customCloudConfig?: string): Chainable<Element>;
+      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
       deleteAllMachReg():Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;

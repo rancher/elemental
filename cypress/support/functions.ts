@@ -119,7 +119,7 @@ Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
 // Machine registration functions
 
 // Create a machine registration
-Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', checkLabels=false, checkAnnotations=false, checkInventoryLabels=false, checkInventoryAnnotations=false, customCloudConfig=''}) => {
+Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', checkLabels=false, checkAnnotations=false, checkInventoryLabels=false, checkInventoryAnnotations=false, customCloudConfig='', checkDefaultCloudConfig=true }) => {
   cy.clickNavMenu(["Dashboard"]);
   cy.clickButton("Create Machine Registration");
   if (namespace != "fleet-default") {
@@ -167,15 +167,27 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   cy.verifyDownload(machRegName + '_registrationURL.yaml');
   cy.contains('Saving').should('not.exist');
   
+    // Check Cloud configuration
+  // TODO: Maybe the check may be improved in one line
+  if (checkDefaultCloudConfig) {
+    cy.get('[data-testid="yaml-editor-code-mirror"]')
+      .should('include.text','config:')
+      .should('include.text','cloud-config:')
+      .should('include.text','users:')
+      .should('include.text','- name: root')
+      .should('include.text','passwd: root')
+      .should('include.text','elemental:')
+      .should('include.text','install:')
+      .should('include.text','device: /dev/nvme0n1')
+      .should('include.text','poweroff: true');
+  }
+
   // Check label and annotation in YAML
   // For now, we can only check in YAML because the fields are disabled and we cannot check their content
   // It looks like we can use shadow DOM to catch it but too complicated for now
   cy.contains('Machine Registrations').click();
   if (checkLabels) {cy.checkMachRegLabel({machRegName: machRegName, labelName: 'myLabel1', labelValue: 'myLabelValue1'})};
   if (checkAnnotations) {cy.checkMachRegAnnotation({machRegName: machRegName, annotationName: 'myAnnotation1', annotationValue: 'myAnnotationValue1'});}
-
-  // Check Cloud configuration
-  // Cannot be checked yet due to https://github.com/rancher/dashboard/issues/6458
 });
 
 // Add Label to machine registration

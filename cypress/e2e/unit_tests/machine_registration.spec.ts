@@ -97,7 +97,7 @@ describe('Machine registration testing', () => {
   // This test must stay the last one because we use this machine registration when we test adding a node.
   // It also tests using a custom cloud config by using read from file button.
   it('Create Machine registration we will use to test adding a node', () => {
-    cy.createMachReg({machRegName: 'machine-registration', checkInventoryLabels: true, checkInventoryAnnotations: true, customCloudConfig: 'custom_cloud-config.yaml'});
+    cy.createMachReg({machRegName: 'machine-registration', checkInventoryLabels: true, checkInventoryAnnotations: true, customCloudConfig: 'custom_cloud-config.yaml', checkDefaultCloudConfig: false});
     cy.checkMachInvLabel({machRegName: 'machine-registration', labelName: 'myInvLabel1', labelValue: 'myInvLabelValue1'});
   });
 });
