@@ -64,6 +64,24 @@ const sidebars = {
         'restore',
       ]
     },
+    {
+      type: 'category',
+      collapsible: true,
+      collapsed: false,
+      label: 'Troubleshooting',
+      items: [
+        {
+          type: 'category',
+          collapsible: true,
+          collapsed: false,
+          label: 'Restore',
+          items: [
+            'troubleshooting-restore',
+          ]
+        }
+      ]
+    },
+
   ],
 
   // But you can create a sidebar manually

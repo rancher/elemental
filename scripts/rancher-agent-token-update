@@ -1,0 +1,47 @@
+#!/bin/sh
+
+if [ "${DEBUG}" = 1 ]; then
+    set -x
+fi
+
+# Environment variables:
+#   - DEBUG (default: 0)
+
+RANCHER_AGENT_FILE="rancher2_connection_info.json"
+
+info() {
+    echo "[INFO] " "$@"
+}
+
+error() {
+    echo "[ERROR] " "$@" >&2
+}
+
+
+if [ ! -f $RANCHER_AGENT_FILE ]; then
+    error "File $RANCHER_AGENT_FILE can't be found in current directory!"
+    error "Copy it from the elemental node /var/lib/rancher/agent/rancher2_connection_info.json"
+    exit 1
+fi
+
+if ! $(kubectl get apiservice v1beta1.elemental.cattle.io > /dev/null 2>&1); then
+    error "Provide kubeconfig for Kubernetes cluster with Rancher UI"
+    exit 1
+fi
+
+export NAMESPACE=$(cat rancher2_connection_info.json | jq -r '.namespace')
+export SECRET=$(cat rancher2_connection_info.json | jq -r '.secretName')
+
+echo
+info "Getting $SECRET-token secret from $NAMESPACE namespace"
+export BEARER_TOKEN=$(kubectl get secret -n $NAMESPACE $SECRET-token -o jsonpath={.data.token} | base64 -d)
+
+info "Updating $RANCHER_AGENT_FILE with new token value"
+echo
+sed -e 's/token: .*\\n/token: '"${BEARER_TOKEN}"'\\n/' $RANCHER_AGENT_FILE
+
+echo
+info "File $RANCHER_AGENT_FILE was updated successfully !!!"
+info "Copy it to elemental node /var/lib/rancher/agent/rancher2_connection_info.json and"
+info "restart rancher-system-agent with command 'systemctl restart rancher-system-agent'"
+echo

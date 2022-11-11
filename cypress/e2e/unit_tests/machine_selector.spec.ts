@@ -4,12 +4,15 @@ import { Elemental } from '../../support/elemental';
 
 Cypress.config();
 describe('Machine selector testing', () => {
-  const topLevelMenu = new TopLevelMenu();
-  const elemental    = new Elemental();
-  const k8s_version  = Cypress.env('k8s_version');
+  const topLevelMenu   = new TopLevelMenu();
+  const elemental      = new Elemental();
+  const k8s_version    = Cypress.env('k8s_version');
+  const ui_account     = Cypress.env('ui_account');
+  const elemental_user = "elemental-user"
+  const ui_password    = "rancherpassword"
 
   beforeEach(() => {
-    cy.login();
+    (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
     cy.visit('/');
 
     // Open the navigation menu
@@ -38,8 +41,9 @@ describe('Machine selector testing', () => {
     //cy.clickButton('Add Rule');
     // TODO: Cannot use the clickButton here, I do not know why yet 
     cy.get('.mt-20 > .btn').contains('Add Rule').click();
-    cy.get('[data-testid="input-match-expression-key-0"] > input').type('cypress');
-    cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('uitesting');
+    cy.get('#vs6__combobox').click()
+    cy.contains('myInvLabel1').click();
+    cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('myInvLabelValue1');
     cy.contains('.banner', 'Matches all 1 existing Machine Inventories').should('exist');
   });
 });

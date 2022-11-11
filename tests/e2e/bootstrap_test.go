@@ -80,7 +80,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	)
 
 	BeforeEach(func() {
-		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
+		// Add node in network configuration if needed
+		if macAdrs == "" {
+			err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
+			Expect(err).To(Not(HaveOccurred()))
+		}
+
+		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
 		client = &tools.Client{
@@ -92,10 +98,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	})
 
 	It("Install node and add it in Rancher", func() {
-		By("Checking if VM name is set", func() {
-			Expect(vmName).To(Not(BeEmpty()))
-		})
-
 		By("Setting emulated TPM to "+emulateTPM, func() {
 			// Set correct value for TPM emulation
 			value := "false"
