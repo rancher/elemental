@@ -72,6 +72,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            href: 'https://rancher-users.slack.com/channels/elemental',
+            label: 'Slack',
+            position: 'right',
+          },
         ],
       },
       footer: {
