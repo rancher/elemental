@@ -229,7 +229,7 @@ you can set the `ARCH` environment variable to the desired target system (x86_64
 :::
 
 ```shell showLineNumbers
-wget -q https://raw.githubusercontent.com/rancher/elemental/main/elemental-iso-build && chmod +x elemental-iso-build
+wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-build && chmod +x elemental-iso-build
 ```
 
 Now that we have the script we can proceed to build the ISO with our configuration injected:
