@@ -69,13 +69,15 @@ const config = {
           },
           {
             href: 'https://github.com/rancher/elemental',
-            label: 'GitHub',
             position: 'right',
+            className: 'header-github-link',
+            'aria-label': 'GitHub repository',
           },
           {
             href: 'https://rancher-users.slack.com/channels/elemental',
-            label: 'Slack',
             position: 'right',
+            className: 'header-slack-link',
+            'aria-label': 'Slack Channel',
           },
         ],
       },
