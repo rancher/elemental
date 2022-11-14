@@ -91,7 +91,7 @@ Once Elemental Teal is installed the OS partition table, according to default va
 
 | Label          | Default Size    | Contains                                                    |
 |----------------|-----------------|-------------------------------------------------------------|
-| COS_BOOT       | 64 MiB          | UEFI Boot partition                                         |
+| COS_GRUB       | 64 MiB          | UEFI Boot partition                                         |
 | COS_STATE      | 15 GiB          | A/B bootable file system images constructed from OCI images |
 | COS_OEM        | 64 MiB          | OEM cloud-config files and other data                       |
 | COS_RECOVERY   | 8 GiB           | Recovery file system image if COS_STATE is destroyed        |
