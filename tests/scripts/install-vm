@@ -6,19 +6,21 @@ set -e -x
 VM_NAME=$1
 MAC=$2
 ARCH=$(uname -m)
-IPXE_BIN=/usr/share/ipxe/ipxe-${ARCH}.efi
-FW=/usr/share/qemu/ovmf-x86_64-4m
+FW_DIR=/usr/share/qemu
+FW_BASE=${FW_DIR}/ovmf-${ARCH}-secure-ipxe-support
+FW_CODE=${FW_BASE}-code.bin
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
 if [[ ${EMULATE_TPM} != "true" ]]; then
   EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
 fi
 
+# Copy our own UEFI firmware(s) (support iPXE with Secure Boot)
+sudo cp -vr ../assets/ovmf/* ${FW_DIR}
+
 # iPXE stuff will not be used if ISO is set
 if [[ ${ISO_BOOT} == "true" ]]; then
-  pushd ../..
-  ISO=$(ls ${PWD}/elemental-*.iso 2>/dev/null)
-  popd
+  ISO=$(realpath ../../elemental-*.iso 2>/dev/null)
 
   # Exit if ISO is not available
   [[ ! -f ${ISO} ]] \
@@ -28,16 +30,21 @@ if [[ ${ISO_BOOT} == "true" ]]; then
   # Force ISO boot
   INSTALL_FLAG="--cdrom ${ISO}"
 else
-  # Exit if iPXE binary is not available
-  [[ ! -f ${IPXE_BIN} ]] \
-    && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
-    && exit 1
+  # NOTE: shim is needed to be able to use private MOK keys with Secure Boot
+  for I in ipxe shim; do
+    # Exit if binary is not available
+    BIN=$(realpath ../assets/efi-bin/${I}-${ARCH}.efi)
+    [[ ! -f ${BIN} ]] \
+      && echo "File ${BIN} not found! Exiting!" >&2 \
+      && exit 1
 
-  # Create symlink for iPXE binary
-  pushd ../..
-  rm -f ipxe.efi  # Force remove, to avoid issue with 'ln'
-  ln -s ${IPXE_BIN} ipxe.efi
-  popd
+    # As shim.efi is hardcoded to run GRUB we need to rename iPXE link
+    [[ ${I} == ipxe ]] && I=grub
+
+    # Create symlink for binary
+    rm -f ../../${I}.efi  # Force remove, to avoid issue with 'ln'
+    ln -s ${BIN} ../../${I}.efi
+  done
 
   # Force PXE boot
   INSTALL_FLAG="--pxe"
@@ -49,7 +56,7 @@ script -e -c "sudo virt-install \
   --os-variant opensuse-unknown \
   --virt-type kvm \
   --machine q35 \
-  --boot loader=${FW}-code.bin,loader.readonly=on,loader.secure=off,loader.type=pflash \
+  --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash \
   --ram=3072 \
   --vcpus=2 \
   --cpu host \

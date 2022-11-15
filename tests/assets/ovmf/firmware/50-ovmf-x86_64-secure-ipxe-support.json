@@ -1,0 +1,36 @@
+{
+    "description": "UEFI firmware for x86_64, with Secure Boot, SMM, iPXE support and MS certs enrolled",
+    "interface-types": [
+        "uefi"
+    ],
+    "mapping": {
+        "device": "flash",
+        "executable": {
+            "filename": "/usr/share/qemu/ovmf-x86_64-secure-ipxe-support-code.bin",
+            "format": "raw"
+        },
+        "nvram-template": {
+            "filename": "/usr/share/qemu/ovmf-x86_64-secure-ipxe-support-vars.bin",
+            "format": "raw"
+        }
+    },
+    "targets": [
+        {
+            "architecture": "x86_64",
+            "machines": [
+                "pc-q35-*"
+            ]
+        }
+    ],
+    "features": [
+        "acpi-s3",
+        "acpi-s4",
+        "requires-smm",
+        "secure-boot",
+	"enrolled-keys",
+        "verbose-dynamic"
+    ],
+    "tags": [
+
+    ]
+}
