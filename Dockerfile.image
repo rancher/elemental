@@ -64,8 +64,6 @@ RUN systemctl enable NetworkManager sshd elemental-populate-node-labels
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
 ARG IMAGE_REPO=norepo
-RUN echo VERSION=\"${IMAGE_TAG}\" >> /etc/os-release
-RUN echo VERSION_ID=\"$(echo ${IMAGE_TAG} | sed s/^v//)\" >> /etc/os-release
 RUN echo COMMIT=\"${IMAGE_COMMIT}\" >> /etc/os-release
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release
 RUN echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release
