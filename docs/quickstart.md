@@ -43,7 +43,7 @@ and available through the [openSUSE Registry](http://registry.opensuse.org/isv/r
      - The Rancher server needs to be accessible on port 443 from all nodes that you are provisioning. (However, the requests are only one way so the nodes can be behind a NAT or other firewall)
  - A machine (bare metal or virtualized) with TPM 2.0
      - Hint 1: Libvirt allows setting virtual TPMs for virtual machines [example here](https://rancher.github.io/elemental/tpm/#add-tpm-module-to-virtual-machine)
-     - Hint 2: You can enable TPM emulation on bare metal machines missing the TPM 2.0 module [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine). There are many caveats to this but it's useful for trying out with a single node. 
+     - Hint 2: For testing on a single bare metal machine missing the TPM 2.0 module, you can enable TPM emulation [example here](https://rancher.github.io/elemental/tpm/#add-tpm-emulation-to-bare-metal-machine). There are many caveats to this but it can be useful for seeing the workflow when only using one node.
  - Helm Package Manager (https://helm.sh/)
  - Docker (for iso manipulation)
 
@@ -93,7 +93,7 @@ the node during installation, allowing the operator to create a `MachineInventor
 See that we set the labels that will match our selector here already, although it can always be added later to the `MachineInventory`.
 
 :::warning warning
-Make sure to modify the registration.yaml above to set the proper install device to point to a valid device based on your node configuration(i.e. /dev/sda, /dev/vda, /dev/nvme0, etc...)
+Make sure to modify the registration.yaml above to set the proper install device to point to a valid device based on your node configuration(i.e. /dev/sda, /dev/vda, /dev/nvme0n1, etc...)
 :::
 
 :::note note
@@ -113,7 +113,7 @@ You can directly apply the quickstart example resource files from the [Elemental
 
 :::warning warning
 This assumes that your Node will have a `/dev/sda` disk available as that is the default device selected in those files.
-If your node doesnt have that device you will have to manually create the registration.yaml file or download the one from the repo and modify before applying
+If your node doesn't have that device you will have to manually create the registration.yaml file or download the one from the repo and modify before applying
 :::
 
 ```bash showLineNumbers
@@ -344,10 +344,5 @@ You should be able to follow along what the machine is doing via:
 It's likely that your ip address changed due to short DHCP leases. This is a known issue in Kubernetes and can be solved with static leases or static ip addresses.
 
 ## What next?
-
-For upgrading of nodes, check out: TODO
-
-For customization, check out: TODO
-
 
 Find us on Slack at `rancher-users.slack.io` on the `#elemental` channel!
