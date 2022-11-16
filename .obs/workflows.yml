@@ -1,4 +1,4 @@
-dev_workflow:
+push_workflow:
   steps:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
@@ -9,10 +9,13 @@ dev_workflow:
         - main
     event: push
 
-staging_workflow:
+tag_workflow:
   steps:
     - trigger_services:
         project: isv:Rancher:Elemental:Staging
+        package: elemental
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
         package: elemental
   filters:
     branches:
