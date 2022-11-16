@@ -19,7 +19,6 @@
 
 ## bootstrap_test.go (E2E - Bootstrapping node)
 **Install node and add it in Rancher by:**
-- Checking if VM name is set
 - Configuring iPXE boot script for network installation
 - Configuring emulated TPM if needed
 - Creating and installing VM
@@ -35,7 +34,6 @@
 
 ## upgrade_test.go (E2E - Upgrading node)
 **Upgrade node by:**
-- Checking if VM name is set
 - Checking if upgrade type is set
 - Triggering Upgrade in Rancher with <upgradeType>
 - Checking VM upgrade

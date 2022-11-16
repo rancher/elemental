@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"gopkg.in/yaml.v3"
+	libvirtxml "libvirt.org/libvirt-go-xml"
 )
 
 const (
@@ -142,4 +144,51 @@ func TrimStringFromChar(s, c string) string {
 		return s[:idx]
 	}
 	return s
+}
+
+func AddNode(name string, index int, file string) error {
+	// Read live XML configuration
+	fileContent, err := exec.Command("sudo", "virsh", "net-dumpxml", "default").Output()
+	if err != nil {
+		return err
+	}
+
+	// Unmarshal fileContent
+	netcfg := &libvirtxml.Network{}
+	if err := netcfg.Unmarshal(string(fileContent)); err != nil {
+		return err
+	}
+
+	// Add new host
+	// NOTE: we only use one network (IPs[0])
+	host := libvirtxml.NetworkDHCPHost{
+		Name: name,
+		MAC:  "52:54:00:00:00:" + fmt.Sprintf("%02x", index),
+		IP:   "192.168.122." + strconv.Itoa(index+1),
+	}
+	netcfg.IPs[0].DHCP.Hosts = append(netcfg.IPs[0].DHCP.Hosts, host)
+
+	// Marshal new content
+	newFileContent, err := netcfg.Marshal()
+	if err != nil {
+		return err
+	}
+
+	// Re-write XML file
+	if err := os.WriteFile(file, []byte(newFileContent), 0644); err != nil {
+		return err
+	}
+
+	// Update live network configuration
+	xmlValue, err := host.Marshal()
+	if err != nil {
+		return err
+	}
+	if err := exec.Command("sudo", "virsh", "net-update",
+		"default", "add", "ip-dhcp-host", "--live", "--xml", xmlValue).Run(); err != nil {
+		return err
+	}
+
+	// All good!
+	return nil
 }

@@ -32,42 +32,8 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		client  *tools.Client
 	)
 
-	BeforeEach(func() {
-		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
-		Expect(err).To(Not(HaveOccurred()))
-
-		client = &tools.Client{
-			Host:     string(hostData.IP) + ":22",
-			Username: userName,
-			Password: userPassword,
-		}
-
-		macAdrs = hostData.Mac
-	})
-
 	It("Configure libvirt and bootstrap a node", func() {
-		By("Checking if VM name is set", func() {
-			Expect(vmName).To(Not(BeEmpty()))
-		})
-
-		By("Adding MachineRegistration", func() {
-			registrationYaml := "../assets/machineregistration.yaml"
-
-			err := tools.Sed("%VM_NAME%", vmNameRoot, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%USER%", userName, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%PASSWORD%", userPassword, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.Sed("%CLUSTER_NAME%", clusterName, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.Apply(clusterNS, registrationYaml)
-			Expect(err).To(Not(HaveOccurred()))
-
+		By("Downloading MachineRegistration", func() {
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
 				"--namespace", clusterNS,
 				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
@@ -104,6 +70,25 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			numberOfFile, err := misc.ConfigureiPXE()
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(numberOfFile).To(BeNumerically(">=", 1))
+		})
+
+		By("Adding VM in default network", func() {
+			// Add node in network configuration if needed
+			if macAdrs == "" {
+				err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
+			Expect(err).To(Not(HaveOccurred()))
+
+			client = &tools.Client{
+				Host:     string(hostData.IP) + ":22",
+				Username: userName,
+				Password: userPassword,
+			}
+
+			macAdrs = hostData.Mac
 		})
 
 		By("Creating and installing VM", func() {

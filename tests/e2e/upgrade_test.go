@@ -31,7 +31,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	)
 
 	BeforeEach(func() {
-		hostData, err := tools.GetHostNetConfig(".*name='"+vmName+"'.*", netDefaultFileName)
+		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
 		client = &tools.Client{
@@ -42,10 +42,6 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	})
 
 	It("Upgrade node", func() {
-		By("Checking if VM name is set", func() {
-			Expect(vmName).To(Not(BeEmpty()))
-		})
-
 		By("Checking if upgrade type is set", func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})

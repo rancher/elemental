@@ -42,8 +42,8 @@ describe('Machine selector testing', () => {
     // TODO: Cannot use the clickButton here, I do not know why yet 
     cy.get('.mt-20 > .btn').contains('Add Rule').click();
     cy.get('#vs6__combobox').click()
-    cy.contains('cypress').click();
-    cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('uitesting');
+    cy.contains('myInvLabel1').click();
+    cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('myInvLabelValue1');
     cy.contains('.banner', 'Matches all 1 existing Machine Inventories').should('exist');
   });
 });

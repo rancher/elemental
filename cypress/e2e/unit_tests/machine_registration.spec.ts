@@ -45,10 +45,6 @@ describe('Machine registration testing', () => {
     cy.createMachReg({machRegName: 'labels-annotations-test', checkLabels: true, checkAnnotations: true});
   });
 
-  it.skip('Create machine registration with custom cloud-config', () => {
-      // Cannot be tested yet due to https://github.com/rancher/dashboard/issues/6458
-  });
-
   it('Delete machine registration', () => {
     cy.createMachReg({machRegName: 'delete-test'});
     cy.deleteMachReg({machRegName: 'delete-test'});
@@ -98,4 +94,10 @@ describe('Machine registration testing', () => {
     cy.verifyDownload('download-yaml-test.yaml');
   });
 
+  // This test must stay the last one because we use this machine registration when we test adding a node.
+  // It also tests using a custom cloud config by using read from file button.
+  it('Create Machine registration we will use to test adding a node', () => {
+    cy.createMachReg({machRegName: 'machine-registration', checkInventoryLabels: true, checkInventoryAnnotations: true, customCloudConfig: 'custom_cloud-config.yaml', checkDefaultCloudConfig: false});
+    cy.checkMachInvLabel({machRegName: 'machine-registration', labelName: 'myInvLabel1', labelValue: 'myInvLabelValue1'});
+  });
 });

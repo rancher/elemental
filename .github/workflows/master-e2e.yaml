@@ -19,7 +19,6 @@ on:
         type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
-        required: false
         type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
@@ -27,15 +26,19 @@ on:
         type: string
       ca_type:
         description: CA type to use (selfsigned or private)
-        required: true
+        default: selfsigned
+        type: string
+      node_number:
+        description: Number of nodes to deploy on the provisioned cluster
+        default: 5
         type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        required: true
+        default: stable
         type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
-        required: true
+        default: latest
         type: string
       runner:
         description: Runner on which to execute tests
@@ -43,23 +46,22 @@ on:
         type: string
       start_condition:
         description: Start condition of the runner
-        required: true
+        default: success
         type: string
       test_type:
         description: Type of test to run (cli or ui)
-        required: true
+        default: cli
         type: string
       upgrade_operator:
         description: URL to elemental-operator version to upgrade to
-        required: false
         type: string
       zone:
         description: GCP zone to host the runner
-        required: true
+        default: us-central1-a
         type: string
       workflow_download:
         description: build-ci workflow to use for artifacts
-        required: false
+        default: build-ci.yaml
         type: string
 
 jobs:
@@ -87,14 +89,13 @@ jobs:
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
       # For K3s installation used to host Rancher Manager
-      INSTALL_K3S_VERSION: v1.24.4+k3s1
+      INSTALL_K3S_VERSION: v1.24.7+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       # For Rancher Manager
       RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
-      DASHBOARD_VERSION: ${{ inputs.dashboard_version }}
       UPGRADE_OPERATOR: ${{ inputs.upgrade_operator }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
@@ -265,24 +266,38 @@ jobs:
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap node 4 with current build (use iPXE)
+      - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
         if: ${{ inputs.test_type == 'cli' }}
         env:
-          VM_INDEX: 4
-        run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 5 with current build (use iPXE)
+          NODE_NUMBER: ${{ inputs.node_number }}
+        run: |
+          cd tests
+          for ((I=4; I<=NODE_NUMBER; ++I)); do
+            echo "=> Bootstrap node ${I}..."
+            VM_INDEX=${I} make e2e-bootstrap-node
+          done
+      - name: List installed nodes
         if: ${{ inputs.test_type == 'cli' }}
-        env:
-          VM_INDEX: 5
-        run: cd tests && make e2e-bootstrap-node
+        run: sudo virsh list
+      - name: Add summary
+        run: |
+          echo "## General informations" >> $GITHUB_STEP_SUMMARY
+          if ${{ inputs.test_type == 'cli' }}; then
+            echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
+          echo "## Versions used" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
       - name: Remove VMs and K3s/RancherManager from worker ♻
         if: always()
         run: |
           # Remove all VMs
-          for I in {1..10}; do
+          for I in $(sudo virsh list --all| awk '/node-/ { print $2 }'); do
             for C in destroy undefine; do
               [[ "${C}" == "undefine" ]] && OPT="--nvram" || unset OPT
-              sudo virsh ${C} ${OPT} node-${I} >/dev/null 2>&1 || true
+              sudo virsh ${C} ${OPT} ${I} >/dev/null 2>&1 || true
             done
           done
           # Remove K3s and Rancher Manager
