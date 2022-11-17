@@ -14,7 +14,7 @@
   </ip>
   <dnsmasq:options>
     <dnsmasq:option value='dhcp-match=set:efi-http,option:client-arch,16'/>
-    <dnsmasq:option value='dhcp-boot=tag:efi-http,http://192.168.122.1:8000/shim.efi'/>
+    <dnsmasq:option value='dhcp-boot=tag:efi-http,http://192.168.122.1:8000/ipxe.efi'/>
     <dnsmasq:option value='dhcp-option-force=tag:efi-http,60,HTTPClient'/>
   </dnsmasq:options>
 </network>
