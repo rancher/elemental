@@ -164,7 +164,7 @@ Then apply changes to Kubernetes cluster
 kubectl apply -f rancher-resource-set.yaml
 ```
 
-Create backup with creating Backup object
+Create `elemental-backup.yaml` file which allows backup with creating Backup object
 
 ```yaml showLineNumbers
 apiVersion: resources.cattle.io/v1
@@ -175,6 +175,12 @@ spec:
   resourceSetName: rancher-resource-set
   schedule: "10 3 * * *"
   retentionCount: 10
+```
+
+Then apply changes to Kubernetes cluster
+
+```shell showLineNumbers
+kubectl apply -f elemental-backup.yaml
 ```
 
 Check logs from rancher-backup operator
