@@ -48,7 +48,7 @@ describe('Upgrade tests', () => {
     cy.contains('Active teal-5.3');
   });
 
-  it.skip('Upgrade one node with OS Image Upgrades', () => {
+  it('Upgrade one node with OS Image Upgrades', () => {
     // Create ManagedOSImage resource
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Image Upgrades').click();
@@ -59,11 +59,12 @@ describe('Upgrade tests', () => {
     cy.contains('myelementalcluster').click();
     cy.typeValue({label: 'OS Image', value: 'quay.io/costoolkit/elemental-ci:latest'});
     cy.clickButton('Create');
+    cy.wait(5000);
     cy.get('[data-testid="sortable-cell-0-0"]').contains('Active');
 
     // Check if the node reboots to apply the upgrade
-    cy.clickNavMenu(["Dashboard"]);
-    cy.clickButton('Manage Elemental Clusters');
+    topLevelMenu.openIfClosed();
+    cy.contains('Cluster Management').click();
     cy.get('.title').contains('Clusters');
     cy.contains('myelementalcluster').click();
     cy.get('.primaryheader').contains('Active');
