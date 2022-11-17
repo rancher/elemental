@@ -6,17 +6,13 @@ set -e -x
 VM_NAME=$1
 MAC=$2
 ARCH=$(uname -m)
-FW_DIR=/usr/share/qemu
-FW_BASE=${FW_DIR}/ovmf-${ARCH}-secure-ipxe-support
-FW_CODE=${FW_BASE}-code.bin
+FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
+FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
 if [[ ${EMULATE_TPM} != "true" ]]; then
   EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
 fi
-
-# Copy our own UEFI firmware(s) (support iPXE with Secure Boot)
-sudo cp -vr ../assets/ovmf/* ${FW_DIR}
 
 # iPXE stuff will not be used if ISO is set
 if [[ ${ISO_BOOT} == "true" ]]; then
@@ -30,21 +26,16 @@ if [[ ${ISO_BOOT} == "true" ]]; then
   # Force ISO boot
   INSTALL_FLAG="--cdrom ${ISO}"
 else
-  # NOTE: shim is needed to be able to use private MOK keys with Secure Boot
-  for I in ipxe shim; do
-    # Exit if binary is not available
-    BIN=$(realpath ../assets/efi-bin/${I}-${ARCH}.efi)
-    [[ ! -f ${BIN} ]] \
-      && echo "File ${BIN} not found! Exiting!" >&2 \
-      && exit 1
+  # Exit if binary is not available
+  IPXE_BIN=$(realpath ../assets/ipxe-${ARCH}.efi)
+  [[ ! -f ${IPXE_BIN} ]] \
+    && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
+    && exit 1
 
-    # As shim.efi is hardcoded to run GRUB we need to rename iPXE link
-    [[ ${I} == ipxe ]] && I=grub
-
-    # Create symlink for binary
-    rm -f ../../${I}.efi  # Force remove, to avoid issue with 'ln'
-    ln -s ${BIN} ../../${I}.efi
-  done
+  # Create symlink for binary
+  SYM_LINK=../../ipxe.efi
+  rm -f ${SYM_LINK}  # Force remove, to avoid issue with 'ln'
+  ln -s ${IPXE_BIN} ${SYM_LINK}
 
   # Force PXE boot
   INSTALL_FLAG="--pxe"
@@ -56,7 +47,7 @@ script -e -c "sudo virt-install \
   --os-variant opensuse-unknown \
   --virt-type kvm \
   --machine q35 \
-  --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash \
+  --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
   --features smm.state=yes \
   --ram=3072 \
   --vcpus=2 \
