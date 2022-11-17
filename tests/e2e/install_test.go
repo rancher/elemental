@@ -19,8 +19,6 @@ import (
 	"os/exec"
 	"time"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
@@ -197,7 +195,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"elemental-operator",
-				"https://rancher.github.io/elemental-operator",
+				"https://itxaka.github.io/elemental-operator",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
