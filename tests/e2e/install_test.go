@@ -197,7 +197,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"elemental-operator",
-				"https://itxaka.github.io/elemental-operator",
+				"https://rancher.github.io/elemental-operator",
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
