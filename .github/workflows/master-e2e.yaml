@@ -281,11 +281,9 @@ jobs:
         if: ${{ inputs.test_type == 'cli' }}
         run: sudo virsh list
       - name: Store logs
-        if: failure()
         run: |
           cd tests && make e2e-get-downstream-logs
       - name: Upload downstream cluster logs
-        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: logs
