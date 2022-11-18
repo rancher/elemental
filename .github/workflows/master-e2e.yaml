@@ -108,6 +108,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
+      - uses: azure/setup-kubectl@v3
       - name: Download default ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
@@ -279,6 +280,17 @@ jobs:
       - name: List installed nodes
         if: ${{ inputs.test_type == 'cli' }}
         run: sudo virsh list
+      - name: Store logs
+        if: failure()
+        run: |
+          cd tests && make e2e-get-downstream-logs
+      - name: Upload downstream cluster logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: tests/**/logs/*
+          if-no-files-found: ignore
       - name: Add summary
         run: |
           echo "## General informations" >> $GITHUB_STEP_SUMMARY
