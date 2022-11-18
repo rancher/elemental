@@ -12,8 +12,8 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 	BeforeEach(func() {
 		sut = &vm.SUT{
 			Host:     "192.168.122.2:22",
-			Username: userName,
-			Password: userPassword,
+			Username: "root",
+			Password: "root",
 		}
 	})
 	It("gets the downstream logs", func() {
