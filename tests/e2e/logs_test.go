@@ -2,8 +2,6 @@ package e2e_test
 
 import (
 	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher-sandbox/ele-testhelpers/vm"
 )
 
@@ -12,14 +10,10 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 		sut *vm.SUT
 	)
 	BeforeEach(func() {
-		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
-		Expect(err).To(Not(HaveOccurred()))
-
 		sut = &vm.SUT{
-			Host:      string(hostData.IP) + ":22",
-			Username:  userName,
-			Password:  userPassword,
-			MachineID: "test",
+			Host:     "192.168.122.2:22",
+			Username: userName,
+			Password: userPassword,
 		}
 	})
 	It("gets the downstream logs", func() {
