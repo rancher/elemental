@@ -194,6 +194,11 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
 
+		By("Install system-controller CRDs", func() {
+			_, err := kubectl.Run("apply", "-f", "https://github.com/rancher/system-upgrade-controller/releases/download/v0.9.1/crd.yaml")
+			Expect(err).To(Not(HaveOccurred()))
+		})
+
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"elemental-operator",
