@@ -200,7 +200,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		})
 
 		By("Install system-controller CRDs", func() {
-			resp, err := http.Get("https: //github.com/rancher/system-upgrade-controller/releases/download/v0.9.1/system-upgrade-controller.yaml")
+			resp, err := http.Get("https://github.com/rancher/system-upgrade-controller/releases/download/v0.9.1/system-upgrade-controller.yaml")
+
 			Expect(err).ToNot(HaveOccurred())
 			defer resp.Body.Close()
 			data := bytes.NewBuffer([]byte{})
