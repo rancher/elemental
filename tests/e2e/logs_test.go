@@ -1,12 +1,8 @@
 package e2e_test
 
 import (
-	"fmt"
 	. "github.com/onsi/ginkgo/v2"
 	"github.com/rancher-sandbox/ele-testhelpers/vm"
-	"os"
-	"os/exec"
-	"strings"
 )
 
 var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
@@ -21,16 +17,9 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 		}
 	})
 	It("gets the downstream logs", func() {
-		sut.Command("elemental-support")
+		sut.Command("curl -L https://github.com/Itxaka/elemental-operator/releases/download/v100.0.0/elemental-support_100.0.0_linux_amd64 -o /tmp/elemental-support")
+		sut.Command("/tmp/elemental-support")
 		out, _ := sut.Command("find /root -name `hostname`*.tar.gz -print")
 		sut.GatherLog(out)
-		hostname, _ := sut.Command("hostname")
-		filename, _ := exec.Command("find", ".", "-name", fmt.Sprintf("%s*.tar.gz", hostname), "-print").CombinedOutput()
-		By(fmt.Sprintf("Renaming %s", filename))
-		err := os.Rename(string(filename), strings.Replace(string(filename), ":", "-", -1))
-		if err != nil {
-			fmt.Fprint(GinkgoWriter, err)
-		}
-
 	})
 })
