@@ -15,8 +15,13 @@ limitations under the License.
 package e2e_test
 
 import (
+	"bytes"
+	"io"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -195,8 +200,23 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		})
 
 		By("Install system-controller CRDs", func() {
-			_, err := kubectl.Run("apply", "-f", "https://github.com/rancher/system-upgrade-controller/releases/download/v0.9.1/crd.yaml")
-			Expect(err).To(Not(HaveOccurred()))
+			resp, err := http.Get("https: //github.com/rancher/system-upgrade-controller/releases/download/v0.9.1/system-upgrade-controller.yaml")
+			Expect(err).ToNot(HaveOccurred())
+			defer resp.Body.Close()
+			data := bytes.NewBuffer([]byte{})
+
+			_, err = io.Copy(data, resp.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			// It needs to look over cattle-system ns to be functional
+			toApply := strings.ReplaceAll(data.String(), "namespace: system-upgrade", "namespace: cattle-system")
+
+			temp, err := ioutil.TempFile("", "temp")
+			Expect(err).ToNot(HaveOccurred())
+
+			defer os.RemoveAll(temp.Name())
+			Expect(ioutil.WriteFile(temp.Name(), []byte(toApply), os.ModePerm)).To(Succeed())
+			Expect(kubectl.Apply("cattle-system", temp.Name())).To(Succeed())
 		})
 
 		By("Installing Elemental Operator", func() {
