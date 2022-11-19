@@ -25,7 +25,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 		out, _ := sut.Command("find /root -name `hostname`*.tar.gz -print")
 		sut.GatherLog(out)
 		hostname, _ := sut.Command("hostname")
-		filename, _ := exec.Command("find", ".", "--name", fmt.Sprintf("%s*.tar.gz", hostname), "-print").CombinedOutput()
+		filename, _ := exec.Command("find", ".", "-name", fmt.Sprintf("%s*.tar.gz", hostname), "-print").CombinedOutput()
 		By(fmt.Sprintf("Renaming %s", filename))
 		err := os.Rename(string(filename), strings.Replace(string(filename), ":", "-", -1))
 		if err != nil {
