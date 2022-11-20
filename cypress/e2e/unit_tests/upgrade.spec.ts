@@ -43,7 +43,8 @@ describe('Upgrade tests', () => {
     cy.get('.title').contains('Clusters');
     cy.contains('myelementalcluster').click();
     cy.get('.primaryheader').contains('Active');
-    cy.get('.primaryheader').contains('Updating', {timeout: 240000});
+    cy.reload()
+    cy.get('.primaryheader').contains('Updating', {timeout: 360000});
     cy.get('.primaryheader').contains('Active', {timeout: 240000});
   });
 });

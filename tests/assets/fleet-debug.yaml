@@ -1,0 +1,10 @@
+spec:
+  template:
+    spec:
+      containers:
+        - name: fleet-controller
+          command:
+            - fleetcontroller
+            - --debug
+            - --debug-level
+            - "5"

@@ -33,6 +33,7 @@ const (
 	selectorYaml       = "../assets/selector.yaml"
 	registrationYaml   = "../assets/machineregistration.yaml"
 	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
+	fleetDebugYaml     = "../assets/fleet-debug.yaml"
 )
 
 var (
