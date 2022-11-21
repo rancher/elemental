@@ -195,8 +195,10 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		})
 
 		By("Patching fleet controller to enable debug", func() {
-			err := k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
-			Expect(err).To(Not(HaveOccurred()))
+			run, _ := kubectl.Run("get", "deployments", "--all-namespaces")
+			GinkgoWriter.Printf(run)
+			err := k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
+			Expect(err).ToNot(HaveOccurred())
 			r, err := kubectl.Run("patch", "deployment", "-n", "cattle-fleet-system", "fleet-controller", "--patch-file", fleetDebugYaml)
 			Expect(err).ToNot(HaveOccurred())
 			GinkgoWriter.Printf(r)
