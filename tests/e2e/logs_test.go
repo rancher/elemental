@@ -46,7 +46,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			fmt.Fprint(GinkgoWriter, err)
 		}
 		os.WriteFile("logs/fleet-agent.log", outcmd, os.ModePerm)
-		outcmd, err = exec.Command("kubectl", "describe", "nodes", "-o").CombinedOutput()
+		outcmd, err = exec.Command("kubectl", "describe", "nodes").CombinedOutput()
 		if err != nil {
 			fmt.Fprint(GinkgoWriter, err)
 		}
