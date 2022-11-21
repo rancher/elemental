@@ -25,16 +25,16 @@ import (
 )
 
 const (
-	vmNameRoot          = "node"
-	userName            = "root"
-	userPassword        = "r0s@pwd1"
-	netDefaultFileName  = "../assets/net-default.xml"
-	clusterYaml         = "../assets/cluster.yaml"
-	selectorYaml        = "../assets/selector.yaml"
-	registrationYaml    = "../assets/machineregistration.yaml"
-	emulatedTPMYaml     = "../assets/emulated_tpm.yaml"
-	fleetDebugYaml      = "../assets/fleet-debug.yaml"
-	fleetAgentDebugYaml = "../assets/fleet-agent-image-debug.yaml"
+	vmNameRoot         = "node"
+	userName           = "root"
+	userPassword       = "r0s@pwd1"
+	netDefaultFileName = "../assets/net-default.xml"
+	clusterYaml        = "../assets/cluster.yaml"
+	selectorYaml       = "../assets/selector.yaml"
+	registrationYaml   = "../assets/machineregistration.yaml"
+	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
+	fleetDebugYaml     = "../assets/fleet-debug.yaml"
+	fleetAgentImagel   = "../assets/fleet-agent-image.yaml"
 )
 
 var (

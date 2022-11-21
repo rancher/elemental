@@ -8,4 +8,4 @@ spec:
             - fleetcontroller
             - --debug
             - --debug-level
-            - "5"
+            - "0"

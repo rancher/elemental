@@ -197,11 +197,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		By("Patching fleet controller to enable debug", func() {
 			err := k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
 			Expect(err).ToNot(HaveOccurred())
-			_, err = kubectl.Run("patch", "deployment", "-n", "cattle-fleet-system", "fleet-controller", "--patch-file", fleetDebugYaml)
+			r, err := kubectl.Run("patch", "deployment", "-n", "cattle-fleet-system", "fleet-controller", "--patch-file", fleetDebugYaml)
 			Expect(err).ToNot(HaveOccurred())
+			GinkgoWriter.Printf(r)
 			err = k.Wait("cattle-fleet-local-system", "Available=True", "deployment/fleet-agent", 120*time.Second)
 			Expect(err).ToNot(HaveOccurred())
-			_, err = kubectl.Run("patch", "deployment", "-n", "cattle-fleet-local-system", "fleet-agent", "--patch-file", fleetAgentDebugYaml)
+			r, err = kubectl.Run("patch", "deployment", "-n", "cattle-fleet-local-system", "fleet-agent", "--patch-file", fleetAgentImagel)
+			Expect(err).ToNot(HaveOccurred())
+			GinkgoWriter.Printf(r)
 		})
 
 		By("Installing Elemental Operator", func() {

@@ -45,7 +45,7 @@ describe('Upgrade tests', () => {
     cy.get('.primaryheader').contains('Active');
     cy.reload()
     // wait half an hour to get logs of a working example
-    cy.wait(1800000)
+    //cy.wait(1800000)
     cy.get('.primaryheader').contains('Updating', {timeout: 120000});
     cy.get('.primaryheader').contains('Active', {timeout: 240000});
   });
