@@ -5,7 +5,7 @@ metadata:
   namespace: fleet-default
 spec:
   # Set to the new Elemental version you would like to upgrade to
-  osImage: "registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest"
+  osImage: "registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-node-image/5.3:latest"
   clusterTargets:
     - clusterName: my-cluster
   nodeSelector:
