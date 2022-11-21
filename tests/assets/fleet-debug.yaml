@@ -3,7 +3,7 @@ spec:
     spec:
       containers:
         - name: fleet-controller
-          image: ttl.sh/fleet-agent:v0.6.0-alpha1-54-g2ac9bf0-amd64
+          image: ttl.sh/fleet:dev
           command:
             - fleetcontroller
             - --debug
