@@ -22,7 +22,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 	})
 	It("gets the downstream logs", func() {
 		// Get a more recent support binary
-		sut.Command("curl -L https://github.com/Itxaka/elemental-operator/releases/download/v100.0.0/elemental-support_100.0.0_linux_amd64 -o /tmp/elemental-support")
+		sut.Command("curl -L https://github.com/Itxaka/elemental-operator/releases/download/v100.0.1/elemental-support_100.0.1_linux_amd64 -o /tmp/elemental-support")
 		sut.Command("chmod +x /tmp/elemental-support")
 		sut.Command("/tmp/elemental-support")
 		out, _ := sut.Command("find /root -name `hostname`*.tar.gz -print")
