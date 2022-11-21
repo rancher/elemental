@@ -196,9 +196,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 		By("Patching fleet controller to enable debug", func() {
 			r, err := kubectl.Run("patch", "deployment", "-n", "cattle-fleet-system", "fleet-controller", "--patch-file", fleetDebugYaml)
-			if err != nil {
-				return
-			}
 			Expect(err).ToNot(HaveOccurred())
 			GinkgoWriter.Printf(r)
 		})
