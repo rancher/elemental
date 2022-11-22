@@ -26,11 +26,11 @@ export class Elemental {
     cy.get('li.child.nav-type').should(($lis) => {
     expect($lis).to.have.length(6);
     expect($lis.eq(0)).to.contain('Dashboard');
-    expect($lis.eq(1)).to.contain('Machine Registrations');
-    expect($lis.eq(2)).to.contain('Machine Inventories');
-    expect($lis.eq(3)).to.contain('OS Image Upgrades');
-    expect($lis.eq(4)).to.contain('Managed OS Versions');
-    expect($lis.eq(5)).to.contain('Managed OS Version Channels');
+    expect($lis.eq(1)).to.contain('Registration Endpoints');
+    expect($lis.eq(2)).to.contain('Inventory of Machines');
+    expect($lis.eq(3)).to.contain('Update Groups');
+    expect($lis.eq(4)).to.contain('OS Versions');
+    expect($lis.eq(5)).to.contain('OS Version Channels');
     })      
   }
 

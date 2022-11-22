@@ -23,7 +23,7 @@ describe('Machine inventory testing', () => {
   });
 
   it('Check that machine inventory has been created', () => {
-    cy.clickNavMenu(["Machine Inventories"]);
+    cy.clickNavMenu(["Inventory of Machines"]);
     cy.contains('.badge-state', 'Active').should('exist');
     cy.contains('Namespace: fleet-default').should('exist');
   });

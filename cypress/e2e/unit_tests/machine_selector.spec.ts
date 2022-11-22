@@ -26,7 +26,7 @@ describe('Machine selector testing', () => {
   });
 
   it('Testing selector without any rule', () => {
-    cy.contains('.banner', 'Matches all 1 existing Machine Inventories').should('exist');
+    cy.contains('.banner', 'Matches all 1 existing Inventory of Machines').should('exist');
   });
 
   it('Testing selector with unmatching rule', () => {
@@ -34,7 +34,7 @@ describe('Machine selector testing', () => {
     // TODO: Cannot use the clickButton here, I do not know why yet 
     cy.get('.mt-20 > .btn').contains('Add Rule').click();
     cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('wrong');
-    cy.contains('.banner', 'Matches no existing Machine Inventories').should('exist');
+    cy.contains('.banner', 'Matches no existing Inventory of Machines').should('exist');
   });
 
   it('Testing selector with matching rule', () => {
@@ -44,6 +44,6 @@ describe('Machine selector testing', () => {
     cy.get('#vs6__combobox').click()
     cy.contains('myInvLabel1').click();
     cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('myInvLabelValue1');
-    cy.contains('.banner', 'Matches all 1 existing Machine Inventories').should('exist');
+    cy.contains('.banner', 'Matches all 1 existing Inventory of Machines').should('exist');
   });
 });
