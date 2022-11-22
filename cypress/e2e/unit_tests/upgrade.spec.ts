@@ -31,7 +31,7 @@ describe('Upgrade tests', () => {
     cy.get('.primaryheader').contains('OS Image Upgrade: Create');
     cy.typeValue({label: 'Name', value: 'upgrade'});
     cy.contains('Target Cluster').click();
-    cy.contains('1').click();
+    cy.contains('cl').click();
     cy.typeValue({label: 'OS Image', value: 'quay.io/costoolkit/elemental-ci:latest'});
     cy.clickButton('Create');
     cy.wait(5000);
@@ -41,11 +41,10 @@ describe('Upgrade tests', () => {
     topLevelMenu.openIfClosed();
     cy.contains('Cluster Management').click();
     cy.get('.title').contains('Clusters');
-    cy.contains('1').click();
+    cy.contains('cl').click();
     cy.get('.primaryheader').contains('Active');
     cy.reload()
     // wait half an hour to get logs of a working example
-    cy.wait(1800000)
     cy.get('.primaryheader').contains('Updating', {timeout: 120000});
     cy.get('.primaryheader').contains('Active', {timeout: 240000});
   });

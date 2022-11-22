@@ -194,23 +194,27 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
 
-		By("Patching fleet controller to enable debug", func() {
-			err := k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
-			Expect(err).ToNot(HaveOccurred())
-			r, err := kubectl.Run("patch", "deployment", "-n", "cattle-fleet-system", "fleet-controller", "--patch-file", fleetDebugYaml)
-			Expect(err).ToNot(HaveOccurred())
+		By("Patching fleet chart to enable debug", func() {
+			time.Sleep(120 * time.Second)
+			r, err := kubectl.Run("get", "pods", "--all-namespaces")
 			GinkgoWriter.Printf(r)
+			err = k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
 			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
 			Expect(err).ToNot(HaveOccurred())
-			err = k.Wait("cattle-fleet-local-system", "Available=True", "deployment/fleet-agent", 120*time.Second)
+			// Patch fleet with custom images for testing
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "fleet", "--install", "--wait", "-n", "cattle-fleet-system",
+				"--set", "image.repository=ttl.sh/fleet",
+				"--set", "image.tag=dev",
+				"--set", "agentImage.repository=ttl.sh/fleet-agent",
+				"--set", "agentImage.tag=dev",
+				"--set", "agentImage.imagePullPolicy=IfNotPresent",
+				"--set", "debug=true",
+				"--set", "debuglevel=5",
+				"https://github.com/rancher/fleet/releases/download/v0.5.0/fleet-0.5.0.tgz",
+			)
 			Expect(err).ToNot(HaveOccurred())
-			r, err = kubectl.Run("patch", "deployment", "-n", "cattle-fleet-local-system", "fleet-agent", "--patch-file", fleetAgentImagel)
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
 			Expect(err).ToNot(HaveOccurred())
-			GinkgoWriter.Printf(r)
-			err = k.Wait("cattle-fleet-local-system", "Available=True", "deployment/fleet-agent", 120*time.Second)
-			Expect(err).ToNot(HaveOccurred())
-			r, err = kubectl.Run("get", "pods", "--all-namespaces")
-			GinkgoWriter.Printf(r)
 		})
 
 		By("Installing Elemental Operator", func() {

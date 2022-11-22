@@ -30,22 +30,22 @@ describe('Machine inventory testing', () => {
 
   it('Create Elemental cluster', () => {
     cy.contains('Create Elemental Cluster').click();
-    cy.typeValue({label: 'Cluster Name', value: '1'});
+    cy.typeValue({label: 'Cluster Name', value: 'cl'});
     cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
     cy.contains('Kubernetes Version').click();
     cy.contains(k8s_version).click();
     cy.clickButton('Create');
-    cy.contains('Updating 1', {timeout: 20000});
-    cy.contains('Active 1', {timeout: 360000});
+    cy.contains('Updating cl', {timeout: 20000});
+    cy.contains('Active cl', {timeout: 360000});
   });
 
   it('Check Elemental cluster status', () => {
     topLevelMenu.openIfClosed();
     cy.contains('Home').click();
     // The new cluster must be in active state
-    cy.get('[data-node-id="fleet-default/1"]').contains('Active');
+    cy.get('[data-node-id="fleet-default/cl"]').contains('Active');
     // Go into the dedicated cluster page
     topLevelMenu.openIfClosed();
-    cy.contains('1').click();
+    cy.contains('cl').click();
   })
 });
