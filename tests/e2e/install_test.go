@@ -184,6 +184,10 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
+			err = k.Wait("cattle-system", "Available=True", "deployment/rancher", 120*time.Second)
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
+			err = k.Wait("cattle-fleet-local-system", "Available=True", "deployment/fleet-agent", 120*time.Second)
+
 			// Check Rancher version
 			operatorVersion, err := kubectl.Run("get", "pod",
 				"--namespace", "cattle-system",
