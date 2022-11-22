@@ -57,6 +57,6 @@ describe('User role testing', () => {
     elemental.elementalIcon().should('exist');
     elemental.accessElementalMenu();
     // User without appropriate role will get a specific page
-    cy.contains('The Elemental Operator is required to run the OS Management extension');
+    cy.contains('Elemental is a software stack');
   });
 });

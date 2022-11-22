@@ -27,8 +27,8 @@ describe('Machine registration testing', () => {
     cy.exec('kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml delete ns mynamespace', {failOnNonZeroExit: false});
     
     // Delete all existing machine registrations
-    cy.contains('Manage Machine Registrations').click();
-    cy.get('.outlet > header').contains('Machine Registrations');
+    cy.contains('Manage Registration Endpoints').click();
+    cy.get('.outlet > header').contains('Registration Endpoints');
     cy.get('body').then(($body) => {
       if (!$body.text().includes('There are no rows to show.')) {
         cy.deleteAllMachReg();
@@ -77,7 +77,7 @@ describe('Machine registration testing', () => {
     cy.contains('li', 'Clone').click();
     cy.typeValue({label: 'Name', value: 'cloned-machine-reg'});
     cy.clickButton('Create');
-    cy.contains('.masthead', 'Machine Registration: cloned-machine-reg Active').should('exist');
+    cy.contains('.masthead', 'Registration Endpoint: cloned-machine-reg Active').should('exist');
     
     // Check that we got the same label and annotation in both machine registration
     cy.checkMachRegLabel({machRegName: 'cloned-machine-reg', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
