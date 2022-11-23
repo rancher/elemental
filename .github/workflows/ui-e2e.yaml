@@ -20,6 +20,6 @@ jobs:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.7+k3s1
       rancher_channel: latest
-      rancher_version: 2.7.0-rc12
+      rancher_version: 2.7.0
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       test_type: ui
