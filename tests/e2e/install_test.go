@@ -197,7 +197,29 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
-		
+
+		By("Patching fleet chart to enable debug", func() {
+			r, err := kubectl.Run("get", "pods", "--all-namespaces")
+			GinkgoWriter.Printf(r)
+			err = k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
+			Expect(err).ToNot(HaveOccurred())
+			// Patch fleet with custom images for testing
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "fleet", "--install", "--wait", "-n", "cattle-fleet-system",
+				"--set", "image.repository=ttl.sh/fleet",
+				"--set", "image.tag=v0.5.0-dev",
+				"--set", "agentImage.repository=ttl.sh/fleet-agent",
+				"--set", "agentImage.tag=v0.5.0-dev",
+				"--set", "agentImage.imagePullPolicy=IfNotPresent",
+				"--set", "debug=true",
+				"--set", "debuglevel=5",
+				"https://github.com/rancher/fleet/releases/download/v0.5.0/fleet-0.5.0.tgz",
+			)
+			Expect(err).ToNot(HaveOccurred())
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"elemental-operator",
