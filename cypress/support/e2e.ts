@@ -28,6 +28,8 @@ declare global {
       addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
+      importMachineInventory(machineInventoryFile: string, machineInventoryName: string): Chainable<Element>;
+      checkFilter(filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean): Chainable<Element>;
     }
 }}
 

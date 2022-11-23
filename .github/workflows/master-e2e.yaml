@@ -169,6 +169,7 @@ jobs:
             cypress/e2e/unit_tests/user.spec.ts
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
+            cypress/e2e/unit_tests/advanced_filtering.spec.ts
         run: make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
         if: failure()
