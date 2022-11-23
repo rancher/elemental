@@ -285,3 +285,26 @@ Cypress.Commands.add('deleteAllMachReg', () => {
   cy.confirmDelete();
   cy.contains('There are no rows to show');
 });
+
+// Machine Inventory functions
+
+// Import machine inventory
+Cypress.Commands.add('importMachineInventory', ({machineInventoryFile, machineInventoryName}) => {
+  cy.clickNavMenu(["Inventory of Machines"]);
+  cy.clickButton('Create from YAML');
+  cy.clickButton('Read from File');
+  cy.get('input[type="file"]').attachFile({filePath: machineInventoryFile});
+  cy.clickButton('Create');
+  cy.contains('Creating').should('not.exist');
+  cy.contains(machineInventoryName).should('exist');
+});
+
+Cypress.Commands.add('checkFilter', ({filterName, testFilterOne, testFilterTwo, shouldNotMatch}) => {
+  cy.clickNavMenu(["Inventory of Machines"]);
+  cy.clickButton("Add Filter");
+  cy.get('.advanced-search-box').type(filterName);
+  cy.get('.bottom-block > .role-primary').click();
+  (testFilterOne) ? cy.contains('test-filter-one').should('exist') : cy.contains('test-filter-one').should('not.exist');
+  (testFilterTwo) ? cy.contains('test-filter-two').should('exist') : cy.contains('test-filter-two').should('not.exist');
+  (shouldNotMatch) ? cy.contains('shouldnotmatch').should('exist') : cy.contains('shouldnotmatch').should('not.exist');
+});
