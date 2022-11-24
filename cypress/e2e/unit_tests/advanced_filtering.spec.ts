@@ -43,4 +43,12 @@ describe('Advanced filtering testing', () => {
     cy.checkFilter({filterName: 'test-bad-filter', testFilterOne: false, testFilterTwo: false, shouldNotMatch: false});
     cy.contains('There are no rows which match your search query.')
   });
+
+  it('Delete all fake machine inventories', () => {
+    cy.clickNavMenu(["Inventory of Machines"]);
+    cy.get('[width="30"] > .checkbox-outer-container > .checkbox-container > .checkbox-custom').click();
+    cy.clickButton('Actions');
+    cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)').click();
+    cy.confirmDelete();
+  });
 });
