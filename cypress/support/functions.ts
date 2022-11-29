@@ -154,7 +154,7 @@ Cypress.Commands.add('createMachReg', ({machRegName, namespace='fleet-default', 
   cy.clickButton("Create");
 
   // Make sure the machine registration is created and active
-  cy.contains('.masthead', 'Registration Endpoint: '+ machRegName + ' Active').should('exist');
+  cy.contains('.masthead', 'Registration Endpoint: '+ machRegName + 'Active').should('exist');
 
   // Check the namespace
   cy.contains('.masthead', 'Namespace: '+ namespace).should('exist');
