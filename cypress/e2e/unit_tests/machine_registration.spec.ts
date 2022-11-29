@@ -77,7 +77,7 @@ describe('Machine registration testing', () => {
     cy.contains('li', 'Clone').click();
     cy.typeValue({label: 'Name', value: 'cloned-machine-reg'});
     cy.clickButton('Create');
-    cy.contains('.masthead', 'Registration Endpoint: cloned-machine-reg Active').should('exist');
+    cy.contains('.masthead', 'Registration Endpoint: cloned-machine-regActive').should('exist');
     
     // Check that we got the same label and annotation in both machine registration
     cy.checkMachRegLabel({machRegName: 'cloned-machine-reg', labelName: 'myLabel1', labelValue: 'myLabelValue1'});
