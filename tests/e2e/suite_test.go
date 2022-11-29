@@ -37,17 +37,17 @@ const (
 
 var (
 	arch            string
+	caType          string
 	clusterName     string
 	clusterNS       string
 	emulateTPM      string
 	imageVersion    string
 	isoBoot         string
 	k8sVersion      string
-	caType          string
-	testType        string
 	osImage         string
 	rancherChannel  string
 	rancherVersion  string
+	testType        string
 	upgradeType     string
 	upgradeOperator string
 	vmIndex         int
@@ -66,6 +66,7 @@ func TestE2E(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
+	caType = os.Getenv("CA_TYPE")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	emulateTPM = os.Getenv("EMULATE_TPM")
@@ -73,11 +74,10 @@ var _ = BeforeSuite(func() {
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
-	caType = os.Getenv("CA_TYPE")
-	testType = os.Getenv("TEST_TYPE")
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
+	testType = os.Getenv("TEST_TYPE")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
 
