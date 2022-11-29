@@ -194,6 +194,29 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
 
+		By("Patching fleet chart to enable debug", func() {
+			time.Sleep(120 * time.Second)
+			r, err := kubectl.Run("get", "pods", "--all-namespaces")
+			GinkgoWriter.Printf(r)
+			err = k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 120*time.Second)
+			Expect(err).ToNot(HaveOccurred())
+			// Patch fleet with custom images for testing
+			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "fleet", "--install", "--wait", "-n", "cattle-fleet-system",
+				"--set", "image.repository=rancher/fleet-agent:v0.5.0",
+				"--set", "image.tag=dev",
+				"--set", "agentImage.repository=rancher/fleet-agent:v0.5.0",
+				"--set", "agentImage.tag=dev",
+				"--set", "agentImage.imagePullPolicy=IfNotPresent",
+				"--set", "debug=true",
+				"--set", "debuglevel=5",
+				"https://github.com/rancher/fleet/releases/download/v0.5.0/fleet-0.5.0.tgz",
+			)
+			Expect(err).ToNot(HaveOccurred())
+			err = k.Wait("cattle-fleet-system", "Available=True", "deployment/fleet-controller", 180*time.Second)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
 				"elemental-operator",
@@ -234,18 +257,5 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Operator Version:\n%s\n", operatorVersion)
 		})
-
-		if testType == "ui" {
-			By("Workaround for upgrade test, restart Fleet", func() {
-				time.Sleep(120 * time.Second)
-				_, err := kubectl.Run("rollout", "restart", "deployment/fleet-controller", "--namespace", "cattle-fleet-system")
-				k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
-				Expect(err).To(Not(HaveOccurred()))
-
-				_, err = kubectl.Run("rollout", "restart", "deployment/fleet-agent", "--namespace", "cattle-fleet-local-system")
-				k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
-				Expect(err).To(Not(HaveOccurred()))
-			})
-		}
 	})
 })
