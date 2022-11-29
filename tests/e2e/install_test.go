@@ -203,7 +203,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).ToNot(HaveOccurred())
 			// Patch fleet with custom images for testing
 			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "fleet", "--install", "--wait", "-n", "cattle-fleet-system",
-				"--set", "image.repository=rancher/fleet-agent:v0.5.0",
+				"--set", "image.repository=rancher/fleet-agent",
 				"--set", "image.tag=dev",
 				"--set", "agentImage.repository=rancher/fleet-agent:v0.5.0",
 				"--set", "agentImage.tag=dev",
