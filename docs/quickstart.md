@@ -67,7 +67,7 @@ NAME                                  READY   STATUS    RESTARTS   AGE
 elemental-operator-64f88fc695-b8qhn   1/1     Running   0          16s
 ```
 
-## Prepare you kubernetes resources
+## Prepare your kubernetes resources
 
 Node deployment starts with a `MachineRegistration`, identifying a set of machines sharing the same configuration (disk drives, network, etc.)
 
@@ -225,7 +225,7 @@ This will generate an ISO on the current directory with the name `elemental-teal
 
 :::info
 The script uses the iso for the arch based on the system is being run from. If you want to cross build for another system,
-you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be build for that architecture.
+you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be built for that architecture.
 :::
 
 ```shell showLineNumbers
@@ -255,7 +255,7 @@ After a few minutes your new cluster will be fully provisioned!!
 
 ## How can I choose the kubernetes version and deployer for the cluster?
 
-On you cluster.yaml file there is a key in the `Spec` called `kubernetesVersion`. That sets the version and deployer that will be used for the cluster,
+In your cluster.yaml file there is a key in the `Spec` called `kubernetesVersion`. That sets the version and deployer that will be used for the cluster,
 for example for rke `v1.23.6` while for rke2 would be `v1.23.6+rke2r1` and for k3s `v1.23.6+k3s1`
 
 To see all compatible versions check the [Rancher Support Matrix](https://www.suse.com/suse-rancher/support-matrix/all-supported-versions/) PDF for rke/rke2/k3s versions and their components.
