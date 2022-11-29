@@ -1,0 +1,12 @@
+# !! LET THIS SCRIPT IN THE GITHUB REPOSITORY !!
+# !!  EVEN IF IT IS NOT USED DIRECTLY BY CI   !!
+# !!    IT IS USED TO BOOSTRAP THE RUNNER     !!
+[Unit]
+Description=Configure GitHub Runner
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/configure-gh-runner.sh
+
+[Install]
+WantedBy=multi-user.target
