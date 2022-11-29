@@ -16,6 +16,10 @@ on:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: devel
         type: string
+      upgrade_operator:
+        description: URL to elemental-operator version to upgrade to
+        default: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher/elemental-operator-chart
+        type: string
 
 concurrency:
   group: e2e-tests-obs-staging-${{ github.head_ref || github.ref }}-${{ github.repository }}
@@ -34,7 +38,7 @@ jobs:
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/elemental/elemental-operator
+      upgrade_operator: ${{ inputs.upgrade_operator }}
   rke2:
     if: always()
     needs: k3s
@@ -50,4 +54,4 @@ jobs:
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       runner: elemental-e2e-ci-runner-spot-x86-64-2
-      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/elemental/elemental-operator
+      upgrade_operator: ${{ inputs.upgrade_operator }}
