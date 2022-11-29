@@ -22,17 +22,18 @@ jobs:
       rancher_version: devel
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       test_type: ui
-  ui-e2e-rke2:
-    if: always()
-    needs: ui-e2e-k3s
-    uses: ./.github/workflows/master-e2e.yaml
-    secrets:
-      credentials: ${{ secrets.GCP_CREDENTIALS }}
-    with:
-      ui_account: user
-      cluster_name: cluster-rke2
-      k8s_version_to_provision: v1.24.8+rke2r1
-      rancher_channel: latest
-      rancher_version: devel
-      runner: elemental-e2e-ci-runner-spot-x86-64-1
-      test_type: ui
+#  ui-e2e-rke2:
+#    if: always()
+#    needs: ui-e2e-k3s
+#    uses: ./.github/workflows/master-e2e.yaml
+#    secrets:
+#      credentials: ${{ secrets.GCP_CREDENTIALS }}
+#    with:
+#      ui_account: user
+#      cluster_name: cluster-rke2
+#      k8s_version_to_provision: v1.24.8+rke2r1
+#      rancher_channel: latest
+#      rancher_version: devel
+#      runner: elemental-e2e-ci-runner-spot-x86-64-1
+#      test_type: ui
+#

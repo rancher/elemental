@@ -149,6 +149,7 @@ jobs:
         id: installation
         env:
           CA_TYPE: ${{ inputs.ca_type }}
+          TEST_TYPE: ${{ inputs.test_type }}
         run: |
           export MY_HOSTNAME=$(hostname -f)
           echo "MY_HOSTNAME=$MY_HOSTNAME" >> $GITHUB_OUTPUT

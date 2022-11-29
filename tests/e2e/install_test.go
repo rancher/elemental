@@ -234,5 +234,18 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Operator Version:\n%s\n", operatorVersion)
 		})
+
+		if testType == "ui" {
+			By("Workaround for upgrade test, restart Fleet", func() {
+				time.Sleep(120 * time.Second)
+				_, err := kubectl.Run("rollout", "restart", "deployment/fleet-controller", "--namespace", "cattle-fleet-system")
+				k.WaitForNamespaceWithPod("cattle-fleet-system", "app=fleet-controller")
+				Expect(err).To(Not(HaveOccurred()))
+
+				_, err = kubectl.Run("rollout", "restart", "deployment/fleet-agent", "--namespace", "cattle-fleet-local-system")
+				k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })
