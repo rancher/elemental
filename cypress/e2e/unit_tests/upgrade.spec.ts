@@ -64,6 +64,9 @@ describe('Upgrade tests', () => {
     cy.wait(10000);
     cy.get('[data-testid="sortable-cell-0-0"]').contains('Active');
 
+    // Workaround to avoid sporadic issue with Upgrade
+    // https://github.com/rancher/elemental/issues/410
+    // Restart fleet agent inside downstream cluster
     topLevelMenu.openIfClosed();
     cy.contains('myelementalcluster').click();
     cy.contains('Workload').click();
