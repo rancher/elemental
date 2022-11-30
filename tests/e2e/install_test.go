@@ -193,6 +193,20 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
 		})
+		if testType == "ui" {
+			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
+				// https://github.com/rancher/elemental/issues/410
+				time.Sleep(misc.SetTimeout(120 * time.Second))
+				_, err := kubectl.Run("scale", "deployment/fleet-agent", "-n", "cattle-fleet-local-system", "--replicas=0")
+				Expect(err).To(Not(HaveOccurred()))
+				_, err = kubectl.Run("scale", "deployment/fleet-controller", "-n", "cattle-fleet-system", "--replicas=0")
+				Expect(err).To(Not(HaveOccurred()))
+				_, err = kubectl.Run("scale", "deployment/fleet-controller", "-n", "cattle-fleet-system", "--replicas=1")
+				Expect(err).To(Not(HaveOccurred()))
+				_, err = kubectl.Run("scale", "deployment/fleet-agent", "-n", "cattle-fleet-local-system", "--replicas=1")
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 
 		By("Installing Elemental Operator", func() {
 			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",

@@ -29,10 +29,11 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
     with:
-      ui_account: user
+      #ui_account: user
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.8+rke2r1
       rancher_channel: latest
       rancher_version: devel
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       test_type: ui
+

@@ -64,7 +64,21 @@ describe('Upgrade tests', () => {
     cy.wait(10000);
     cy.get('[data-testid="sortable-cell-0-0"]').contains('Active');
 
+    // Workaround to avoid sporadic issue with Upgrade
+    // https://github.com/rancher/elemental/issues/410
+    // Restart fleet agent inside downstream cluster
+    topLevelMenu.openIfClosed();
+    cy.contains('myelementalcluster').click();
+    cy.contains('Workload').click();
+    cy.contains('Pods').click();
+    cy.get('.header-buttons > :nth-child(2)').click();
+    cy.wait(40000);
+    cy.get('.xterm-cursor-layer').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=0{enter}');
+    cy.get('.xterm-cursor-layer').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
+
     // Check if the node reboots to apply the upgrade
+    topLevelMenu.openIfClosed();
+    elemental.accessElementalMenu();
     cy.clickNavMenu(["Dashboard"]);
     cy.clickButton('Manage Elemental Clusters');
     cy.get('.title').contains('Clusters');
