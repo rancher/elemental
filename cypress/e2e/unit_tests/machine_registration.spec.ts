@@ -31,7 +31,7 @@ describe('Machine registration testing', () => {
     cy.get('.outlet > header').contains('Registration Endpoints');
     cy.get('body').then(($body) => {
       if (!$body.text().includes('There are no rows to show.')) {
-        cy.deleteAllMachReg();
+        cy.deleteAllResources();
       };
     });
   });
