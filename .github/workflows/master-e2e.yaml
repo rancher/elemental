@@ -304,13 +304,20 @@ jobs:
         run: sudo virsh list
       - name: Add summary
         run: |
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image})
+          # Add summary
           echo "## General informations" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.test_type == 'cli' }}; then
             echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
           echo "## Versions used" >> $GITHUB_STEP_SUMMARY
-          echo "Rancher Manager: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager Version: ${RM_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
       - name: Remove VMs and K3s/RancherManager from worker ♻
