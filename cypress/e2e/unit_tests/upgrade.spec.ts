@@ -20,7 +20,6 @@ describe('Upgrade tests', () => {
 
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
-
   });
 
   it('Create an OS Version Channels', () => {
@@ -46,6 +45,24 @@ describe('Upgrade tests', () => {
     cy.get('.nav').contains('OS Versions').click();
     cy.contains('Active teal-5.2', {timeout: 120000});
     cy.contains('Active teal-5.3');
+  });
+
+  it('Delete OS Versions', () => {
+    cy.get('.nav').contains('Advanced').click();
+    cy.get('.nav').contains('OS Versions').click();
+    cy.contains('teal-5.2').parent().parent().click();
+    cy.clickButton('Delete');
+    cy.confirmDelete();
+    cy.contains('teal-5.2').should('not.exist');
+  });
+
+  it('Delete OS Versions Channels', () => {
+    cy.get('.nav').contains('Advanced').click();
+    cy.get('.nav').contains('OS Version Channels').click();
+    cy.deleteAllResources();
+    cy.get('.nav').contains('Advanced').click();
+    cy.get('.nav').contains('OS Versions').click();
+    cy.contains('There are no rows to show');
   });
 
   it('Upgrade one node with OS Image Upgrades', () => {

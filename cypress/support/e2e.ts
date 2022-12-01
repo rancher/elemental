@@ -17,7 +17,7 @@ declare global {
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
       createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
-      deleteAllMachReg():Chainable<Element>;
+      deleteAllResources():Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
       checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;

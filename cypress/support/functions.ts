@@ -116,6 +116,14 @@ Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
   cy.clickButton('Create');
 });
 
+// Delete all resources from a page
+Cypress.Commands.add('deleteAllResources', () => {  
+  cy.get('[width="30"] > .checkbox-outer-container').click();
+  cy.clickButton('Delete');
+  cy.confirmDelete();
+  cy.contains('There are no rows to show');
+});
+
 // Machine registration functions
 
 // Create a machine registration
@@ -276,14 +284,6 @@ Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
   cy.clickButton('Delete');
   cy.confirmDelete();
   cy.contains(machRegName).should('not.exist')
-});
-
-// Delete all machine registrations
-Cypress.Commands.add('deleteAllMachReg', () => {  
-  cy.get('[width="30"] > .checkbox-outer-container').click();
-  cy.clickButton('Delete');
-  cy.confirmDelete();
-  cy.contains('There are no rows to show');
 });
 
 // Machine Inventory functions
