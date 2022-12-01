@@ -42,10 +42,15 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
 			Expect(err).To(Not(HaveOccurred()))
 
-			// Execute K3s installation
-			out, err := exec.Command("sh", fileName).CombinedOutput()
-			GinkgoWriter.Printf("%s\n", out)
-			Expect(err).To(Not(HaveOccurred()))
+			// Retry in case of (sporadfic) failure...
+			count := 1
+			Eventually(func() error {
+				// Execute K3s installation
+				out, err := exec.Command("sh", fileName).CombinedOutput()
+				GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
+				count++
+				return err
+			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 		})
 
 		By("Starting K3s", func() {
