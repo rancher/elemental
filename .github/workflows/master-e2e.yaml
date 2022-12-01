@@ -303,6 +303,7 @@ jobs:
         if: ${{ inputs.test_type == 'cli' }}
         run: sudo virsh list
       - name: Add summary
+        if: always()
         run: |
           # Extract Rancher Manager version
           RM_VERSION=$(kubectl get pod \
