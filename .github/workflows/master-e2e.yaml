@@ -141,7 +141,7 @@ jobs:
         env:
           cache-name: cache-artifacts
         with:
-          path: build/*.iso
+          path: build/*
           key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
           # Alternate key, mainly useful for UI test
           restore-keys: |
