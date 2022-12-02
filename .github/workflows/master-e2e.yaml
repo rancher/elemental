@@ -139,7 +139,7 @@ jobs:
         if: ${{ inputs.iso_to_test == '' }}
         uses: actions/cache@v3
         env:
-          cache-name: cache-iso
+          cache-name: cache-artifacts
         with:
           path: build/*.iso
           key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
