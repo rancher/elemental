@@ -3,6 +3,13 @@ sidebar_label: Quickstart
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 import Cluster from "!!raw-loader!../examples/quickstart/cluster.yaml"
 import Registration from "!!raw-loader!../examples/quickstart/registration.yaml"
 import Selector from "!!raw-loader!../examples/quickstart/selector.yaml"
