@@ -190,6 +190,12 @@ As you can see we obtained the proper initial registration needed by `elemental-
 
 Now we can write down the data returned for that url into a file that we will inject into the iso
 
+```bash showLineNumbers
+$ curl --insecure https://172.18.0.2.sslip.io/elemental/registration/gsh4n8nj9gvbsjk4x7hxvnr5l6hmhbdbdffrmkwzrss2dtfbnpbmqp > initial-registration.yaml
+```
+
+Which results in
+
 ```yaml title="initial-registration.yaml" showLineNumbers
 elemental:
   registration:
@@ -234,18 +240,6 @@ This will generate an ISO on the current directory with the name `elemental-teal
 The script uses the iso for the arch based on the system is being run from. If you want to cross build for another system,
 you can set the `ARCH` environment variable to the desired target system (x86_64, aarch64) and the iso will be built for that architecture.
 :::
-
-```shell showLineNumbers
-wget -q https://raw.githubusercontent.com/rancher/elemental/main/.github/elemental-iso-build && chmod +x elemental-iso-build
-```
-
-Now that we have the script we can proceed to build the ISO with our configuration injected:
-
-```shell showLineNumbers
-./elemental-iso-build initial-registration.yaml
-```
-
-This will generate an ISO on the current directory with the name `elemental-<timestamp>.iso`
 
 </TabItem>
 </Tabs>
