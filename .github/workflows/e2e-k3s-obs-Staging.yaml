@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: OBS Stable - Elemental E2E tests with Rancher Manager
+name: OBS Staging - K3s - Elemental E2E tests with Rancher Manager
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster
         default: 5
-        type: string
+        type: number
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -18,11 +18,11 @@ on:
         type: string
       upgrade_operator:
         description: URL to elemental-operator version to upgrade to
-        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
+        default: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher/elemental-operator-chart
         type: string
 
 concurrency:
-  group: e2e-tests-obs-stable-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  group: e2e-k3s-obs-staging-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -34,23 +34,8 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       cluster_name: cluster-k3s
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+k3s1
-      node_number: ${{ inputs.node_number }}
-      rancher_channel: ${{ inputs.rancher_channel }}
-      rancher_version: ${{ inputs.rancher_version }}
-      upgrade_operator: ${{ inputs.upgrade_operator }}
-  rke2:
-    uses: ./.github/workflows/master-e2e.yaml
-    secrets:
-      credentials: ${{ secrets.GCP_CREDENTIALS }}
-      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-    with:
-      ca_type: private
-      cluster_name: cluster-rke2
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+rke2r1
       node_number: ${{ inputs.node_number }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}

@@ -1,0 +1,34 @@
+# This workflow calls the master E2E workflow with custom variables
+name: K3s - Elemental UI End-To-End tests with Rancher Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      rancher_channel:
+        description: Rancher Manager channel to use for installation (alpha/latest/stable)
+        default: latest
+        type: string
+      rancher_version:
+        description: Rancher Manager version to use for installation (fixed version or latest)
+        default: devel
+        type: string
+      upgrade_operator:
+        description: URL to elemental-operator version to upgrade to
+        type: string
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  ui-k3s:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      cluster_name: cluster-k3s
+      k8s_version_to_provision: v1.24.8+k3s1
+      rancher_channel: ${{ inputs.rancher_channel }}
+      rancher_version: ${{ inputs.rancher_version }}
+      test_type: ui
+      upgrade_operator: ${{ inputs.upgrade_operator }}
