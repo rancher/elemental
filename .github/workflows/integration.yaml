@@ -45,7 +45,7 @@ jobs:
           cache-name: cache-artifacts
         with:
           path: build/*
-          key: iso-build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Run tests
         run: |
           GIT_TAG=$(git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0")
@@ -102,7 +102,7 @@ jobs:
           cache-name: cache-artifacts
         with:
           path: build/*
-          key: iso-build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Run tests
         run: |
           export COS_HOST=127.0.0.1:2222

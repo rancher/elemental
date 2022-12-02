@@ -39,7 +39,7 @@ jobs:
           cache-name: cache-artifacts
         with:
           path: build/*
-          key: iso-build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Send failed status to slack (only on schedule)
         if: failure() && github.event_name == 'schedule'
         uses: slackapi/slack-github-action@v1.23.0
@@ -78,7 +78,7 @@ jobs:
           cache-name: cache-artifacts
         with:
           path: build/*
-          key: iso-build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Upload docker image
         uses: actions/upload-artifact@v3
         with:

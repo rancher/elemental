@@ -142,7 +142,7 @@ jobs:
           cache-name: cache-iso
         with:
           path: build/*.iso
-          key: iso-build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
           # Alternate key, mainly useful for UI test
           restore-keys: |
             iso-build-ci-
