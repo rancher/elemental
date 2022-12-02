@@ -3,6 +3,13 @@ sidebar_label: Upgrade
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 import ClusterTarget from "!!raw-loader!../examples/upgrade/upgrade-cluster-target.yaml"
 import NodeSelector from "!!raw-loader!../examples/upgrade/upgrade-node-selector.yaml"
 import ManagedOSVersion from "!!raw-loader!../examples/upgrade/upgrade-managedos-version.yaml"
