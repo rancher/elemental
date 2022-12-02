@@ -1,0 +1,43 @@
+# This workflow calls the master E2E workflow with custom variables
+name: OBS Dev - RKE2 - Elemental E2E tests with Rancher Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      node_number:
+        description: Number of nodes (>3) to deploy on the provisioned cluster
+        default: 5
+        type: number
+      rancher_channel:
+        description: Rancher Manager channel to use for installation (alpha/latest/stable)
+        default: latest
+        type: string
+      rancher_version:
+        description: Rancher Manager version to use for installation (fixed version or latest)
+        default: devel
+        type: string
+      upgrade_operator:
+        description: URL to elemental-operator version to upgrade to
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
+        type: string
+
+concurrency:
+  group: e2e-rke2-obs-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  rke2:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      ca_type: private
+      cluster_name: cluster-rke2
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
+      k8s_version_to_provision: v1.24.8+rke2r1
+      node_number: ${{ inputs.node_number }}
+      rancher_channel: ${{ inputs.rancher_channel }}
+      rancher_version: ${{ inputs.rancher_version }}
+      upgrade_operator: ${{ inputs.upgrade_operator }}
