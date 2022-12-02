@@ -47,7 +47,7 @@ build:
 .PHONY: dump_image
 dump_image:
 	@mkdir -p build
-	@docker save ${REPO}:${FINAL_TAG} -o build/elemental_${FINAL_TAG}.tar
+	@docker save ${REPO}:${FINAL_TAG} -o build/elemental-${FINAL_TAG}.tar
 
 # Build iso with the elemental image as base
 .PHONY: iso
