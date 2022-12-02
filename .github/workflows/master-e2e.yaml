@@ -145,7 +145,7 @@ jobs:
           key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
           # Alternate key, mainly useful for UI test
           restore-keys: |
-            iso-build-ci-
+            build-ci-
       - name: Download specified ISO
         if: ${{ inputs.iso_to_test != '' }}
         env:
