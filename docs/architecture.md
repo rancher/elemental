@@ -3,6 +3,13 @@ sidebar_label: Architecture
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 # Architecture
 
 The Elemental stack can be divided in two main parts: the Elemental OS, an immutable and customizable OS which comprises the tools and the steps needed to prepare the Cloud Native OS image and perform the actual OS installation on the host, and the <Vars name="elemental_operator_name" />, that allows central management of the Elemental OS via Rancher, the Kubernetes way.

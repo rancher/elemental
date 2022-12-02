@@ -1,0 +1,24 @@
+# This workflow calls the master E2E workflow with custom variables
+name: K3s - Elemental E2E tests with Rancher Manager
+
+on:
+  workflow_run:
+    workflows:
+      - build-ci
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  k3s:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      cluster_name: cluster-k3s
+      k8s_version_to_provision: v1.24.8+k3s1
+      start_condition: ${{ github.event.workflow_run.conclusion }}
+      workflow_download: ${{ github.event.workflow_run.workflow_id }}

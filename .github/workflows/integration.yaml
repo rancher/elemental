@@ -36,21 +36,23 @@ jobs:
           checkName: build-all-artifacts
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           timeoutSeconds: 1800
-      - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2.24.0
+      - name: Stop the workflow if build has failed
+        if: steps.wait-for-build.outputs.conclusion == 'failure'
+        run: exit 1
+      - name: Restore cache artifacts
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
         with:
-          workflow: build-ci.yaml
-          run_id: ${{ github.event.workflow_run.id }}
-          name: iso-image
-          # Force the path, this is a security hint!
-          path: ./
+          path: build/*
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Run tests
         run: |
           GIT_TAG=$(git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0")
           GIT_COMMIT_SHORT=$(git rev-parse --short HEAD)
           export CONTAINER_IMAGE=${REPO}:${GIT_TAG}-${GIT_COMMIT_SHORT}
           export COS_HOST=127.0.0.1:2222
-          export ISO=$PWD/$(ls elemental-*.iso 2>/dev/null)
+          export ISO=$PWD/$(ls build/elemental-*.iso 2>/dev/null)
           cd tests && make container-tests
       - name: Upload logs
         uses: actions/upload-artifact@v3
@@ -91,18 +93,20 @@ jobs:
           checkName: build-all-artifacts
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           timeoutSeconds: 1800
-      - name: Download artifacts
-        uses: dawidd6/action-download-artifact@v2.24.0
+      - name: Stop the workflow if build has failed
+        if: steps.wait-for-build.outputs.conclusion == 'failure'
+        run: exit 1
+      - name: Restore cache artifacts
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
         with:
-          workflow: build-ci.yaml
-          run_id: ${{ github.event.workflow_run.id }}
-          name: iso-image
-          # Force the path, this is a security hint!
-          path: ./
+          path: build/*
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Run tests
         run: |
           export COS_HOST=127.0.0.1:2222
-          export ISO=$PWD/$(ls elemental-*.iso 2>/dev/null)
+          export ISO=$PWD/$(ls build/elemental-*.iso 2>/dev/null)
           cd tests && make iso-tests
       - name: Upload logs
         uses: actions/upload-artifact@v3

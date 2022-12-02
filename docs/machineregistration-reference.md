@@ -3,6 +3,13 @@ sidebar_label: Machineregistration reference
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 # MachineRegistration reference
 
 The MachineRegistration resource is the responsible of defining a machine registration end point. Once created it generates a registration URL used by nodes to register so they are inventoried.

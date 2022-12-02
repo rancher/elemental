@@ -42,10 +42,15 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
 			Expect(err).To(Not(HaveOccurred()))
 
-			// Execute K3s installation
-			out, err := exec.Command("sh", fileName).CombinedOutput()
-			GinkgoWriter.Printf("%s\n", out)
-			Expect(err).To(Not(HaveOccurred()))
+			// Retry in case of (sporadfic) failure...
+			count := 1
+			Eventually(func() error {
+				// Execute K3s installation
+				out, err := exec.Command("sh", fileName).CombinedOutput()
+				GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
+				count++
+				return err
+			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 		})
 
 		By("Starting K3s", func() {
@@ -209,17 +214,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 
 		By("Installing Elemental Operator", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add",
-				"elemental-operator",
-				"https://rancher.github.io/elemental-operator",
-			)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
-				"elemental-operator/elemental-operator",
+			operatorChart := "oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart"
+			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
+				operatorChart,
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			)
@@ -229,7 +226,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Check if an upgrade to a specific version is configured
-			if upgradeOperator != "" {
+			if upgradeOperator != "" && upgradeOperator != operatorChart {
 				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
 					upgradeOperator,
 					"--namespace", "cattle-elemental-system",
@@ -239,6 +236,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 				k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 				Expect(err).To(Not(HaveOccurred()))
+
+				// Delay few seconds before checking
+				time.Sleep(misc.SetTimeout(60 * time.Second))
 			}
 
 			// Check elemental-operator version

@@ -8,6 +8,12 @@ on:
       credentials:
         description: Credentials to use to connect
         required: true
+      pat_token:
+        description: PAT token used to add runner
+        required: true
+      slack_webhook_url:
+        description: WebHook URL to use for Slack
+        required: true
     inputs:
       ui_account:
         description: Account used to test RBAC role in UI
@@ -32,6 +38,10 @@ on:
         description: Number of nodes to deploy on the provisioned cluster
         default: 5
         type: string
+      machine_type:
+        description: Type of VM
+        default: n2-standard-8
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
@@ -39,10 +49,6 @@ on:
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
-        type: string
-      runner:
-        description: Runner on which to execute tests
-        required: true
         type: string
       start_condition:
         description: Start condition of the runner
@@ -64,25 +70,45 @@ on:
         default: build-ci.yaml
         type: string
 
+env:
+  runner_template: elemental-e2e-ci-runner-spot-x86-64-template-v2
+
 jobs:
-  start-runner:
+  create-runner:
     if: ${{ inputs.start_condition == 'success' }}
     runs-on: ubuntu-latest
+    outputs:
+      uuid: ${{ steps.generator.outputs.uuid }}
+      runner: ${{ steps.generator.outputs.runner }}
     steps:
       # actions/checkout MUST come before auth
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Generate UUID and Runner hostname
+        id: generator
+        run: |
+          UUID=$(uuidgen)
+          echo "uuid=${UUID}" >> ${GITHUB_OUTPUT}
+          echo "runner=elemental-ci-${UUID}" >> ${GITHUB_OUTPUT}
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.credentials }}
       - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v0
-      - name: Start runner
-        run: gcloud compute instances start --zone ${{ inputs.zone }} ${{ inputs.runner }}
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Create runner
+        run: |
+          gcloud compute instances create ${{ steps.generator.outputs.runner }} \
+            --source-instance-template ${{ env.runner_template }} \
+            --machine-type ${{ inputs.machine_type }} \
+            --zone ${{ inputs.zone }}
+      - name: Create PAT token secret
+        run: |
+          echo -n ${{ secrets.pat_token }} \
+            | gcloud secrets create PAT_TOKEN_${{ steps.generator.outputs.uuid }} --data-file=-
   e2e:
-    needs: start-runner
-    runs-on: ${{ inputs.runner }}
+    needs: create-runner
+    runs-on: ${{ needs.create-runner.outputs.uuid }}
     env:
       TIMEOUT_SCALE: 2
       ARCH: amd64
@@ -108,43 +134,38 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '~1.18'
-      - name: Download default ISO
+      - name: Cache ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: ${{ inputs.iso_to_test == '' }}
-        uses: dawidd6/action-download-artifact@v2.24.0
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
         with:
-          workflow: ${{ inputs.workflow_download }}
-          workflow_conclusion: success
-          name: iso-image
-          # Force the path, this is a security hint!
-          path: ./
+          path: build/*
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+          # Alternate key, mainly useful for UI test
+          restore-keys: |
+            build-ci-
       - name: Download specified ISO
         if: ${{ inputs.iso_to_test != '' }}
         env:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
         run: |
-          wget -v -L -c ${ISO_TO_TEST} -O elemental-${TAG}.iso
+          mkdir -p build
+          wget -v -L -c ${ISO_TO_TEST} -O build/elemental-${TAG}.iso
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
-          ISO=$(ls elemental-*.iso 2>/dev/null)
+          ISO=$(ls build/elemental-*.iso 2>/dev/null)
           TAG=${ISO#*-}
           export TAG=${TAG%.iso}
-          # Move ISO to build for next step
-          mkdir -p build
-          mv -f ${ISO} build/
           # Extract iPXE artifacts
           make extract_kernel_init_squash
           make ipxe
           mv -f build/* .
           # Looks a little bit weird but we have to keep the ISO in build!
           mv -f elemental-*.iso build/
-      - name: Clean local Helm repositories
-        run: |
-          # Clean Helm repo
-          HELM_REPO=$(helm repo list 2>/dev/null | awk '(NR>1) { print $1 }')
-          [[ -n "${HELM_REPO}" ]] && helm repo remove ${HELM_REPO} || true
       - name: Install Rancher
         id: installation
         env:
@@ -282,14 +303,22 @@ jobs:
         if: ${{ inputs.test_type == 'cli' }}
         run: sudo virsh list
       - name: Add summary
+        if: always()
         run: |
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image})
+          # Add summary
           echo "## General informations" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.test_type == 'cli' }}; then
             echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
           fi
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
           echo "## Versions used" >> $GITHUB_STEP_SUMMARY
-          echo "Rancher Manager: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+          echo "Rancher Manager Version: ${RM_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
       - name: Remove VMs and K3s/RancherManager from worker ♻
@@ -333,21 +362,27 @@ jobs:
               ]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-  stop-runner:
-    if: always()
-    needs: e2e
+  delete-runner:
+    if: ${{ always() && needs.create-runner.result == 'success' }}
+    needs: [create-runner, e2e]
     runs-on: ubuntu-latest
     steps:
       # actions/checkout MUST come before auth
       - name: Checkout
         uses: actions/checkout@v3
       - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.credentials }}
       - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v0
-      - name: Stop runner
-        run: gcloud compute instances stop --zone ${{ inputs.zone }} ${{ inputs.runner }}
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Delete PAT token secret
+        run: |
+          gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }}
+      - name: Delete runner
+        run: |
+          gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
+            --delete-disks all \
+            --zone ${{ inputs.zone }}

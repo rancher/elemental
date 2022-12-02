@@ -3,6 +3,13 @@ sidebar_label: Inventory Management
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 ## Inventory Management
 
 The Elemental operator can hold an inventory of machines and

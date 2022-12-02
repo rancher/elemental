@@ -3,6 +3,13 @@ sidebar_label: Backup
 title: ''
 ---
 
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting to https://elemental.docs.rancher.com</title>
+  <meta http-equiv="refresh" content="0; URL=https://elemental.docs.rancher.com/" />
+  <link rel="canonical" href="https://elemental.docs.rancher.com/" />
+</head>
+
 # Backup
 
 Follow this guide to create backup for Elemental configuration installed together with Rancher.

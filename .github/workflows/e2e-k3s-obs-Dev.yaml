@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: OBS Dev - Elemental E2E tests with Rancher Manager
+name: OBS Dev - K3s - Elemental E2E tests with Rancher Manager
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ on:
         type: string
 
 concurrency:
-  group: e2e-tests-obs-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  group: e2e-k3s-obs-dev-${{ github.head_ref || github.ref }}-${{ github.repository }}
   cancel-in-progress: true
 
 jobs:
@@ -30,28 +30,13 @@ jobs:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.7+k3s1
-      node_number: ${{ inputs.node_number }}
-      rancher_channel: ${{ inputs.rancher_channel }}
-      rancher_version: ${{ inputs.rancher_version }}
-      runner: elemental-e2e-ci-runner-spot-x86-64-2
-      upgrade_operator: ${{ inputs.upgrade_operator }}
-  rke2:
-    if: always()
-    needs: k3s
-    uses: ./.github/workflows/master-e2e.yaml
-    secrets:
-      credentials: ${{ secrets.GCP_CREDENTIALS }}
-    with:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
-      cluster_name: cluster-rke2
-      k8s_version_to_provision: v1.24.7+rke2r1
-      ca_type: private
+      k8s_version_to_provision: v1.24.8+k3s1
       node_number: ${{ inputs.node_number }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
-      runner: elemental-e2e-ci-runner-spot-x86-64-2
       upgrade_operator: ${{ inputs.upgrade_operator }}

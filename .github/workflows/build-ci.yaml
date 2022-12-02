@@ -33,16 +33,13 @@ jobs:
       - name: Build iso
         run: |
           make iso
-      - name: Upload docker image
-        uses: actions/upload-artifact@v3
+      - name: Cache artifacts
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
         with:
-          name: docker-image
-          path: build/*.tar
-      - name: Upload ISO
-        uses: actions/upload-artifact@v3
-        with:
-          name: iso-image
-          path: build/*.iso
+          path: build/*
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
       - name: Send failed status to slack (only on schedule)
         if: failure() && github.event_name == 'schedule'
         uses: slackapi/slack-github-action@v1.23.0
@@ -71,3 +68,24 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  upload-all-artifacts:
+    needs: build-all-artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore cache artifacts
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-artifacts
+        with:
+          path: build/*
+          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Upload docker image
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker-image
+          path: build/*.tar
+      - name: Upload ISO
+        uses: actions/upload-artifact@v3
+        with:
+          name: iso-image
+          path: build/*.iso
