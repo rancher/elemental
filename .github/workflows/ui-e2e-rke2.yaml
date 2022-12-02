@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: Elemental UI End-To-End tests with Rancher Manager
+name: RKE2 - Elemental UI End-To-End tests with Rancher Manager
 
 on:
   workflow_dispatch:
@@ -18,25 +18,8 @@ on:
   schedule:
     - cron: '0 4 * * *'
 
-concurrency:
-  group: ui-e2e-tests-${{ github.head_ref || github.ref }}-${{ github.repository }}
-  cancel-in-progress: false
-
 jobs:
-  ui-e2e-k3s:
-    uses: ./.github/workflows/master-e2e.yaml
-    secrets:
-      credentials: ${{ secrets.GCP_CREDENTIALS }}
-      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-    with:
-      cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.8+k3s1
-      rancher_channel: ${{ inputs.rancher_channel }}
-      rancher_version: ${{ inputs.rancher_version }}
-      test_type: ui
-      upgrade_operator: ${{ inputs.upgrade_operator }}
-  ui-e2e-rke2:
+  ui-rke2:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
