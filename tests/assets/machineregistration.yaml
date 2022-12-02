@@ -20,7 +20,6 @@ spec:
           passwd: %PASSWORD%
     elemental:
       install:
-        automatic: true
         reboot: false
         poweroff: true
         device: /dev/sda
