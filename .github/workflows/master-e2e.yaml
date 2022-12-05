@@ -300,6 +300,17 @@ jobs:
       - name: List installed nodes
         if: inputs.test_type == 'cli'
         run: sudo virsh list
+      - name: Store logs
+        if: always()
+        run: |
+          cd tests && make e2e-get-logs
+      - name: Upload downstream cluster logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: support-logs
+          path: tests/**/logs/*
+          if-no-files-found: ignore
       - name: Add summary
         if: always()
         run: |
@@ -331,23 +342,8 @@ jobs:
           echo "Elemental Operator Version: ${OPERATOR_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
-      - name: Remove VMs and K3s/RancherManager from worker ♻
-        if: always()
-        run: |
-          # Remove all VMs
-          for I in $(sudo virsh list --all| awk '/node-/ { print $2 }'); do
-            for C in destroy undefine; do
-              [[ "${C}" == "undefine" ]] && OPT="--nvram" || unset OPT
-              sudo virsh ${C} ${OPT} ${I} >/dev/null 2>&1 || true
-            done
-          done
-          # Remove K3s and Rancher Manager
-          /usr/local/bin/k3s-uninstall.sh || true
-      - name: Remove remaining stuff from worker ♻
-        if: always()
-        uses: colpal/actions-clean@v1
       - name: Send failed status to slack
-        if: failure() && github.event_name == 'schedule'
+        if: failure()
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -375,7 +371,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
   delete-runner:
-    if: always() && needs.create-runner.result == 'success'
+    if: ${{ always() && needs.create-runner.result == 'success' }}
     needs: [create-runner, e2e]
     runs-on: ubuntu-latest
     steps:
@@ -396,3 +392,4 @@ jobs:
           gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
             --delete-disks all \
             --zone ${{ inputs.zone }}
+

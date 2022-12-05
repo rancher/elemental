@@ -121,7 +121,7 @@ Cypress.Commands.add('deleteAllResources', () => {
   cy.get('[width="30"] > .checkbox-outer-container').click();
   cy.clickButton('Delete');
   cy.confirmDelete();
-  cy.contains('There are no rows to show');
+  cy.contains('There are no rows to show', {timeout: 20000});
 });
 
 // Machine registration functions
