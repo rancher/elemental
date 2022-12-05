@@ -72,7 +72,7 @@ on:
 
 jobs:
   create-runner:
-    if: ${{ inputs.start_condition == 'success' }}
+    if: inputs.start_condition == 'success'
     runs-on: ubuntu-latest
     outputs:
       uuid: ${{ steps.generator.outputs.uuid }}
@@ -132,7 +132,7 @@ jobs:
           go-version: '~1.18'
       - name: Cache ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
-        if: ${{ inputs.iso_to_test == '' }}
+        if: inputs.iso_to_test == ''
         uses: actions/cache@v3
         env:
           cache-name: cache-artifacts
@@ -143,7 +143,7 @@ jobs:
           restore-keys: |
             build-ci-
       - name: Download specified ISO
-        if: ${{ inputs.iso_to_test != '' }}
+        if: inputs.iso_to_test != ''
         env:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
@@ -173,7 +173,7 @@ jobs:
           cd tests && HOSTNAME=$(hostname -f) make e2e-install-rancher
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
-        if: ${{ inputs.test_type == 'ui' }}
+        if: inputs.test_type == 'ui'
         env:
           UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: chrome
@@ -207,13 +207,13 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       - name: Deploy a node to join Rancher manager
-        if: ${{ inputs.test_type == 'ui' }}
+        if: inputs.test_type == 'ui'
         env:
           VM_INDEX: 1
         run: cd tests && make e2e-ui-rancher
       - name: Cypress tests - Advanced
         # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
-        if: ${{ inputs.test_type == 'ui' }}
+        if: inputs.test_type == 'ui'
         env:
           UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: firefox
@@ -244,49 +244,49 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       - name: Configure Rancher & Libvirt
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
       - name: Bootstrap node 1 with current build (use Emulated TPM and iPXE)
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
       - name: Upgrade node 1 (with osImage method) to latest build
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
       - name: Bootstrap node 2 with current build (use ISO)
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           ISO_BOOT: true
           VM_INDEX: 2
         run: cd tests && make e2e-bootstrap-node
       - name: Bootstrap node 3 with current build (use ISO)
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           ISO_BOOT: true
           VM_INDEX: 3
         run: cd tests && make e2e-bootstrap-node
       - name: Upgrade node 2 (with manual method) to latest build
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: manual
           VM_INDEX: 2
         run: cd tests && make e2e-upgrade-node
       - name: Upgrade node 3 (with managedOSVersionName method) to specified Teal version
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           IMAGE_VERSION: teal-5.3
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 3
         run: cd tests && make e2e-upgrade-node
       - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         env:
           NODE_NUMBER: ${{ inputs.node_number }}
         run: |
@@ -296,7 +296,7 @@ jobs:
             VM_INDEX=${I} make e2e-bootstrap-node
           done
       - name: List installed nodes
-        if: ${{ inputs.test_type == 'cli' }}
+        if: inputs.test_type == 'cli'
         run: sudo virsh list
       - name: Add summary
         if: always()
@@ -333,7 +333,7 @@ jobs:
         if: always()
         uses: colpal/actions-clean@v1
       - name: Send failed status to slack
-        if: failure()
+        if: failure() && github.event_name == 'schedule'
         uses: slackapi/slack-github-action@v1.23.0
         with:
           payload: |
@@ -361,7 +361,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
   delete-runner:
-    if: ${{ always() && needs.create-runner.result == 'success' }}
+    if: always() && needs.create-runner.result == 'success'
     needs: [create-runner, e2e]
     runs-on: ubuntu-latest
     steps:
