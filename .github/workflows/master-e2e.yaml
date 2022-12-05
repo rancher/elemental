@@ -38,10 +38,6 @@ on:
         description: Number of nodes to deploy on the provisioned cluster
         default: 5
         type: string
-      machine_type:
-        description: Type of VM
-        default: n2-standard-8
-        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
@@ -101,7 +97,6 @@ jobs:
         run: |
           gcloud compute instances create ${{ steps.generator.outputs.runner }} \
             --source-instance-template ${{ inputs.runner_template }} \
-            --machine-type ${{ inputs.machine_type }} \
             --zone ${{ inputs.zone }}
       - name: Create PAT token secret
         run: |
