@@ -1,7 +1,9 @@
 # Elemental
-[![Elemental End-To-End tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/e2e.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e.yaml)
+[![K3s - Elemental E2E tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/e2e-k3s.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-k3s.yaml)
+[![RKE2 - Elemental E2E tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/e2e-rke2.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-rke2.yaml)
 
-[![Elemental UI End-To-End tests](https://github.com/rancher/elemental/actions/workflows/ui-e2e.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e.yaml)
+[![K3s - Elemental UI End-To-End tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s.yaml)
+[![RKE2 - Elemental UI End-To-End tests with Rancher Manager](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2.yaml)
 
 Elemental is a software stack enabling a centralized, full cloud-native OS management solution with Kubernetes.
 
