@@ -305,7 +305,17 @@ jobs:
           RM_VERSION=$(kubectl get pod \
                          --namespace cattle-system \
                          -l app=rancher \
-                         -o jsonpath={.items[*].status.containerStatuses[*].image})
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract elemental-operator version
+          if ${{ env.UPGRADE_OPERATOR == '' }}; then
+            UPGRADE_OPERATOR_VALUE="N/A"
+          else
+            UPGRADE_OPERATOR_VALUE=${{ env.UPGRADE_OPERATOR }}
+          fi
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Add summary
           echo "## General informations" >> $GITHUB_STEP_SUMMARY
           if ${{ inputs.test_type == 'cli' }}; then
@@ -315,6 +325,8 @@ jobs:
           echo "## Versions used" >> $GITHUB_STEP_SUMMARY
           echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "Rancher Manager Version: ${RM_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "Elemental Operator Upgrade: ${UPGRADE_OPERATOR_VALUE}" >> $GITHUB_STEP_SUMMARY
+          echo "Elemental Operator Version: ${OPERATOR_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
           echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
       - name: Remove VMs and K3s/RancherManager from worker ♻
