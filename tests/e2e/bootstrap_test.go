@@ -177,25 +177,38 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}
 		})
 
-		By("Increasing 'quantity' node of predefined cluster", func() {
-			// Patch the already-created yaml file directly
-			err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
-			Expect(err).To(Not(HaveOccurred()))
+		if vmIndex > 1 {
+			By("Increasing 'quantity' node of predefined cluster", func() {
+				// Patch the already-created yaml file directly
+				err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
+				Expect(err).To(Not(HaveOccurred()))
 
-			out, err := kubectl.Run("patch", "cluster",
-				"--namespace", clusterNS, clusterName,
-				"--type", "merge", "--patch-file", clusterYaml,
-			)
-			Expect(err).To(Not(HaveOccurred()), out)
-		})
+				out, err := kubectl.Run("patch", "cluster",
+					"--namespace", clusterNS, clusterName,
+					"--type", "merge", "--patch-file", clusterYaml,
+				)
+				Expect(err).To(Not(HaveOccurred()), out)
+			})
+		}
 
-		By("Waiting for known cluster state before adding the node", func() {
-			if vmIndex > 1 {
-				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", "WaitingForBootstrapReason")
-			} else {
-				waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message", "waiting for viable init node")
-			}
-		})
+		// Get elemental-operator version
+		operatorImage, err := kubectl.Run("get", "pod",
+			"--namespace", "cattle-elemental-system",
+			"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+		Expect(err).To(Not(HaveOccurred()))
+		operatorVersion := strings.Split(operatorImage, ":")
+		operatorVersionShort := strings.Split(operatorVersion[1], ".")
+
+		// Only for elemental-operator v1.0.x
+		if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
+			By("Waiting for known cluster state before adding the node", func() {
+				if vmIndex > 1 {
+					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", "WaitingForBootstrapReason")
+				} else {
+					waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message", "waiting for viable init node")
+				}
+			})
+		}
 
 		By("Restarting the VM to add it in the cluster", func() {
 			err := exec.Command("sudo", "virsh", "start", vmName).Run()
