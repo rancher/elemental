@@ -189,14 +189,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
-			// Check Rancher version
-			operatorVersion, err := kubectl.Run("get", "pod",
+			// Check Rancher image
+			rancherImage, err := kubectl.Run("get", "pod",
 				"--namespace", "cattle-system",
 				"-l", "app=rancher",
 				"-o", "jsonpath={.items[*].status.containerStatuses[*].image}",
 			)
 			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("Rancher Version:\n%s\n", operatorVersion)
+			GinkgoWriter.Printf("Rancher Image:\n%s\n", rancherImage)
 		})
 		if testType == "ui" {
 			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
@@ -241,12 +241,10 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				time.Sleep(misc.SetTimeout(60 * time.Second))
 			}
 
-			// Check elemental-operator version
-			operatorVersion, err := kubectl.Run("get", "pod",
-				"--namespace", "cattle-elemental-system",
-				"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			// Check elemental-operator image
+			operatorImage, err := misc.GetOperatorImage()
 			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("Operator Version:\n%s\n", operatorVersion)
+			GinkgoWriter.Printf("Operator Image:\n%s\n", operatorImage)
 		})
 	})
 })

@@ -193,12 +193,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Waiting for known cluster state before adding the node", func() {
 			// Get elemental-operator version
-			operatorImage, err := kubectl.Run("get", "pod",
-				"--namespace", "cattle-elemental-system",
-				"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			operatorVersion, err := misc.GetOperatorVersion()
 			Expect(err).To(Not(HaveOccurred()))
-			operatorVersion := strings.Split(operatorImage, ":")
-			operatorVersionShort := strings.Split(operatorVersion[1], ".")
+			operatorVersionShort := strings.Split(operatorVersion, ".")
 
 			if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
 				// Only for elemental-operator v1.0.x
