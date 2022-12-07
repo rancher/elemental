@@ -31,6 +31,29 @@ func GetServerId(clusterNS string, index int) (string, error) {
 	return serverId, nil
 }
 
+func GetOperatorImage() (string, error) {
+	operatorImage, err := kubectl.Run("get", "pod",
+		"--namespace", "cattle-elemental-system",
+		"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+	if err != nil {
+		return "", err
+	}
+
+	return operatorImage, nil
+}
+
+func GetOperatorVersion() (string, error) {
+	operatorImage, err := GetOperatorImage()
+	if err != nil {
+		return "", err
+	}
+
+	// Extract version
+	operatorVersion := strings.Split(operatorImage, ":")
+
+	return operatorVersion[1], nil
+}
+
 func ConfigureiPXE() (int, error) {
 	ipxeScript, err := tools.GetFiles("../..", "*.ipxe")
 	if err != nil {
