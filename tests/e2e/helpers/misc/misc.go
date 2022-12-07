@@ -16,6 +16,78 @@ import (
 	libvirtxml "libvirt.org/libvirt-go-xml"
 )
 
+// Cluster is the definition of a K8s cluster
+type Cluster struct {
+	APIVersion string        `yaml:"apiVersion"`
+	Kind       string        `yaml:"kind,omitempty"`
+	Metadata   Metadata      `yaml:"metadata"`
+	Spec       ClusterSpec   `yaml:"spec"`
+	Status     ClusterStatus `yaml:"status,omitempty"`
+}
+
+// Metadata is metadata attached to any object
+type Metadata struct {
+	Annotations     interface{} `yaml:"annotations"`
+	Labels          interface{} `yaml:"labels,omitempty"`
+	Finalizers      interface{} `yaml:"finalizers,omitempty"`
+	ManagedFields   interface{} `yaml:"managedFields,omitempty"`
+	Name            string      `yaml:"name"`
+	Namespace       string      `yaml:"namespace"`
+	ResourceVersion string      `yaml:"resourceVersion"`
+	UID             string      `yaml:"uid"`
+}
+
+// ClusterSpec is a description of a cluster
+type ClusterSpec struct {
+	KubernetesVersion        string      `yaml:"kubernetesVersion"`
+	LocalClusterAuthEndpoint interface{} `yaml:"localClusterAuthEndpoint"`
+	RkeConfig                RKEConfig   `yaml:"rkeConfig"`
+}
+
+// RKEConfig has all RKE/K3s cluster information
+type RKEConfig struct {
+	Etcd                interface{}    `yaml:"etcd,omitempty"`
+	ChartValues         interface{}    `yaml:"chartValues"`
+	MachineGlobalConfig interface{}    `yaml:"machineGlobalConfig"`
+	MachinePools        []MachinePools `yaml:"machinePools"`
+	UpgradeStrategy     interface{}    `yaml:"upgradeStrategy,omitempty"`
+}
+
+// MachinePools has all pools information
+type MachinePools struct {
+	ControlPlaneRole bool             `yaml:"controlPlaneRole,omitempty"`
+	EtcdRole         bool             `yaml:"etcdRole,omitempty"`
+	MachineConfigRef MachineConfigRef `yaml:"machineConfigRef"`
+	Name             string           `yaml:"name"`
+	Quantity         int              `yaml:"quantity"`
+	WorkerRole       bool             `yaml:"workerRole,omitempty"`
+}
+
+// MachineConfigRef makes the link between the cluster, pool and the Elemental nodes
+type MachineConfigRef struct {
+	APIVersion string `yaml:"apiVersion"`
+	Kind       string `yaml:"kind"`
+	Name       string `yaml:"name"`
+}
+
+// ClusterStatus has all the cluster status information
+type ClusterStatus struct {
+	AgentDeployed    bool               `yaml:"agentDeployed,omitempty"`
+	ClientSecretName string             `yaml:"clientSecretName"`
+	ClusterName      string             `yaml:"clusterName"`
+	Conditions       []ClusterCondition `yaml:"conditions,omitempty"`
+	Ready            bool               `yaml:"ready,omitempty"`
+}
+
+// ClusterCondition is the cluster condition status
+type ClusterCondition struct {
+	LastUpdateTime string `yaml:"lastUpdateTime"`
+	Message        string `yaml:"message,omitempty"`
+	Reason         string `yaml:"reason,omitempty"`
+	Status         string `yaml:"status"`
+	Type           string `yaml:"type"`
+}
+
 const (
 	httpSrv = "http://192.168.122.1:8000"
 )
@@ -111,6 +183,60 @@ func SetTimeout(timeout time.Duration) time.Duration {
 	return timeout
 }
 
+func IncreaseQuantity(clusterName, clusterNS, pool string) (int, error) {
+	// Quantity set
+	quantitySet := 0
+
+	// Data to store
+	c := &Cluster{}
+
+	// Get content
+	out, err := kubectl.Run("get", "cluster",
+		"--namespace", clusterNS, clusterName,
+		"-o", "yaml")
+	if err != nil {
+		return 0, err
+	}
+
+	// Convert string to []byte
+	clusterConf := []byte(out)
+
+	// Decode content
+	if err := yaml.Unmarshal(clusterConf, &c); err != nil {
+		return 0, err
+	}
+
+	// Increase quantity field
+	for i := range c.Spec.RkeConfig.MachinePools {
+		// Only on selected pool
+		if c.Spec.RkeConfig.MachinePools[i].Name == pool {
+			c.Spec.RkeConfig.MachinePools[i].Quantity++
+			quantitySet = c.Spec.RkeConfig.MachinePools[i].Quantity
+		}
+	}
+
+	// Encode content
+	clusterConf, err = yaml.Marshal(&c)
+	if err != nil {
+		return 0, err
+	}
+
+	// Write temporary file
+	tempFile := "updated-" + pool + ".yaml"
+	if err = os.WriteFile(tempFile, clusterConf, 0644); err != nil {
+		return 0, err
+	}
+
+	// Apply the new configuration
+	err = kubectl.Apply(clusterNS, tempFile)
+	if err != nil {
+		return 0, err
+	}
+
+	// All good!
+	return quantitySet, nil
+}
+
 func AddSelector(key, value string) ([]byte, error) {
 	type selectorYaml struct {
 		MatchLabels map[string]string `yaml:"matchLabels,omitempty"`
@@ -160,6 +286,11 @@ func ConcateFiles(srcfile, dstfile string, data []byte) error {
 
 	// All good!
 	return nil
+}
+
+func CopyFile(srcFile, dstFile string) error {
+	// Concate files without adding data is in fact a copy
+	return (ConcateFiles(srcFile, dstFile, []byte("")))
 }
 
 func TrimStringFromChar(s, c string) string {
