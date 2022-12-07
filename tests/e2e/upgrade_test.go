@@ -26,22 +26,16 @@ import (
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
-	var (
-		client *tools.Client
-	)
-
-	BeforeEach(func() {
+	It("Upgrade node", func() {
 		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
-		client = &tools.Client{
+		client := &tools.Client{
 			Host:     string(hostData.IP) + ":22",
 			Username: userName,
 			Password: userPassword,
 		}
-	})
 
-	It("Upgrade node", func() {
 		By("Checking if upgrade type is set", func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})
@@ -65,8 +59,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 				// We don't know what is the previous type of upgrade, so easier to replace all here
 				// as there is only one in the yaml file anyway
-				patterns := []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"}
-				for _, p := range patterns {
+				for _, p := range []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"} {
 					err := tools.Sed(p, upgradeType+": "+upgradeTypeValue, upgradeOsYaml)
 					Expect(err).To(Not(HaveOccurred()))
 				}

@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 	"time"
@@ -74,12 +73,16 @@ func waitForKnownState(condition, msg string) {
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
-	var (
-		client  *tools.Client
-		macAdrs string
-	)
+	It("Install node and add it in Rancher", func() {
+		var (
+			indexInPool int
+			macAdrs     string
+			poolType    string
+		)
 
-	BeforeEach(func() {
+		// indexInPool is 1 by default
+		indexInPool = 1
+
 		// Add node in network configuration if needed
 		if macAdrs == "" {
 			err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
@@ -89,15 +92,26 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
-		client = &tools.Client{
+		client := &tools.Client{
 			Host:     string(hostData.IP) + ":22",
 			Username: userName,
 			Password: userPassword,
 		}
 		macAdrs = hostData.Mac
-	})
 
-	It("Install node and add it in Rancher", func() {
+		// Set pool type and name
+		poolName := "pool-"
+		if vmIndex < 4 {
+			// First third nodes are in Master pool
+			poolType = "master"
+			poolName += poolType + "-" + clusterName
+		} else {
+			// The others are in Worker pool
+			poolType = "worker"
+			poolName += poolType + "-" + clusterName
+		}
+		machineReg := "machine-registration-" + poolType + "-" + clusterName
+
 		By("Setting emulated TPM to "+emulateTPM, func() {
 			// Set correct value for TPM emulation
 			value := "false"
@@ -110,7 +124,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			out, err := kubectl.Run("patch", "MachineRegistration",
-				"--namespace", clusterNS, "machine-registration",
+				"--namespace", clusterNS, machineReg,
 				"--type", "merge", "--patch-file", emulatedTPMYaml,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
@@ -119,8 +133,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Downloading installation config file", func() {
 			// Download the new YAML installation config file
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
-				"--namespace", clusterNS,
-				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
+				"--namespace", clusterNS, machineReg,
+				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
 
 			fileName := "../../install-config.yaml"
@@ -171,23 +185,16 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(id).To(Not(BeEmpty()))
 		})
 
-		By("Ensuring that the cluster is in healthy state (not on 1st node)", func() {
-			if vmIndex > 1 {
-				checkClusterState()
-			}
-		})
-
 		if vmIndex > 1 {
-			By("Increasing 'quantity' node of predefined cluster", func() {
-				// Patch the already-created yaml file directly
-				err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
-				Expect(err).To(Not(HaveOccurred()))
+			By("Ensuring that the cluster is in healthy state", func() {
+				checkClusterState()
+			})
 
-				out, err := kubectl.Run("patch", "cluster",
-					"--namespace", clusterNS, clusterName,
-					"--type", "merge", "--patch-file", clusterYaml,
-				)
-				Expect(err).To(Not(HaveOccurred()), out)
+			By("Increasing 'quantity' node of predefined cluster", func() {
+				// Increase 'quantity' field
+				var err error
+				indexInPool, err = misc.IncreaseQuantity(clusterName, clusterNS, poolName)
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
 
@@ -200,8 +207,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
 				// Only for elemental-operator v1.0.x
 				if vmIndex > 1 {
-					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
-						"WaitingForBootstrapReason")
+					if indexInPool == 1 {
+						waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
+							"waiting for agent to check in and apply initial plan")
+					} else {
+						waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
+							"WaitingForBootstrapReason")
+					}
 				} else {
 					waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message",
 						"waiting for viable init node")

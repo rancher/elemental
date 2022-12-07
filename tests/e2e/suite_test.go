@@ -31,7 +31,7 @@ const (
 	netDefaultFileName = "../assets/net-default.xml"
 	clusterYaml        = "../assets/cluster.yaml"
 	selectorYaml       = "../assets/selector.yaml"
-	registrationYaml   = "../assets/machineregistration.yaml"
+	registrationYaml   = "../assets/machineRegistration.yaml"
 	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
 )
 

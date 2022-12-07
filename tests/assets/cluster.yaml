@@ -11,10 +11,19 @@ spec:
       machineConfigRef:
         apiVersion: elemental.cattle.io/v1beta1
         kind: MachineInventorySelectorTemplate
-        name: selector-%CLUSTER_NAME%
-      name: pool-%CLUSTER_NAME%
+        name: selector-master-%CLUSTER_NAME%
+      name: pool-master-%CLUSTER_NAME%
       quantity: 1
-      unhealthyNodeTimeout: 0s
+      workerRole: true
+    - controlPlaneRole: false
+      etcdRole: false
+      labels: {}
+      machineConfigRef:
+        apiVersion: elemental.cattle.io/v1beta1
+        kind: MachineInventorySelectorTemplate
+        name: selector-worker-%CLUSTER_NAME%
+      name: pool-worker-%CLUSTER_NAME%
+      quantity: 0
       workerRole: true
     etcd:
       disableSnapshots: true

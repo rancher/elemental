@@ -1,13 +1,17 @@
 kind: MachineInventorySelectorTemplate
 apiVersion: elemental.cattle.io/v1beta1
 metadata:
-  name: selector-%CLUSTER_NAME%
+  name: selector-%POOL_TYPE%-%CLUSTER_NAME%
   # namespace: fleet-default
 spec:
   template:
     spec:
       selector:
         matchExpressions:
+        - key: pool-type
+          operator: In
+          values:
+          - %POOL_TYPE%
         - key: cluster-id
           operator: In
           values:
