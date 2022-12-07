@@ -10,3 +10,4 @@ spec:
     URI: http://192.168.122.1:8000/tests/assets/osVersions.json
     Timeout: 1m
   type: json
+  syncInterval: 5m
