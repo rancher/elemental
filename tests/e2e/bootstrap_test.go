@@ -191,24 +191,32 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			})
 		}
 
-		// Get elemental-operator version
-		operatorImage, err := kubectl.Run("get", "pod",
-			"--namespace", "cattle-elemental-system",
-			"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
-		Expect(err).To(Not(HaveOccurred()))
-		operatorVersion := strings.Split(operatorImage, ":")
-		operatorVersionShort := strings.Split(operatorVersion[1], ".")
+		By("Waiting for known cluster state before adding the node", func() {
+			// Get elemental-operator version
+			operatorImage, err := kubectl.Run("get", "pod",
+				"--namespace", "cattle-elemental-system",
+				"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
+			Expect(err).To(Not(HaveOccurred()))
+			operatorVersion := strings.Split(operatorImage, ":")
+			operatorVersionShort := strings.Split(operatorVersion[1], ".")
 
-		// Only for elemental-operator v1.0.x
-		if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-			By("Waiting for known cluster state before adding the node", func() {
+			if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
+				// Only for elemental-operator v1.0.x
 				if vmIndex > 1 {
-					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", "WaitingForBootstrapReason")
+					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
+						"WaitingForBootstrapReason")
 				} else {
-					waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message", "waiting for viable init node")
+					waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message",
+						"waiting for viable init node")
 				}
-			})
-		}
+			} else {
+				// For newer elemental-operator versions
+				if vmIndex > 1 {
+					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
+						"waiting for agent to check in and apply initial plan")
+				}
+			}
+		})
 
 		By("Restarting the VM to add it in the cluster", func() {
 			err := exec.Command("sudo", "virsh", "start", vmName).Run()
