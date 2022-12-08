@@ -225,7 +225,9 @@ jobs:
             cypress/e2e/unit_tests/machine_selector.spec.ts
             cypress/e2e/unit_tests/machine_inventory.spec.ts
             cypress/e2e/unit_tests/upgrade.spec.ts
-        run: make -f tests/Makefile start-cypress-tests
+        run: |
+          export OPERATOR_VERSION=$(kubectl get pods -n cattle-elemental-system -l app=elemental-operator -o jsonpath={.items[*].status.containerStatuses[*].image}|awk -F ':' '{print substr($2,0,3)}')
+          make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: failure()
         uses: actions/upload-artifact@v3

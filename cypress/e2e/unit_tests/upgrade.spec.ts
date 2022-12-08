@@ -5,11 +5,12 @@ import 'cypress-file-upload';
 
 Cypress.config();
 describe('Upgrade tests', () => {
-  const topLevelMenu   = new TopLevelMenu();
-  const elemental      = new Elemental();
-  const ui_account     = Cypress.env('ui_account');
-  const elemental_user = "elemental-user"
-  const ui_password    = "rancherpassword"
+  const topLevelMenu     = new TopLevelMenu();
+  const elemental        = new Elemental();
+  const ui_account       = Cypress.env('ui_account');
+  const operator_version = Cypress.env('operator_version');
+  const elemental_user   = "elemental-user"
+  const ui_password      = "rancherpassword"
 
   beforeEach(() => {
     (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
@@ -23,8 +24,9 @@ describe('Upgrade tests', () => {
   });
 
   it('Create an OS Version Channels', () => {
+    (operator_version == "1.0") ? cy.exec(`sed -i '/syncInterval/d' tests/assets/managedOSVersionChannel.yaml`) : "" ;
     // Create ManagedOSVersionChannel resource
-    cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' tests/assets/managedOSVersionChannel.yaml`)
+    cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' tests/assets/managedOSVersionChannel.yaml`);
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Version Channels').click();
     cy.clickButton('Create from YAML');
