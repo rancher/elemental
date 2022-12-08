@@ -20,6 +20,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.cache_session = process.env.CACHE_SESSION || false;
   config.env.k8s_version = process.env.K8S_VERSION_TO_PROVISION;
   config.env.ui_account = process.env.UI_ACCOUNT;
+  config.env.operator_version = process.env.OPERATOR_VERSION;
 
   return config;
 };
