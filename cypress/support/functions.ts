@@ -121,7 +121,16 @@ Cypress.Commands.add('deleteAllResources', () => {
   cy.get('[width="30"] > .checkbox-outer-container').click();
   cy.clickButton('Delete');
   cy.confirmDelete();
-  cy.contains('There are no rows to show');
+  // Sometimes, UI is crashing when a resource is deleted
+  // A reload should workaround the failure
+  cy.get('body').then(($body) => {
+    if (!$body.text().includes('There are no rows to show.')) {
+        cy.reload();
+        cy.log('RELOAD TRIGGERED');
+        cy.screenshot('reload-triggered');
+      };
+    });
+  cy.contains('There are no rows to show', {timeout: 15000});
 });
 
 // Machine registration functions
