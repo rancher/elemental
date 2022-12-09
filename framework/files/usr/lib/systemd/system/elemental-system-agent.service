@@ -3,6 +3,7 @@ Description=Elemental System Agent
 Documentation=https://github.com/rancher/system-agent
 Wants=network-online.target
 After=network-online.target
+After=time-sync.target
 ConditionPathExists=!/run/cos/live_mode
 ConditionPathExists=!/etc/systemd/system/rancher-system-agent.service
 
