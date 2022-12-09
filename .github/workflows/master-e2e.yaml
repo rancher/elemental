@@ -23,6 +23,10 @@ on:
         description: Name of the provisioned cluster
         required: true
         type: string
+      elemental_support_version:
+        description: Elemental support version to use for collecting logs
+        default: "1.0.0"
+        type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
         type: string
@@ -302,9 +306,11 @@ jobs:
         run: sudo virsh list
       - name: Store logs
         if: always()
+        env:
+          ELEMENTAL_SUPPORT_VERSION: ${{ inputs.elemental_support_version}}
         run: |
           cd tests && make e2e-get-logs
-      - name: Upload downstream cluster logs
+      - name: Upload cluster logs
         if: always()
         uses: actions/upload-artifact@v3
         with:

@@ -4,44 +4,81 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
+func checkRC(err error) {
+	if err != nil {
+		GinkgoWriter.Printf("%s\n", err)
+	}
+}
+
 var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
+	type Binary struct {
+		Url  string
+		Name string
+	}
+
+	type getResourceLog struct {
+		Name string
+		Verb []string
+	}
+	var elementalBinary string = fmt.Sprintf("https://github.com/rancher/elemental-operator/releases/download/v%s/elemental-support_%s_linux_amd64", elementalSupportVersion, elementalSupportVersion)
+
 	It("Get the upstream cluster logs", func() {
-		By("Downloading tools to generate logs", func() {
+		By("Downloading and executing tools to generate logs", func() {
+			elemental := Binary{
+				elementalBinary,
+				"elemental-support",
+			}
+
+			logCollector := Binary{
+				"https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh",
+				"rancher2_logs_collector.sh",
+			}
+
 			_ = os.Mkdir("logs", 0755)
 			_ = os.Chdir("logs")
-			err := exec.Command("curl", "-L", "https://github.com/rancher/elemental-operator/releases/download/v1.0.0/elemental-support_1.0.0_linux_amd64", "-o", "elemental-support").Run()
-			Expect(err).To(Not(HaveOccurred()))
-			err = exec.Command("chmod", "+x", "elemental-support").Run()
-			Expect(err).To(Not(HaveOccurred()))
-			err = exec.Command("curl", "-L", "https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh", "-o", "rancher2_logs_collector.sh").Run()
-			Expect(err).To(Not(HaveOccurred()))
-			err = exec.Command("chmod", "+x", "rancher2_logs_collector.sh").Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
+			myDir, _ := os.Getwd()
 
-		By("Executing binaries to collect logs", func() {
-			err := exec.Command("./elemental-support").Run()
-			Expect(err).To(Not(HaveOccurred()))
-			err = exec.Command("sudo", "./rancher2_logs_collector.sh", "-d", "../logs").Run()
-			Expect(err).To(Not(HaveOccurred()))
+			var binaries []Binary = []Binary{elemental, logCollector}
+			for _, b := range binaries {
+				Eventually(func() error {
+					err := exec.Command("curl", "-L", b.Url, "-o", b.Name).Run()
+					return err
+				}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(BeNil())
+
+				err := exec.Command("chmod", "+x", b.Name).Run()
+				checkRC(err)
+				if b.Name == "elemental-support" {
+					err := exec.Command(myDir + "/" + b.Name).Run()
+					checkRC(err)
+				} else {
+					err := exec.Command("sudo", myDir+"/"+b.Name, "-d", "../logs").Run()
+					checkRC(err)
+				}
+			}
 		})
 
 		By("Collecting additionals logs with kubectl commands", func() {
-			outcmd, err := exec.Command("kubectl", "get", "bundles", "--all-namespaces").CombinedOutput()
-			if err != nil {
-				fmt.Fprint(GinkgoWriter, err)
+			Bundles := getResourceLog{
+				"bundles",
+				[]string{"get", "describe"},
 			}
-			os.WriteFile("bundles-resource.log", outcmd, os.ModePerm)
-			outcmd, err = exec.Command("kubectl", "describe", "bundles", "--all-namespaces").CombinedOutput()
-			if err != nil {
-				fmt.Fprint(GinkgoWriter, err)
+
+			var getResources []getResourceLog = []getResourceLog{Bundles}
+			for _, r := range getResources {
+				for _, v := range r.Verb {
+					outcmd, err := exec.Command("kubectl", v, r.Name, "--all-namespaces").CombinedOutput()
+					checkRC(err)
+					err = os.WriteFile(r.Name+"-"+v+".log", outcmd, os.ModePerm)
+					checkRC(err)
+				}
 			}
-			os.WriteFile("bundles-describe.log", outcmd, os.ModePerm)
 		})
 	})
 })

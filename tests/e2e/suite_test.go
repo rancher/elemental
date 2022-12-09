@@ -36,22 +36,23 @@ const (
 )
 
 var (
-	arch            string
-	caType          string
-	clusterName     string
-	clusterNS       string
-	emulateTPM      string
-	imageVersion    string
-	isoBoot         string
-	k8sVersion      string
-	osImage         string
-	rancherChannel  string
-	rancherVersion  string
-	testType        string
-	upgradeType     string
-	upgradeOperator string
-	vmIndex         int
-	vmName          string
+	arch                    string
+	caType                  string
+	clusterName             string
+	clusterNS               string
+	elementalSupportVersion string
+	emulateTPM              string
+	imageVersion            string
+	isoBoot                 string
+	k8sVersion              string
+	osImage                 string
+	rancherChannel          string
+	rancherVersion          string
+	testType                string
+	upgradeType             string
+	upgradeOperator         string
+	vmIndex                 int
+	vmName                  string
 )
 
 func FailWithReport(message string, callerSkip ...int) {
@@ -69,6 +70,7 @@ var _ = BeforeSuite(func() {
 	caType = os.Getenv("CA_TYPE")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
+	elementalSupportVersion = os.Getenv("ELEMENTAL_SUPPORT_VERSION")
 	emulateTPM = os.Getenv("EMULATE_TPM")
 	imageVersion = os.Getenv("IMAGE_VERSION")
 	index := os.Getenv("VM_INDEX")
