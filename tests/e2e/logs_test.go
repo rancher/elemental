@@ -7,6 +7,7 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
@@ -70,9 +71,9 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			var getResources []getResourceLog = []getResourceLog{Bundles}
 			for _, r := range getResources {
 				for _, v := range r.Verb {
-					outcmd, err := exec.Command("kubectl", v, r.Name, "--all-namespaces").CombinedOutput()
+					outcmd, err := kubectl.Run(v, r.Name, "--all-namespaces")
 					checkRC(err)
-					err = os.WriteFile(r.Name+"-"+v+".log", outcmd, os.ModePerm)
+					err = os.WriteFile(r.Name+"-"+v+".log", []byte(outcmd), os.ModePerm)
 					checkRC(err)
 				}
 			}
