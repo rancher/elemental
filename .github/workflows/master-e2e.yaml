@@ -23,9 +23,9 @@ on:
         description: Name of the provisioned cluster
         required: true
         type: string
-      elemental_support_version:
-        description: Elemental support version to use for collecting logs
-        default: "1.0.0"
+      elemental_support:
+        description: URL of the elemental support binary
+        default: https://github.com/rancher/elemental-operator/releases/download/v1.0.0/elemental-support_1.0.0_linux_amd64
         type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
@@ -45,6 +45,10 @@ on:
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
+        type: string
+      rancher_log_collector:
+        description: URL of the Rancher log collector script
+        default: https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh
         type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
@@ -307,7 +311,8 @@ jobs:
       - name: Store logs
         if: always()
         env:
-          ELEMENTAL_SUPPORT_VERSION: ${{ inputs.elemental_support_version}}
+          ELEMENTAL_SUPPORT: ${{ inputs.elemental_support }}
+          RANCHER_LOG_COLLECTOR: ${{ inputs.rancher_log_collector }}
         run: |
           cd tests && make e2e-get-logs
       - name: Upload cluster logs

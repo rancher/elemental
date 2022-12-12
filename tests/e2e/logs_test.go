@@ -1,7 +1,6 @@
 package e2e_test
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -18,7 +17,7 @@ func checkRC(err error) {
 }
 
 var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
-	type Binary struct {
+	type binary struct {
 		Url  string
 		Name string
 	}
@@ -27,17 +26,16 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 		Name string
 		Verb []string
 	}
-	var elementalBinary string = fmt.Sprintf("https://github.com/rancher/elemental-operator/releases/download/v%s/elemental-support_%s_linux_amd64", elementalSupportVersion, elementalSupportVersion)
 
 	It("Get the upstream cluster logs", func() {
 		By("Downloading and executing tools to generate logs", func() {
-			elemental := Binary{
-				elementalBinary,
+			elemental := binary{
+				elementalSupport,
 				"elemental-support",
 			}
 
-			logCollector := Binary{
-				"https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh",
+			logCollector := binary{
+				rancherLogCollector,
 				"rancher2_logs_collector.sh",
 			}
 
@@ -45,11 +43,10 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			_ = os.Chdir("logs")
 			myDir, _ := os.Getwd()
 
-			var binaries []Binary = []Binary{elemental, logCollector}
+			var binaries []binary = []binary{elemental, logCollector}
 			for _, b := range binaries {
 				Eventually(func() error {
-					err := exec.Command("curl", "-L", b.Url, "-o", b.Name).Run()
-					return err
+					return exec.Command("curl", "-L", b.Url, "-o", b.Name).Run()
 				}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(BeNil())
 
 				err := exec.Command("chmod", "+x", b.Name).Run()
