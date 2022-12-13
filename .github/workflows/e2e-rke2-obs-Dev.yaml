@@ -4,6 +4,10 @@ name: OBS Dev - RKE2 - Elemental E2E tests with Rancher Manager
 on:
   workflow_dispatch:
     inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster
         default: 5
@@ -39,6 +43,7 @@ jobs:
     with:
       ca_type: private
       cluster_name: cluster-rke2
+      boolean: ${{ inputs.destroy_runner }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+rke2r1
       node_number: ${{ inputs.node_number }}

@@ -15,14 +15,18 @@ on:
         description: WebHook URL to use for Slack
         required: true
     inputs:
-      ui_account:
-        description: Account used to test RBAC role in UI
-        required: false
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        default: selfsigned
         type: string
       cluster_name:
         description: Name of the provisioned cluster
         required: true
         type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
       elemental_support:
         description: URL of the elemental support binary
         default: https://github.com/rancher/elemental-operator/releases/download/v1.0.0/elemental-support_1.0.0_linux_amd64
@@ -33,10 +37,6 @@ on:
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
         required: true
-        type: string
-      ca_type:
-        description: CA type to use (selfsigned or private)
-        default: selfsigned
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
@@ -66,16 +66,20 @@ on:
         description: Type of test to run (cli or ui)
         default: cli
         type: string
+      ui_account:
+        description: Account used to test RBAC role in UI
+        required: false
+        type: string
       upgrade_operator:
         description: URL to elemental-operator version to upgrade to
-        type: string
-      zone:
-        description: GCP zone to host the runner
-        default: us-central1-a
         type: string
       workflow_download:
         description: build-ci workflow to use for artifacts
         default: build-ci.yaml
+        type: string
+      zone:
+        description: GCP zone to host the runner
+        default: us-central1-a
         type: string
 
 jobs:
@@ -234,7 +238,11 @@ jobs:
             cypress/e2e/unit_tests/machine_inventory.spec.ts
             cypress/e2e/unit_tests/upgrade.spec.ts
         run: |
-          export OPERATOR_VERSION=$(kubectl get pods -n cattle-elemental-system -l app=elemental-operator -o jsonpath={.items[*].status.containerStatuses[*].image}|awk -F ':' '{print substr($2,0,3)}')
+          export OPERATOR_VERSION=$(kubectl get pods \
+                                      -n cattle-elemental-system \
+                                      -l app=elemental-operator \
+                                      -o jsonpath={.items[*].status.containerStatuses[*].image} \
+                                    | awk -F ':' '{print substr($2,0,3)}')
           make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: failure()
@@ -382,7 +390,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
   delete-runner:
-    if: always() && needs.create-runner.result == 'success'
+    if: always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true
     needs: [create-runner, e2e]
     runs-on: ubuntu-latest
     steps:

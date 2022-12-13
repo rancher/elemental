@@ -3,6 +3,10 @@ name: OBS Stable - K3s - Elemental UI End-To-End tests with Rancher Manager
 on:
   workflow_dispatch:
     inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -29,6 +33,7 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       cluster_name: cluster-k3s
+      destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+k3s1
       rancher_channel: ${{ inputs.rancher_channel }}
