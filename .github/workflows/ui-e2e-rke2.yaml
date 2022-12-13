@@ -4,6 +4,10 @@ name: RKE2 - Elemental UI End-To-End tests with Rancher Manager
 on:
   workflow_dispatch:
     inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -35,6 +39,7 @@ jobs:
       #ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
+      destroy_runner: ${{ inputs.destroy_runner || true }}
       k8s_version_to_provision: v1.24.8+rke2r1
       rancher_channel: ${{ inputs.rancher_channel || 'latest' }}
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
