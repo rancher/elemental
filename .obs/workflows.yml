@@ -22,3 +22,19 @@ tag_workflow:
       only:
         - main
     event: tag_push
+
+pr_workflow:
+  steps:
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: elemental
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev:Teal53
+        source_package: node-image
+        target_project: isv:Rancher:Elemental:PR:Teal53
+  filters:
+    event: pull_request
+    branches:
+      only:
+        - main
