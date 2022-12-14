@@ -23,6 +23,7 @@ describe('Install Elemental plugin', () => {
     cy.contains('Extensions').click();
     cy.clickButton('Enable');
     cy.contains('Enable Extension Support?')
+    cy.contains('Add the Rancher Extension Repository').click();
     cy.clickButton('OK');
     cy.contains('No Extensions installed', {timeout: 40000});
   });
@@ -35,6 +36,11 @@ describe('Install Elemental plugin', () => {
     cy.contains('Install Extension elemental');
     cy.clickButton('Install');
     cy.contains('Installing');
-    cy.wait(20000);
+    cy.contains('Extensions changed - reload required', {timeout: 40000});
+    cy.clickButton('Reload');
+    cy.get('.plugins')
+      .children()
+      .should('contain', 'elemental')
+      .and('contain', 'Uninstall')
   });
 });
