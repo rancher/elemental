@@ -1,0 +1,5 @@
+# ignore rclink missing checks
+addFilter("W: suse-missing-rclink");
+
+# ignore fhs complaints
+addFilter("W: suse-filelist-forbidden-fhs23");
