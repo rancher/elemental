@@ -3,6 +3,9 @@ push_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: elemental
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev:Teal53
+        package: node-image
   filters:
     branches:
       only:
@@ -17,6 +20,12 @@ tag_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: elemental
+    - trigger_services:
+        project: isv:Rancher:Elemental:Staging:Teal53
+        package: node-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev:Teal53
+        package: node-image
   filters:
     branches:
       only:
