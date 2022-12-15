@@ -260,7 +260,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Eventually(func() string {
 				out, _ := client.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
 				return out
-			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+			}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
 		})
 
 		By("Checking cluster state", func() {
