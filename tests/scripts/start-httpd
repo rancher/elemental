@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e -x
-
-# Start a simple HTTP server for iPXE/OS installation
-pushd ../..
-setsid --fork python3 -m http.server >/dev/null 2>&1
-popd

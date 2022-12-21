@@ -169,16 +169,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			})
 		}
 
-		By("Starting HTTP server for network installation", func() {
-			// TODO: improve it to run in background!
-			// err := tools.HTTPShare("../..", 8000)
-			// Expect(err).To(Not(HaveOccurred()))
-
-			// Use Python for now...
-			err := exec.Command("../scripts/start-httpd").Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
-
 		By("Starting default network", func() {
 			// Don't check return code, as the default network could be already removed
 			for _, c := range []string{"net-destroy", "net-undefine"} {

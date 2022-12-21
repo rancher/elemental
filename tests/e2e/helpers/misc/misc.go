@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -423,4 +424,14 @@ func AddNode(name string, index int, file string) error {
 
 	// All good!
 	return nil
+}
+
+func FileShare(directory, listenAddr string) {
+	fs := http.FileServer(http.Dir(directory))
+
+	go func() {
+		if err := http.ListenAndServe(listenAddr, fs); err != nil {
+			fmt.Printf("Server failed: %s\n", err)
+		}
+	}()
 }
