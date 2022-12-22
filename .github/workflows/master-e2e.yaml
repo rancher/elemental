@@ -200,6 +200,7 @@ jobs:
             cypress/e2e/unit_tests/menu.spec.ts
             cypress/e2e/unit_tests/machine_registration.spec.ts
             cypress/e2e/unit_tests/advanced_filtering.spec.ts
+        # No 'cd tests' for Cypress!
         run: make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
         if: failure() && inputs.test_type == 'ui'
@@ -244,6 +245,8 @@ jobs:
                                       -l app=elemental-operator \
                                       -o jsonpath={.items[*].status.containerStatuses[*].image} \
                                     | awk -F ':' '{print substr($2,0,3)}')
+
+          # No 'cd tests' for Cypress!
           make -f tests/Makefile start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: failure() && inputs.test_type == 'ui'

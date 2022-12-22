@@ -44,8 +44,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			_ = os.Chdir("logs")
 			myDir, _ := os.Getwd()
 
-			var binaries []binary = []binary{elemental, logCollector}
-			for _, b := range binaries {
+			for _, b := range []binary{elemental, logCollector} {
 				Eventually(func() error {
 					return exec.Command("curl", "-L", b.Url, "-o", b.Name).Run()
 				}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(BeNil())
