@@ -1,6 +1,6 @@
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
 import '~/cypress/support/functions';
-import { Elemental } from '../../support/elemental';
+import { Elemental } from '~/cypress/support/elemental';
 import { contains } from 'cypress/types/jquery';
 
 Cypress.config();

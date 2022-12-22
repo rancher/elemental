@@ -1,6 +1,6 @@
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
 import '~/cypress/support/functions';
-import { Elemental } from '../../support/elemental';
+import { Elemental } from '~/cypress/support/elemental';
 
 Cypress.config();
 describe('Machine registration testing', () => {
