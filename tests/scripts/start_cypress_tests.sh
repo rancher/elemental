@@ -2,6 +2,9 @@
 
 set -evx
 
+# Start a simple HTTP server for sharing some config files
+setsid --fork python3 -m http.server >/dev/null 2>&1
+
 # Needed to install Cypress plugins
 npm install
 
