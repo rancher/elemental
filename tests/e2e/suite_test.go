@@ -26,14 +26,20 @@ import (
 )
 
 const (
-	vmNameRoot         = "node"
-	userName           = "root"
-	userPassword       = "r0s@pwd1"
-	netDefaultFileName = "../assets/net-default.xml"
-	clusterYaml        = "../assets/cluster.yaml"
-	selectorYaml       = "../assets/selector.yaml"
-	registrationYaml   = "../assets/machineRegistration.yaml"
-	emulatedTPMYaml    = "../assets/emulated_tpm.yaml"
+	clusterYaml               = "../assets/cluster.yaml"
+	emulatedTPMYaml           = "../assets/emulated_tpm.yaml"
+	configPrivateCAScript     = "../scripts/config-private-ca"
+	installConfigYaml         = "../../install-config.yaml"
+	installVMScript           = "../scripts/install-vm"
+	netDefaultFileName        = "../assets/net-default.xml"
+	osListYaml                = "../assets/managedOSVersionChannel.yaml"
+	registrationYaml          = "../assets/machineRegistration.yaml"
+	selectorYaml              = "../assets/selector.yaml"
+	upgradeClusterTargetsYaml = "../assets/upgrade_clusterTargets.yaml"
+	upgradeOSVersionNameYaml  = "../assets/upgrade_managedOSVersionName.yaml"
+	userName                  = "root"
+	userPassword              = "r0s@pwd1"
+	vmNameRoot                = "node"
 )
 
 var (

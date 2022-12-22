@@ -81,7 +81,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 		if caType == "private" {
 			By("Configuring Private CA", func() {
-				cmd := exec.Command("../scripts/config-private-ca")
+				cmd := exec.Command(configPrivateCAScript)
 				out, err := cmd.CombinedOutput()
 				GinkgoWriter.Printf("%s\n", out)
 				Expect(err).To(Not(HaveOccurred()))

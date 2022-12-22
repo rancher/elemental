@@ -137,8 +137,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
 
-			fileName := "../../install-config.yaml"
-			err = tools.GetFileFromURL(tokenURL, fileName, false)
+			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -159,7 +158,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				if len(isIso) == 0 {
 					cmd := exec.Command(
 						"bash", "-c",
-						"../../.github/elemental-iso-add-registration ../../install-config.yaml ../../build/elemental-*.iso",
+						"../../.github/elemental-iso-add-registration "+installConfigYaml+" ../../build/elemental-*.iso",
 					)
 					out, err := cmd.CombinedOutput()
 					GinkgoWriter.Printf("%s\n", out)
@@ -173,7 +172,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		}
 
 		By("Creating and installing VM", func() {
-			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)
+			cmd := exec.Command(installVMScript, vmName, macAdrs)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))

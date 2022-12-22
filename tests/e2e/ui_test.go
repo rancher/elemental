@@ -40,8 +40,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Get the YAML config file
-			fileName := "../../install-config.yaml"
-			err = tools.GetFileFromURL(tokenURL, fileName, false)
+			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -83,7 +82,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 
 		By("Creating and installing VM", func() {
 			// Install VM
-			cmd := exec.Command("../scripts/install-vm", vmName, macAdrs)
+			cmd := exec.Command(installVMScript, vmName, macAdrs)
 			out, err := cmd.CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))
