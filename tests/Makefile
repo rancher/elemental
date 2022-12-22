@@ -19,6 +19,9 @@ clean:
 	rm -rf build-box build || true
 
 deps: 
+	# Setting these permissions for 'downloads' is needed because
+	# Go and Cypress share the same directory for some artifacts
+	mkdir downloads && chmod 1777 downloads
 	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
 	go install -mod=mod github.com/onsi/gomega
 	go mod tidy
