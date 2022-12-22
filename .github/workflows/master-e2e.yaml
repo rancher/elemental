@@ -222,7 +222,14 @@ jobs:
         if: inputs.test_type == 'ui'
         env:
           VM_INDEX: 1
-        run: cd tests && make e2e-ui-rancher
+        run: |
+          cd tests && (
+            # Setting these permissions for 'downloads' is needed because to avoid
+            # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
+            sudo chmod 1777 cypress/downloads
+
+            make e2e-ui-rancher
+          )
       - name: Cypress tests - Advanced
         # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
         if: inputs.test_type == 'ui'
