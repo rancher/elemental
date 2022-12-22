@@ -1,6 +1,6 @@
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
 import '~/cypress/support/functions';
-import { Elemental } from '../../support/elemental';
+import { Elemental } from '~/cypress/support/elemental';
 import 'cypress-file-upload';
 
 Cypress.config();
@@ -24,15 +24,15 @@ describe('Upgrade tests', () => {
   });
 
   it('Create an OS Version Channels', () => {
-    (operator_version == "1.0") ? cy.exec(`sed -i '/syncInterval/d' tests/assets/managedOSVersionChannel.yaml`) : "" ;
+    (operator_version == "1.0") ? cy.exec(`sed -i '/syncInterval/d' assets/managedOSVersionChannel.yaml`) : "" ;
     // Create ManagedOSVersionChannel resource
-    cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' tests/assets/managedOSVersionChannel.yaml`);
+    cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' assets/managedOSVersionChannel.yaml`);
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Version Channels').click();
     cy.clickButton('Create from YAML');
     // Wait needed to avoid crash with the upload
     cy.wait(2000);
-    cy.get('input[type="file"]').attachFile({filePath: '../../tests/assets/managedOSVersionChannel.yaml'});
+    cy.get('input[type="file"]').attachFile({filePath: '../../assets/managedOSVersionChannel.yaml'});
     // Wait needed to avoid crash with the upload
     cy.wait(2000);
     // Wait for os-versions to be printed, that means the upload is done

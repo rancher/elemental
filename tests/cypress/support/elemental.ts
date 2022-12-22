@@ -1,5 +1,4 @@
 export class Elemental {
-
   firstLogin() {
     cy.get('input').type(Cypress.env('password'), {log: false});
     cy.clickButton('Log in with Local User');
