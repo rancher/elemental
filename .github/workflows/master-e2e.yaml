@@ -224,9 +224,9 @@ jobs:
           VM_INDEX: 1
         run: |
           cd tests && (
-            # Setting these permissions for 'downloads' is needed because to avoid
+            # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
-            sudo chmod 1777 cypress/downloads
+            sudo rm -rf cypress/downloads
 
             make e2e-ui-rancher
           )
