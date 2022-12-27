@@ -3,7 +3,10 @@
 set -evx
 
 # Start a simple HTTP server for sharing some config files
-setsid --fork python3 -m http.server >/dev/null 2>&1
+HTTP_SRV_CMD="python3 -m http.server"
+pushd ..
+setsid --fork ${HTTP_SRV_CMD} >/dev/null 2>&1
+popd
 
 # Needed to install Cypress plugins
 npm install
@@ -20,3 +23,6 @@ docker run -v $PWD:/e2e -w /e2e                            \
     --ipc=host                                             \
     $CYPRESS_DOCKER                                        \
     -s /e2e/$SPEC
+
+# Kill the HTTP server
+pkill -f "${HTTP_SRV_CMD}"
