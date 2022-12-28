@@ -12,6 +12,10 @@ on:
         description: Number of nodes (>3) to deploy on the provisioned cluster
         default: 5
         type: number
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -46,6 +50,7 @@ jobs:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+k3s1
       node_number: ${{ inputs.node_number }}
+      proxy: ${{ inputs.proxy }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_template: ${{ inputs.runner_template }}

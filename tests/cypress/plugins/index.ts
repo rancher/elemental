@@ -21,6 +21,8 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.k8s_version = process.env.K8S_VERSION_TO_PROVISION;
   config.env.ui_account = process.env.UI_ACCOUNT;
   config.env.operator_version = process.env.OPERATOR_VERSION;
+  config.env.proxy = process.env.PROXY;
+  config.env.proxy_ip = process.env.PROXY_IP;
 
   return config;
 };

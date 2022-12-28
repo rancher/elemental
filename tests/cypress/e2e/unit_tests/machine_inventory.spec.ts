@@ -34,6 +34,19 @@ describe('Machine inventory testing', () => {
     cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
     cy.contains('Kubernetes Version').click();
     cy.contains(k8s_version).click();
+    // Configure proxy if proxy is set to elemental
+    if ( Cypress.env('proxy') == "elemental") {
+      cy.contains('Agent Environment Vars').click();
+      cy.get('#agentEnv > .key-value').contains('Add').click();
+      cy.get('.key > input').type('HTTP_PROXY');
+      cy.get('.no-resize').type('http://192.168.122.1:3128');
+      cy.get('#agentEnv > .key-value').contains('Add').click();
+      cy.get(':nth-child(7) > input').type('HTTPS_PROXY');
+      cy.get(':nth-child(8) > .no-resize').type('http://192.168.122.1:3128');
+      cy.get('#agentEnv > .key-value').contains('Add').click();
+      cy.get(':nth-child(10) > input').type('NO_PROXY');
+      cy.get(':nth-child(11) > .no-resize').type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+    }
     cy.clickButton('Create');
     cy.contains('Updating myelementalcluster', {timeout: 20000});
     cy.contains('Active myelementalcluster', {timeout: 360000});

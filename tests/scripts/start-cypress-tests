@@ -19,6 +19,7 @@ docker run -v $PWD:/e2e -w /e2e                            \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION  \
     -e UI_ACCOUNT=$UI_ACCOUNT                              \
     -e OPERATOR_VERSION=$OPERATOR_VERSION                  \
+    -e PROXY=$PROXY                                        \
     --add-host host.docker.internal:host-gateway           \
     --ipc=host                                             \
     $CYPRESS_DOCKER                                        \
