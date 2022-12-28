@@ -204,7 +204,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-basics-${{ inputs.cluster_name }}
-          path: cypress/screenshots
+          path: tests/cypress/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Basics)
@@ -213,9 +213,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-basics-${{ inputs.cluster_name }}
-          path: cypress/videos
+          path: tests/cypress/videos
           retention-days: 7
-          if-no-files-found: ignore
       - name: Deploy a node to join Rancher manager
         if: inputs.test_type == 'ui'
         env:
@@ -256,7 +255,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
-          path: cypress/screenshots
+          path: tests/cypress/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Advanced)
@@ -265,9 +264,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-advanced-${{ inputs.cluster_name }}
-          path: cypress/videos
+          path: tests/cypress/videos
           retention-days: 7
-          if-no-files-found: ignore
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
