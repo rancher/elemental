@@ -52,6 +52,10 @@ container-tests: build-box/sda.vdi deps
 	ginkgo --label-filter container -r -v ./install
 	ginkgo -r -v ./smoke
 
+# Generate tests description file
+generate-readme:
+	@./scripts/generate-readme > README.md
+
 # E2E tests
 e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e

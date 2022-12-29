@@ -70,7 +70,7 @@ func FailWithReport(message string, callerSkip ...int) {
 
 func TestE2E(t *testing.T) {
 	RegisterFailHandler(FailWithReport)
-	RunSpecs(t, "End-To-End Test Suite")
+	RunSpecs(t, "Elemental End-To-End Test Suite")
 }
 
 var _ = BeforeSuite(func() {
