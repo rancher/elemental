@@ -25,5 +25,5 @@ import (
 
 func TestSmoke(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Elemental Smoke test Suite")
+	RunSpecs(t, "Elemental Smoke Test Suite")
 }

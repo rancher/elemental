@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Variables
+DIR_LIST="cypress/e2e/unit_tests e2e install smoke"
+
+for DIR in ${DIR_LIST}; do
+  echo -e "# Tests description for ${DIR}\n"
+  scripts/generate-tests-description ${DIR}
+done
+
+# Done!
+exit 0
