@@ -25,22 +25,6 @@ import (
 	sut "github.com/rancher-sandbox/ele-testhelpers/vm"
 )
 
-func checkOsAfterReboot(s *sut.SUT) {
-	// Reboot to check the installed OS
-	s.Reboot()
-
-	By("Checking we booted from the installed OS")
-	s.AssertBootedFrom(sut.Active)
-
-	By("Checking config file was run")
-	_, err := s.Command("stat /oem/90_custom.yaml")
-	Expect(err).ToNot(HaveOccurred())
-
-	out, err := s.Command("hostname")
-	Expect(err).ToNot(HaveOccurred())
-	Expect(out).To(ContainSubstring("my-own-name"))
-}
-
 var _ = Describe("Elemental Installation tests", func() {
 	var s *sut.SUT
 	BeforeEach(func() {
@@ -90,6 +74,18 @@ var _ = Describe("Elemental Installation tests", func() {
 	})
 
 	It("has customization applied", Label("iso", "container"), func() {
-		checkOsAfterReboot(s)
+		// Reboot to check the installed OS
+		s.Reboot()
+
+		By("Checking we booted from the installed OS")
+		s.AssertBootedFrom(sut.Active)
+
+		By("Checking config file was run")
+		_, err := s.Command("stat /oem/90_custom.yaml")
+		Expect(err).ToNot(HaveOccurred())
+
+		out, err := s.Command("hostname")
+		Expect(err).ToNot(HaveOccurred())
+		Expect(out).To(ContainSubstring("my-own-name"))
 	})
 })
