@@ -19,7 +19,7 @@ jobs:
           # - the expiration date
           # - if the account associated still exists
           # - if the person still has access to the repo
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       - name: Generate tests description file
         id: readme_generator
         run: |
