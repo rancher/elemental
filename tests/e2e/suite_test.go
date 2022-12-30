@@ -53,6 +53,7 @@ var (
 	isoBoot             string
 	k8sVersion          string
 	osImage             string
+	proxy               string
 	rancherChannel      string
 	rancherLogCollector string
 	rancherVersion      string
@@ -85,6 +86,7 @@ var _ = BeforeSuite(func() {
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	osImage = os.Getenv("CONTAINER_IMAGE")
+	proxy = os.Getenv("PROXY")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")

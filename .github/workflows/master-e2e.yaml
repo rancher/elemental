@@ -48,6 +48,9 @@ on:
         description: Number of nodes to deploy on the provisioned cluster
         default: 5
         type: string
+      proxy:
+        description: Deploy a proxy
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
@@ -178,10 +181,15 @@ jobs:
           mv -f build/* .
           # Looks a little bit weird but we have to keep the ISO in build!
           mv -f elemental-*.iso build/
+      - name: Deploy Proxy
+        id: proxy
+        if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
+        run: docker run -d -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
       - name: Install Rancher
         id: installation
         env:
           CA_TYPE: ${{ inputs.ca_type }}
+          PROXY: ${{ inputs.proxy }}
           TEST_TYPE: ${{ inputs.test_type }}
         run: |
           export MY_HOSTNAME=$(hostname -f)
@@ -240,6 +248,7 @@ jobs:
           UI_ACCOUNT: ${{ inputs.ui_account }}
           BROWSER: firefox
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
+          PROXY: ${{ inputs.proxy }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
