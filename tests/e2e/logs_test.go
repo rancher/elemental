@@ -79,11 +79,13 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 		})
 
 		if proxy != "" {
-			log := exec.Command("docker", "exec", "squid_proxy", "cat", "/var/log/squid/access.log")
-			out, err := log.CombinedOutput()
-			checkRC(err)
-			err = os.WriteFile("squid.log", []byte(out), os.ModePerm)
-			checkRC(err)
+			By("Collecting proxy log and make sure traffic went through it", func() {
+				out, err := exec.Command("docker", "exec", "squid_proxy", "cat", "/var/log/squid/access.log").CombinedOutput()
+				checkRC(err)
+				err = os.WriteFile("squid.log", []byte(out), os.ModePerm)
+				checkRC(err)
+				Expect(out).Should(MatchRegexp("TCP_TUNNEL/200.*CONNECT git.rancher.io"))
+			})
 		}
 	})
 })
