@@ -184,7 +184,7 @@ jobs:
       - name: Deploy Proxy
         id: proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
-        run: docker run -d -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
+        run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
       - name: Install Rancher
         id: installation
         env:
@@ -340,6 +340,7 @@ jobs:
         if: always()
         env:
           ELEMENTAL_SUPPORT: ${{ inputs.elemental_support }}
+          PROXY: ${{ inputs.proxy }}
           RANCHER_LOG_COLLECTOR: ${{ inputs.rancher_log_collector }}
         run: |
           cd tests && (
