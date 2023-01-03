@@ -8,8 +8,9 @@ describe('Machine inventory testing', () => {
   const elemental      = new Elemental();
   const k8s_version    = Cypress.env('k8s_version');
   const ui_account     = Cypress.env('ui_account');
-  const elemental_user = "elemental-user"
-  const ui_password    = "rancherpassword"
+  const elemental_user = 'elemental-user'
+  const ui_password    = 'rancherpassword'
+  const proxy          = 'http://172.17.0.1:3128'
 
   beforeEach(() => {
     (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
@@ -39,10 +40,10 @@ describe('Machine inventory testing', () => {
       cy.contains('Agent Environment Vars').click();
       cy.get('#agentEnv > .key-value').contains('Add').click();
       cy.get('.key > input').type('HTTP_PROXY');
-      cy.get('.no-resize').type('http://192.168.122.1:3128');
+      cy.get('.no-resize').type(proxy);
       cy.get('#agentEnv > .key-value').contains('Add').click();
       cy.get(':nth-child(7) > input').type('HTTPS_PROXY');
-      cy.get(':nth-child(8) > .no-resize').type('http://192.168.122.1:3128');
+      cy.get(':nth-child(8) > .no-resize').type(proxy);
       cy.get('#agentEnv > .key-value').contains('Add').click();
       cy.get(':nth-child(10) > input').type('NO_PROXY');
       cy.get(':nth-child(11) > .no-resize').type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
