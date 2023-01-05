@@ -8,9 +8,10 @@
 .idea
 /tests/build
 /tests/build-box
-/cypress/videos/*
-/cypress/screenshots/*
-/cypress/downloads/*
-/node_modules
+/tests/cypress/videos/*
+/tests/cypress/screenshots/*
+/tests/cypress/downloads/*
+/tests/node_modules
+/tests/package-lock.json
 package-lock.json
 /.docusaurus
