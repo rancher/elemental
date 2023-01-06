@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -66,7 +67,12 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 		})
 
 		By("Creating cluster selectors", func() {
-			selectorTmp := "/tmp/selector.yaml"
+			// Set temporary file
+			tmp, err := os.CreateTemp("", "selector")
+			Expect(err).To(Not(HaveOccurred()))
+			selectorTmp := tmp.Name()
+			defer os.Remove(selectorTmp)
+
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
 				addPatterns := []pattern{
@@ -112,7 +118,12 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 		})
 
 		By("Adding MachineRegistration", func() {
-			registrationTmp := "/tmp/registration.yaml"
+			// Set temporary file
+			tmp, err := os.CreateTemp("", "machineRegistration")
+			Expect(err).To(Not(HaveOccurred()))
+			registrationTmp := tmp.Name()
+			defer os.Remove(registrationTmp)
+
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
 				addPatterns := []pattern{

@@ -15,8 +15,11 @@ limitations under the License.
 package e2e_test
 
 import (
+	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -72,60 +75,76 @@ func waitForKnownState(condition, msg string) {
 	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
 }
 
+func selectPool(index int) string {
+	// Set pool type
+	if index < 4 {
+		// First third nodes are in Master pool
+		return "master"
+	} else {
+		// The others are in Worker pool
+		return "worker"
+	}
+}
+
+func getNodeInfo(hostName string, index int) (*tools.Client, string) {
+	// Get VM network data
+	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Set 'client' to be able to access the node through SSH
+	c := &tools.Client{
+		Host:     string(hostData.IP) + ":22",
+		Username: userName,
+		Password: userPassword,
+	}
+
+	return c, hostData.Mac
+}
+
+func deployNode(hostName string, macAdrs string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	out, err := exec.Command(installVMScript, hostName, macAdrs).CombinedOutput()
+	GinkgoWriter.Printf("Output from deployment of node '%s':\n%s\n", hostName, out)
+	Expect(err).To(Not(HaveOccurred()))
+}
+
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	It("Install node and add it in Rancher", func() {
-		var (
-			indexInPool int
-			macAdrs     string
-			poolType    string
-		)
-
 		// indexInPool is 1 by default
-		indexInPool = 1
+		indexInPool := 1
 
-		// Add node in network configuration if needed
-		if macAdrs == "" {
-			err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
-			Expect(err).To(Not(HaveOccurred()))
-		}
+		// Get pool data
+		poolType := selectPool(vmIndex)
 
-		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
-		Expect(err).To(Not(HaveOccurred()))
+		// Set MachineRegistration name based on VM hostname
+		machineRegName := "machine-registration-" + poolType + "-" + clusterName
 
-		client := &tools.Client{
-			Host:     string(hostData.IP) + ":22",
-			Username: userName,
-			Password: userPassword,
-		}
-		macAdrs = hostData.Mac
-
-		// Set pool type and name
-		poolName := "pool-"
-		if vmIndex < 4 {
-			// First third nodes are in Master pool
-			poolType = "master"
-			poolName += poolType + "-" + clusterName
-		} else {
-			// The others are in Worker pool
-			poolType = "worker"
-			poolName += poolType + "-" + clusterName
-		}
-		machineReg := "machine-registration-" + poolType + "-" + clusterName
-
-		By("Setting emulated TPM to "+emulateTPM, func() {
-			// Set correct value for TPM emulation
-			value := "false"
-			if emulateTPM == "true" {
-				value = "true"
+		By("Checking if parallel deployment is set and authorized", func() {
+			if numberOfVMs > vmIndex {
+				// Parallel deployment set, only on worker pool
+				Expect(poolType).To(Equal("worker"))
 			}
+		})
+
+		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
+			// Set temporary file
+			tmp, err := os.CreateTemp("", "emulatedTPM")
+			Expect(err).To(Not(HaveOccurred()))
+			emulatedTmp := tmp.Name()
+			defer os.Remove(emulatedTmp)
+
+			// Save original file as it can be modified multiple time
+			misc.CopyFile(emulateTPMYaml, emulatedTmp)
 
 			// Patch the yaml file
-			err := tools.Sed("emulate-tpm:.*", "emulate-tpm: "+value, emulatedTPMYaml)
+			err = tools.Sed("emulate-tpm:.*", "emulate-tpm: "+strconv.FormatBool(emulateTPM), emulatedTmp)
 			Expect(err).To(Not(HaveOccurred()))
 
+			// And apply it
 			out, err := kubectl.Run("patch", "MachineRegistration",
-				"--namespace", clusterNS, machineReg,
-				"--type", "merge", "--patch-file", emulatedTPMYaml,
+				"--namespace", clusterNS, machineRegName,
+				"--type", "merge", "--patch-file", emulatedTmp,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
 		})
@@ -133,7 +152,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Downloading installation config file", func() {
 			// Download the new YAML installation config file
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
-				"--namespace", clusterNS, machineReg,
+				"--namespace", clusterNS, machineRegName,
 				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
 
@@ -171,18 +190,37 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			})
 		}
 
-		By("Creating and installing VM", func() {
-			cmd := exec.Command(installVMScript, vmName, macAdrs)
-			out, err := cmd.CombinedOutput()
-			GinkgoWriter.Printf("%s\n", out)
-			Expect(err).To(Not(HaveOccurred()))
-		})
+		// Loop on node provisionning
+		// NOTE: if numberOfVMs == vmIndex then only one node will be provisionned
+		var wg sync.WaitGroup
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
 
-		By("Checking that the VM is available in Rancher", func() {
-			id, err := misc.GetServerId(clusterNS, vmIndex)
+			// Add node in network configuration
+			err := misc.AddNode(netDefaultFileName, hostName, index)
 			Expect(err).To(Not(HaveOccurred()))
-			Expect(id).To(Not(BeEmpty()))
-		})
+
+			// Get generated MAC address
+			_, macAdrs := getNodeInfo(hostName, index)
+			Expect(macAdrs).To(Not(BeNil()))
+
+			By("Creating and installing VM "+hostName, func() {
+				// Execute node deployment in parallel
+				wg.Add(1)
+				go deployNode(hostName, macAdrs, &wg)
+			})
+		}
+		// Wait for all node to be deployed
+		wg.Wait()
+
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			By("Checking that the VM(s) is/are available in Rancher", func() {
+				id, err := misc.GetServerId(clusterNS, index)
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(id).To(Not(BeEmpty()))
+			})
+		}
 
 		if vmIndex > 1 {
 			By("Ensuring that the cluster is in healthy state", func() {
@@ -192,7 +230,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			By("Increasing 'quantity' node of predefined cluster", func() {
 				// Increase 'quantity' field
 				var err error
-				indexInPool, err = misc.IncreaseQuantity(clusterNS, clusterName, poolName)
+				indexInPool, err = misc.IncreaseQuantity(clusterNS,
+					clusterName,
+					"pool-"+poolType+"-"+clusterName,
+					(numberOfVMs - vmIndex + 1))
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
@@ -226,31 +267,45 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}
 		})
 
-		By("Restarting the VM to add it in the cluster", func() {
-			err := exec.Command("sudo", "virsh", "start", vmName).Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
 
-		By("Checking VM connection", func() {
-			id, err := misc.GetServerId(clusterNS, vmIndex)
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(id).To(Not(BeEmpty()))
+			// Restart the VM(s)
+			By("Restarting the VM(s) to add it/them in the cluster", func() {
+				err := exec.Command("sudo", "virsh", "start", hostName).Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
 
-			// Retry the SSH connection, as it can takes time for the user to be created
-			Eventually(func() string {
-				out, _ := client.RunSSH("uname -n")
-				out = strings.Trim(out, "\n")
-				return out
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
-		})
+			// Get node information
+			client, _ := getNodeInfo(hostName, index)
+			Expect(client).To(Not(BeNil()))
 
-		By("Showing OS version", func() {
-			out, err := client.RunSSH("cat /etc/os-release")
-			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("OS Version:\n%s\n", out)
-		})
+			By("Checking VM connection", func() {
+				id, err := misc.GetServerId(clusterNS, index)
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(id).To(Not(BeEmpty()))
 
+				// Retry the SSH connection, as it can takes time for the user to be created
+				Eventually(func() string {
+					out, _ := client.RunSSH("uname -n")
+					out = strings.Trim(out, "\n")
+					return out
+				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
+			})
+
+			By("Showing OS version", func() {
+				out, err := client.RunSSH("cat /etc/os-release")
+				Expect(err).To(Not(HaveOccurred()))
+				GinkgoWriter.Printf("OS Version:\n%s\n", out)
+			})
+		}
+
+		// No need to check on multiple VMs for now, as only worker pool can be bootstrapped in parallel for now
 		if poolType != "worker" {
+			// Get node information
+			client, _ := getNodeInfo(vmName, vmIndex)
+
 			By("Configuring kubectl command on the VM", func() {
 				if strings.Contains(k8sVersion, "rke2") {
 					dir := "/var/lib/rancher/rke2/bin"
@@ -279,29 +334,51 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Checking cluster state", func() {
 			// Check agent and cluster state
 			if poolType != "worker" {
+				// Get node information
+				client, _ := getNodeInfo(vmName, vmIndex)
+				Expect(client).To(Not(BeNil()))
 				checkClusterAgent(client)
 			}
 			checkClusterState()
 		})
 
+		// No need to check on multiple VMs for now, as only worker pool can be bootstrapped in parallel for now
 		if poolType != "worker" {
 			By("Checking cluster version", func() {
+				// Get node information
+				client, _ := getNodeInfo(vmName, vmIndex)
+				Expect(client).To(Not(BeNil()))
+
 				// Show cluster version, could be useful for debugging purposes
 				version := getClusterVersion(client)
 				GinkgoWriter.Printf("K8s version:\n%s\n", version)
 			})
 		}
 
-		By("Rebooting the VM and checking that cluster is still healthy after", func() {
-			// Execute 'reboot' in background, to avoid ssh locking
-			_, err := client.RunSSH("setsid -f reboot")
-			Expect(err).To(Not(HaveOccurred()))
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			By("Rebooting the VM(s)", func() {
+				// Set node hostname
+				hostName := misc.SetHostname(vmNameRoot, index)
 
-			// Wait a little bit for the cluster to be in an unstable state (yes!)
-			time.Sleep(misc.SetTimeout(2 * time.Minute))
+				// Get node information
+				client, _ := getNodeInfo(hostName, index)
+				Expect(client).To(Not(BeNil()))
 
+				// Execute 'reboot' in background, to avoid SSH locking
+				_, err := client.RunSSH("setsid -f reboot")
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Wait a little bit for the cluster to be in an unstable state (yes!)
+				time.Sleep(misc.SetTimeout(2 * time.Minute))
+			})
+		}
+
+		By("Checking that cluster is still healthy after", func() {
 			// Check agent and cluster state
 			if poolType != "worker" {
+				// Get node information
+				client, _ := getNodeInfo(vmName, vmIndex)
+				Expect(client).To(Not(BeNil()))
 				checkClusterAgent(client)
 			}
 			checkClusterState()

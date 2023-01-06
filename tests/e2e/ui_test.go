@@ -64,7 +64,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		By("Adding VM in default network", func() {
 			// Add node in network configuration if needed
 			if macAdrs == "" {
-				err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
+				err := misc.AddNode(netDefaultFileName, vmName, vmIndex)
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
