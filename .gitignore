@@ -13,5 +13,3 @@
 /tests/cypress/downloads/*
 /tests/node_modules
 /tests/package-lock.json
-package-lock.json
-/.docusaurus
