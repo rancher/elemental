@@ -232,7 +232,7 @@ func SetTimeout(timeout time.Duration) time.Duration {
 	return timeout
 }
 
-func IncreaseQuantity(ns, name, pool string) (int, error) {
+func IncreaseQuantity(ns, name, pool string, quantity int) (int, error) {
 	c := &Cluster{}
 	quantitySet := 0
 	poolFound := false
@@ -250,7 +250,7 @@ func IncreaseQuantity(ns, name, pool string) (int, error) {
 			poolFound = true
 
 			// Increase quantity
-			c.Spec.RkeConfig.MachinePools[i].Quantity++
+			c.Spec.RkeConfig.MachinePools[i].Quantity += quantity
 			quantitySet = c.Spec.RkeConfig.MachinePools[i].Quantity
 
 			// Quantity increased, loop can be stopped
@@ -379,7 +379,7 @@ func TrimStringFromChar(s, c string) string {
 	return s
 }
 
-func AddNode(name string, index int, file string) error {
+func AddNode(file, name string, index int) error {
 	// Read live XML configuration
 	fileContent, err := exec.Command("sudo", "virsh", "net-dumpxml", "default").Output()
 	if err != nil {
@@ -434,4 +434,14 @@ func FileShare(directory, listenAddr string) {
 			fmt.Printf("Server failed: %s\n", err)
 		}
 	}()
+}
+
+func SetHostname(baseName string, index int) string {
+	if baseName == "" {
+		baseName = "emtpy"
+	}
+	if index < 0 {
+		index = 0
+	}
+	return baseName + "-" + fmt.Sprintf("%03d", index)
 }

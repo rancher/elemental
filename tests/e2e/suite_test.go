@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"testing"
@@ -27,7 +26,7 @@ import (
 
 const (
 	clusterYaml               = "../assets/cluster.yaml"
-	emulatedTPMYaml           = "../assets/emulated_tpm.yaml"
+	emulateTPMYaml            = "../assets/emulateTPM.yaml"
 	configPrivateCAScript     = "../scripts/config-private-ca"
 	installConfigYaml         = "../../install-config.yaml"
 	installVMScript           = "../scripts/install-vm"
@@ -48,10 +47,12 @@ var (
 	clusterName         string
 	clusterNS           string
 	elementalSupport    string
-	emulateTPM          string
+	emulateTPM          bool
+	eTPM                string
 	imageVersion        string
 	isoBoot             string
 	k8sVersion          string
+	numberOfVMs         int
 	osImage             string
 	proxy               string
 	rancherChannel      string
@@ -80,11 +81,12 @@ var _ = BeforeSuite(func() {
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
-	emulateTPM = os.Getenv("EMULATE_TPM")
+	eTPM = os.Getenv("EMULATE_TPM")
 	imageVersion = os.Getenv("IMAGE_VERSION")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
+	number := os.Getenv("VM_NUMBERS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
 	proxy = os.Getenv("PROXY")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
@@ -100,13 +102,26 @@ var _ = BeforeSuite(func() {
 		vmIndex, err = strconv.Atoi(index)
 		Expect(err).To(Not(HaveOccurred()))
 
-		// Now we can set the VM name
-		vmName = vmNameRoot + "-" + fmt.Sprintf("%03d", vmIndex)
+		// Set default hostname
+		vmName = misc.SetHostname(vmNameRoot, vmIndex)
 	}
 
-	// Force a correct value
-	if emulateTPM != "true" {
-		emulateTPM = "false"
+	// Only if VM_NUMBER is set
+	if number != "" {
+		var err error
+		numberOfVMs, err = strconv.Atoi(number)
+		Expect(err).To(Not(HaveOccurred()))
+	} else {
+		// By default set to vmIndex
+		numberOfVMs = vmIndex
+	}
+
+	// Force a correct value for emulateTPM
+	switch eTPM {
+	case "true":
+		emulateTPM = true
+	default:
+		emulateTPM = false
 	}
 
 	// Start HTTP server
