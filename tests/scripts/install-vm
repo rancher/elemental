@@ -44,6 +44,9 @@ fi
 # Create logs directory if needed
 mkdir -p logs
 
+# Create a dedicated directory for storage pool
+mkdir -p ${VM_NAME}
+
 # Create VM
 script -e -O logs/bootstrap_${VM_NAME}.log \
   -c "sudo virt-install \
@@ -56,7 +59,7 @@ script -e -O logs/bootstrap_${VM_NAME}.log \
   --ram=3072 \
   --vcpus=2 \
   --cpu host \
-  --disk path=${VM_NAME}.img,bus=scsi,size=35 \
+  --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
   --check disk_size=off \
   --graphics none \
   --serial pty \
