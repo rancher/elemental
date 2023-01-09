@@ -11,7 +11,7 @@ FROM suse/sle-micro-rancher/5.3:latest
 # kernel-firmware-amdgpu installed here until 5.4 is released and includes it
 RUN zypper in -y -- \
   NetworkManager-wwan \
-  kernel-firmware-amdgpu \
+  kernel-firmware-all \
   -systemd-presets-branding-SLE-Micro-for-Rancher \
   elemental
 
