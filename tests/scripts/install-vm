@@ -41,8 +41,12 @@ else
   INSTALL_FLAG="--pxe"
 fi
 
+# Create logs directory if needed
+mkdir -p logs
+
 # Create VM
-script -e -c "sudo virt-install \
+script -e -O logs/bootstrap_${VM_NAME}.log \
+  -c "sudo virt-install \
   --name ${VM_NAME} \
   --os-variant opensuse-unknown \
   --virt-type kvm \
