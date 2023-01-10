@@ -260,10 +260,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 			} else {
 				// For newer elemental-operator versions
-				if vmIndex > 1 {
-					waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
-						"waiting for agent to check in and apply initial plan")
+				var state string
+				if vmIndex < 4 {
+					state = "waiting for agent to check in and apply initial plan"
+				} else {
+					state = "configuring control plane node(s)"
 				}
+				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", state)
 			}
 		})
 
