@@ -101,25 +101,26 @@ func getNodeInfo(hostName string, index int) (*tools.Client, string) {
 	return c, hostData.Mac
 }
 
-func deployNode(hostName string, macAdrs string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	out, err := exec.Command(installVMScript, hostName, macAdrs).CombinedOutput()
-	GinkgoWriter.Printf("Output from deployment of node '%s':\n%s\n", hostName, out)
-	Expect(err).To(Not(HaveOccurred()))
-}
-
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
-	It("Install node and add it in Rancher", func() {
+	var (
+		indexInPool    int
+		machineRegName string
+		poolType       string
+		wg             sync.WaitGroup
+	)
+
+	BeforeEach(func() {
 		// indexInPool is 1 by default
-		indexInPool := 1
+		indexInPool = 1
 
 		// Get pool data
-		poolType := selectPool(vmIndex)
+		poolType = selectPool(vmIndex)
 
 		// Set MachineRegistration name based on VM hostname
-		machineRegName := "machine-registration-" + poolType + "-" + clusterName
+		machineRegName = "machine-registration-" + poolType + "-" + clusterName
+	})
 
+	It("Provision the node", func() {
 		By("Checking if parallel deployment is set and authorized", func() {
 			if numberOfVMs > vmIndex {
 				// Parallel deployment set, only on worker pool
@@ -192,7 +193,6 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		// Loop on node provisionning
 		// NOTE: if numberOfVMs == vmIndex then only one node will be provisionned
-		var wg sync.WaitGroup
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -205,22 +205,42 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			_, macAdrs := getNodeInfo(hostName, index)
 			Expect(macAdrs).To(Not(BeNil()))
 
-			By("Creating and installing VM "+hostName, func() {
-				// Execute node deployment in parallel
-				wg.Add(1)
-				go deployNode(hostName, macAdrs, &wg)
-			})
+			wg.Add(1)
+			go func(s, h, m string) {
+				defer wg.Done()
+				defer GinkgoRecover()
+
+				By("Creating and installing VM "+h, func() {
+					// Execute node deployment in parallel
+					out, err := exec.Command(s, h, m).CombinedOutput()
+					GinkgoWriter.Printf("Output from deployment of node '%s':\n%s\n", h, out)
+					Expect(err).To(Not(HaveOccurred()))
+				})
+			}(installVMScript, hostName, macAdrs)
 		}
 		// Wait for all node to be deployed
 		wg.Wait()
+	})
 
+	It("Add the node in Rancher Manager", func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
-			By("Checking that the VM(s) is/are available in Rancher", func() {
-				id, err := misc.GetServerId(clusterNS, index)
-				Expect(err).To(Not(HaveOccurred()))
-				Expect(id).To(Not(BeEmpty()))
-			})
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
+
+			// Execute node deployment in parallel
+			wg.Add(1)
+			go func(c, h string, i int) {
+				defer wg.Done()
+				defer GinkgoRecover()
+				By("Checking that VM "+h+" is available in Rancher", func() {
+					id, err := misc.GetServerId(c, i)
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(id).To(Not(BeEmpty()))
+				})
+			}(clusterNS, hostName, index)
 		}
+		// Wait for all node to be checked
+		wg.Wait()
 
 		if vmIndex > 1 {
 			By("Ensuring that the cluster is in healthy state", func() {
@@ -274,35 +294,44 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
 
-			// Restart the VM(s)
-			By("Restarting the VM(s) to add it/them in the cluster", func() {
-				err := exec.Command("sudo", "virsh", "start", hostName).Run()
-				Expect(err).To(Not(HaveOccurred()))
-			})
-
 			// Get node information
 			client, _ := getNodeInfo(hostName, index)
 			Expect(client).To(Not(BeNil()))
 
-			By("Checking VM connection", func() {
-				id, err := misc.GetServerId(clusterNS, index)
-				Expect(err).To(Not(HaveOccurred()))
-				Expect(id).To(Not(BeEmpty()))
+			// Execute in parallel
+			wg.Add(1)
+			go func(c, h string, i int, cl *tools.Client) {
+				defer wg.Done()
+				defer GinkgoRecover()
 
-				// Retry the SSH connection, as it can takes time for the user to be created
-				Eventually(func() string {
-					out, _ := client.RunSSH("uname -n")
-					out = strings.Trim(out, "\n")
-					return out
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
-			})
+				// Restart the VM(s)
+				By("Restarting "+h+" to add it in the cluster", func() {
+					err := exec.Command("sudo", "virsh", "start", h).Run()
+					Expect(err).To(Not(HaveOccurred()))
+				})
 
-			By("Showing OS version", func() {
-				out, err := client.RunSSH("cat /etc/os-release")
-				Expect(err).To(Not(HaveOccurred()))
-				GinkgoWriter.Printf("OS Version:\n%s\n", out)
-			})
+				By("Checking "+h+" SSH connection", func() {
+					id, err := misc.GetServerId(c, i)
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(id).To(Not(BeEmpty()))
+
+					// Retry the SSH connection, as it can takes time for the user to be created
+					Eventually(func() string {
+						out, _ := cl.RunSSH("uname -n")
+						out = strings.Trim(out, "\n")
+						return out
+					}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
+				})
+
+				By("Checking OS version on "+h, func() {
+					out, err := cl.RunSSH("cat /etc/os-release")
+					Expect(err).To(Not(HaveOccurred()))
+					GinkgoWriter.Printf("OS Version:\n%s\n", out)
+				})
+			}(clusterNS, hostName, index, client)
 		}
+		// Wait for all node to be added in the cluster
+		wg.Wait()
 
 		// No need to check on multiple VMs for now, as only worker pool can be bootstrapped in parallel for now
 		if poolType != "worker" {
@@ -358,11 +387,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			})
 		}
 
+		// This is not done in parallel, to avoid locking issue in libvirtd
 		for index := vmIndex; index <= numberOfVMs; index++ {
-			By("Rebooting the VM(s)", func() {
-				// Set node hostname
-				hostName := misc.SetHostname(vmNameRoot, index)
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
 
+			By("Rebooting "+hostName, func() {
 				// Get node information
 				client, _ := getNodeInfo(hostName, index)
 				Expect(client).To(Not(BeNil()))
@@ -375,6 +405,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				time.Sleep(misc.SetTimeout(2 * time.Minute))
 			})
 		}
+		// Wait for all node to be added in the cluster
+		//wg.Wait()
 
 		By("Checking that cluster is still healthy after", func() {
 			// Check agent and cluster state
