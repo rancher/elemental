@@ -47,7 +47,7 @@ iso_repack() {
 
   cp "${REG_CONFIG_FILE}" "${TEMPDIR}/config/${REG_FILE}"
 
-  if [ -f "/var/run/docker.pid" ]; then
+  if [ -S "/var/run/docker.sock" ]; then
     CONT_ENGINE="docker"
   elif [ -x "$(command -v podman)" ]; then
     CONT_ENGINE="podman"
