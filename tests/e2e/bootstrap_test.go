@@ -29,13 +29,6 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
-func getClusterVersion(client *tools.Client) string {
-	out, err := client.RunSSH("kubectl version")
-	Expect(err).To(Not(HaveOccurred()))
-
-	return out
-}
-
 func checkClusterAgent(client *tools.Client) {
 	// cluster-agent is the pod that communicates to Rancher, wait for it before continuing
 	Eventually(func() string {
@@ -75,19 +68,8 @@ func waitForKnownState(condition, msg string) {
 	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
 }
 
-func selectPool(index int) string {
-	// Set pool type
-	if index < 4 {
-		// First third nodes are in Master pool
-		return "master"
-	} else {
-		// The others are in Worker pool
-		return "worker"
-	}
-}
-
 func getNodeInfo(hostName string, index int) (*tools.Client, string) {
-	// Get VM network data
+	// Get network data
 	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
 	Expect(err).To(Not(HaveOccurred()))
 
@@ -113,21 +95,20 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		// indexInPool is 1 by default
 		indexInPool = 1
 
-		// Get pool data
-		poolType = selectPool(vmIndex)
+		// Set pool type
+		if vmIndex < 4 {
+			// First third nodes are in Master pool
+			poolType = "master"
+		} else {
+			// The others are in Worker pool
+			poolType = "worker"
+		}
 
-		// Set MachineRegistration name based on VM hostname
+		// Set MachineRegistration name based on hostname
 		machineRegName = "machine-registration-" + poolType + "-" + clusterName
 	})
 
 	It("Provision the node", func() {
-		By("Checking if parallel deployment is set and authorized", func() {
-			if numberOfVMs > vmIndex {
-				// Parallel deployment set, only on worker pool
-				Expect(poolType).To(Equal("worker"))
-			}
-		})
-
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
 			tmp, err := os.CreateTemp("", "emulatedTPM")
@@ -196,6 +177,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
 
 			// Add node in network configuration
 			err := misc.AddNode(netDefaultFileName, hostName, index)
@@ -210,7 +192,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				defer wg.Done()
 				defer GinkgoRecover()
 
-				By("Creating and installing VM "+h, func() {
+				By("Installing node "+h, func() {
 					// Execute node deployment in parallel
 					out, err := exec.Command(s, h, m).CombinedOutput()
 					GinkgoWriter.Printf("Output from deployment of node '%s':\n%s\n", h, out)
@@ -218,7 +200,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				})
 			}(installVMScript, hostName, macAdrs)
 		}
-		// Wait for all node to be deployed
+		// Wait for all parallel jobs
 		wg.Wait()
 	})
 
@@ -226,20 +208,21 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
 
 			// Execute node deployment in parallel
 			wg.Add(1)
 			go func(c, h string, i int) {
 				defer wg.Done()
 				defer GinkgoRecover()
-				By("Checking that VM "+h+" is available in Rancher", func() {
+				By("Checking that node "+h+" is available in Rancher", func() {
 					id, err := misc.GetServerId(c, i)
 					Expect(err).To(Not(HaveOccurred()))
 					Expect(id).To(Not(BeEmpty()))
 				})
 			}(clusterNS, hostName, index)
 		}
-		// Wait for all node to be checked
+		// Wait for all parallel jobs
 		wg.Wait()
 
 		if vmIndex > 1 {
@@ -281,8 +264,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			} else {
 				// For newer elemental-operator versions
 				var state string
-				if vmIndex < 4 {
+				if vmIndex == 1 {
 					state = "waiting for agent to check in and apply initial plan"
+				} else if vmIndex < 4 {
+					state = "configuring etcd node"
 				} else {
 					state = "configuring control plane node(s)"
 				}
@@ -293,6 +278,135 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
+
+			// Get node information
+			client, _ := getNodeInfo(hostName, index)
+			Expect(client).To(Not(BeNil()))
+
+			// Get serverId in MachineInventories
+			serverId, err := misc.GetServerId(clusterNS, index)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(serverId).To(Not(BeEmpty()))
+
+			// Execute in parallel
+			wg.Add(1)
+			go func(c, h, id string, i int, cl *tools.Client) {
+				defer wg.Done()
+				defer GinkgoRecover()
+
+				// Restart the node(s)
+				By("Restarting "+h+" to add it in the cluster", func() {
+					err := exec.Command("sudo", "virsh", "start", h).Run()
+					Expect(err).To(Not(HaveOccurred()))
+				})
+
+				By("Checking "+h+" SSH connection", func() {
+					// Retry the SSH connection, as it can takes time for the user to be created
+					Eventually(func() string {
+						out, _ := cl.RunSSH("uname -n")
+						out = strings.Trim(out, "\n")
+						return out
+					}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal(id))
+				})
+
+				By("Checking OS version on "+h, func() {
+					out, err := cl.RunSSH("cat /etc/os-release")
+					Expect(err).To(Not(HaveOccurred()))
+					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
+				})
+			}(clusterNS, hostName, serverId, index, client)
+		}
+		// Wait for all parallel jobs
+		wg.Wait()
+
+		if poolType != "worker" {
+			for index := vmIndex; index <= numberOfVMs; index++ {
+				// Set node hostname
+				hostName := misc.SetHostname(vmNameRoot, index)
+				Expect(hostName).To(Not(BeNil()))
+
+				// Get node information
+				client, _ := getNodeInfo(hostName, index)
+				Expect(client).To(Not(BeNil()))
+
+				// Execute in parallel
+				wg.Add(1)
+				go func(h string, cl *tools.Client) {
+					defer wg.Done()
+					defer GinkgoRecover()
+
+					if strings.Contains(k8sVersion, "rke2") {
+						By("Configuring kubectl command on node "+h, func() {
+							dir := "/var/lib/rancher/rke2/bin"
+							kubeCfg := "export KUBECONFIG=/etc/rancher/rke2/rke2.yaml"
+
+							// Wait a little to be sure that RKE2 installation has started
+							// Otherwise the directory is not available!
+							Eventually(func() string {
+								out, _ := cl.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
+								return out
+							}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal("OK"))
+
+							// Configure kubectl
+							_, err := cl.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
+							Expect(err).To(Not(HaveOccurred()))
+						})
+					}
+
+					By("Checking kubectl command on "+h, func() {
+						// Check if kubectl works
+						Eventually(func() string {
+							out, _ := cl.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
+							return out
+						}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+					})
+
+					By("Checking cluster agent on "+h, func() {
+						checkClusterAgent(cl)
+					})
+				}(hostName, client)
+			}
+		}
+		// Wait for all parallel jobs
+		wg.Wait()
+
+		By("Checking cluster state", func() {
+			checkClusterState()
+		})
+
+		if poolType != "worker" {
+			for index := vmIndex; index <= numberOfVMs; index++ {
+				// Set node hostname
+				hostName := misc.SetHostname(vmNameRoot, index)
+				Expect(hostName).To(Not(BeNil()))
+
+				// Get node information
+				client, _ := getNodeInfo(hostName, index)
+				Expect(client).To(Not(BeNil()))
+
+				// Execute in parallel
+				wg.Add(1)
+				go func(h string, cl *tools.Client) {
+					defer wg.Done()
+					defer GinkgoRecover()
+
+					By("Checking cluster version on "+h, func() {
+						// Show cluster version, could be useful for debugging purposes
+						version, err := client.RunSSH("kubectl version")
+						Expect(err).To(Not(HaveOccurred()))
+						GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, version)
+					})
+				}(hostName, client)
+			}
+		}
+		// Wait for all parallel jobs
+		wg.Wait()
+
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
 			client, _ := getNodeInfo(hostName, index)
@@ -300,122 +414,30 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Execute in parallel
 			wg.Add(1)
-			go func(c, h string, i int, cl *tools.Client) {
+			go func(h, p string, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
-				// Restart the VM(s)
-				By("Restarting "+h+" to add it in the cluster", func() {
-					err := exec.Command("sudo", "virsh", "start", h).Run()
+				By("Rebooting "+h, func() {
+					// Execute 'reboot' in background, to avoid SSH locking
+					_, err := cl.RunSSH("setsid -f reboot")
 					Expect(err).To(Not(HaveOccurred()))
+
+					// Wait a little bit for the cluster to be in an unstable state (yes!)
+					time.Sleep(misc.SetTimeout(2 * time.Minute))
 				})
 
-				By("Checking "+h+" SSH connection", func() {
-					id, err := misc.GetServerId(c, i)
-					Expect(err).To(Not(HaveOccurred()))
-					Expect(id).To(Not(BeEmpty()))
-
-					// Retry the SSH connection, as it can takes time for the user to be created
-					Eventually(func() string {
-						out, _ := cl.RunSSH("uname -n")
-						out = strings.Trim(out, "\n")
-						return out
-					}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Equal(id))
-				})
-
-				By("Checking OS version on "+h, func() {
-					out, err := cl.RunSSH("cat /etc/os-release")
-					Expect(err).To(Not(HaveOccurred()))
-					GinkgoWriter.Printf("OS Version:\n%s\n", out)
-				})
-			}(clusterNS, hostName, index, client)
+				if p != "worker" {
+					By("Checking cluster agent on "+h, func() {
+						checkClusterAgent(cl)
+					})
+				}
+			}(hostName, poolType, client)
 		}
-		// Wait for all node to be added in the cluster
+		// Wait for all parallel jobs
 		wg.Wait()
 
-		// No need to check on multiple VMs for now, as only worker pool can be bootstrapped in parallel for now
-		if poolType != "worker" {
-			// Get node information
-			client, _ := getNodeInfo(vmName, vmIndex)
-
-			By("Configuring kubectl command on the VM", func() {
-				if strings.Contains(k8sVersion, "rke2") {
-					dir := "/var/lib/rancher/rke2/bin"
-					kubeCfg := "export KUBECONFIG=/etc/rancher/rke2/rke2.yaml"
-
-					// Wait a little to be sure that RKE2 installation has started
-					// Otherwise the directory is not available!
-					Eventually(func() string {
-						out, _ := client.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
-						return out
-					}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal("OK"))
-
-					// Configure kubectl
-					_, err := client.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
-				// Check if kubectl works
-				Eventually(func() string {
-					out, _ := client.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
-					return out
-				}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
-			})
-		}
-
-		By("Checking cluster state", func() {
-			// Check agent and cluster state
-			if poolType != "worker" {
-				// Get node information
-				client, _ := getNodeInfo(vmName, vmIndex)
-				Expect(client).To(Not(BeNil()))
-				checkClusterAgent(client)
-			}
-			checkClusterState()
-		})
-
-		// No need to check on multiple VMs for now, as only worker pool can be bootstrapped in parallel for now
-		if poolType != "worker" {
-			By("Checking cluster version", func() {
-				// Get node information
-				client, _ := getNodeInfo(vmName, vmIndex)
-				Expect(client).To(Not(BeNil()))
-
-				// Show cluster version, could be useful for debugging purposes
-				version := getClusterVersion(client)
-				GinkgoWriter.Printf("K8s version:\n%s\n", version)
-			})
-		}
-
-		// This is not done in parallel, to avoid locking issue in libvirtd
-		for index := vmIndex; index <= numberOfVMs; index++ {
-			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
-
-			By("Rebooting "+hostName, func() {
-				// Get node information
-				client, _ := getNodeInfo(hostName, index)
-				Expect(client).To(Not(BeNil()))
-
-				// Execute 'reboot' in background, to avoid SSH locking
-				_, err := client.RunSSH("setsid -f reboot")
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Wait a little bit for the cluster to be in an unstable state (yes!)
-				time.Sleep(misc.SetTimeout(2 * time.Minute))
-			})
-		}
-		// Wait for all node to be added in the cluster
-		//wg.Wait()
-
-		By("Checking that cluster is still healthy after", func() {
-			// Check agent and cluster state
-			if poolType != "worker" {
-				// Get node information
-				client, _ := getNodeInfo(vmName, vmIndex)
-				Expect(client).To(Not(BeNil()))
-				checkClusterAgent(client)
-			}
+		By("Checking cluster state after reboot", func() {
 			checkClusterState()
 		})
 	})

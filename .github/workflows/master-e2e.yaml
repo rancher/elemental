@@ -297,17 +297,12 @@ jobs:
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap node 2 with current build (use ISO)
+      - name: Bootstrap node 2 and 3 with current build (use ISO)
         if: inputs.test_type == 'cli'
         env:
           ISO_BOOT: true
           VM_INDEX: 2
-        run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 3 with current build (use ISO)
-        if: inputs.test_type == 'cli'
-        env:
-          ISO_BOOT: true
-          VM_INDEX: 3
+          VM_NUMBERS: 3
         run: cd tests && make e2e-bootstrap-node
       - name: Upgrade node 2 (with manual method) to latest build
         if: inputs.test_type == 'cli'
