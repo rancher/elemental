@@ -6,7 +6,7 @@ usage() {
 me=$(basename "$0")
 cat << EOF
 
-usage: 
+usage:
    $me REGISTRATION_CONFIG_FILE [ISO_URL]
 
 REGISTRATION_CONFIG_FILE is the yaml file required by elemental-register in
@@ -34,22 +34,30 @@ iso_repack() {
 
   [ -f "$(pwd)/${ISO_FILE}" ] && abort "$(pwd)/${ISO_FILE} already exists, aborting"
 
-  case ${ISO_URL} in 
+  case ${ISO_URL} in
     http*)
       wget -O "${TEMPDIR}/iso/${ISO_FILE}" "${ISO_URL}"
       ;;
     *)
       # Assume it is a local path
       [ -f "${ISO_URL}" ] || abort "${ISO_URL} does not exist, aborting"
-      cp "${ISO_URL}" "${TEMPDIR}/iso/${ISO_FILE}" 
+      cp "${ISO_URL}" "${TEMPDIR}/iso/${ISO_FILE}"
       ;;
   esac
 
   cp "${REG_CONFIG_FILE}" "${TEMPDIR}/config/${REG_FILE}"
 
+  if [ -f "/var/run/docker.pid" ]; then
+    CONT_ENGINE="docker"
+  elif [ -x "$(command -v podman)" ]; then
+    CONT_ENGINE="podman"
+  else
+    abort "No suitable container engine found, please install Docker or Podman first."
+  fi
+  echo -e "\nInfo: Using $CONT_ENGINE to run the ISO builder..."
 
-  docker pull "${BUILD_IMG}"
-  docker run --rm -v ${TEMPDIR}:/mnt -v $(pwd):/output ${BUILD_IMG} \
+  $CONT_ENGINE pull "${BUILD_IMG}"
+  $CONT_ENGINE run --rm -v ${TEMPDIR}:/mnt -v $(pwd):/output ${BUILD_IMG} \
       xorriso -indev "/mnt/iso/${ISO_FILE}" -outdev "/output/${ISO_FILE}" -map "/mnt/config/${REG_FILE}" "/${REG_FILE}" -boot_image any replay
 
   rm -rf "${TEMPDIR}"
