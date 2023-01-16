@@ -45,17 +45,17 @@ describe('Upgrade tests', () => {
   it('Check OS Versions', () => {
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Versions').click();
-    cy.contains('Active teal-5.2', {timeout: 120000});
+    cy.contains('Active fake-image', {timeout: 120000});
     cy.contains('Active teal-5.3');
   });
 
   it('Delete OS Versions', () => {
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('OS Versions').click();
-    cy.contains('teal-5.2').parent().parent().click();
+    cy.contains('fake-image').parent().parent().click();
     cy.clickButton('Delete');
     cy.confirmDelete();
-    cy.contains('teal-5.2').should('not.exist');
+    cy.contains('fake-image').should('not.exist');
   });
 
   it('Delete OS Versions Channels', () => {
