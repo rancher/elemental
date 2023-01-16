@@ -25,7 +25,7 @@ abort() {
 }
 
 iso_repack() {
-  local TEMPDIR=$(mktemp -d)
+  local TEMPDIR=$(mktemp -d $HOME/elemental_iso.XXX)
   local ISO_FILE=$(basename "${ISO_URL}")
   local REG_FILE="livecd-cloud-config.yaml"
 
