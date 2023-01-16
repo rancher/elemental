@@ -7,19 +7,19 @@
       "version": "teal-5.3",
       "type": "container",
       "metadata": {
-        "upgradeImage": "registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-node-image/5.3:latest"
+        "upgradeImage": "registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-node-image/5.3:latest"
       }
     }
   },
   {
     "metadata": {
-      "name": "teal-5.2"
+      "name": "fake-image"
     },
     "spec": {
-      "version": "teal-5.2",
+      "version": "fake-image",
       "type": "container",
       "metadata": {
-        "upgradeImage": "registry.opensuse.org/isv/rancher/elemental/teal52/15.3/rancher/elemental-node-image/5.2:latest"
+        "upgradeImage": "fake-image"
       }
     }
   }
