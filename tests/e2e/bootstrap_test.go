@@ -268,7 +268,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				} else if vmIndex < 4 {
 					state = "configuring etcd node"
 				} else {
-					state = "configuring control plane node(s)"
+					if strings.Contains(k8sVersion, "k3s") {
+						state = "configuring control plane node"
+					} else {
+						state = "configuring worker node"
+					}
 				}
 				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", state)
 			}
