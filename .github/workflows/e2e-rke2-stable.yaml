@@ -1,0 +1,25 @@
+# This workflow calls the master E2E workflow with custom variables
+name: RKE2-E2E-Stable_RM
+
+on:
+  workflow_run:
+    workflows:
+      - build-ci
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  rke2:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      ca_type: private
+      cluster_name: cluster-rke2
+      k8s_version_to_provision: v1.24.8+rke2r1
+      start_condition: ${{ github.event.workflow_run.conclusion }}
+      workflow_download: ${{ github.event.workflow_run.workflow_id }}

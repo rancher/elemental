@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: RKE2 - Elemental E2E tests with Rancher Manager
+name: RKE2-E2E-Latest_RM
 
 on:
   workflow_run:
@@ -21,5 +21,7 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.8+rke2r1
+      rancher_channel: latest
+      rancher_version: devel
       start_condition: ${{ github.event.workflow_run.conclusion }}
       workflow_download: ${{ github.event.workflow_run.workflow_id }}

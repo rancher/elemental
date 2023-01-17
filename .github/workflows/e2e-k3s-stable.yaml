@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: K3s - Elemental E2E tests with Rancher Manager
+name: K3s-E2E-Stable_RM
 
 on:
   workflow_run:

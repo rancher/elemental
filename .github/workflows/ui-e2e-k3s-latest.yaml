@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: RKE2 - Elemental UI End-To-End tests with Rancher Manager
+name: K3s-UI_E2E-Latest_RM
 
 on:
   workflow_dispatch:
@@ -8,6 +8,10 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -27,20 +31,17 @@ on:
     - cron: '0 4 * * *'
 
 jobs:
-  ui-rke2:
+  ui-k3s:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      # Using user account has to be disable due to this bug
-      # https://github.com/rancher/elemental-ui/issues/64
-      #ui_account: user
-      ca_type: private
-      cluster_name: cluster-rke2
+      cluster_name: cluster-k3s
       destroy_runner: ${{ inputs.destroy_runner || true }}
-      k8s_version_to_provision: v1.24.8+rke2r1
+      k8s_version_to_provision: v1.24.8+k3s1
+      proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_channel: ${{ inputs.rancher_channel || 'latest' }}
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       runner_template: ${{ inputs.runner_template || 'elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2' }}
