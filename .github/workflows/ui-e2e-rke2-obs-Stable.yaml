@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: OBS Stable - RKE2 - Elemental UI End-To-End tests with Rancher Manager
+name: OBS-Stable-RKE2-UI_E2E
 
 on:
   workflow_dispatch:

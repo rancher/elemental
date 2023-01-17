@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: OBS Dev - RKE2 - Elemental UI End-To-End tests with Rancher Manager
+name: OBS-Dev-RKE2-UI_E2E
 
 on:
   workflow_dispatch:
@@ -10,11 +10,11 @@ on:
         type: boolean
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: latest
+        default: stable
         type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
-        default: devel
+        default: latest
         type: string
       runner_template:
         description: Runner template to use

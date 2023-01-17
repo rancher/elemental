@@ -1,4 +1,4 @@
-name: OBS Stable - K3s - Elemental UI End-To-End tests with Rancher Manager
+name: OBS-Stable-K3s-UI_E2E
 
 on:
   workflow_dispatch:
@@ -13,11 +13,11 @@ on:
         type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: latest
+        default: stable
         type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
-        default: devel
+        default: latest
         type: string
       runner_template:
         description: Runner template to use
