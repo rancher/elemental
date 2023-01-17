@@ -42,6 +42,7 @@ const (
 )
 
 var (
+	addedNode           int
 	arch                string
 	caType              string
 	clusterName         string
@@ -115,6 +116,9 @@ var _ = BeforeSuite(func() {
 		// By default set to vmIndex
 		numberOfVMs = vmIndex
 	}
+
+	// Set number of added node
+	addedNode = (numberOfVMs - vmIndex) + 1
 
 	// Force a correct value for emulateTPM
 	switch eTPM {
