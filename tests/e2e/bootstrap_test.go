@@ -34,7 +34,7 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
+	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 func checkClusterState() {
@@ -44,7 +44,7 @@ func checkClusterState() {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
 		return clusterStatus
-	}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(Equal("True"))
+	}, misc.SetTimeout(2*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(Equal("True"))
 
 	// Wait a little bit for the cluster to be in a stable state
 	// NOTE: not SetTimeout needed here!
@@ -56,7 +56,7 @@ func checkClusterState() {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={.status.conditions[*].reason}")
 		return reason
-	}, misc.SetTimeout(3*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
 func waitForKnownState(condition, msg string) {
@@ -65,7 +65,7 @@ func waitForKnownState(condition, msg string) {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={"+condition+"}")
 		return clusterMsg
-	}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
+	}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
 }
 
 func getNodeInfo(hostName string, index int) (*tools.Client, string) {
@@ -235,8 +235,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				var err error
 				indexInPool, err = misc.IncreaseQuantity(clusterNS,
 					clusterName,
-					"pool-"+poolType+"-"+clusterName,
-					(numberOfVMs - vmIndex + 1))
+					"pool-"+poolType+"-"+clusterName, addedNode)
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
