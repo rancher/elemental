@@ -7,7 +7,7 @@
       "version": "teal-5.3",
       "type": "container",
       "metadata": {
-        "upgradeImage": "registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-node-image/5.3:latest"
+        "upgradeImage": "registry.opensuse.org/isv/rancher/elemental/teal53/15.4/rancher/elemental-node-image/5.3:latest"
       }
     }
   },
