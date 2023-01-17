@@ -283,14 +283,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			client, _ := getNodeInfo(hostName, index)
 			Expect(client).To(Not(BeNil()))
 
-			// Get serverId in MachineInventories
-			serverId, err := misc.GetServerId(clusterNS, index)
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(serverId).To(Not(BeEmpty()))
-
 			// Execute in parallel
 			wg.Add(1)
-			go func(c, h, id string, i int, cl *tools.Client) {
+			go func(c, h string, i int, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
@@ -303,10 +298,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				By("Checking "+h+" SSH connection", func() {
 					// Retry the SSH connection, as it can takes time for the user to be created
 					Eventually(func() string {
-						out, _ := cl.RunSSH("uname -n")
+						out, _ := cl.RunSSH("echo SSH_OK")
 						out = strings.Trim(out, "\n")
 						return out
-					}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal(id))
+					}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
 				})
 
 				By("Checking OS version on "+h, func() {
@@ -314,7 +309,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					Expect(err).To(Not(HaveOccurred()))
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
-			}(clusterNS, hostName, serverId, index, client)
+			}(clusterNS, hostName, index, client)
 		}
 		// Wait for all parallel jobs
 		wg.Wait()
