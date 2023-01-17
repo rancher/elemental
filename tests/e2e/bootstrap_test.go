@@ -194,8 +194,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				By("Installing node "+h, func() {
 					// Execute node deployment in parallel
-					out, err := exec.Command(s, h, m).CombinedOutput()
-					GinkgoWriter.Printf("Output from deployment of node '%s':\n%s\n", h, out)
+					err := exec.Command(s, h, m).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
 			}(installVMScript, hostName, macAdrs)
