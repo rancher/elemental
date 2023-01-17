@@ -44,7 +44,7 @@ var _ = Describe("Elemental Installation tests", func() {
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
-				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
+				ContainSubstring("Finished copying /run/rootfsbase into /run/cos/workingtree"),
 				ContainSubstring("Setting default grub entry to Elemental"),
 			), out)
 		})
@@ -66,7 +66,7 @@ var _ = Describe("Elemental Installation tests", func() {
 			Expect(out).To(And(
 				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
-				ContainSubstring("Finished copying /run/cos/state/cOS/active.img into /run/cos/state/cOS/passive.img"),
+				ContainSubstring("Finished copying "+containerImage+" into /run/cos/workingtree"),
 				ContainSubstring("Unpacking a container image: "+containerImage),
 				ContainSubstring("Setting default grub entry to Elemental"),
 			), out)
