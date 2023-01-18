@@ -271,6 +271,8 @@ func IncreaseQuantity(ns, name, pool string, quantity int) (int, error) {
 	return quantitySet, nil
 }
 
+// How to use it, for example:
+// err := misc.ToggleRole(clusterNS, clusterName, "pool-worker-"+clusterName, "ControlPlaneRole", true)
 func ToggleRole(ns, name, pool, role string, value bool) error {
 	c := &Cluster{}
 	poolFound := false
