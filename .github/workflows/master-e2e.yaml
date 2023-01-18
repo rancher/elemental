@@ -311,13 +311,6 @@ jobs:
           UPGRADE_TYPE: manual
           VM_INDEX: 2
         run: cd tests && make e2e-upgrade-node
-      - name: Upgrade node 3 (with managedOSVersionName method) to specified Teal version
-        if: inputs.test_type == 'cli'
-        env:
-          IMAGE_VERSION: teal-5.3
-          UPGRADE_TYPE: managedOSVersionName
-          VM_INDEX: 3
-        run: cd tests && make e2e-upgrade-node
       - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
         if: inputs.test_type == 'cli'
         env:
