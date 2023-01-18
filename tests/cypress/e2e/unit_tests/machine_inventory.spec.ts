@@ -33,6 +33,7 @@ describe('Machine inventory testing', () => {
     cy.contains('Create Elemental Cluster').click();
     cy.typeValue({label: 'Cluster Name', value: 'myelementalcluster'});
     cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
+    cy.contains('Show deprecated Kubernetes').click();
     cy.contains('Kubernetes Version').click();
     cy.contains(k8s_version).click();
     // Configure proxy if proxy is set to elemental
