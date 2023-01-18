@@ -17,7 +17,6 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -168,17 +167,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("machine-registration-" + pool + "-" + clusterName))
 			}
 		})
-
-		// Only for K3s cluster
-		if strings.Contains(k8sVersion, "k3s") {
-			By("Setting controlPlane role for worker pool", func() {
-				// Wait a little before toggling the role
-				time.Sleep(misc.SetTimeout(1 * time.Minute))
-
-				err := misc.ToggleRole(clusterNS, clusterName, "pool-worker-"+clusterName, "ControlPlaneRole", true)
-				Expect(err).To(Not(HaveOccurred()))
-			})
-		}
 
 		By("Starting default network", func() {
 			// Don't check return code, as the default network could be already removed
