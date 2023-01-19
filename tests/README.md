@@ -81,23 +81,28 @@
 ## `bootstrap_test.go`
 
 - **Describe:** E2E - Bootstrapping node
-    - **It:** Install node and add it in Rancher
-      -  **By:** Setting emulated TPM to +emulateTPM
+    - **It:** Provision the node
+      -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM)
       -  **By:** Downloading installation config file
       -  **By:** Configuring iPXE boot script for network installation
       -  **By:** Adding registration file to ISO
-      -  **By:** Creating and installing VM
-      -  **By:** Checking that the VM is available in Rancher
+      -  **By:** Installing node +h
+    - **It:** Add the node in Rancher Manager
+      -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Ensuring that the cluster is in healthy state
       -  **By:** Increasing quantity node of predefined cluster
       -  **By:** Waiting for known cluster state before adding the node
-      -  **By:** Restarting the VM to add it in the cluster
-      -  **By:** Checking VM connection
-      -  **By:** Showing OS version
-      -  **By:** Configuring kubectl command on the VM
+      -  **By:** Restarting +h+ to add it in the cluster
+      -  **By:** Checking +h+ SSH connection
+      -  **By:** Checking OS version on +h
+      -  **By:** Configuring kubectl command on node +h
+      -  **By:** Checking kubectl command on +h
+      -  **By:** Checking cluster agent on +h
       -  **By:** Checking cluster state
-      -  **By:** Checking cluster version
-      -  **By:** Rebooting the VM and checking that cluster is still healthy after
+      -  **By:** Checking cluster version on +h
+      -  **By:** Rebooting +h
+      -  **By:** Checking cluster agent on +h
+      -  **By:** Checking cluster state after reboot
 
 ## `configure_test.go`
 
@@ -106,7 +111,6 @@
       -  **By:** Creating a new cluster
       -  **By:** Creating cluster selectors
       -  **By:** Adding MachineRegistration
-      -  **By:** Setting controlPlane role for worker pool
       -  **By:** Starting default network
 
 ## `install_test.go`
