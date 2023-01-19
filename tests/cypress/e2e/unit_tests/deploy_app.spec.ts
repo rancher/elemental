@@ -37,6 +37,6 @@ describe('Deploy application in fresh Elemental Cluster', () => {
     cy.clickButton('Delete');
     cy.confirmDelete();
     cy.contains('SUCCESS: helm uninstall', {timeout:30000});
-    cy.contains('CIS Benchmark').should('not.exist');
+    cy.contains('.apps', 'CIS Benchmark').should('not.exist');
   });
 });
