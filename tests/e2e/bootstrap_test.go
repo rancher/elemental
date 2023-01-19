@@ -214,6 +214,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			go func(c, h string, i int) {
 				defer wg.Done()
 				defer GinkgoRecover()
+
 				By("Checking that node "+h+" is available in Rancher", func() {
 					id, err := misc.GetServerId(c, i)
 					Expect(err).To(Not(HaveOccurred()))
@@ -282,7 +283,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Execute in parallel
 			wg.Add(1)
-			go func(c, h string, i int, cl *tools.Client) {
+			go func(c, h string, i int, t bool, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
@@ -301,12 +302,23 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
 				})
 
+				By("Checking that TPM is correctly configured on "+h, func() {
+					testValue := "-c"
+					if t == true {
+						testValue = "! -e"
+					}
+					Eventually(func() error {
+						_, err := cl.RunSSH("[[ " + testValue + " /dev/tpm0 ]]")
+						return err
+					}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+				})
+
 				By("Checking OS version on "+h, func() {
 					out, err := cl.RunSSH("cat /etc/os-release")
 					Expect(err).To(Not(HaveOccurred()))
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
-			}(clusterNS, hostName, index, client)
+			}(clusterNS, hostName, index, emulateTPM, client)
 		}
 		// Wait for all parallel jobs
 		wg.Wait()
@@ -334,10 +346,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 							// Wait a little to be sure that RKE2 installation has started
 							// Otherwise the directory is not available!
-							Eventually(func() string {
-								out, _ := cl.RunSSH("[[ -d " + dir + " ]] && echo -n OK")
-								return out
-							}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal("OK"))
+							Eventually(func() error {
+								_, err := cl.RunSSH("[[ -d " + dir + " ]]")
+								return err
+							}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 							// Configure kubectl
 							_, err := cl.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")

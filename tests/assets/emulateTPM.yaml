@@ -3,3 +3,4 @@ spec:
     elemental:
       registration:
         emulate-tpm: %EMULATE_TPM%
+        emulated-tpm-seed: -1
