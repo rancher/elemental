@@ -2,16 +2,17 @@
 
 set -e -x
 
-# Variable(s)
+# Variable(s) and default values
 VM_NAME=$1
 MAC=$2
 ARCH=$(uname -m)
 FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
+EMULATED_TPM="none"
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
 if [[ ${EMULATE_TPM} != "true" ]]; then
-  EMULATED_TPM="--tpm emulator,model=tpm-crb,version=2.0"
+  EMULATED_TPM="emulator,model=tpm-crb,version=2.0"
 fi
 
 # iPXE stuff will not be used if ISO is set
@@ -65,7 +66,7 @@ script -e -O logs/bootstrap_${VM_NAME}.log \
   --serial pty \
   --console pty,target_type=virtio \
   --rng random \
-  ${EMULATED_TPM} \
+  --tpm ${EMULATED_TPM} \
   --noreboot \
   ${INSTALL_FLAG} \
   --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"
