@@ -67,6 +67,10 @@ mkdir -p logs
 # Create a dedicated directory for storage pool
 mkdir -p ${VM_NAME}
 
+# Wait randomly until 20s to avoid running virt-install at the same time
+# Because it can lead to some issues with hugepages
+sleep $((RANDOM % 20))
+
 # Create VM
 script -e -O logs/bootstrap_${VM_NAME}.log \
   -c "sudo virt-install \
