@@ -10,6 +10,21 @@ FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 EMULATED_TPM="none"
 
+# Configure hugepages if needed
+NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
+if (( NR_HUGEPAGES == 0 )); then
+  # Not configured, do it now!
+  MEMTOTAL_KB=$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)
+
+  # Number of hugepages (with hugepagesize set to 2MB)
+  # NOTE: keep 8GB for the hypervisor/Rancher Manager Server
+  (( VALUE = ((MEMTOTAL_KB - 8388608) / 2048) ))
+
+  # Set nr_hugepage
+  (( VALUE > 0 )) \
+    && sudo bash -c "echo ${VALUE} > /proc/sys/vm/nr_hugepages"
+fi
+
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
 if [[ ${EMULATE_TPM} != "true" ]]; then
   EMULATED_TPM="emulator,model=tpm-crb,version=2.0"
@@ -57,8 +72,9 @@ script -e -O logs/bootstrap_${VM_NAME}.log \
   --machine q35 \
   --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
   --features smm.state=yes \
-  --ram=3072 \
-  --vcpus=2 \
+  --memorybacking hugepages=yes,size=2,unit=M,locked=yes \
+  --memory 3072,hugepages=yes \
+  --vcpus 2 \
   --cpu host \
   --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
   --check disk_size=off \
