@@ -42,16 +42,20 @@ if [[ ${ISO_BOOT} == "true" ]]; then
   # Force ISO boot
   INSTALL_FLAG="--cdrom ${ISO}"
 else
-  # Exit if binary is not available
-  IPXE_BIN=$(realpath ../assets/ipxe-${ARCH}.efi)
-  [[ ! -f ${IPXE_BIN} ]] \
-    && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
-    && exit 1
-
-  # Create symlink for binary
+  # Create symlink for binary but only if it doesn't exist
   SYM_LINK=../../ipxe.efi
-  rm -f ${SYM_LINK}  # Force remove, to avoid issue with 'ln'
-  ln -s ${IPXE_BIN} ${SYM_LINK}
+  if [[ ! -h ${SYM_LINK} ]]; then
+    # Exit if binary is not available
+    IPXE_BIN=$(realpath ../assets/ipxe-${ARCH}.efi)
+    [[ ! -f ${IPXE_BIN} ]] \
+      && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
+      && exit 1
+
+    # Force remove, to avoid issue with 'ln'
+    # Only useful if an EFI file exists and it's not a symlink
+    rm -f ${SYM_LINK}
+    ln -s ${IPXE_BIN} ${SYM_LINK}
+  fi
 
   # Force PXE boot
   INSTALL_FLAG="--pxe"
