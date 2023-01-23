@@ -94,6 +94,7 @@
       -  **By:** Waiting for known cluster state before adding the node
       -  **By:** Restarting +h+ to add it in the cluster
       -  **By:** Checking +h+ SSH connection
+      -  **By:** Checking that TPM is correctly configured on +h
       -  **By:** Checking OS version on +h
       -  **By:** Configuring kubectl command on node +h
       -  **By:** Checking kubectl command on +h
