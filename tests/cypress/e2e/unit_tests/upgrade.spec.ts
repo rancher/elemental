@@ -91,9 +91,9 @@ describe('Upgrade tests', () => {
     cy.contains('Workload').click();
     cy.contains('Pods').click();
     cy.get('.header-buttons > :nth-child(2)').click();
-    cy.wait(40000);
-    cy.get('.xterm-cursor-layer').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=0{enter}');
-    cy.get('.xterm-cursor-layer').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
+    cy.wait(20000);
+    cy.get('.shell-body').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=0{enter}');
+    cy.get('.shell-body').type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
 
     // Check if the node reboots to apply the upgrade
     topLevelMenu.openIfClosed();
