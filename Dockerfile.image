@@ -18,6 +18,7 @@ RUN cloud-config/recovery
 RUN cloud-config/live
 RUN cloud-config/boot-assessment
 RUN cloud-config/default-services
+RUN cloud-config/upgrade_grub_hooks
 RUN system/grub2-config
 RUN system/base-dracut-modules
 
