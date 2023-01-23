@@ -65,7 +65,7 @@ func waitForKnownState(condition, msg string) {
 			"--namespace", clusterNS, clusterName,
 			"-o", "jsonpath={"+condition+"}")
 		return clusterMsg
-	}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(ContainSubstring(msg))
+	}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 }
 
 func getNodeInfo(hostName string, index int) (*tools.Client, string) {
@@ -262,13 +262,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 			} else {
 				// For newer elemental-operator versions
-				var state string
-				if vmIndex < 4 {
-					state = "configuring bootstrap node"
-				} else {
-					state = "configuring worker node"
-				}
-				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", state)
+				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", `configuring .* node\(s\)`)
 			}
 		})
 
