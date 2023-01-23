@@ -34,7 +34,7 @@ fi
 config
 mount --rbind $HOST_DIR/dev /dev
 mount --rbind $HOST_DIR/run /run
-elemental upgrade --system.uri dir:/
+elemental --debug upgrade --system.uri dir:/
 
 # After elemental upgrade we have to also copy
 # /etc/resolv.conf from /host filesystem, otherwise 
