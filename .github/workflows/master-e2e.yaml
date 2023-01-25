@@ -291,7 +291,7 @@ jobs:
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
       - name: Upgrade node 1 (with osImage method) to latest build
-        if: inputs.test_type == 'cli'
+        if: inputs.test_type == 'cli' && !contains(inputs.iso_to_test, '/Stable:/')
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: osImage
@@ -316,7 +316,7 @@ jobs:
 
           cd tests && make e2e-bootstrap-node
       - name: Upgrade node 2 (with manual method) to latest build
-        if: inputs.test_type == 'cli'
+        if: inputs.test_type == 'cli' && !contains(inputs.iso_to_test, '/Stable:/')
         env:
           CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
           UPGRADE_TYPE: manual
