@@ -59,13 +59,10 @@ func checkClusterState() {
 	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
-func waitForKnownState(condition, msg string) {
-	Eventually(func() string {
-		clusterMsg, _ := kubectl.Run("get", "cluster",
-			"--namespace", clusterNS, clusterName,
-			"-o", "jsonpath={"+condition+"}")
-		return clusterMsg
-	}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
+func getClusterState(ns, cluster, condition string) string {
+	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
+	Expect(err).To(Not(HaveOccurred()))
+	return out
 }
 
 func getNodeInfo(hostName string, index int) (*tools.Client, string) {
@@ -85,16 +82,12 @@ func getNodeInfo(hostName string, index int) (*tools.Client, string) {
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
-		indexInPool    int
 		machineRegName string
 		poolType       string
 		wg             sync.WaitGroup
 	)
 
 	BeforeEach(func() {
-		// indexInPool is 1 by default
-		indexInPool = 1
-
 		// Set pool type
 		if vmIndex < 4 {
 			// First third nodes are in Master pool
@@ -231,39 +224,34 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			})
 
 			By("Increasing 'quantity' node of predefined cluster", func() {
+				comparator := ">"
+				if poolType == "worker" {
+					// In case of worker the first value could be equal to 1
+					comparator = ">="
+				}
+
 				// Increase 'quantity' field
-				var err error
-				indexInPool, err = misc.IncreaseQuantity(clusterNS,
+				value, err := misc.IncreaseQuantity(clusterNS,
 					clusterName,
 					"pool-"+poolType+"-"+clusterName, addedNode)
 				Expect(err).To(Not(HaveOccurred()))
+				Expect(value).To(BeNumerically(comparator, 1))
 			})
 		}
 
-		By("Waiting for known cluster state before adding the node", func() {
-			// Get elemental-operator version
-			operatorVersion, err := misc.GetOperatorVersion()
-			Expect(err).To(Not(HaveOccurred()))
-			operatorVersionShort := strings.Split(operatorVersion, ".")
+		By("Waiting for known cluster state before adding the node(s)", func() {
+			msg := `(configuring .* node\(s\)|waiting for viable init node)`
+			Eventually(func() string {
+				clusterMsg := getClusterState(clusterNS, clusterName,
+					"{.status.conditions[?(@.type==\"Updated\")].message}")
 
-			if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-				// Only for elemental-operator v1.0.x
-				if vmIndex > 1 {
-					if indexInPool == 1 {
-						waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
-							"waiting for agent to check in and apply initial plan")
-					} else {
-						waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message",
-							"WaitingForBootstrapReason")
-					}
-				} else {
-					waitForKnownState(".status.conditions[?(@.type==\"Provisioned\")].message",
-						"waiting for viable init node")
+				if clusterMsg == "" {
+					clusterMsg = getClusterState(clusterNS, clusterName,
+						"{.status.conditions[?(@.type==\"Provisioned\")].message}")
 				}
-			} else {
-				// For newer elemental-operator versions
-				waitForKnownState(".status.conditions[?(@.type==\"Updated\")].message", `configuring .* node\(s\)`)
-			}
+
+				return clusterMsg
+			}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 		})
 
 		for index := vmIndex; index <= numberOfVMs; index++ {
