@@ -1,0 +1,11 @@
+[Unit]
+Description=Kill containerd-shims on shutdown
+DefaultDependencies=false
+Before=shutdown.target umount.target
+
+[Service]
+ExecStart=/usr/local/bin/k3s-killall.sh
+Type=oneshot
+
+[Install]
+WantedBy=shutdown.target
