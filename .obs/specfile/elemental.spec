@@ -99,6 +99,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %dir %{_sysconfdir}/NetworkManager/conf.d
 %config %{_sysconfdir}/NetworkManager/conf.d/rke2-canal.conf
 %dir %{_unitdir}
+%{_unitdir}/shutdown-k3s.service
 %{_unitdir}/elemental-populate-node-labels.service
 %{_sbindir}/elemental-populate-node-labels
 %dir /usr/libexec

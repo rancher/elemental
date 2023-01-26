@@ -60,7 +60,7 @@ COPY --from=elemental-cli /usr/bin/elemental /usr/bin/elemental
 COPY framework/files/ /
 
 # Enable services
-RUN systemctl enable NetworkManager sshd elemental-populate-node-labels systemd-timesyncd
+RUN systemctl enable NetworkManager sshd elemental-populate-node-labels systemd-timesyncd shutdown-k3s
 
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
