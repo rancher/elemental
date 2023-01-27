@@ -17,8 +17,9 @@ if (( NR_HUGEPAGES == 0 )); then
   MEMTOTAL_KB=$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)
 
   # Number of hugepages (with hugepagesize set to 2MB)
-  # NOTE: keep 8GB for the hypervisor/Rancher Manager Server
-  (( VALUE = ((MEMTOTAL_KB - 8388608) / 2048) ))
+  # NOTE: keep 12GB by default for the hypervisor/Rancher Manager Server
+  # And this value can be modified with HOST_MEMORY_RESERVED variable
+  (( VALUE = ((MEMTOTAL_KB - ${HOST_MEMORY_RESERVED:-12582912}) / 2048) ))
 
   # Set nr_hugepage
   (( VALUE > 0 )) \
