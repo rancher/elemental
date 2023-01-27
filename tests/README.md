@@ -91,7 +91,7 @@
       -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Ensuring that the cluster is in healthy state
       -  **By:** Increasing quantity node of predefined cluster
-      -  **By:** Waiting for known cluster state before adding the node
+      -  **By:** Waiting for known cluster state before adding the nodes)
       -  **By:** Restarting +h+ to add it in the cluster
       -  **By:** Checking +h+ SSH connection
       -  **By:** Checking that TPM is correctly configured on +h
