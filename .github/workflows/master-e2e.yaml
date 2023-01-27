@@ -127,7 +127,7 @@ jobs:
     needs: create-runner
     runs-on: ${{ needs.create-runner.outputs.uuid }}
     env:
-      TIMEOUT_SCALE: 2
+      TIMEOUT_SCALE: 3
       ARCH: amd64
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
