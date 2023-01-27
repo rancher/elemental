@@ -233,6 +233,7 @@ jobs:
         if: inputs.test_type == 'ui'
         env:
           VM_INDEX: 1
+          HOST_MEMORY_RESERVED: 50331648
         run: |
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
