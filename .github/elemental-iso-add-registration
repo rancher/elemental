@@ -18,14 +18,22 @@ ISO releases if not set. It can also be a local path.
 EOF
 }
 
+cleanup() {
+  if [ -n "${TEMPDIR}" ]; then
+    rm -rf "${TEMPDIR}"
+    unset TEMPDIR
+  fi
+}
+
 abort() {
     >&2 echo "Error: $@"
+    cleanup
     usage
     exit 1
 }
 
 iso_repack() {
-  local TEMPDIR=$(mktemp -d $HOME/elemental_iso.XXX)
+  TEMPDIR=$(mktemp -d $HOME/elemental_iso.XXX)
   local ISO_FILE=$(basename "${ISO_URL}")
   local REG_FILE="livecd-cloud-config.yaml"
 
@@ -61,7 +69,7 @@ iso_repack() {
   $CONT_ENGINE run --rm -v ${TEMPDIR}:/mnt -v $(pwd):/output ${BUILD_IMG} \
       xorriso -indev "/mnt/iso/${ISO_FILE}" -outdev "/output/${ISO_FILE}" -map "/mnt/config/${REG_FILE}" "/${REG_FILE}" -boot_image any replay
 
-  rm -rf "${TEMPDIR}"
+  cleanup
 
   echo "ISO generated at $(pwd)/${ISO_FILE}"
 }
