@@ -292,7 +292,8 @@ Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
   cy.contains(machRegName).parent().parent().click();
   cy.clickButton('Delete');
   cy.confirmDelete();
-  cy.contains(machRegName).should('not.exist')
+  // Timeout should fix this issue https://github.com/rancher/elemental/issues/643
+  cy.contains(machRegName, {timeout: 20000}).should('not.exist')
 });
 
 // Machine Inventory functions
