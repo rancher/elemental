@@ -100,7 +100,7 @@ Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
   cy.clickClusterMenu(['Apps', 'Repositories'])
 
   // Make sure we are in the 'Repositories' screen (test failed here before)
-  cy.contains('header', 'Repositories', {timeout: 8000}).should('be.visible');
+  cy.contains('header', 'Repositories').should('be.visible');
   cy.contains('Create').should('be.visible');
 
   cy.clickButton('Create');
