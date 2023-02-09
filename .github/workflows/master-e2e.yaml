@@ -46,7 +46,7 @@ on:
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
-        default: 5
+        default: 10
         type: string
       proxy:
         description: Deploy a proxy
