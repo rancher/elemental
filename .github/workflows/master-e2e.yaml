@@ -25,9 +25,15 @@ on:
         description: CA type to use (selfsigned or private)
         default: selfsigned
         type: string
+      cert-manager_version:
+        description: Version of cert-manager to use
+        type: string
       cluster_name:
         description: Name of the provisioned cluster
         required: true
+        type: string
+      cluster_type:
+        description: Type of the cluster
         type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
@@ -39,6 +45,9 @@ on:
         type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
+        type: string
+      k3s_flags:
+        description: Argument to configure INSTALL_K3S_EXEC env variable 
         type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
@@ -129,9 +138,12 @@ jobs:
     env:
       TIMEOUT_SCALE: 3
       ARCH: amd64
+      CERT-MANAGER_VERSION: ${{ inputs.cert-manager_version }}
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
+      CLUSTER_TYPE: ${{ inputs.cluster_type }}
       # For K3s installation used to host Rancher Manager
+      INSTALL_K3S_EXEC: ${{ inputs.k3s_flags }}
       INSTALL_K3S_VERSION: v1.24.7+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
@@ -434,3 +446,4 @@ jobs:
           gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
             --delete-disks all \
             --zone ${{ inputs.zone }}
+

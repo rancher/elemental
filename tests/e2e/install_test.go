@@ -52,7 +52,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				return err
 			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 		})
-
+		if clusterType == "hardened" {
+			By("Configuring hardened cluster", func() {
+				err := exec.Command("sudo", installHardenedScript).Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 		By("Starting K3s", func() {
 			err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
 			Expect(err).To(Not(HaveOccurred()))
@@ -94,11 +99,19 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "cert-manager", "jetstack/cert-manager",
+				// Set flags for cert-manager installation
+				flags := []string{
+					"upgrade", "--install", "cert-manager", "jetstack/cert-manager",
 					"--namespace", "cert-manager",
 					"--create-namespace",
 					"--set", "installCRDs=true",
-				)
+				}
+
+				if clusterType == "hardened" {
+					flags = append(flags, "--version", CertManagerVersion)
+				}
+
+				err = kubectl.RunHelmBinaryWithCustomErr(flags...)
 				Expect(err).To(Not(HaveOccurred()))
 
 				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
