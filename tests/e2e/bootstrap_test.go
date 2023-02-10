@@ -104,9 +104,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	It("Provision the node", func() {
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "emulatedTPM")
+			emulatedTmp, err := misc.CreateTemp("emulatedTPM")
 			Expect(err).To(Not(HaveOccurred()))
-			emulatedTmp := tmp.Name()
 			defer os.Remove(emulatedTmp)
 
 			// Save original file as it can be modified multiple time

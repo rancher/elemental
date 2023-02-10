@@ -67,9 +67,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 
 		By("Creating cluster selectors", func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "selector")
+			selectorTmp, err := misc.CreateTemp("selector")
 			Expect(err).To(Not(HaveOccurred()))
-			selectorTmp := tmp.Name()
 			defer os.Remove(selectorTmp)
 
 			for _, pool := range []string{"master", "worker"} {
@@ -118,9 +117,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 
 		By("Adding MachineRegistration", func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "machineRegistration")
+			registrationTmp, err := misc.CreateTemp("machineRegistration")
 			Expect(err).To(Not(HaveOccurred()))
-			registrationTmp := tmp.Name()
 			defer os.Remove(registrationTmp)
 
 			for _, pool := range []string{"master", "worker"} {

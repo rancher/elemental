@@ -447,3 +447,11 @@ func SetHostname(baseName string, index int) string {
 	}
 	return baseName + "-" + fmt.Sprintf("%03d", index)
 }
+
+func CreateTemp(baseName string) (string, error) {
+	t, err := os.CreateTemp("", baseName)
+	if err != nil {
+		return "", err
+	}
+	return t.Name(), nil
+}
