@@ -29,6 +29,7 @@ const (
 	emulateTPMYaml            = "../assets/emulateTPM.yaml"
 	configPrivateCAScript     = "../scripts/config-private-ca"
 	installConfigYaml         = "../../install-config.yaml"
+	installHardenedScript     = "../scripts/config-hardened"
 	installVMScript           = "../scripts/install-vm"
 	netDefaultFileName        = "../assets/net-default.xml"
 	osListYaml                = "../assets/managedOSVersionChannel.yaml"
@@ -45,8 +46,10 @@ var (
 	addedNode           int
 	arch                string
 	caType              string
+	CertManagerVersion  string
 	clusterName         string
 	clusterNS           string
+	clusterType         string
 	elementalSupport    string
 	emulateTPM          bool
 	eTPM                string
@@ -79,8 +82,10 @@ func TestE2E(t *testing.T) {
 var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
 	caType = os.Getenv("CA_TYPE")
+	CertManagerVersion = os.Getenv("CERT-MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
+	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM = os.Getenv("EMULATE_TPM")
 	imageVersion = os.Getenv("IMAGE_VERSION")
