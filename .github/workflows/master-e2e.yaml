@@ -336,7 +336,7 @@ jobs:
           VM_INDEX: 2
         run: cd tests && make e2e-upgrade-node
       - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
-        if: inputs.test_type == 'cli'
+        if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
           VM_INDEX: 4
           VM_NUMBERS: ${{ inputs.node_number }}
