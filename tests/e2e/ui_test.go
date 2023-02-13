@@ -82,8 +82,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 
 		By("Creating and installing VM", func() {
 			// Install VM
-			cmd := exec.Command(installVMScript, vmName, macAdrs)
-			out, err := cmd.CombinedOutput()
+			out, err := exec.Command(installVMScript, vmName, macAdrs).CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))
 		})

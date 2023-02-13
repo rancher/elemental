@@ -149,11 +149,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				// No need to recreate the ISO twice
 				if len(isIso) == 0 {
-					cmd := exec.Command(
+					out, err := exec.Command(
 						"bash", "-c",
 						"../../.github/elemental-iso-add-registration "+installConfigYaml+" ../../build/elemental-*.iso",
-					)
-					out, err := cmd.CombinedOutput()
+					).CombinedOutput()
 					GinkgoWriter.Printf("%s\n", out)
 					Expect(err).To(Not(HaveOccurred()))
 
