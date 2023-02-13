@@ -119,6 +119,7 @@
 - **Describe:** E2E - Install Rancher Manager
     - **It:** Install Rancher Manager
       -  **By:** Installing K3s
+      -  **By:** Configuring hardened cluster
       -  **By:** Starting K3s
       -  **By:** Waiting for K3s to be started
       -  **By:** Configuring Private CA
