@@ -349,7 +349,7 @@ func ConcateFiles(srcfile, dstfile string, data []byte) error {
 	defer f.Close()
 
 	// Open/create destination file
-	d, err := os.OpenFile(dstfile, os.O_CREATE|os.O_WRONLY, 0644)
+	d, err := os.OpenFile(dstfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}

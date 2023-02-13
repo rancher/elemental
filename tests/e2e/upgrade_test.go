@@ -101,7 +101,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 					// Create new file for this specific upgrade
 					err = misc.ConcateFiles(upgradeClusterTargetsYaml, upgradeOSVersionNameYaml, selector)
-					Expect(err).To(Not(HaveOccurred()), selector)
+					Expect(err).To(Not(HaveOccurred()))
 
 					// Swap yaml file
 					upgradeOsYaml = upgradeOSVersionNameYaml

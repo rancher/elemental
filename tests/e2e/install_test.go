@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -34,6 +35,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		PollTimeout:  misc.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
+
+	// Define local Kubeconfig file
+	localKubeconfig := os.Getenv("HOME") + "/.kube/config"
 
 	It("Install Rancher Manager", func() {
 		By("Installing K3s", func() {
@@ -82,6 +86,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
 			Expect(err).To(Not(HaveOccurred()))
+		})
+
+		By("Configuring Kubeconfig file", func() {
+			// Copy K3s file in ~/.kube/config
+			// NOTE: don't check for error, as it will happen anyway (only K3s or RKE2 is installed at a time)
+			file, _ := exec.Command("bash", "-c", "ls /etc/rancher/{k3s,rke2}/*.yaml").Output()
+			Expect(file).To(Not(BeEmpty()))
+			misc.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
 		})
 
 		if caType == "private" {
@@ -134,14 +146,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Set flags for Rancher Manager installation
-			hostname := os.Getenv("HOSTNAME")
 			flags := []string{
 				"upgrade", "--install", "rancher", "rancher/rancher",
 				"--namespace", "cattle-system",
 				"--create-namespace",
-				"--set", "hostname=" + hostname,
+				"--set", "hostname=" + rancherHostname,
 				"--set", "extraEnv[0].name=CATTLE_SERVER_URL",
-				"--set", "extraEnv[0].value=https://" + hostname,
+				"--set", "extraEnv[0].value=https://" + rancherHostname,
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
 				"--set", "replicas=1",
@@ -204,7 +215,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			// Check issuer for Private CA
 			if caType == "private" {
-				out, err := exec.Command("bash", "-c", "curl -vk https://$(hostname -f)").CombinedOutput()
+				out, err := exec.Command("bash", "-c", "curl -vk https://"+rancherHostname).CombinedOutput()
 				GinkgoWriter.Printf("%s\n", out)
 				Expect(err).To(Not(HaveOccurred()))
 			}
@@ -218,6 +229,50 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			GinkgoWriter.Printf("Rancher Image:\n%s\n", rancherImage)
 		})
+
+		By("Configuring kubectl to use Rancher admin user", func() {
+			// Getting internal username for admin
+			internalUsername, err := kubectl.Run("get", "user",
+				"-o", "jsonpath={.items[?(@.username==\"admin\")].metadata.name}",
+			)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Add token in Rancher Manager
+			err = tools.Sed("%ADMIN_USER%", internalUsername, ciTokenYaml)
+			Expect(err).To(Not(HaveOccurred()))
+			err = kubectl.Apply("default", ciTokenYaml)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Getting Rancher Manager local cluster CA
+			// NOTE: loop until the cmd return something, it could take some time
+			cmd := []string{
+				"get", "secret",
+				"--namespace", "cattle-system",
+				"tls-rancher-ingress",
+				"-o", "jsonpath={.data.tls\\.crt}",
+			}
+			Eventually(func() error {
+				_, err := kubectl.Run(cmd...)
+				return err
+			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+			rancherCA, err := kubectl.Run(cmd...)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Copy skel file for ~/.kube/config
+			misc.CopyFile(localKubeconfigYaml, localKubeconfig)
+
+			// Create kubeconfig for local cluster
+			err = tools.Sed("%RANCHER_URL%", rancherHostname, localKubeconfig)
+			Expect(err).To(Not(HaveOccurred()))
+			err = tools.Sed("%RANCHER_CA%", rancherCA, localKubeconfig)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Remove the "old" kubeconfig file to force the use of the new one
+			// NOTE: in fact move it, just to keep it in case of issue
+			// Also don't check the returned error, as it will always not equal 0
+			_ = exec.Command("bash", "-c", "sudo mv -f /etc/rancher/{k3s,rke2}/*.yaml ~/").Run()
+		})
+
 		if testType == "ui" {
 			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
 				// https://github.com/rancher/elemental/issues/410

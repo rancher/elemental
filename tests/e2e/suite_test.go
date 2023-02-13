@@ -27,10 +27,12 @@ import (
 const (
 	clusterYaml               = "../assets/cluster.yaml"
 	emulateTPMYaml            = "../assets/emulateTPM.yaml"
+	ciTokenYaml               = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript     = "../scripts/config-private-ca"
 	installConfigYaml         = "../../install-config.yaml"
 	installHardenedScript     = "../scripts/config-hardened"
 	installVMScript           = "../scripts/install-vm"
+	localKubeconfigYaml       = "../assets/local-kubeconfig-skel.yaml"
 	netDefaultFileName        = "../assets/net-default.xml"
 	osListYaml                = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml          = "../assets/machineRegistration.yaml"
@@ -53,6 +55,7 @@ var (
 	elementalSupport    string
 	emulateTPM          bool
 	eTPM                string
+	rancherHostname     string
 	imageVersion        string
 	isoBoot             string
 	k8sVersion          string
@@ -88,6 +91,7 @@ var _ = BeforeSuite(func() {
 	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM = os.Getenv("EMULATE_TPM")
+	rancherHostname = os.Getenv("HOSTNAME")
 	imageVersion = os.Getenv("IMAGE_VERSION")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")

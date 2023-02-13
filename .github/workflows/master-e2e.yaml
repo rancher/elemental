@@ -151,7 +151,6 @@ jobs:
       INSTALL_K3S_VERSION: v1.24.7+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
-      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       # For Rancher Manager
       RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
