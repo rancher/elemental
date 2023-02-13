@@ -4,7 +4,6 @@ name: K3s-hard-E2E-Stable_RM
 on:
   schedule:
     - cron: '0 1 * * *'
-  pull_request:
 jobs:
   k3s:
     uses: ./.github/workflows/master-e2e.yaml
