@@ -1,4 +1,4 @@
-name: "Elemental system agent bootstarp"
+name: "Elemental system agent bootstrap"
 stages:
   network.after:
     - if: '[ ! -f /etc/systemd/system/rancher-system-agent.service ] && [ ! -f /run/cos/live_mode ] && [ ! -f /run/cos/recovery_mode ]'
