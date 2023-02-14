@@ -8,6 +8,10 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      elemental_ui_version:
+        description: Version of the elemental ui which will be installed
+        default: latest
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: latest
@@ -39,6 +43,7 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+rke2r1
       rancher_channel: ${{ inputs.rancher_channel }}
