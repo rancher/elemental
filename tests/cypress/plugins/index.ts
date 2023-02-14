@@ -23,6 +23,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.operator_version = process.env.OPERATOR_VERSION;
   config.env.proxy = process.env.PROXY;
   config.env.proxy_ip = process.env.PROXY_IP;
+  config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
 
   return config;
 };
