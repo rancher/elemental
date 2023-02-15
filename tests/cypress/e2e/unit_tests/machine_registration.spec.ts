@@ -23,9 +23,6 @@ describe('Machine registration testing', () => {
     // Delete all files previously downloaded
     cy.exec('rm cypress/downloads/*', {failOnNonZeroExit: false});
 
-    // Delete namespace
-    cy.exec('kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml delete ns mynamespace', {failOnNonZeroExit: false});
-    
     // Delete all existing machine registrations
     cy.contains('Manage Registration Endpoints').click();
     cy.get('.outlet > header').contains('Registration Endpoints');
