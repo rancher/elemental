@@ -122,9 +122,11 @@
       -  **By:** Configuring hardened cluster
       -  **By:** Starting K3s
       -  **By:** Waiting for K3s to be started
+      -  **By:** Configuring Kubeconfig file
       -  **By:** Configuring Private CA
       -  **By:** Installing CertManager
       -  **By:** Installing Rancher
+      -  **By:** Configuring kubectl to use Rancher admin user
       -  **By:** Workaround for upgrade test, restart Fleet controller and agent
       -  **By:** Installing Elemental Operator
 
