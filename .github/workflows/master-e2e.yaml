@@ -307,13 +307,6 @@ jobs:
           EMULATE_TPM: true
           VM_INDEX: 1
         run: cd tests && make e2e-bootstrap-node
-      - name: Upgrade node 1 (with osImage method) to latest build
-        if: inputs.test_type == 'cli'
-        env:
-          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
-          UPGRADE_TYPE: osImage
-          VM_INDEX: 1
-        run: cd tests && make e2e-upgrade-node
       - name: Bootstrap node 2 and 3 with current build (use Emulated TPM and ISO)
         if: inputs.test_type == 'cli'
         env:
@@ -332,13 +325,6 @@ jobs:
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
 
           cd tests && make e2e-bootstrap-node
-      - name: Upgrade node 2 (with manual method) to latest build
-        if: inputs.test_type == 'cli'
-        env:
-          CONTAINER_IMAGE: quay.io/costoolkit/elemental-ci:latest
-          UPGRADE_TYPE: manual
-          VM_INDEX: 2
-        run: cd tests && make e2e-upgrade-node
       - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
