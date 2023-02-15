@@ -27,9 +27,6 @@ tag_workflow:
         project: isv:Rancher:Elemental:Dev:Teal53
         package: node-image
   filters:
-    branches:
-      only:
-        - main
     event: tag_push
 
 pr_workflow:
