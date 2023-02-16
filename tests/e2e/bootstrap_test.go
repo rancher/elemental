@@ -82,26 +82,13 @@ func getNodeInfo(hostName string, index int) (*tools.Client, string) {
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
-		machineRegName string
-		poolType       string
-		wg             sync.WaitGroup
+		wg sync.WaitGroup
 	)
 
-	BeforeEach(func() {
-		// Set pool type
-		if vmIndex < 4 {
-			// First third nodes are in Master pool
-			poolType = "master"
-		} else {
-			// The others are in Worker pool
-			poolType = "worker"
-		}
-
-		// Set MachineRegistration name based on hostname
-		machineRegName = "machine-registration-" + poolType + "-" + clusterName
-	})
-
 	It("Provision the node", func() {
+		// Set MachineRegistration name based on hostname
+		machineRegName := "machine-registration-" + poolType + "-" + clusterName
+
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
 			emulatedTmp, err := misc.CreateTemp("emulatedTPM")
@@ -220,22 +207,24 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			By("Ensuring that the cluster is in healthy state", func() {
 				checkClusterState()
 			})
-
-			By("Increasing 'quantity' node of predefined cluster", func() {
-				comparator := ">"
-				if poolType == "worker" {
-					// In case of worker the first value could be equal to 1
-					comparator = ">="
-				}
-
-				// Increase 'quantity' field
-				value, err := misc.IncreaseQuantity(clusterNS,
-					clusterName,
-					"pool-"+poolType+"-"+clusterName, addedNode)
-				Expect(err).To(Not(HaveOccurred()))
-				Expect(value).To(BeNumerically(comparator, 1))
-			})
 		}
+
+		By("Increment number of nodes in pool "+poolType, func() {
+			// Increase 'quantity' field
+			value, err := misc.IncreaseQuantity(clusterNS,
+				clusterName,
+				"pool-"+poolType+"-"+clusterName, addedNode)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(value).To(BeNumerically(">=", 1))
+
+			// Check that the selector has been correctly created
+			Eventually(func() string {
+				out, _ := kubectl.Run("get", "MachineInventorySelector",
+					"--namespace", clusterNS,
+					"-o", "jsonpath={.items[*].metadata.name}")
+				return out
+			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + poolType + "-" + clusterName))
+		})
 
 		By("Waiting for known cluster state before adding the node(s)", func() {
 			msg := `(configuring .* node\(s\)|waiting for viable init node)`

@@ -301,18 +301,13 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1 with current build (use Emulated TPM and iPXE)
-        if: inputs.test_type == 'cli'
-        env:
-          EMULATE_TPM: true
-          VM_INDEX: 1
-        run: cd tests && make e2e-bootstrap-node
-      - name: Bootstrap node 2 and 3 with current build (use Emulated TPM and ISO)
+      - name: Bootstrap node 1, 2 and 3 with current build (use Emulated TPM and ISO) in pool "master"
         if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
           ISO_BOOT: true
-          VM_INDEX: 2
+          POOL: master
+          VM_INDEX: 1
           VM_NUMBERS: 3
         run: |
           OPERATOR_VERSION=$(kubectl get pods \
@@ -325,9 +320,10 @@ jobs:
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
 
           cd tests && make e2e-bootstrap-node
-      - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE)
+      - name: Bootstrap additional nodes (total of ${{ inputs.node_number }}) with current build (use iPXE) in pool "worker"
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
+          POOL: worker
           VM_INDEX: 4
           VM_NUMBERS: ${{ inputs.node_number }}
         run: cd tests && make e2e-bootstrap-node
@@ -437,4 +433,3 @@ jobs:
           gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
             --delete-disks all \
             --zone ${{ inputs.zone }}
-
