@@ -101,17 +101,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 						"-o", "jsonpath={.items[*].metadata.name}")
 					return out
 				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
-
-				// Check that the selector for master is correctly created
-				// NOTE: the worker one is not created yet because 'quantity' is set to 0 for this one
-				if pool == "master" {
-					Eventually(func() string {
-						out, _ := kubectl.Run("get", "MachineInventorySelector",
-							"--namespace", clusterNS,
-							"-o", "jsonpath={.items[*].metadata.name}")
-						return out
-					}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
-				}
 			}
 		})
 

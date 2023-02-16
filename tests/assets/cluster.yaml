@@ -13,7 +13,7 @@ spec:
         kind: MachineInventorySelectorTemplate
         name: selector-master-%CLUSTER_NAME%
       name: pool-master-%CLUSTER_NAME%
-      quantity: 1
+      quantity: 0
       workerRole: true
     - controlPlaneRole: false
       etcdRole: false

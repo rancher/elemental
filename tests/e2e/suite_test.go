@@ -61,6 +61,7 @@ var (
 	k8sVersion          string
 	numberOfVMs         int
 	osImage             string
+	poolType            string
 	proxy               string
 	rancherChannel      string
 	rancherLogCollector string
@@ -98,6 +99,7 @@ var _ = BeforeSuite(func() {
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
 	osImage = os.Getenv("CONTAINER_IMAGE")
+	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
