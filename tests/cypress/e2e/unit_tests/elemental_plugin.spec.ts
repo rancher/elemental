@@ -26,7 +26,7 @@ describe('Install Elemental plugin', () => {
     cy.contains('Enable Extension Support?')
     cy.contains('Add the Rancher Extension Repository').click();
     cy.clickButton('OK');
-    cy.contains('No Extensions installed', {timeout: 40000});
+    cy.get('.tabs', {timeout: 40000}).contains('Installed Available Updates All');
   });
 
   it('Install Elemental plugin', () => {
@@ -46,6 +46,6 @@ describe('Install Elemental plugin', () => {
     cy.get('.plugins')
       .children()
       .should('contain', 'elemental')
-      .and('contain', 'Uninstall')
+      .and('contain', 'Uninstall');
   });
 });

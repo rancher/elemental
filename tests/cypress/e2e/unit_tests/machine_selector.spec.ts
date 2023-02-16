@@ -32,7 +32,7 @@ describe('Machine selector testing', () => {
   it('Testing selector with unmatching rule', () => {
     //cy.clickButton('Add Rule');
     // TODO: Cannot use the clickButton here, I do not know why yet 
-    cy.get('.mt-20 > .btn').contains('Add Rule').click();
+    cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]').contains('Add Rule').click();
     cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('wrong');
     cy.contains('.banner', 'Matches no existing Inventory of Machines').should('exist');
   });
@@ -40,7 +40,7 @@ describe('Machine selector testing', () => {
   it('Testing selector with matching rule', () => {
     //cy.clickButton('Add Rule');
     // TODO: Cannot use the clickButton here, I do not know why yet 
-    cy.get('.mt-20 > .btn').contains('Add Rule').click();
+    cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]').contains('Add Rule').click();
     cy.get('#vs6__combobox').click()
     cy.contains('myInvLabel1').click();
     cy.get('[data-testid="input-match-expression-values-0"] > input').click().type('myInvLabelValue1');
