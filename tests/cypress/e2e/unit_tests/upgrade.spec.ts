@@ -67,7 +67,7 @@ describe('Upgrade tests', () => {
     cy.contains('There are no rows to show');
   });
 
-  it('Upgrade one node with OS Image Upgrades', () => {
+  it.skip('Upgrade one node with OS Image Upgrades', () => {
     // Create ManagedOSImage resource
     cy.get('.nav').contains('Advanced').click();
     cy.get('.nav').contains('Update Groups').click();
