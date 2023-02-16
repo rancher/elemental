@@ -66,7 +66,7 @@
     - **It:** Check OS Versions
     - **It:** Delete OS Versions
     - **It:** Delete OS Versions Channels
-    - **It:** Upgrade one node with OS Image Upgrades
+    - **It:** .skipUpgrade one node with OS Image Upgrades
 
 ## `user.spec.ts`
 
@@ -90,7 +90,7 @@
     - **It:** Add the node in Rancher Manager
       -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Ensuring that the cluster is in healthy state
-      -  **By:** Increasing quantity node of predefined cluster
+      -  **By:** Increment number of nodes in pool +poolType
       -  **By:** Waiting for known cluster state before adding the nodes)
       -  **By:** Restarting +h+ to add it in the cluster
       -  **By:** Checking +h+ SSH connection
@@ -162,7 +162,6 @@
       -  **By:** Checking if upgrade type is set
       -  **By:** Showing OS version before upgrade
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
-      -  **By:** Triggering Manual Upgrade
       -  **By:** Checking VM upgrade
       -  **By:** Showing OS version after upgrade
       -  **By:** Cleaning upgrade orders
