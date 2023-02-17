@@ -41,6 +41,7 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       cluster_name: cluster-k3s
+      cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso

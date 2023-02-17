@@ -20,6 +20,7 @@ docker run -v $PWD:/e2e -w /e2e                            \
     -e UI_ACCOUNT=$UI_ACCOUNT                              \
     -e OPERATOR_VERSION=$OPERATOR_VERSION                  \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION          \
+    -e CYPRESS_TAGS=$CYPRESS_TAGS                          \
     -e PROXY=$PROXY                                        \
     --add-host host.docker.internal:host-gateway           \
     --ipc=host                                             \

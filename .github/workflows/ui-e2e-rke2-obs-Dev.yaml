@@ -42,6 +42,7 @@ jobs:
       #ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
+      cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
