@@ -43,6 +43,7 @@ jobs:
       #ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
+      cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest'}}
       k8s_version_to_provision: v1.24.8+rke2r1
