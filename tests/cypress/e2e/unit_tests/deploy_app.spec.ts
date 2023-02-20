@@ -27,7 +27,7 @@ filterTests(['main'], () => {
     
     it('Deploy CIS Benchmark application', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('myelementalcluster').click();
+      cy.contains('mycluster').click();
       cy.contains('Apps').click();
       cy.contains('Charts').click();
       cy.contains('CIS Benchmark').click();
@@ -42,7 +42,7 @@ filterTests(['main'], () => {
   
     it('Remove CIS Benchmark application', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('myelementalcluster').click();
+      cy.contains('mycluster').click();
       cy.contains('Apps').click();
       cy.contains('Installed Apps').click();
       cy.contains('.title', 'Installed Apps', {timeout:20000});
