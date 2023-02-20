@@ -15,7 +15,9 @@ limitations under the License.
 package e2e_test
 
 import (
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -26,45 +28,48 @@ import (
 )
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
+	var (
+		wg           sync.WaitGroup
+		value        string
+		valueToCheck string
+	)
+
 	It("Upgrade node", func() {
-		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
-		Expect(err).To(Not(HaveOccurred()))
-
-		client := &tools.Client{
-			Host:     string(hostData.IP) + ":22",
-			Username: userName,
-			Password: userPassword,
-		}
-
 		By("Checking if upgrade type is set", func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})
 
-		By("Showing OS version before upgrade", func() {
-			out, err := client.RunSSH("cat /etc/os-release")
-			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("OS Version:\n%s\n", out)
-		})
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
+
+			// Get node information
+			client, _ := GetNodeInfo(hostName)
+			Expect(client).To(Not(BeNil()))
+
+			// Execute node deployment in parallel
+			wg.Add(1)
+			go func(h string, cl *tools.Client) {
+				defer wg.Done()
+				defer GinkgoRecover()
+
+				By("Checking OS version on "+h+" before upgrade", func() {
+					out, err := client.RunSSH("cat /etc/os-release")
+					Expect(err).To(Not(HaveOccurred()))
+					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
+				})
+			}(hostName, client)
+		}
+
+		// Wait for all parallel jobs
+		wg.Wait()
 
 		By("Triggering Upgrade in Rancher with "+upgradeType, func() {
-			upgradeOsYaml := upgradeClusterTargetsYaml
-			upgradeTypeValue := osImage // Default to osImage
-			if upgradeType == "managedOSVersionName" {
-				upgradeTypeValue = imageVersion
-			}
-
-			// We should have a version defined
-			Expect(upgradeTypeValue).NotTo(BeNil())
-
-			// We don't know what is the previous type of upgrade, so easier to replace all here
-			// as there is only one in the yaml file anyway
-			for _, p := range []string{"%OS_IMAGE%", "osImage:.*", "managedOSVersionName:.*"} {
-				err := tools.Sed(p, upgradeType+": "+upgradeTypeValue, upgradeOsYaml)
-				Expect(err).To(Not(HaveOccurred()))
-			}
-
-			err := tools.Sed("%CLUSTER_NAME%", clusterName, upgradeClusterTargetsYaml)
+			// Set temporary file
+			upgradeTmp, err := misc.CreateTemp("upgrade")
 			Expect(err).To(Not(HaveOccurred()))
+			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
 				// Get elemental-operator version
@@ -74,20 +79,51 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 
 				// Remove 'syncInterval' option if needed (only supported in operator v1.1+)
 				if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-					err = tools.Sed("syncInterval:.*", "", osListYaml)
+					err := tools.Sed("syncInterval:.*", "", osListYaml)
 					Expect(err).To(Not(HaveOccurred()))
 				}
 
-				// Add OS list
+				// Add OS channel list
+				err = tools.Sed("%UPGRADE_CHANNEL_LIST%", upgradeChannelList, osListYaml)
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Apply the generated file
 				err = kubectl.Apply(clusterNS, osListYaml)
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Wait for ManagedOSVersion to be populated from ManagedOSVersionChannel
 				Eventually(func() string {
 					out, _ := kubectl.Run("get", "ManagedOSVersion",
-						"--namespace", clusterNS, imageVersion)
+						"--namespace", clusterNS, upgradeOsChannel)
 					return out
 				}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
+
+				// Set OS image to use for upgrade
+				value = upgradeOsChannel
+
+				// Extract the value to check after the upgrade
+				out, err := kubectl.Run("get", "ManagedOSVersion",
+					"--namespace", clusterNS, upgradeOsChannel,
+					"-o", "jsonpath={.spec.metadata.upgradeImage}")
+				Expect(err).To(Not(HaveOccurred()))
+				valueToCheck = misc.TrimStringFromChar(out, ":")
+			} else if upgradeType == "osImage" {
+				// Set OS image to use for upgrade
+				value = upgradeImage
+
+				// Extract the value to check after the upgrade
+				valueToCheck = misc.TrimStringFromChar(upgradeImage, ":")
+			}
+
+			// Add a nodeSelector if needed
+			if usedNodes == 1 {
+				// Set node hostname
+				hostName := misc.SetHostname(vmNameRoot, vmIndex)
+				Expect(hostName).To(Not(BeNil()))
+
+				// Get node information
+				client, _ := GetNodeInfo(hostName)
+				Expect(client).To(Not(BeNil()))
 
 				// Get *REAL* hostname
 				hostname, err := client.RunSSH("hostname")
@@ -99,55 +135,65 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 				Expect(err).To(Not(HaveOccurred()), selector)
 
 				// Create new file for this specific upgrade
-				err = misc.ConcateFiles(upgradeClusterTargetsYaml, upgradeOSVersionNameYaml, selector)
+				err = misc.ConcateFiles(upgradeSkelYaml, upgradeTmp, selector)
 				Expect(err).To(Not(HaveOccurred()))
-
-				// Swap yaml file
-				upgradeOsYaml = upgradeOSVersionNameYaml
-
-				// Set correct value for os osImage
-				out, err := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS, imageVersion,
-					"-o", "jsonpath={.spec.metadata.upgradeImage}")
-				Expect(err).To(Not(HaveOccurred()))
-				osImage = misc.TrimStringFromChar(out, ":")
+			} else {
+				// Use original file as-is
+				misc.CopyFile(upgradeSkelYaml, upgradeTmp)
 			}
 
-			err = kubectl.Apply(clusterNS, upgradeOsYaml)
+			// Set values
+			err = tools.Sed("with-%UPGRADE_TYPE%", strings.ToLower(upgradeType), upgradeTmp)
+			Expect(err).To(Not(HaveOccurred()))
+			err = tools.Sed("%UPGRADE_TYPE%", upgradeType+": "+value, upgradeTmp)
+			Expect(err).To(Not(HaveOccurred()))
+			err = tools.Sed("%CLUSTER_NAME%", clusterName, upgradeTmp)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Apply the generated file
+			err = kubectl.Apply(clusterNS, upgradeTmp)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Checking VM upgrade", func() {
-			Eventually(func() string {
-				// Use grep here in case of comment in the file!
-				out, _ := client.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
-				out = strings.Trim(out, "\n")
+		for index := vmIndex; index <= numberOfVMs; index++ {
+			// Set node hostname
+			hostName := misc.SetHostname(vmNameRoot, index)
+			Expect(hostName).To(Not(BeNil()))
 
-				// Re-format the output if needed
-				if upgradeType == "managedOSVersionName" {
-					// NOTE: this remove the version and keep only the repo,
-					// as 'latest' is set and in the file we have the exact version
-					out = misc.TrimStringFromChar(out, ":")
-				}
+			// Get node information
+			client, _ := GetNodeInfo(hostName)
+			Expect(client).To(Not(BeNil()))
 
-				return out
-			}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(osImage))
-		})
+			// Execute node deployment in parallel
+			wg.Add(1)
+			go func(h string, cl *tools.Client) {
+				defer wg.Done()
+				defer GinkgoRecover()
 
-		By("Showing OS version after upgrade", func() {
-			out, err := client.RunSSH("cat /etc/os-release")
-			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("OS Version:\n%s\n", out)
-		})
+				By("Checking VM upgrade on "+h, func() {
+					Eventually(func() string {
+						// Use grep here in case of comment in the file!
+						out, _ := client.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
 
-		By("Cleaning upgrade orders", func() {
-			if upgradeType == "managedOSVersionName" {
-				err := kubectl.DeleteResource(clusterNS, "ManagedOSVersionChannel", "os-versions")
-				Expect(err).To(Not(HaveOccurred()))
-			}
+						// This remove the version and keep only the repo, as in the file
+						// we have the exact version and we don't know it before the upgrade
+						return misc.TrimStringFromChar(strings.Trim(out, "\n"), ":")
+					}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
+				})
 
-			err := kubectl.DeleteResource(clusterNS, "ManagedOSImage", "default-os-image")
-			Expect(err).To(Not(HaveOccurred()))
+				By("Checking OS version on "+h+" after upgrade", func() {
+					out, err := client.RunSSH("cat /etc/os-release")
+					Expect(err).To(Not(HaveOccurred()))
+					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
+				})
+			}(hostName, client)
+		}
+
+		// Wait for all parallel jobs
+		wg.Wait()
+
+		By("Checking cluster state after upgrade", func() {
+			CheckClusterState(clusterNS, clusterName)
 		})
 	})
 })

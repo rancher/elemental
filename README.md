@@ -4,6 +4,9 @@ CI with latest stable Rancher Manager:
 [![K3s-E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-stable.yaml)
 [![RKE2-E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-stable.yaml)
 
+[![CLI-K3s-OS-Upgrade-RM_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-os-upgrade-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-os-upgrade-rancher_stable.yaml)
+[![CLI-RKE2-OS-Upgrade-RM_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-os-upgrade-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-os-upgrade-rancher_stable.yaml)
+
 [![K3s-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml)
 [![RKE2-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml)
 
@@ -11,6 +14,9 @@ CI with latest devel Rancher Manager:
 
 [![K3s-E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-latest.yaml)
 [![RKE2-E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-latest.yaml)
+
+[![CLI-K3s-OS-Upgrade-RM_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-os-upgrade-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-os-upgrade-rancher_latest.yaml)
+[![CLI-RKE2-OS-Upgrade-RM_Latest](https://github.com/rancher/elemental/actions/workflows/cli-rke2-os-upgrade-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-os-upgrade-rancher_latest.yaml)
 
 [![K3s-UI_E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-latest.yaml)
 [![RKE2-UI_E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-latest.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-latest.yaml)

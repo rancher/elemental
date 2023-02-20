@@ -1,0 +1,30 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-RKE2-OS-Upgrade-RM_Latest
+
+# This worflow is scheduled because it uses Dev artifacts from OBS and
+# not the ones built in the CI (build-ci workflow).
+# The scheduling is also to avoid running the workflow on each push on main.
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  k3s:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      cluster_name: cluster-rke2
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+      k8s_version_to_provision: v1.24.8+rke2r1
+      # Force to only deploy the first 3 nodes
+      node_number: 3
+      rancher_channel: latest
+      rancher_version: devel
+      runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-8-v2
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
+      upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
+      upgrade_os_channel: dev

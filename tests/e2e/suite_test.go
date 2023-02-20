@@ -18,34 +18,35 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 const (
-	clusterYaml               = "../assets/cluster.yaml"
-	emulateTPMYaml            = "../assets/emulateTPM.yaml"
-	ciTokenYaml               = "../assets/local-kubeconfig-token-skel.yaml"
-	configPrivateCAScript     = "../scripts/config-private-ca"
-	installConfigYaml         = "../../install-config.yaml"
-	installHardenedScript     = "../scripts/config-hardened"
-	installVMScript           = "../scripts/install-vm"
-	localKubeconfigYaml       = "../assets/local-kubeconfig-skel.yaml"
-	netDefaultFileName        = "../assets/net-default.xml"
-	osListYaml                = "../assets/managedOSVersionChannel.yaml"
-	registrationYaml          = "../assets/machineRegistration.yaml"
-	selectorYaml              = "../assets/selector.yaml"
-	upgradeClusterTargetsYaml = "../assets/upgrade_clusterTargets.yaml"
-	upgradeOSVersionNameYaml  = "../assets/upgrade_managedOSVersionName.yaml"
-	userName                  = "root"
-	userPassword              = "r0s@pwd1"
-	vmNameRoot                = "node"
+	clusterYaml           = "../assets/cluster.yaml"
+	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
+	configPrivateCAScript = "../scripts/config-private-ca"
+	installConfigYaml     = "../../install-config.yaml"
+	installHardenedScript = "../scripts/config-hardened"
+	installVMScript       = "../scripts/install-vm"
+	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
+	netDefaultFileName    = "../assets/net-default.xml"
+	osListYaml            = "../assets/managedOSVersionChannel.yaml"
+	registrationYaml      = "../assets/machineRegistration.yaml"
+	selectorYaml          = "../assets/selector.yaml"
+	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
+	userName              = "root"
+	userPassword          = "r0s@pwd1"
+	vmNameRoot            = "node"
 )
 
 var (
-	addedNode           int
 	arch                string
 	caType              string
 	CertManagerVersion  string
@@ -67,11 +68,53 @@ var (
 	rancherLogCollector string
 	rancherVersion      string
 	testType            string
-	upgradeType         string
+	upgradeChannelList  string
+	upgradeImage        string
 	upgradeOperator     string
+	upgradeOsChannel    string
+	upgradeType         string
+	usedNodes           int
 	vmIndex             int
 	vmName              string
 )
+
+func CheckClusterState(ns, cluster string) {
+	// Check that a 'type' property named 'Ready' is set to true
+	Eventually(func() string {
+		clusterStatus, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns, cluster,
+			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
+		return clusterStatus
+	}, misc.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("True"))
+
+	// Wait a little bit for the cluster to be in a stable state
+	// Because if we do the next test too quickly it can be a false positive!
+	// NOTE: no SetTimeout needed here!
+	time.Sleep(30 * time.Second)
+
+	// There should be no 'reason' property set in a clean cluster
+	Eventually(func() string {
+		reason, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns, cluster,
+			"-o", "jsonpath={.status.conditions[*].reason}")
+		return reason
+	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(BeEmpty())
+}
+
+func GetNodeInfo(hostName string) (*tools.Client, string) {
+	// Get network data
+	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Set 'client' to be able to access the node through SSH
+	c := &tools.Client{
+		Host:     string(hostData.IP) + ":22",
+		Username: userName,
+		Password: userPassword,
+	}
+
+	return c, hostData.Mac
+}
 
 func FailWithReport(message string, callerSkip ...int) {
 	// Ensures the correct line numbers are reported
@@ -93,20 +136,21 @@ var _ = BeforeSuite(func() {
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM = os.Getenv("EMULATE_TPM")
 	rancherHostname = os.Getenv("HOSTNAME")
-	imageVersion = os.Getenv("IMAGE_VERSION")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
-	osImage = os.Getenv("CONTAINER_IMAGE")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	testType = os.Getenv("TEST_TYPE")
-	upgradeType = os.Getenv("UPGRADE_TYPE")
+	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
+	upgradeImage = os.Getenv("UPGRADE_IMAGE")
 	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
+	upgradeOsChannel = os.Getenv("UPGRADE_OS_CHANNEL")
+	upgradeType = os.Getenv("UPGRADE_TYPE")
 
 	// Only if VM_INDEX is set
 	if index != "" {
@@ -116,6 +160,9 @@ var _ = BeforeSuite(func() {
 
 		// Set default hostname
 		vmName = misc.SetHostname(vmNameRoot, vmIndex)
+	} else {
+		// Default value for vmIndex
+		vmIndex = 0
 	}
 
 	// Only if VM_NUMBER is set
@@ -128,8 +175,9 @@ var _ = BeforeSuite(func() {
 		numberOfVMs = vmIndex
 	}
 
-	// Set number of added node
-	addedNode = (numberOfVMs - vmIndex) + 1
+	// Set number of "used" nodes
+	// NOTE: could be the number added nodes or the number of nodes to use/upgrade
+	usedNodes = (numberOfVMs - vmIndex) + 1
 
 	// Force a correct value for emulateTPM
 	switch eTPM {

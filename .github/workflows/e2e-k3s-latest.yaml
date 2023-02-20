@@ -3,7 +3,7 @@ name: K3s-E2E-Latest_RM
 
 # This worflow is scheduled *after* build-ci to be sure that we have
 # the lastest version built. The scheduling is also to avoid running
-# the worklow on each push on main.
+# the workflow on each push on main.
 on:
   schedule:
     - cron: '0 1 * * *'
