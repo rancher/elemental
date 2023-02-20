@@ -66,7 +66,7 @@
     - **It:** Check OS Versions
     - **It:** Delete OS Versions
     - **It:** Delete OS Versions Channels
-    - **It:** .skipUpgrade one node with OS Image Upgrades
+    - **It:** Upgrade one node with OS Image Upgrades
 
 ## `user.spec.ts`
 
