@@ -34,50 +34,13 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
-}
-
-func checkClusterState() {
-	// Check that a 'type' property named 'Ready' is set to true
-	Eventually(func() string {
-		clusterStatus, _ := kubectl.Run("get", "cluster",
-			"--namespace", clusterNS, clusterName,
-			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
-		return clusterStatus
-	}, misc.SetTimeout(2*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(Equal("True"))
-
-	// Wait a little bit for the cluster to be in a stable state
-	// NOTE: not SetTimeout needed here!
-	time.Sleep(30 * time.Second)
-
-	// There should be no 'reason' property set in a clean cluster
-	Eventually(func() string {
-		reason, _ := kubectl.Run("get", "cluster",
-			"--namespace", clusterNS, clusterName,
-			"-o", "jsonpath={.status.conditions[*].reason}")
-		return reason
-	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 func getClusterState(ns, cluster, condition string) string {
 	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
 	Expect(err).To(Not(HaveOccurred()))
 	return out
-}
-
-func getNodeInfo(hostName string, index int) (*tools.Client, string) {
-	// Get network data
-	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
-	Expect(err).To(Not(HaveOccurred()))
-
-	// Set 'client' to be able to access the node through SSH
-	c := &tools.Client{
-		Host:     string(hostData.IP) + ":22",
-		Username: userName,
-		Password: userPassword,
-	}
-
-	return c, hostData.Mac
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
@@ -162,7 +125,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Get generated MAC address
-			_, macAdrs := getNodeInfo(hostName, index)
+			_, macAdrs := GetNodeInfo(hostName)
 			Expect(macAdrs).To(Not(BeNil()))
 
 			wg.Add(1)
@@ -177,6 +140,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				})
 			}(installVMScript, hostName, macAdrs)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 	})
@@ -200,20 +164,21 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				})
 			}(clusterNS, hostName, index)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
 		if vmIndex > 1 {
-			By("Ensuring that the cluster is in healthy state", func() {
-				checkClusterState()
+			By("Checking cluster state", func() {
+				CheckClusterState(clusterNS, clusterName)
 			})
 		}
 
-		By("Increment number of nodes in pool "+poolType, func() {
+		By("Incrementing number of nodes in "+poolType+" pool", func() {
 			// Increase 'quantity' field
 			value, err := misc.IncreaseQuantity(clusterNS,
 				clusterName,
-				"pool-"+poolType+"-"+clusterName, addedNode)
+				"pool-"+poolType+"-"+clusterName, usedNodes)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(value).To(BeNumerically(">=", 1))
 
@@ -238,7 +203,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 
 				return clusterMsg
-			}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
+			}, misc.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 		})
 
 		for index := vmIndex; index <= numberOfVMs; index++ {
@@ -247,7 +212,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
-			client, _ := getNodeInfo(hostName, index)
+			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
 			// Execute in parallel
@@ -289,6 +254,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				})
 			}(clusterNS, hostName, index, emulateTPM, client)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
@@ -299,7 +265,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
-				client, _ := getNodeInfo(hostName, index)
+				client, _ := GetNodeInfo(hostName)
 				Expect(client).To(Not(BeNil()))
 
 				// Execute in parallel
@@ -339,12 +305,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					})
 				}(hostName, client)
 			}
+
+			// Wait for all parallel jobs
+			wg.Wait()
 		}
-		// Wait for all parallel jobs
-		wg.Wait()
 
 		By("Checking cluster state", func() {
-			checkClusterState()
+			CheckClusterState(clusterNS, clusterName)
 		})
 
 		if poolType != "worker" {
@@ -354,7 +321,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
-				client, _ := getNodeInfo(hostName, index)
+				client, _ := GetNodeInfo(hostName)
 				Expect(client).To(Not(BeNil()))
 
 				// Execute in parallel
@@ -371,9 +338,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					})
 				}(hostName, client)
 			}
+
+			// Wait for all parallel jobs
+			wg.Wait()
 		}
-		// Wait for all parallel jobs
-		wg.Wait()
 
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
@@ -381,7 +349,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
-			client, _ := getNodeInfo(hostName, index)
+			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
 			// Execute in parallel
@@ -406,11 +374,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 			}(hostName, poolType, client)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
 		By("Checking cluster state after reboot", func() {
-			checkClusterState()
+			CheckClusterState(clusterNS, clusterName)
 		})
 	})
 })
