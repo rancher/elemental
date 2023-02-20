@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 - 2023 SUSE LLC
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -27,6 +26,7 @@ describe('Upgrade tests', () => {
   const operator_version = Cypress.env('operator_version');
   const elemental_user   = "elemental-user"
   const ui_password      = "rancherpassword"
+  const upgrade_image    = Cypress.env('upgrade_image')
 
   beforeEach(() => {
     (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
@@ -93,8 +93,8 @@ describe('Upgrade tests', () => {
       cy.get('.primaryheader').contains('Update Group: Create');
       cy.typeValue({label: 'Name', value: 'upgrade'});
       cy.contains('Target Cluster').click();
-      cy.contains('myelementalcluster').click();
-      cy.typeValue({label: 'OS Image', value: 'registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest'});
+      cy.contains('mycluster').click();
+      cy.typeValue({label: 'OS Image', value: upgrade_image});
       cy.clickButton('Create');
       // Status changes a lot right after the creation so let's wait 10 secondes
       // before checking
@@ -105,7 +105,7 @@ describe('Upgrade tests', () => {
       // https://github.com/rancher/elemental/issues/410
       // Restart fleet agent inside downstream cluster
       topLevelMenu.openIfClosed();
-      cy.contains('myelementalcluster').click();
+      cy.contains('mycluster').click();
       cy.contains('Workload').click();
       cy.contains('Pods').click();
       cy.get('.header-buttons > :nth-child(2)').click();
@@ -119,10 +119,10 @@ describe('Upgrade tests', () => {
       cy.clickNavMenu(["Dashboard"]);
       cy.clickButton('Manage Elemental Clusters');
       cy.get('.title').contains('Clusters');
-      cy.contains('myelementalcluster').click();
+      cy.contains('mycluster').click();
       cy.get('.primaryheader').contains('Active');
       cy.get('.primaryheader').contains('Updating', {timeout: 240000});
       cy.get('.primaryheader').contains('Active', {timeout: 240000});
     });
   });
-}); 
+});

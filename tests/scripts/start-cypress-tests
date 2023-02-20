@@ -22,6 +22,7 @@ docker run -v $PWD:/e2e -w /e2e                            \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION          \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                          \
     -e PROXY=$PROXY                                        \
+    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                        \
     --add-host host.docker.internal:host-gateway           \
     --ipc=host                                             \
     $CYPRESS_DOCKER                                        \

@@ -49,7 +49,7 @@ describe('Machine inventory testing', () => {
   filterTests(['main', 'upgrade'], () => {
     it('Create Elemental cluster', () => {
       cy.contains('Create Elemental Cluster').click();
-      cy.typeValue({label: 'Cluster Name', value: 'myelementalcluster'});
+      cy.typeValue({label: 'Cluster Name', value: 'mycluster'});
       cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
       cy.contains('Show deprecated Kubernetes').click();
       cy.contains('Kubernetes Version').click();
@@ -68,8 +68,8 @@ describe('Machine inventory testing', () => {
         cy.get(':nth-child(11) > .no-resize').type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
       }
       cy.clickButton('Create');
-      cy.contains('Updating myelementalcluster', {timeout: 20000});
-      cy.contains('Active myelementalcluster', {timeout: 360000});
+      cy.contains('Updating mycluster', {timeout: 20000});
+      cy.contains('Active mycluster', {timeout: 360000});
     });
   });
   
@@ -78,10 +78,10 @@ describe('Machine inventory testing', () => {
       topLevelMenu.openIfClosed();
       cy.contains('Home').click();
       // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/myelementalcluster"]').contains('Active');
+      cy.get('[data-node-id="fleet-default/mycluster"]').contains('Active');
       // Go into the dedicated cluster page
       topLevelMenu.openIfClosed();
-      cy.contains('myelementalcluster').click();
+      cy.contains('mycluster').click();
     })
   });
 });

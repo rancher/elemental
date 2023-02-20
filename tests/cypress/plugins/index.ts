@@ -39,6 +39,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.proxy_ip = process.env.PROXY_IP;
   config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
   config.env.cypress_tags = process.env.CYPRESS_TAGS;
+  config.env.upgrade_image = process.env.UPGRADE_IMAGE;
 
   return config;
 };
