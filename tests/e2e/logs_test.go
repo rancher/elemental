@@ -98,7 +98,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 				checkRC(err)
 				err = os.WriteFile("squid.log", []byte(out), os.ModePerm)
 				checkRC(err)
-				Expect(out).Should(MatchRegexp("TCP_TUNNEL/200.*CONNECT git.rancher.io"))
+				Expect(out).Should(MatchRegexp("TCP_TUNNEL/200.*CONNECT charts.rancher.io"))
 			})
 		}
 	})
