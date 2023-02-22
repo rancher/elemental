@@ -340,14 +340,14 @@ jobs:
 
           cd tests && make e2e-bootstrap-node
       - name: Upgrade node 1 to specified OS version with osImage
-        if: inputs.upgrade_image != ''
+        if: inputs.test_type == 'cli' && inputs.upgrade_image != ''
         env:
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
-        if: inputs.upgrade_os_channel != ''
+        if: inputs.test_type == 'cli' && inputs.upgrade_os_channel != ''
         env:
           UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
