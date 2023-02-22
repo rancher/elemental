@@ -89,8 +89,8 @@
       -  **By:** Installing node +h
     - **It:** Add the node in Rancher Manager
       -  **By:** Checking that node +h+ is available in Rancher
-      -  **By:** Ensuring that the cluster is in healthy state
-      -  **By:** Increment number of nodes in pool +poolType
+      -  **By:** Checking cluster state
+      -  **By:** Incrementing number of nodes in +poolType+ pool
       -  **By:** Waiting for known cluster state before adding the nodes)
       -  **By:** Restarting +h+ to add it in the cluster
       -  **By:** Checking +h+ SSH connection
@@ -160,11 +160,11 @@
 - **Describe:** E2E - Upgrading node
     - **It:** Upgrade node
       -  **By:** Checking if upgrade type is set
-      -  **By:** Showing OS version before upgrade
+      -  **By:** Checking OS version on +h+ before upgrade
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
-      -  **By:** Checking VM upgrade
-      -  **By:** Showing OS version after upgrade
-      -  **By:** Cleaning upgrade orders
+      -  **By:** Checking VM upgrade on +h
+      -  **By:** Checking OS version on +h+ after upgrade
+      -  **By:** Checking cluster state after upgrade
 
 # Tests description for install
 
