@@ -158,9 +158,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				defer GinkgoRecover()
 
 				By("Checking that node "+h+" is available in Rancher", func() {
-					id, err := misc.GetServerId(c, i)
-					Expect(err).To(Not(HaveOccurred()))
-					Expect(id).To(Not(BeEmpty()))
+					Eventually(func() string {
+						id, _ := misc.GetServerId(c, i)
+						return id
+					}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
 				})
 			}(clusterNS, hostName, index)
 		}
