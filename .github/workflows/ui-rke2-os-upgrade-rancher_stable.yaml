@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-K3s-Stable-RM_Stable-Upgrade
+name: UI-RKE2-OS-Upgrade-Rancher_Stable
 
 on:
   workflow_dispatch:
@@ -11,10 +11,6 @@ on:
       elemental_ui_version:
         description: Version of the elemental ui which will be installed
         default: '1.0.0'
-        type: string
-      proxy:
-        description: Deploy a proxy (none/rancher/elemental)
-        default: elemental
         type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
@@ -32,20 +28,23 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  ui-k3s:
+  ui-rke2:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      cluster_name: cluster-k3s
+      # Using user account has to be disable due to this bug
+      # https://github.com/rancher/elemental-ui/issues/64
+      #ui_account: user
+      ca_type: private
+      cluster_name: cluster-rke2
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || '1.0.0' }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+k3s1
-      proxy: ${{ inputs.proxy || 'elemental' }}
+      k8s_version_to_provision: v1.24.8+rke2r1
       rancher_channel: ${{ inputs.rancher_channel || 'stable' }}
       rancher_version: ${{ inputs.rancher_version || 'latest' }}
       runner_template: ${{ inputs.runner_template || 'elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2' }}
