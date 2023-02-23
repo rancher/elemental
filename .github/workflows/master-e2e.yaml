@@ -287,6 +287,7 @@ jobs:
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
+          UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           SPEC: |
             cypress/e2e/unit_tests/machine_selector.spec.ts

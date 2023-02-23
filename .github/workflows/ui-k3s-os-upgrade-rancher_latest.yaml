@@ -10,7 +10,7 @@ on:
         type: boolean
       elemental_ui_version:
         description: Version of the elemental ui which will be installed
-        default: '1.0.0'
+        default: latest
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
@@ -42,7 +42,7 @@ jobs:
       cluster_name: cluster-k3s
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner || true }}
-      elemental_ui_version: ${{ inputs.elemental_ui_version || '1.0.0' }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest' }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
@@ -50,5 +50,6 @@ jobs:
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       runner_template: ${{ inputs.runner_template || 'elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2' }}
       test_type: ui
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
       upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
