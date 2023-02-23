@@ -20,13 +20,14 @@ import filterTests from '~/cypress/support/filterTests.js';
 
 Cypress.config();
 describe('Upgrade tests', () => {
-  const topLevelMenu     = new TopLevelMenu();
-  const elemental        = new Elemental();
-  const ui_account       = Cypress.env('ui_account');
-  const operator_version = Cypress.env('operator_version');
-  const elemental_user   = "elemental-user"
-  const ui_password      = "rancherpassword"
-  const upgrade_image    = Cypress.env('upgrade_image')
+  const topLevelMenu            = new TopLevelMenu();
+  const elemental               = new Elemental();
+  const ui_account              = Cypress.env('ui_account');
+  const operator_version        = Cypress.env('operator_version');
+  const elemental_user          = "elemental-user"
+  const ui_password             = "rancherpassword"
+  const upgrade_channel_list    = Cypress.env('upgrade_channel_list')
+  const upgrade_image           = Cypress.env('upgrade_image')
 
   beforeEach(() => {
     (ui_account == "user") ? cy.login(elemental_user, ui_password) : cy.login();
@@ -38,11 +39,12 @@ describe('Upgrade tests', () => {
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
   });
-  filterTests(['main'], () => {
+  filterTests(['upgrade'], () => {
     it('Create an OS Version Channels', () => {
       (operator_version == "1.0") ? cy.exec(`sed -i '/syncInterval/d' assets/managedOSVersionChannel.yaml`) : "" ;
       // Create ManagedOSVersionChannel resource
       cy.exec(`sed -i 's/# namespace: fleet-default/namespace: fleet-default/g' assets/managedOSVersionChannel.yaml`);
+      cy.exec(`sed -i 's@image: %UPGRADE_CHANNEL_LIST%@image: ${upgrade_channel_list}@g' assets/managedOSVersionChannel.yaml`);
       cy.get('.nav').contains('Advanced').click();
       cy.get('.nav').contains('OS Version Channels').click();
       cy.clickButton('Create from YAML');
@@ -52,7 +54,6 @@ describe('Upgrade tests', () => {
       // Wait needed to avoid crash with the upload
       cy.wait(2000);
       // Wait for os-versions to be printed, that means the upload is done
-      cy.contains('os-versions');
       cy.clickButton('Create');
       // The new resource must be active
       cy.contains('Active');
@@ -61,17 +62,18 @@ describe('Upgrade tests', () => {
     it('Check OS Versions', () => {
       cy.get('.nav').contains('Advanced').click();
       cy.get('.nav').contains('OS Versions').click();
-      cy.contains('Active fake-image', {timeout: 120000});
-      cy.contains('Active teal-5.3');
+      cy.contains('Active dev', {timeout: 120000});
+      cy.contains('Active stable');
+      cy.contains('Active staging');
     });
 
     it('Delete OS Versions', () => {
       cy.get('.nav').contains('Advanced').click();
       cy.get('.nav').contains('OS Versions').click();
-      cy.contains('fake-image').parent().parent().click();
+      cy.contains('dev').parent().parent().click();
       cy.clickButton('Delete');
       cy.confirmDelete();
-      cy.contains('fake-image').should('not.exist');
+      cy.contains('dev').should('not.exist');
     });
 
     it('Delete OS Versions Channels', () => {
@@ -82,9 +84,7 @@ describe('Upgrade tests', () => {
       cy.get('.nav').contains('OS Versions').click();
       cy.contains('There are no rows to show');
     });
-  });
 
-  filterTests(['upgrade'], () => {
     it('Upgrade one node with OS Image Upgrades', () => {
       // Create ManagedOSImage resource
       cy.get('.nav').contains('Advanced').click();
