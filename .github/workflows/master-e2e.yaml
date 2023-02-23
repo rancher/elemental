@@ -321,7 +321,7 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1, 2 and 3 (use Emulated TPM and ISO) in pool "master"
+      - name: Bootstrap node 1, 2 and 3 (use and ISO) in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
@@ -338,6 +338,11 @@ jobs:
 
           # If elemental-operator is a v1.0.x we should disable EMULATE_TPM
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
+
+          # Disable EMULATE_TPM in case of upgrade test
+          # This is because we don't know the version in advance, so easier to not use it
+          [[ ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }} ]] \
+            && unset EMULATE_TPM
 
           cd tests && make e2e-bootstrap-node
       - name: Upgrade node 1 to specified OS version with osImage
