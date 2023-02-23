@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-OS-Upgrade-RM_Stable
+name: CLI-RKE2-OS-Upgrade-Rancher_Stable
 
 # This worflow is scheduled because it uses Dev artifacts from OBS and
 # not the ones built in the CI (build-ci workflow).

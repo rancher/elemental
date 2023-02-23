@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-RKE2-Stable-RM_Latest-Upgrade
+name: UI-RKE2-OS-Upgrade-Rancher_Latest
 
 on:
   workflow_dispatch:

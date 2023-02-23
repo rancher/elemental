@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-K3s-OS-Upgrade-RM_Latest
+name: CLI-K3s-OS-Upgrade-Rancher_Latest
 
 # This worflow is scheduled because it uses Dev artifacts from OBS and
 # not the ones built in the CI (build-ci workflow).
