@@ -11,14 +11,12 @@ function config()
     if [ ! -s $CONF_FILE ]; then
         if [ -e ${HOST_DIR}/oem/90_operator.yaml ]; then
             rm -f ${HOST_DIR}/oem/90_operator.yaml
-            $REBOOT
         fi
         return 0
     fi
 
     if [ ! -e ${HOST_DIR}/oem/90_operator.yaml ] || ! diff $CONF_FILE ${HOST_DIR}/oem/90_operator.yaml >/dev/null; then
         cp -f $CONF_FILE ${HOST_DIR}/oem/90_operator.yaml
-        $REBOOT
     fi
 }
 
@@ -34,7 +32,6 @@ function config()
           echo Update to date with
           cat ${RELEASE_FILE}
 
-          REBOOT="nsenter -i -m -t 1 -- reboot"
           config
           exit 0
       fi
