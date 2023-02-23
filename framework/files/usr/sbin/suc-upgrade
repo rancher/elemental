@@ -3,6 +3,8 @@ set -x -e
 HOST_DIR="${HOST_DIR:-/host}"
 RELEASE_FILE="${RELEASE_FILE:-/etc/os-release}"
 CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
+LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
+LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/cos/upgrade.lock}"
 
 function config()
 {
@@ -20,33 +22,41 @@ function config()
     fi
 }
 
-if [ "$FORCE" != "true" ]; then
-    if diff $RELEASE_FILE ${HOST_DIR}${RELEASE_FILE} >/dev/null; then
-        echo Update to date with
-        cat ${RELEASE_FILE}
+(
+  flock -w $LOCK_TIMEOUT 200 || exit 1
+  if ! nsenter -i -m -t 1 -- systemctl is-system-running; then
+      # Exit if there is a shutdown process already going on
+      exit 1
+  fi
 
-        REBOOT="nsenter -i -m -t 1 -- reboot"
-        config
-        exit 0
-    fi
-fi
+  if [ "$FORCE" != "true" ]; then
+      if diff $RELEASE_FILE ${HOST_DIR}${RELEASE_FILE} >/dev/null; then
+          echo Update to date with
+          cat ${RELEASE_FILE}
 
-config
-mount --rbind $HOST_DIR/dev /dev
-mount --rbind $HOST_DIR/run /run
-elemental --debug upgrade --system.uri dir:/
+          REBOOT="nsenter -i -m -t 1 -- reboot"
+          config
+          exit 0
+      fi
+  fi
+  
+  config
+  mount --rbind $HOST_DIR/dev /dev
+  mount --rbind $HOST_DIR/run /run
+  elemental --debug upgrade --system.uri dir:/
 
-# After elemental upgrade we have to also copy
-# /etc/resolv.conf from /host filesystem, otherwise 
-# it will be taken from container context
-mount -o remount,rw /run/initramfs/cos-state
-LOOP_DEV=$(losetup -f)
-losetup $LOOP_DEV /run/initramfs/cos-state/cOS/active.img
-mkdir -p /tmp/cOS
-mount $LOOP_DEV /tmp/cOS
-rsync -av $HOST_DIR/etc/resolv.conf /tmp/cOS/etc/resolv.conf
-umount /tmp/cOS
-losetup -d $LOOP_DEV
+  # After elemental upgrade we have to also copy
+  # /etc/resolv.conf from /host filesystem, otherwise 
+  # it will be taken from container context
+  mount -o remount,rw /run/initramfs/cos-state
+  LOOP_DEV=$(losetup -f)
+  losetup $LOOP_DEV /run/initramfs/cos-state/cOS/active.img
+  mkdir -p /tmp/cOS
+  mount $LOOP_DEV /tmp/cOS
+  rsync -av $HOST_DIR/etc/resolv.conf /tmp/cOS/etc/resolv.conf
+  umount /tmp/cOS
+  losetup -d $LOOP_DEV
 
-nsenter -i -m -t 1 -- reboot
-exit 1
+  nsenter -i -m -t 1 -- reboot
+  exit 1
+) 200> $LOCK_FILE
