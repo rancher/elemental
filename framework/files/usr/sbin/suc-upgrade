@@ -20,6 +20,24 @@ function config()
     fi
 }
 
+function isHigherVersion()
+{
+    local img_ver=$( . ${RELEASE_FILE} && printf '%s\n' "${IMAGE_TAG}" )
+    local host_ver=$( . ${HOST_DIR}${RELEASE_FILE} && printf '%s\n' "${IMAGE_TAG}" )
+    local higher_ver
+
+    # Without knowing the version in the host, all img versions are
+    # considered higher
+    [ -z "${host_ver}" ] && return 0
+    
+    [ "${host_ver}" == "${img_ver}" ] && return 1
+
+    # Note sort -V is a natural numbering sort, not semver
+    higher_ver=$(printf '%s\n' "${img_ver}" "${host_ver}" | sort -rV | head -n1)
+    [ "${higher_ver}" == "${img_ver}" ] && return 0
+    return 1
+}
+
 (
   flock -w $LOCK_TIMEOUT 200 || exit 1
   if ! nsenter -i -m -t 1 -- systemctl is-system-running; then
@@ -28,9 +46,9 @@ function config()
   fi
 
   if [ "$FORCE" != "true" ]; then
-      if diff $RELEASE_FILE ${HOST_DIR}${RELEASE_FILE} >/dev/null; then
-          echo Update to date with
-          cat ${RELEASE_FILE}
+      if ! isHigherVersion; then
+          echo "Up to date with release:"
+          cat ${HOST_DIR}${RELEASE_FILE}
 
           config
           exit 0
