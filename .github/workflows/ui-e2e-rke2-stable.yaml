@@ -40,6 +40,7 @@ jobs:
     with:
       # Using user account has to be disable due to this bug
       # https://github.com/rancher/elemental-ui/issues/64
+      # Fixed in elemental-ui 1.1.0
       #ui_account: user
       ca_type: private
       cluster_name: cluster-rke2

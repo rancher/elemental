@@ -49,6 +49,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
+      ui_account: user
       cluster_name: cluster-rke2
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner }}

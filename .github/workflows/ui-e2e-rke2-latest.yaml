@@ -38,9 +38,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      # Using user account has to be disable due to this bug
-      # https://github.com/rancher/elemental-ui/issues/64
-      #ui_account: user
+      ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
