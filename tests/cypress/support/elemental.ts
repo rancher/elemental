@@ -22,6 +22,9 @@ export class Elemental {
   }
 
   elementalIcon() {
+    if (Cypress.env('elemental_ui_version') != '1.0.0') {
+      return cy.get('.option .icon.group-icon.icon-elemental');
+    }
     return cy.get('.option .icon.group-icon.icon-os-management');
   } 
 
