@@ -64,9 +64,9 @@
 - **Describe:** Upgrade tests
     - **It:** Create an OS Version Channels
     - **It:** Check OS Versions
+    - **It:** Upgrade one node different methods if rke2 or k3s)
     - **It:** Delete OS Versions
     - **It:** Delete OS Versions Channels
-    - **It:** Upgrade one node with OS Image Upgrades
 
 ## `user.spec.ts`
 
