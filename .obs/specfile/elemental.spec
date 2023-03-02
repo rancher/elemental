@@ -76,19 +76,19 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 
 %pre
 %service_add_pre elemental-populate-node-labels.service
-%service_add_pre shutdown-k3s.service
+%service_add_pre shutdown-containerd.service
 
 %post
 %service_add_post elemental-populate-node-labels.service
-%service_add_post shutdown-k3s.service
+%service_add_post shutdown-containerd.service
 
 %preun
 %service_del_preun elemental-populate-node-labels.service
-%service_del_preun shutdown-k3s.service
+%service_del_preun shutdown-containerd.service
 
 %postun
 %service_del_postun elemental-populate-node-labels.service
-%service_del_postun shutdown-k3s.service
+%service_del_postun shutdown-containerd.service
 
 %files
 %defattr(-,root,root,-)
@@ -103,7 +103,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %dir %{_sysconfdir}/NetworkManager/conf.d
 %config %{_sysconfdir}/NetworkManager/conf.d/rke2-canal.conf
 %dir %{_unitdir}
-%{_unitdir}/shutdown-k3s.service
+%{_unitdir}/shutdown-containerd.service
 %{_unitdir}/elemental-populate-node-labels.service
 %{_sbindir}/elemental-populate-node-labels
 %dir /usr/libexec
