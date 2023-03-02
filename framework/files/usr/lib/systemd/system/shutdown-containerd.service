@@ -1,0 +1,19 @@
+[Unit]
+Description=Kill containerd-shims on shutdown
+DefaultDependencies=no
+Before=umount.target shutdown.target
+Conflicts=rke2-server.service k3s.service
+ConditionPathExists=|/usr/local/bin/k3s-killall.sh
+ConditionPathExists=|/opt/rke2/bin/rke2-killall.sh
+RefuseManualStart=yes
+
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=-/usr/local/bin/k3s-killall.sh
+ExecStart=-/opt/rke2/bin/rke2-killall.sh
+
+[Install]
+WantedBy=shutdown.target
+WantedBy=umount.target
