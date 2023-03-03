@@ -20,6 +20,7 @@ filterTests(['main'], () => {
   Cypress.config();
   describe('Deploy application in fresh Elemental Cluster', () => {
     const topLevelMenu = new TopLevelMenu();
+    const clusterName  = "mycluster"
     beforeEach(() => {
       cy.login();
       cy.visit('/');
@@ -27,10 +28,14 @@ filterTests(['main'], () => {
     
     it('Deploy CIS Benchmark application', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('mycluster').click();
-      cy.contains('Apps').click();
-      cy.contains('Charts').click();
-      cy.contains('CIS Benchmark').click();
+      cy.contains(clusterName)
+        .click();
+      cy.contains('Apps')
+        .click();
+      cy.contains('Charts')
+        .click();
+      cy.contains('CIS Benchmark')
+        .click();
       cy.contains('.name-logo-install', 'CIS Benchmark', {timeout:20000});
       cy.clickButton('Install');
       cy.clickButton('Next');
@@ -42,18 +47,27 @@ filterTests(['main'], () => {
   
     it('Remove CIS Benchmark application', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('mycluster').click();
-      cy.contains('Apps').click();
-      cy.contains('Installed Apps').click();
+      cy.contains(clusterName)
+        .click();
+      cy.contains('Apps')
+        .click();
+      cy.contains('Installed Apps')
+        .click();
       cy.contains('.title', 'Installed Apps', {timeout:20000});
-      cy.get('.ns-dropdown > .icon').click().type('cis-operator');
-      cy.contains('cis-operator').click();
-      cy.get('.ns-dropdown > .icon-chevron-up').click();
-      cy.get('[width="30"] > .checkbox-outer-container').click();
+      cy.get('.ns-dropdown > .icon')
+        .click()
+        .type('cis-operator');
+      cy.contains('cis-operator')
+        .click();
+      cy.get('.ns-dropdown > .icon-chevron-up')
+        .click();
+      cy.get('[width="30"] > .checkbox-outer-container')
+        .click();
       cy.clickButton('Delete');
       cy.confirmDelete();
       cy.contains('SUCCESS: helm uninstall', {timeout:30000});
-      cy.contains('.apps', 'CIS Benchmark').should('not.exist');
+      cy.contains('.apps', 'CIS Benchmark')
+        .should('not.exist');
     });
   });
 });

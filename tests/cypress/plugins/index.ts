@@ -26,21 +26,20 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   const { isFileExist, findFiles } = require('cy-verify-downloads');
   on('task', { isFileExist, findFiles })
 
-  config.baseUrl = url.replace(/\/$/, '');
-
-  config.env.username = process.env.RANCHER_USER;
-  config.env.password = process.env.RANCHER_PASSWORD;
-  config.env.cluster = process.env.CLUSTER_NAME;
-  config.env.cache_session = process.env.CACHE_SESSION || false;
-  config.env.k8s_version = process.env.K8S_VERSION_TO_PROVISION;
-  config.env.ui_account = process.env.UI_ACCOUNT;
-  config.env.operator_version = process.env.OPERATOR_VERSION;
-  config.env.proxy = process.env.PROXY;
-  config.env.proxy_ip = process.env.PROXY_IP;
+  config.baseUrl                  = url.replace(/\/$/, );
+  config.env.cache_session        = process.env.CACHE_SESSION || false;
+  config.env.cluster              = process.env.CLUSTER_NAME;
+  config.env.cypress_tags         = process.env.CYPRESS_TAGS;
   config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
-  config.env.cypress_tags = process.env.CYPRESS_TAGS;
+  config.env.k8s_version          = process.env.K8S_VERSION_TO_PROVISION;
+  config.env.operator_version     = process.env.OPERATOR_VERSION;
+  config.env.password             = process.env.RANCHER_PASSWORD;
+  config.env.proxy_ip             = process.env.PROXY_IP;
+  config.env.proxy                = process.env.PROXY;
+  config.env.ui_account           = process.env.UI_ACCOUNT;
   config.env.upgrade_channel_list = process.env.UPGRADE_CHANNEL_LIST;
-  config.env.upgrade_image = process.env.UPGRADE_IMAGE;
+  config.env.upgrade_image        = process.env.UPGRADE_IMAGE;
+  config.env.username             = process.env.RANCHER_USER;
 
   return config;
 };

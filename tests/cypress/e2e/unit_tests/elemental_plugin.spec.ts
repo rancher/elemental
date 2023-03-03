@@ -14,15 +14,13 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
 import '~/cypress/support/functions';
-import { Elemental } from '~/cypress/support/elemental';
 import filterTests from '~/cypress/support/filterTests.js';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-    const topLevelMenu = new TopLevelMenu();
-    const elemental = new Elemental();
     const elemental_ui_version = Cypress.env('elemental_ui_version');
+    const topLevelMenu         = new TopLevelMenu();
   
     beforeEach(() => {
       cy.login();
@@ -31,29 +29,40 @@ filterTests(['main', 'upgrade'], () => {
   
     it('Add elemental-ui repo', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('local').click();
-      cy.addHelmRepo({repoName: 'elemental-ui', repoUrl: 'https://github.com/rancher/elemental-ui.git', repoType: 'git'});
+      cy.contains('local')
+        .click();
+      cy.addHelmRepo({repoName: 'elemental-ui',
+        repoUrl: 'https://github.com/rancher/elemental-ui.git',
+        repoType: 'git'});
     });
     
     it('Enable extension support', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('Extensions').click();
+      cy.contains('Extensions')
+        .click();
       cy.clickButton('Enable');
       cy.contains('Enable Extension Support?')
-      cy.contains('Add the Rancher Extension Repository').click();
+      cy.contains('Add the Rancher Extension Repository')
+        .click();
       cy.clickButton('OK');
-      cy.get('.tabs', {timeout: 40000}).contains('Installed Available Updates All');
+      cy.get('.tabs', {timeout: 40000})
+        .contains('Installed Available Updates All');
     });
   
     it('Install Elemental plugin', () => {
       topLevelMenu.openIfClosed();
-      cy.contains('Extensions').click();
+      cy.contains('Extensions')
+        .click();
       cy.contains('elemental');
-      cy.get('.plugin').contains('Install').click();
+      cy.get('.plugin')
+        .contains('Install')
+        .click();
       cy.contains('Install Extension elemental');
       if (elemental_ui_version != 'latest') {
-        cy.get('.labeled-select').click();
-        cy.contains(elemental_ui_version).click();
+        cy.get('.labeled-select')
+          .click();
+        cy.contains(elemental_ui_version)
+          .click();
       }
       cy.clickButton('Install');
       cy.contains('Installing');

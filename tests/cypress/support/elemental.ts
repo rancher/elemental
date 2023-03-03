@@ -13,33 +13,36 @@ limitations under the License.
 */
 
 export class Elemental {
-  firstLogin() {
-    cy.get('input').type(Cypress.env('password'), {log: false});
-    cy.clickButton('Log in with Local User');
-    cy.contains('By checking').click('left');
-    cy.clickButton('Continue');
-    cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
+  // Go into the cluster creation menu
+  accessClusterMenu() {
+    cy.contains('.title', 'Dashboard')
+      .should('exist');
+    cy.contains('Dashboard')
+      .click();
+    cy.contains('Create Elemental Cluster')
+      .should('exist');
+    cy.contains('Create Elemental Cluster')
+      .click();
   }
 
-  elementalIcon() {
-    if (Cypress.env('elemental_ui_version') != '1.0.0') {
-      return cy.get('.option .icon.group-icon.icon-elemental');
-    }
-    return cy.get('.option .icon.group-icon.icon-os-management');
-  } 
-
-  // Go into the Elemental Menu
+  // Go into the Elemental menu
   accessElementalMenu() {
-    cy.contains('OS Management').click();
+    cy.contains('OS Management')
+      .click();
   }
 
+  // Make sure we get all menus
   checkElementalNav() {
-    // Open Advanced accordion
-    cy.get('div.header > i').eq(0).click()
-    cy.get('div.header').contains('Advanced').should('be.visible')
-
+    // Open advanced accordion
+    cy.get('div.header > i')
+      .eq(0)
+      .click()
+    cy.get('div.header')
+      .contains('Advanced')
+      .should('be.visible')
     // Check all listed options once accordion is opened
-    cy.get('li.child.nav-type').should(($lis) => {
+    cy.get('li.child.nav-type')
+      .should(($lis) => {
     expect($lis).to.have.length(6);
     expect($lis.eq(0)).to.contain('Dashboard');
     expect($lis.eq(1)).to.contain('Registration Endpoints');
@@ -50,11 +53,23 @@ export class Elemental {
     })      
   }
 
-  // Go into the cluster creation menu
-  accessClusterMenu() {
-    cy.contains('.title', 'Dashboard').should('exist');
-    cy.contains('Dashboard').click();
-    cy.contains('Create Elemental Cluster').should('exist');
-    cy.contains('Create Elemental Cluster').click();
+  // Make sure Elemental logo appears
+  elementalIcon() {
+    if (Cypress.env('elemental_ui_version') != '1.0.0') {
+      return cy.get('.option .icon.group-icon.icon-elemental');
+    }
+    return cy.get('.option .icon.group-icon.icon-os-management');
+  } 
+  
+  // Handle first login in Rancher
+  firstLogin() {
+    cy.get('input')
+      .type(Cypress.env('password'), {log: false});
+    cy.clickButton('Log in with Local User');
+    cy.contains('By checking')
+      .click('left');
+    cy.clickButton('Continue');
+    cy.get('[data-testid="banner-title"]')
+      .contains('Welcome to Rancher');
   }
 }
