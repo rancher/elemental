@@ -13,17 +13,17 @@ limitations under the License.
 */
 
 import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
-import '~/cypress/support/functions';
 import { Elemental } from '~/cypress/support/elemental';
+import '~/cypress/support/functions';
 import filterTests from '~/cypress/support/filterTests.js';
 
 Cypress.config();
 describe('User role testing', () => {
-  const topLevelMenu   = new TopLevelMenu();
-  const elemental      = new Elemental();
-  const std_user       = "std-user"
-  const elemental_user = "elemental-user"
-  const ui_password    = "rancherpassword"
+  const elemental     = new Elemental();
+  const elementalUser = "elemental-user"
+  const stdUser       = "std-user"
+  const topLevelMenu  = new TopLevelMenu();
+  const uiPassword    = "rancherpassword"
 
   beforeEach(() => {
     cy.visit('/');
@@ -34,12 +34,14 @@ describe('User role testing', () => {
       // User with the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.contains('Users & Authentication').click();
-      cy.contains('.title', 'Users').should('exist');
+      cy.contains('Users & Authentication')
+        .click();
+      cy.contains('.title', 'Users')
+        .should('exist');
       cy.clickButton('Create');
-      cy.typeValue({label: 'Username', value: std_user});
-      cy.typeValue({label: 'New Password', value: ui_password});
-      cy.typeValue({label: 'Confirm Password', value: ui_password});
+      cy.typeValue({label: 'Username', value: stdUser});
+      cy.typeValue({label: 'New Password', value: uiPassword});
+      cy.typeValue({label: 'Confirm Password', value: uiPassword});
       cy.clickButton('Create');
     });
 
@@ -47,21 +49,25 @@ describe('User role testing', () => {
       // User without the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.contains('Users & Authentication').click();
-      cy.contains('.title', 'Users').should('exist');
+      cy.contains('Users & Authentication')
+        .click();
+      cy.contains('.title', 'Users')
+        .should('exist');
       cy.clickButton('Create');
-      cy.typeValue({label: 'Username', value: elemental_user});
-      cy.typeValue({label: 'New Password', value: ui_password});
-      cy.typeValue({label: 'Confirm Password', value: ui_password});
-      cy.contains('Elemental Administrator').click();
+      cy.typeValue({label: 'Username', value: elementalUser});
+      cy.typeValue({label: 'New Password', value: uiPassword});
+      cy.typeValue({label: 'Confirm Password', value: uiPassword});
+      cy.contains('Elemental Administrator')
+        .click();
       cy.clickButton('Create');
     });
   });
 
   filterTests(['main'], () => {
     it('Elemental user should access the OS management menu', () => {
-      cy.login(elemental_user, ui_password);
-      cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
+      cy.login(elementalUser, uiPassword);
+      cy.get('[data-testid="banner-title"]')
+        .contains('Welcome to Rancher');
       topLevelMenu.openIfClosed();
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
@@ -69,8 +75,9 @@ describe('User role testing', () => {
     });
 
     it('Standard user should not access the OS management menu', () => {
-      cy.login(std_user, ui_password);
-      cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
+      cy.login(stdUser, uiPassword);
+      cy.get('[data-testid="banner-title"]')
+        .contains('Welcome to Rancher');
       topLevelMenu.openIfClosed();
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
