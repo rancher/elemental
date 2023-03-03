@@ -22,6 +22,7 @@ describe('Machine inventory testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
   const k8sVersion    = Cypress.env('k8s_version');
+  const clusterName   = "mycluster"
   const proxy         = "http://172.17.0.1:3128"
   const topLevelMenu  = new TopLevelMenu();
   const uiAccount     = Cypress.env('ui_account');
@@ -52,7 +53,7 @@ describe('Machine inventory testing', () => {
     it('Create Elemental cluster', () => {
       cy.contains('Create Elemental Cluster')
         .click();
-      cy.typeValue({label: 'Cluster Name', value: 'mycluster'});
+      cy.typeValue({label: 'Cluster Name', value: clusterName});
       cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
       cy.contains('Show deprecated Kubernetes')
         .click();
@@ -87,8 +88,8 @@ describe('Machine inventory testing', () => {
           .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
       }
       cy.clickButton('Create');
-      cy.contains('Updating mycluster', {timeout: 20000});
-      cy.contains('Active mycluster', {timeout: 360000});
+      cy.contains('Updating ' + clusterName, {timeout: 20000});
+      cy.contains('Active ' + clusterName, {timeout: 360000});
     });
   });
   
@@ -98,11 +99,11 @@ describe('Machine inventory testing', () => {
       cy.contains('Home')
         .click();
       // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/mycluster"]')
+      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
         .contains('Active');
       // Go into the dedicated cluster page
       topLevelMenu.openIfClosed();
-      cy.contains('mycluster')
+      cy.contains(clusterName)
         .click();
     })
   });
