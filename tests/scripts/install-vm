@@ -9,10 +9,11 @@ ARCH=$(uname -m)
 FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 EMULATED_TPM="none"
+VM_MEM=3072
 
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
-if (( NR_HUGEPAGES == 0 )); then
+if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
   # Not configured, do it now!
   MEMTOTAL_KB=$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)
 
@@ -24,6 +25,12 @@ if (( NR_HUGEPAGES == 0 )); then
   # Set nr_hugepage
   (( VALUE > 0 )) \
     && sudo bash -c "echo ${VALUE} > /proc/sys/vm/nr_hugepages"
+
+  # Set memory config on command line
+  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM},hugepages=yes"
+else
+  # Set memory config on command line
+  INSTALL_FLAG+=" --memory ${VM_MEM}"
 fi
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
@@ -47,7 +54,7 @@ if [[ ${ISO_BOOT} == "true" ]]; then
   ln -s ${ISO} ${VM_NAME}/
 
   # Force ISO boot
-  INSTALL_FLAG="--cdrom ${VM_NAME}/${ISO##*/}"
+  INSTALL_FLAG+=" --cdrom ${VM_NAME}/${ISO##*/}"
 else
   # Create symlink for binary but only if it doesn't exist
   SYM_LINK=../../ipxe.efi
@@ -65,7 +72,7 @@ else
   fi
 
   # Force PXE boot
-  INSTALL_FLAG="--pxe"
+  INSTALL_FLAG+=" --pxe"
 fi
 
 # Wait randomly until 20s to avoid running virt-install at the same time
@@ -81,8 +88,6 @@ script -e -O logs/bootstrap_${VM_NAME}.log \
   --machine q35 \
   --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
   --features smm.state=yes \
-  --memorybacking hugepages=yes,size=2,unit=M,locked=yes \
-  --memory 3072,hugepages=yes \
   --vcpus 2 \
   --cpu host \
   --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
@@ -93,5 +98,5 @@ script -e -O logs/bootstrap_${VM_NAME}.log \
   --rng random \
   --tpm ${EMULATED_TPM} \
   --noreboot \
-  ${INSTALL_FLAG} \
-  --network network=default,bridge=virbr0,model=virtio,mac=${MAC}"
+  --network network=default,bridge=virbr0,model=virtio,mac=${MAC} \
+  ${INSTALL_FLAG}"
