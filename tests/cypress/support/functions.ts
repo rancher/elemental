@@ -13,6 +13,22 @@ limitations under the License.
 */
 
 import 'cypress-file-upload';
+
+// Global
+interface hardwareLabels {
+  [key: string]: string;
+};
+
+const hwLabels: hardwareLabels = {
+  'CPUModel': '${System Data/CPU/Model}',
+  'CPUVendor': '${System Data/CPU/Vendor}',
+  'NumberBlockDevices': '${System Data/Block Devices/Number Devices}',
+  'NumberNetInterface': '${System Data/Network/Number Interfaces}',
+  'CPUVendorTotalCPUCores': '${System Data/CPU/Total Cores}',
+  'TotalCPUThread': '${System Data/CPU/Total Threads}',
+  'TotalMemory': '${System Data/Memory/Total Physical Bytes}'
+};
+
 // Generic functions
 
 // Log into Rancher
@@ -299,15 +315,21 @@ Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue})
 });
 
 // Add Label to machine inventory
-Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue}) => {
-  cy.get('#machine-inventory')
-    .contains('Inventory of Machines')
-    .click();
+Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue, useHardwareLabels=true}) => {
+  cy.get('#machine-inventory').contains('Inventory of Machines').click();
   cy.clickButton('Add Label');
-  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.key')
-    .type(labelName);
-  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.value')
-    .type(labelValue);
+  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.key').type(labelName);
+  cy.get('#machine-inventory > .mb-30 > .key-value > .kv-container > .kv-item.value').type(labelValue);
+  if (useHardwareLabels) {
+    var nthChildIndex = 7;
+    for (const key in hwLabels) {
+      const value = hwLabels[key];
+      cy.clickButton('Add Label');
+      cy.get(`#machine-inventory > .mb-30 > .key-value > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
+      cy.get(`#machine-inventory > .mb-30 > .key-value > .kv-container > :nth-child(${nthChildIndex + 1}) > .no-resize`).type(value, {parseSpecialCharSequences: false});
+      nthChildIndex += 3;
+    };
+  };
 });
 
 // Add Annotation to machine inventory
@@ -323,17 +345,33 @@ Cypress.Commands.add('addMachInvAnnotation', ({annotationName, annotationValue})
 });
 
 // Check machine inventory label in YAML
-Cypress.Commands.add('checkMachInvLabel', ({machRegName, labelName, labelValue}) => {
-  cy.contains(machRegName)
-    .click();
-  cy.get('div.actions > .role-multi-action')
-    .click()
-  cy.contains('li', 'Edit YAML')
-    .click();
-  cy.contains('Registration Endpoint: '+ machRegName)
-    .should('exist');
-  cy.contains(labelName + ': ' + labelValue);
-  cy.clickButton('Cancel');
+Cypress.Commands.add('checkMachInvLabel', ({machRegName, labelName, labelValue, userHardwareLabels=true, afterBoot=false}) => {
+  if (afterBoot == false ) {
+    cy.contains(machRegName)
+      .click();
+    cy.get('div.actions > .role-multi-action')
+      .click()
+    cy.contains('li', 'Edit YAML')
+      .click();
+    cy.contains('Registration Endpoint: '+ machRegName)
+      .should('exist');
+    cy.contains(labelName + ': ' + labelValue);
+    if (userHardwareLabels) {
+      for (const key in hwLabels) {
+        const value = hwLabels[key];
+        cy.contains(key +': ' + value);
+      };
+    };
+    cy.clickButton('Cancel');
+  } else {
+      cy.contains(labelName + ': ' + labelValue);
+      if (userHardwareLabels) {
+        for (const key in hwLabels) {
+          const value = hwLabels[key];
+          cy.contains(key +': ');
+      };
+    };
+  }
 });
 
 // Check machine registration label in YAML

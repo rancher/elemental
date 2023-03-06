@@ -21,6 +21,9 @@ Cypress.config();
 describe('Machine inventory testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
+  const hwLabels      = ["TotalCPUThread", "TotalMemory", "CPUModel",
+                        "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
+                        "CPUVendorTotalCPUCores"]
   const k8sVersion    = Cypress.env('k8s_version');
   const clusterName   = "mycluster"
   const proxy         = "http://172.17.0.1:3128"
@@ -44,11 +47,33 @@ describe('Machine inventory testing', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('.badge-state', 'Active')
         .should('exist');
+      cy.contains('.sortable-table', 'my-machine')
+        .should('exist');
       cy.contains('Namespace: fleet-default')
         .should('exist');
     });
-  });
 
+    it('Check we can see our embedded hardware labels', () => {
+      cy.clickNavMenu(["Inventory of Machines"]);
+      cy.contains('my-machine')
+        .click()
+      cy.checkMachInvLabel({machRegName: 'machine-registration',
+        labelName: 'myInvLabel1',
+        labelValue: 'myInvLabelValue1',
+        afterBoot: true});
+      for (var hwLabel in hwLabels) { 
+        cy.clickNavMenu(["Inventory of Machines"]);
+        cy.get('.table-options-group > .btn > .icon')
+          .click()
+          .parent()
+          .parent()
+          .contains(hwLabels[hwLabel])
+          .click({force: true})
+        cy.contains(hwLabels[hwLabel]);
+      }
+    });
+  });
+  
   filterTests(['main', 'upgrade'], () => {
     it('Create Elemental cluster', () => {
       cy.contains('Create Elemental Cluster')

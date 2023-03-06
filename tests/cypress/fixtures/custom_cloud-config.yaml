@@ -8,3 +8,4 @@ config:
       poweroff: true
       device: /dev/sda
       debug: true
+machineName: my-machine
