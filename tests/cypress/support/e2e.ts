@@ -21,13 +21,13 @@ declare global {
       // Functions declared in functions.ts
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
       addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
-      addMachInvLabel(labelName: string, labelValue: string):Chainable<Element>;
+      addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels: boolean):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
       byLabel(label: string,): Chainable<Element>;
       checkFilter(filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean): Chainable<Element>;
       checkMachInvAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
-      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
+      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string, useHardwareLabels: boolean, afterBoot: boolean):Chainable<Element>;
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
       checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
       clickButton(label: string,): Chainable<Element>;

@@ -48,7 +48,7 @@ describe('Machine registration testing', () => {
       };
     });
   });
-  
+
   filterTests(['main'], () => {
     it('Create machine registration with default options', () => {
       cy.createMachReg({machRegName: 'default-options-test'});
