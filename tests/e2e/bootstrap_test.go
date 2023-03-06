@@ -62,7 +62,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			misc.CopyFile(emulateTPMYaml, emulatedTmp)
 
 			// Patch the yaml file
-			err = tools.Sed("emulate-tpm:.*", "emulate-tpm: "+strconv.FormatBool(emulateTPM), emulatedTmp)
+			err = tools.Sed("%EMULATE_TPM%", strconv.FormatBool(emulateTPM), emulatedTmp)
 			Expect(err).To(Not(HaveOccurred()))
 
 			// And apply it
