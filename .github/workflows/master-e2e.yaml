@@ -343,8 +343,11 @@ jobs:
 
           # Disable EMULATE_TPM in case of upgrade test
           # This is because we don't know the version in advance, so easier to not use it
-          [[ ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }} ]] \
-            && unset EMULATE_TPM
+          if ${{ inputs.upgrade_image != '' }}      || \
+             ${{ inputs.upgrade_os_channel != '' }} || \
+             ${{ contains(inputs.iso_to_test, '/Stable:/') }}; then
+            unset EMULATE_TPM
+          fi
 
           cd tests && make e2e-bootstrap-node
       - name: Upgrade node 1 to specified OS version with osImage
