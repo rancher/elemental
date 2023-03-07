@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"math/rand"
 	"os"
 	"os/exec"
 	"strconv"
@@ -41,6 +42,19 @@ func getClusterState(ns, cluster, condition string) string {
 	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
 	Expect(err).To(Not(HaveOccurred()))
 	return out
+}
+
+func randomSleep(index int) {
+	timeMax := 240000
+
+	// Initialize the seed
+	rand.Seed(time.Now().UnixNano())
+
+	// Get a pseudo-random value
+	value := rand.Intn(timeMax + (timeMax % index))
+
+	// Wait until value is reached
+	time.Sleep(time.Duration(value) * time.Millisecond)
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
@@ -129,23 +143,26 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(macAdrs).To(Not(BeNil()))
 
 			wg.Add(1)
-			go func(s, h, m string) {
+			go func(s, h, m string, i int) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
 				By("Installing node "+h, func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					// Execute node deployment in parallel
 					err := exec.Command(s, h, m).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
-			}(installVMScript, hostName, macAdrs)
+			}(installVMScript, hostName, macAdrs, index)
 		}
 
 		// Wait for all parallel jobs
 		wg.Wait()
 	})
 
-	It("Add the node in Rancher Manager", func() {
+	It("Add the nodes in Rancher Manager", func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -224,6 +241,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				// Restart the node(s)
 				By("Restarting "+h+" to add it in the cluster", func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					err := exec.Command("sudo", "virsh", "start", h).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
@@ -355,17 +375,17 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Execute in parallel
 			wg.Add(1)
-			go func(h, p string, cl *tools.Client) {
+			go func(h, p string, i int, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
 				By("Rebooting "+h, func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					// Execute 'reboot' in background, to avoid SSH locking
 					_, err := cl.RunSSH("setsid -f reboot")
 					Expect(err).To(Not(HaveOccurred()))
-
-					// Wait a little bit for the cluster to be in an unstable state (yes!)
-					time.Sleep(misc.SetTimeout(2 * time.Minute))
 				})
 
 				if p != "worker" {
@@ -373,7 +393,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						checkClusterAgent(cl)
 					})
 				}
-			}(hostName, poolType, client)
+			}(hostName, poolType, index, client)
 		}
 
 		// Wait for all parallel jobs
