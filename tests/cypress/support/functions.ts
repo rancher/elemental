@@ -444,9 +444,17 @@ Cypress.Commands.add('editMachReg', ({
 Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
   cy.contains('Registration Endpoint')
     .click();
+  /*  This code cannot be used anymore for now because of
+      https://github.com/rancher/elemental/issues/714
+      As it is not a blocker, we need to bypass it.
+      Instead of selecting resource to delete by name
+      we select all resources.
   cy.contains(machRegName)
     .parent()
     .parent()
+    .click();
+  */
+  cy.get('[width="30"] > .checkbox-outer-container')
     .click();
   cy.clickButton('Delete');
   cy.confirmDelete();
