@@ -31,6 +31,7 @@
 
 - **Describe:** Machine inventory testing
     - **It:** Check that machine inventory has been created
+    - **It:** Check we can see our embedded hardware labels
     - **It:** Create Elemental cluster
     - **It:** Check Elemental cluster status
 
