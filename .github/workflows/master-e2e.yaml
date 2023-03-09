@@ -323,11 +323,10 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1, 2 and 3 (use and ISO) in pool "master" (use Emulated TPM if possible)
+      - name: Bootstrap node 1, 2 and 3 (with iPXE) in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
-          ISO_BOOT: true
           POOL: master
           VM_INDEX: 1
           VM_NUMBERS: 3
@@ -366,9 +365,10 @@ jobs:
           VM_INDEX: 2
           VM_NUMBERS: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap additional nodes (use iPXE) in pool "worker" (total of ${{ inputs.node_number }})
+      - name: Bootstrap additional nodes (with ISO) in pool "worker" (total of ${{ inputs.node_number }})
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
+          ISO_BOOT: true
           POOL: worker
           VM_INDEX: 4
           VM_NUMBERS: ${{ inputs.node_number }}
