@@ -5,12 +5,14 @@
 # !!    IT IS USED TO BOOSTRAP THE RUNNER     !!
 
 # Variable(s)
-SSD=/dev/nvme0n1
+LV_NAME=lv
+VG_NAME=data
 GH_USER=gh-runner
 HOST_PREFIX="elemental-ci-"
 HOST_PATTERN="^${HOST_PREFIX}[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*-[a-f0-9][a-f0-9]*\$"
 UNVALID_HOSTNAME=1
 GCLOUD_BIN=/opt/google-cloud-sdk/bin/gcloud
+declare -a NVME_DISK  # Force variable type to array
 
 # Just for logs
 echo "$0: started"
@@ -50,12 +52,16 @@ if [[ -z "${PAT_TOKEN}" ]]; then
   exit 1
 fi
 
-# Configure Local SSD
-mkfs -t xfs -f ${SSD}
+# Configure LVM using striping I/O with Local SSD(s)
+NVME_DISK=($(ls /dev/nvme[0-9]*n[0-9]* 2>/dev/null))
+pvcreate -v ${NVME_DISK[*]}
+vgcreate -v ${VG_NAME} ${NVME_DISK[*]}
+lvcreate -v -l100%FREE -i ${#NVME_DISK[*]} -n ${LV_NAME} ${VG_NAME}
+mkfs -t xfs -f /dev/${VG_NAME}/${LV_NAME}
 
 # Configure gh-runner account
 mkdir -p /home/${GH_USER}
-mount ${SSD} /home/${GH_USER}
+mount /dev/${VG_NAME}/${LV_NAME} /home/${GH_USER}
 useradd -d /home/${GH_USER} -g users -G docker,libvirt,google-sudoers -M ${GH_USER}
 chown -R ${GH_USER}:users /home/${GH_USER}
 
