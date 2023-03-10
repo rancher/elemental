@@ -33,7 +33,7 @@ on:
         default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2
         type: string
       sequential:
-        description: Defines if bootstrapping is done sequantially (true) or in parallel (false)
+        description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
         type: string
       upgrade_operator:
