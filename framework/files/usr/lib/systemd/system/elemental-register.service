@@ -1,0 +1,10 @@
+[Unit]
+Description=Elemental Register
+Documentation=https://elemental.docs.rancher.com
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=bash --login -c "elemental-register --debug /run/initramfs/live"
+
