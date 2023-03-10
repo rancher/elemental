@@ -1,0 +1,24 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-RKE2-Sequential-Rancher_Latest
+
+# This worflow is scheduled *after* build-ci to be sure that we have
+# the lastest version built. The scheduling is also to avoid running
+# the workflow on each push on main.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  k3s:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      cluster_name: cluster-rke2
+      k8s_version_to_provision: v1.24.8+rke2r1
+      rancher_channel: latest
+      rancher_version: devel
+      sequential: true

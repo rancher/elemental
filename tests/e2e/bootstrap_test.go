@@ -45,12 +45,16 @@ func getClusterState(ns, cluster, condition string) string {
 }
 
 func randomSleep(index int) {
-	timeMax := 240000
+	// Only useful in parallel mode
+	if sequential == true {
+		return
+	}
 
 	// Initialize the seed
 	rand.Seed(time.Now().UnixNano())
 
 	// Get a pseudo-random value
+	timeMax := 240000
 	value := rand.Intn(timeMax + (timeMax % index))
 
 	// Wait until value is reached

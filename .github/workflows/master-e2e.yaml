@@ -84,6 +84,10 @@ on:
         description: Runner template to use
         default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2
         type: string
+      sequential:
+        description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
+        default: false
+        type: string
       start_condition:
         description: Start condition of the runner
         default: success
@@ -328,8 +332,8 @@ jobs:
         env:
           EMULATE_TPM: true
           POOL: master
-          VM_INDEX: 1
-          VM_NUMBERS: 3
+          VM_START: 1
+          VM_END: 3
         run: |
           OPERATOR_VERSION=$(kubectl get pods \
                                -n cattle-elemental-system \
@@ -348,7 +352,15 @@ jobs:
             unset EMULATE_TPM
           fi
 
-          cd tests && make e2e-bootstrap-node
+          if ${{ inputs.sequential == 'true' }}; then
+            # Force node bootstrapping in sequential instead of parallel
+            cd tests
+            for ((i = VM_START ; i <= VM_END ; i++)); do
+              VM_INDEX=${i} make e2e-bootstrap-node
+            done
+          else
+            cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
+          fi
       - name: Upgrade node 1 to specified OS version with osImage
         if: inputs.test_type == 'cli' && inputs.upgrade_image != ''
         env:
@@ -370,9 +382,18 @@ jobs:
         env:
           ISO_BOOT: true
           POOL: worker
-          VM_INDEX: 4
-          VM_NUMBERS: ${{ inputs.node_number }}
-        run: cd tests && make e2e-bootstrap-node
+          VM_START: 4
+          VM_END: ${{ inputs.node_number }}
+        run: |
+          if ${{ inputs.sequential == 'true' }}; then
+            # Force node bootstrapping in sequential instead of parallel
+            cd tests
+            for ((i = VM_START ; i <= VM_END ; i++)); do
+              VM_INDEX=${i} make e2e-bootstrap-node
+            done
+          else
+            cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
+          fi
       - name: List installed nodes
         if: inputs.test_type == 'cli'
         run: sudo virsh list
