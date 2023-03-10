@@ -55,7 +55,6 @@ var (
 	clusterType         string
 	elementalSupport    string
 	emulateTPM          bool
-	eTPM                string
 	rancherHostname     string
 	imageVersion        string
 	isoBoot             string
@@ -67,6 +66,7 @@ var (
 	rancherChannel      string
 	rancherLogCollector string
 	rancherVersion      string
+	sequential          bool
 	testType            string
 	upgradeChannelList  string
 	upgradeImage        string
@@ -134,7 +134,7 @@ var _ = BeforeSuite(func() {
 	clusterNS = os.Getenv("CLUSTER_NS")
 	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
-	eTPM = os.Getenv("EMULATE_TPM")
+	eTPM := os.Getenv("EMULATE_TPM")
 	rancherHostname = os.Getenv("HOSTNAME")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
@@ -145,6 +145,7 @@ var _ = BeforeSuite(func() {
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
+	seqString := os.Getenv("SEQUENTIAL")
 	testType = os.Getenv("TEST_TYPE")
 	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
@@ -185,6 +186,14 @@ var _ = BeforeSuite(func() {
 		emulateTPM = true
 	default:
 		emulateTPM = false
+	}
+
+	// Same for sequential
+	switch seqString {
+	case "true":
+		sequential = true
+	default:
+		sequential = false
 	}
 
 	// Start HTTP server
