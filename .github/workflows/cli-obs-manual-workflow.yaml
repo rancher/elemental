@@ -51,7 +51,7 @@ jobs:
     with:
       cluster_name: cluster-k3s
       destroy_runner: ${{ inputs.destroy_runner }}
-      iso_to_test: ${ inputs.iso_to_test }}
+      iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
       node_number: ${{ inputs.node_number }}
       rancher_channel: ${{ inputs.rancher_channel }}
