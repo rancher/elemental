@@ -6,5 +6,5 @@ After=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=bash --login -c elemental-register --debug /run/initramfs/live
+ExecStart=bash --login -c "elemental-register --debug /run/initramfs/live"
 
