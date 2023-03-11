@@ -88,7 +88,7 @@
       -  **By:** Configuring iPXE boot script for network installation
       -  **By:** Adding registration file to ISO
       -  **By:** Installing node +h
-    - **It:** Add the node in Rancher Manager
+    - **It:** Add the nodes in Rancher Manager
       -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Checking cluster state
       -  **By:** Incrementing number of nodes in +poolType+ pool
