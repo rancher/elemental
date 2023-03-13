@@ -45,11 +45,11 @@ describe('Machine inventory testing', () => {
   filterTests(['main'], () => {
     it('Check that machine inventory has been created', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
-      cy.contains('.badge-state', 'Active')
+      cy.contains('[data-testid="sortable-cell-0-0"]', 'Active')
         .should('exist');
-      cy.contains('.sortable-table', 'my-machine')
+      cy.contains('[data-testid="sortable-cell-0-1"]', 'my-machine')
         .should('exist');
-      cy.contains('Namespace: fleet-default')
+      cy.contains('[data-testid="sortable-cell-0-3"]', 'fleet-default')
         .should('exist');
     });
 
@@ -76,10 +76,12 @@ describe('Machine inventory testing', () => {
   
   filterTests(['main', 'upgrade'], () => {
     it('Create Elemental cluster', () => {
-      cy.contains('Create Elemental Cluster')
+      cy.get('[data-testid="button-create-elemental-cluster"]')
         .click();
-      cy.typeValue({label: 'Cluster Name', value: clusterName});
-      cy.typeValue({label: 'Cluster Description', value: 'My Elemental testing cluster'});
+      cy.get('[data-testid="name-ns-description-name"]')
+        .type(clusterName);
+      cy.get('[data-testid="name-ns-description-description"]')
+        .type('My Elemental testing cluster');
       cy.contains('Show deprecated Kubernetes')
         .click();
       cy.contains('Kubernetes Version')

@@ -35,17 +35,19 @@ filterTests(['main'], () => {
       topLevelMenu.openIfClosed();
   
       // Elemental's icon should appear in the side menu
-        elemental.elementalIcon().should('exist');
+        elemental.elementalIcon()
+          .should('exist');
     });
     
     it('Check Elemental menu', () => {
       topLevelMenu.openIfClosed();
   
       // Elemental's icon should appear in the side menu
-        elemental.elementalIcon().should('exist');
+      elemental.elementalIcon()
+        .should('exist');
   
-        // Click on the Elemental's icon
-        elemental.accessElementalMenu(); 
+      // Click on the Elemental's icon
+      elemental.accessElementalMenu(); 
   
       // Check Elemental's side menu
       elemental.checkElementalNav();

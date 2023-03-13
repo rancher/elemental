@@ -34,7 +34,8 @@ describe('User role testing', () => {
       // User with the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.contains('Users & Authentication')
+      cy.get('[data-testid="side-menu"]')
+        .contains('Users & Authentication')
         .click();
       cy.contains('.title', 'Users')
         .should('exist');
@@ -49,17 +50,20 @@ describe('User role testing', () => {
       // User without the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.contains('Users & Authentication')
+      cy.get('[data-testid="side-menu"]')
+        .contains('Users & Authentication')
         .click();
       cy.contains('.title', 'Users')
         .should('exist');
-      cy.clickButton('Create');
+      cy.contains('[data-testid="masthead-create"]', 'Create')
+        .click();
       cy.typeValue({label: 'Username', value: elementalUser});
       cy.typeValue({label: 'New Password', value: uiPassword});
       cy.typeValue({label: 'Confirm Password', value: uiPassword});
       cy.contains('Elemental Administrator')
         .click();
-      cy.clickButton('Create');
+      cy.contains('[data-testid="form-save"]', 'Create')
+        .click();
     });
   });
 
@@ -82,7 +86,12 @@ describe('User role testing', () => {
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
       // User without appropriate role will get a specific page
-      cy.contains('Elemental is a software stack');
+      cy.get('[data-testid="elemental-icon"]')
+        .should('exist');
+      cy.contains('[data-testid="elemental-description-text"]', 'Elemental is a software stack')
+        .should('exist');
+      cy.get('[data-testid="warning-not-install-or-no-schema"]')
+        .should('exist');
     });
   });
 });
