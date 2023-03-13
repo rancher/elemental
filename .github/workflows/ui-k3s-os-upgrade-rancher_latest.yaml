@@ -16,10 +16,6 @@ on:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: latest
-        type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: devel
@@ -42,7 +38,7 @@ jobs:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
-      rancher_channel: ${{ inputs.rancher_channel || 'latest' }}
+      rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       test_type: ui
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
