@@ -12,10 +12,6 @@ on:
         description: Version of the elemental ui which will be installed
         default: latest
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: latest
-        type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: devel
@@ -41,7 +37,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest'}}
       k8s_version_to_provision: v1.24.8+rke2r1
-      rancher_channel: ${{ inputs.rancher_channel || 'latest' }}
+      rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       test_type: ui
       upgrade_operator: ${{ inputs.upgrade_operator }}

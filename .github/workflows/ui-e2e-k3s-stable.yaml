@@ -16,10 +16,6 @@ on:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: stable
-        type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
@@ -44,7 +40,7 @@ jobs:
       elemental_ui_version: ${{ inputs.elemental_ui_version || '1.0.0' }}
       k8s_version_to_provision: v1.24.8+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
-      rancher_channel: ${{ inputs.rancher_channel || 'stable' }}
+      rancher_channel: 'stable'
       rancher_version: ${{ inputs.rancher_version || 'latest' }}
       test_type: ui
       upgrade_operator: ${{ inputs.upgrade_operator }}

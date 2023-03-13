@@ -12,10 +12,6 @@ on:
         description: Version of the elemental ui which will be installed
         default: '1.0.0'
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: stable
-        type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
@@ -42,7 +38,7 @@ jobs:
       elemental_ui_version: ${{ inputs.elemental_ui_version || '1.0.0' }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+rke2r1
-      rancher_channel: ${{ inputs.rancher_channel || 'stable' }}
+      rancher_channel: 'stable'
       rancher_version: ${{ inputs.rancher_version || 'latest' }}
       test_type: ui
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
