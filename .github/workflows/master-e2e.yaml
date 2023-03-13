@@ -45,7 +45,7 @@ on:
         type: boolean
       elemental_support:
         description: URL of the elemental support binary
-        default: https://github.com/rancher/elemental-operator/releases/download/v1.0.0/elemental-support_1.0.0_linux_amd64
+        default: https://github.com/rancher/elemental-operator/releases/download/v1.1.4/elemental-support_1.1.4_linux_amd64
         type: string
       elemental_ui_version:
         description: Version of the elemental ui which will be installed
