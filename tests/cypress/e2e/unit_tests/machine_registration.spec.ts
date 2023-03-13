@@ -39,7 +39,7 @@ describe('Machine registration testing', () => {
     cy.exec('rm cypress/downloads/*', {failOnNonZeroExit: false});
 
     // Delete all existing machine registrations
-    cy.contains('Manage Registration Endpoints')
+    cy.get('[data-testid="manage-reg-btn"]')
       .click();
     cy.get('.outlet > header').contains('Registration Endpoints');
     cy.get('body').then(($body) => {
@@ -70,7 +70,8 @@ describe('Machine registration testing', () => {
       cy.editMachReg({machRegName: 'edit-config-test',
         addLabel: true,
         addAnnotation: true });
-      cy.clickButton('Save');
+      cy.contains('[data-testid="form-save"]', 'Save')
+        .click();
 
       // Check that we can see our label and annotation in the YAML
       cy.checkMachRegLabel({machRegName: 'edit-config-test',
@@ -87,7 +88,8 @@ describe('Machine registration testing', () => {
         addLabel: true,
         addAnnotation: true,
         withYAML: true });
-      cy.clickButton('Save');
+      cy.contains('[data-testid="action-button-async-button"]', 'Save')
+        .click();
 
       // Check that we can see our label and annotation in the YAML
       cy.checkMachRegLabel({machRegName: 'edit-yaml-test',
@@ -108,8 +110,10 @@ describe('Machine registration testing', () => {
         .click()
       cy.contains('li', 'Clone')
         .click();
-      cy.typeValue({label: 'Name', value: 'cloned-machine-reg'});
-      cy.clickButton('Create');
+      cy.get('[data-testid="name-ns-description-name"]')
+        .type('cloned-machine-reg')
+      cy.contains('[data-testid="form-save"]', 'Create')
+        .click();
       cy.contains('.masthead', 'Registration Endpoint: cloned-machine-regActive')
         .should('exist');
       

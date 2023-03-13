@@ -15,13 +15,13 @@ limitations under the License.
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
-    cy.contains('.title', 'Dashboard')
-      .should('exist');
     cy.contains('Dashboard')
       .click();
-    cy.contains('Create Elemental Cluster')
+    cy.get('[data-testid="elemental-main-title"]')
       .should('exist');
-    cy.contains('Create Elemental Cluster')
+    cy.contains('[data-testid="card-clusters"]', 'Create Elemental Cluster')
+      .should('exist');
+    cy.get('[data-testid="button-create-elemental-cluster"]')
       .click();
   }
 
@@ -55,6 +55,7 @@ export class Elemental {
 
   // Make sure Elemental logo appears
   elementalIcon() {
+    // TODO: REMOVE 'IF' BLOCK AFTER NEXT STABLE VERSION (> 1.0.0)
     if (Cypress.env('elemental_ui_version') != '1.0.0') {
       return cy.get('.option .icon.group-icon.icon-elemental');
     }
