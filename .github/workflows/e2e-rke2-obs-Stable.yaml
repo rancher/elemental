@@ -8,10 +8,6 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
-      node_number:
-        description: Number of nodes (>3) to deploy on the provisioned cluster
-        default: 5
-        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
@@ -19,10 +15,6 @@ on:
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
-        type: string
-      runner_template:
-        description: Runner template to use
-        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v2
         type: string
       upgrade_operator:
         description: URL to elemental-operator version to upgrade to
@@ -46,8 +38,6 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.8+rke2r1
-      node_number: ${{ inputs.node_number }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
-      runner_template: ${{ inputs.runner_template }}
       upgrade_operator: ${{ inputs.upgrade_operator }}
