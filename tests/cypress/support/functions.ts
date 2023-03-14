@@ -42,16 +42,16 @@ Cypress.Commands.add('login', (
       
       cy.visit('/auth/login');
 
-      cy.get('[data-testid="local-login-username"]')
+      cy.getBySel('local-login-username')
         .type(username, {log: false});
 
-      cy.get('[data-testid="local-login-password"]')
+      cy.getBySel('local-login-password')
         .type(password, {log: false});
 
-      cy.get('[data-testid="login-submit"]')
+      cy.getBySel('login-submit')
         .click();
       cy.wait('@loginReq');
-      cy.get('[data-testid="banner-title"]').contains('Welcome to Rancher');
+      cy.getBySel('banner-title').contains('Welcome to Rancher');
       } 
 
     if (cacheSession) {
@@ -59,6 +59,11 @@ Cypress.Commands.add('login', (
     } else {
       login();
     }
+});
+
+// Search by data-testid selector
+Cypress.Commands.add("getBySel", (selector, ...args) => {
+  return cy.get(`[data-testid=${selector}]`, ...args);
 });
 
 // Search fields by label
@@ -77,7 +82,7 @@ Cypress.Commands.add('clickButton', (label) => {
 
 // Confirm the delete operation
 Cypress.Commands.add('confirmDelete', () => {
-  cy.get('[data-testid="prompt-remove-confirm-button"]')
+  cy.getBySel('prompt-remove-confirm-button')
     .click()
 });
 
@@ -167,7 +172,8 @@ Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
 Cypress.Commands.add('deleteAllResources', () => {  
   cy.get('[width="30"] > .checkbox-outer-container')
     .click();
-  cy.contains('[data-testid="sortable-table-promptRemove"]', 'Delete')
+  cy.getBySel('sortable-table-promptRemove')
+    .contains('Delete')
     .click()
   cy.confirmDelete();
   // Sometimes, UI is crashing when a resource is deleted
@@ -195,9 +201,9 @@ Cypress.Commands.add('createMachReg', ({
   customCloudConfig='',
   checkDefaultCloudConfig=true }) => {
     cy.clickNavMenu(["Dashboard"]);
-    cy.get('[data-testid="button-create-registration-endpoint"]')
+    cy.getBySel('button-create-registration-endpoint')
       .click();
-    cy.get('[data-testid="name-ns-description-name"]')
+    cy.getBySel('name-ns-description-name')
       .type(machRegName);
 
     if (customCloudConfig != '') {
@@ -227,7 +233,8 @@ Cypress.Commands.add('createMachReg', ({
         annotationValue: 'myInvAnnotationValue1'});
     }
 
-    cy.contains('[data-testid="form-save"]', 'Create')
+    cy.getBySel('form-save')
+      .contains('Create')
       .click();
 
     // Make sure the machine registration is created and active
@@ -239,10 +246,11 @@ Cypress.Commands.add('createMachReg', ({
       .should('exist');
 
     // Make sure there is an URL registration in the Registration URL block
-    cy.contains('[data-testid="registration-url"]', /https:\/\/.*elemental\/registration/);
+    cy.getBySel('registration-url')
+      .contains(/https:\/\/.*elemental\/registration/);
 
     // Try to download the registration file and check it
-    cy.get('[data-testid="download-btn"]')
+    cy.getBySel('download-btn')
       .click();
     cy.verifyDownload(machRegName + '_registrationURL.yaml');
     cy.contains('Saving')
@@ -251,7 +259,7 @@ Cypress.Commands.add('createMachReg', ({
       // Check Cloud configuration
     // TODO: Maybe the check may be improved in one line
     if (checkDefaultCloudConfig) {
-      cy.get('[data-testid="yaml-editor-code-mirror"]')
+      cy.getBySel('yaml-editor-code-mirror')
         .should('include.text','config:')
         .should('include.text','cloud-config:')
         .should('include.text','users:')
@@ -280,7 +288,8 @@ Cypress.Commands.add('createMachReg', ({
 
 // Add Label to machine registration
 Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
-  cy.get('[data-testid="labels-and-annotations-block"]').contains('Registration Endpoint')
+  cy.getBySel('labels-and-annotations-block')
+    .contains('Registration Endpoint')
     .click();
   cy.get('[data-testid="add-label-mach-reg"] > .footer > .btn')
     .click();
@@ -292,7 +301,8 @@ Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
 
 // Add Annotation to machine registration
 Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue}) => {
-  cy.get('[data-testid="labels-and-annotations-block"]').contains('Registration Endpoint')
+  cy.getBySel('labels-and-annotations-block')
+    .contains('Registration Endpoint')
     .click();
   cy.get('[data-testid="add-annotation-mach-reg"] > .footer > .btn')
     .click();
@@ -304,7 +314,8 @@ Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue})
 
 // Add Label to machine inventory
 Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue, useHardwareLabels=true}) => {
-  cy.get('[data-testid="labels-and-annotations-block"]').contains('Inventory of Machines')
+  cy.getBySel('labels-and-annotations-block')
+    .contains('Inventory of Machines')
     .click();
   cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
     .click();
@@ -325,7 +336,8 @@ Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue, useHardwareLabe
 
 // Add Annotation to machine inventory
 Cypress.Commands.add('addMachInvAnnotation', ({annotationName, annotationValue}) => {
-  cy.get('[data-testid="labels-and-annotations-block"]').contains('Inventory of Machines')
+  cy.getBySel('labels-and-annotations-block')
+    .contains('Inventory of Machines')
     .click();
   cy.clickButton('Add Annotation');
   cy.get('[data-testid="add-annotation-mach-inv"] > .kv-container > .kv-item.key')
@@ -345,20 +357,24 @@ Cypress.Commands.add('checkMachInvLabel', ({machRegName, labelName, labelValue, 
       .click();
     cy.contains('Registration Endpoint: '+ machRegName)
       .should('exist');
-    cy.contains('[data-testid="yaml-editor-code-mirror"]', labelName + ': ' + labelValue);
+    cy.getBySel('yaml-editor-code-mirror')
+      .contains(labelName + ': ' + labelValue);
     if (userHardwareLabels) {
       for (const key in hwLabels) {
         const value = hwLabels[key];
-        cy.contains('[data-testid="yaml-editor-code-mirror"]', key +': ' + value);
+        cy.getBySel('yaml-editor-code-mirror')
+          .contains(key +': ' + value);
       };
     };
     cy.clickButton('Cancel');
   } else {
-      cy.contains('[data-testid="yaml-editor-code-mirror"]', labelName + ': ' + labelValue);
+      cy.getBySel('yaml-editor-code-mirror')
+        .contains(labelName + ': ' + labelValue);
       if (userHardwareLabels) {
         for (const key in hwLabels) {
           const value = hwLabels[key];
-          cy.contains('[data-testid="yaml-editor-code-mirror"]', key +': ');
+          cy.getBySel('yaml-editor-code-mirror')
+            .contains(key +': ');
       };
     };
   }
@@ -377,7 +393,8 @@ Cypress.Commands.add('checkMachRegLabel', ({
       .click();
     cy.contains('Registration Endpoint: '+ machRegName)
       .should('exist');
-    cy.contains('[data-testid="yaml-editor-code-mirror"]', labelName + ': ' + labelValue);
+    cy.getBySel('yaml-editor-code-mirror')
+      .contains(labelName + ': ' + labelValue);
     cy.clickButton('Cancel');
 });
 
@@ -394,7 +411,8 @@ Cypress.Commands.add('checkMachRegAnnotation', ({
       .click();
     cy.contains('Registration Endpoint: '+ machRegName)
       .should('exist');
-    cy.contains('[data-testid="yaml-editor-code-mirror"]', annotationName + ': ' + annotationValue);
+    cy.getBySel('yaml-editor-code-mirror')
+      .contains(annotationName + ': ' + annotationValue);
     cy.clickButton('Cancel');
 });
 
@@ -446,8 +464,9 @@ Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
   */
   cy.get('[width="30"] > .checkbox-outer-container')
     .click();
-  cy.contains('[data-testid="sortable-table-promptRemove"]', 'Delete')
-    .click()
+  cy.getBySel('sortable-table-promptRemove')
+    .contains('Delete')
+    .click();
   cy.confirmDelete();
   // Timeout should fix this issue https://github.com/rancher/elemental/issues/643
   cy.contains(machRegName, {timeout: 20000})
@@ -461,12 +480,13 @@ Cypress.Commands.add('importMachineInventory', ({
   machineInventoryFile,
   machineInventoryName}) => {
     cy.clickNavMenu(["Inventory of Machines"]);
-    cy.get('[data-testid="masthead-create-yaml"]')
+    cy.getBySel('masthead-create-yaml')
       .click();
     cy.clickButton('Read from File');
     cy.get('input[type="file"]')
       .attachFile({filePath: machineInventoryFile});
-    cy.contains('[data-testid="action-button-async-button"]', 'Create')
+    cy.getBySel('action-button-async-button')
+      .contains('Create')
       .click();
     cy.contains('Creating')
       .should('not.exist');

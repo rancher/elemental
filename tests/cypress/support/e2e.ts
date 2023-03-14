@@ -39,6 +39,7 @@ declare global {
       deleteAllResources():Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
+      getBySel(dataTestAttribute: string, args?: any): Chainable<JQuery<HTMLElement>>;
       getDetail(name: string, type: string, namespace?: string): Chainable<Element>;
       importMachineInventory(machineInventoryFile: string, machineInventoryName: string): Chainable<Element>;
       login(username?: string, password?: string, cacheSession?: boolean,): Chainable<Element>;

@@ -17,11 +17,12 @@ export class Elemental {
   accessClusterMenu() {
     cy.contains('Dashboard')
       .click();
-    cy.get('[data-testid="elemental-main-title"]')
+    cy.getBySel('elemental-main-title')
       .should('exist');
-    cy.contains('[data-testid="card-clusters"]', 'Create Elemental Cluster')
+    cy.getBySel('card-clusters')
+      .contains('Create Elemental Cluster')
       .should('exist');
-    cy.get('[data-testid="button-create-elemental-cluster"]')
+    cy.getBySel('button-create-elemental-cluster')
       .click();
   }
 
@@ -70,7 +71,7 @@ export class Elemental {
     cy.contains('By checking')
       .click('left');
     cy.clickButton('Continue');
-    cy.get('[data-testid="banner-title"]')
+    cy.getBySel('banner-title')
       .contains('Welcome to Rancher');
   }
 }

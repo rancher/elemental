@@ -34,7 +34,7 @@ describe('User role testing', () => {
       // User with the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.get('[data-testid="side-menu"]')
+      cy.getBySel('side-menu')
         .contains('Users & Authentication')
         .click();
       cy.contains('.title', 'Users')
@@ -50,19 +50,21 @@ describe('User role testing', () => {
       // User without the elemental-administrator role
       cy.login();
       topLevelMenu.openIfClosed();
-      cy.get('[data-testid="side-menu"]')
+      cy.getBySel('side-menu')
         .contains('Users & Authentication')
         .click();
       cy.contains('.title', 'Users')
         .should('exist');
-      cy.contains('[data-testid="masthead-create"]', 'Create')
+      cy.getBySel('masthead-create')
+        .contains('Create')
         .click();
       cy.typeValue({label: 'Username', value: elementalUser});
       cy.typeValue({label: 'New Password', value: uiPassword});
       cy.typeValue({label: 'Confirm Password', value: uiPassword});
       cy.contains('Elemental Administrator')
         .click();
-      cy.contains('[data-testid="form-save"]', 'Create')
+      cy.getBySel('form-save')
+        .contains('Create')
         .click();
     });
   });
@@ -70,7 +72,7 @@ describe('User role testing', () => {
   filterTests(['main'], () => {
     it('Elemental user should access the OS management menu', () => {
       cy.login(elementalUser, uiPassword);
-      cy.get('[data-testid="banner-title"]')
+      cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
       topLevelMenu.openIfClosed();
       elemental.elementalIcon().should('exist');
@@ -80,17 +82,18 @@ describe('User role testing', () => {
 
     it('Standard user should not access the OS management menu', () => {
       cy.login(stdUser, uiPassword);
-      cy.get('[data-testid="banner-title"]')
+      cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
       topLevelMenu.openIfClosed();
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
       // User without appropriate role will get a specific page
-      cy.get('[data-testid="elemental-icon"]')
+      cy.getBySel('elemental-icon')
         .should('exist');
-      cy.contains('[data-testid="elemental-description-text"]', 'Elemental is a software stack')
+      cy.getBySel('elemental-description-text')
+        .contains('Elemental is a software stack')
         .should('exist');
-      cy.get('[data-testid="warning-not-install-or-no-schema"]')
+      cy.getBySel('warning-not-install-or-no-schema')
         .should('exist');
     });
   });

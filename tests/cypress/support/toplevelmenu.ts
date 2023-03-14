@@ -14,7 +14,8 @@ limitations under the License.
 
 export class TopLevelMenu {
   toggle() {
-    cy.get('[data-testid="top-level-menu"]', {timeout: 12000}).click();
+    cy.getBySel('top-level-menu', {timeout: 12000})
+      .click();
   }
 
   openIfClosed() {
