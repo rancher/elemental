@@ -46,35 +46,41 @@ describe('Upgrade tests', () => {
   filterTests(['upgrade'], () => {
     it('Create an OS Version Channels', () => {
       cy.clickNavMenu(["Advanced", "OS Version Channels"]);
-      cy.contains('[data-testid="masthead-create"]', 'Create')
+      cy.getBySel('masthead-create')
+        .contains('Create')
         .click();
-      cy.get('[data-testid="name-ns-description-name"]')
+      cy.getBySel('name-ns-description-name')
         .type(channelName);
-      cy.get('[data-testid="os-version-channel-path"]')
+      cy.getBySel('os-version-channel-path')
         .type(upgradeChannelList);
-      cy.contains('[data-testid="form-save"]', 'Create')
+      cy.getBySel('form-save')
+        .contains('Create')
         .click();
     });
 
     it('Check OS Versions', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      cy.contains('[data-testid="sortable-table-0-row"]', 'Active dev', {timeout: 120000});
-      cy.contains('[data-testid="sortable-table-1-row"]', 'Active stable');
-      cy.contains('[data-testid="sortable-table-2-row"]', 'Active staging');
+      cy.getBySel('sortable-table-0-row')
+        .contains('Active dev', {timeout: 120000});
+      cy.getBySel('sortable-table-1-row')
+        .contains('Active stable');
+      cy.getBySel('sortable-table-2-row')
+        .contains('Active staging');
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
       // K3s cluster upgraded with OS Image
       // RKE2 cluster upgraded with OS version channel
       cy.clickNavMenu(["Advanced", "Update Groups"]);
-      cy.contains('[data-testid="masthead-create"]', 'Create')
+      cy.getBySel('masthead-create')
+      .contains('Create')
         .click();
       cy.get('.primaryheader')
         .contains('Update Group: Create');
-      cy.get('[data-testid="name-ns-description-name"]')
+      cy.getBySel('name-ns-description-name')
         .type(channelName);
       cy.contains('Target Cluster')
-      cy.get('[data-testid="cluster-target"]')
+      cy.getBySel('cluster-target')
         .click();
       cy.contains(clusterName)
         .click();
@@ -84,38 +90,39 @@ describe('Upgrade tests', () => {
         cy.typeValue({label: 'OS Image', value: upgradeImage});
       } else {
         if (!checkK3s.test(k8sVersion)) {
-          cy.get('[data-testid="upgrade-choice-selector"]')
+          cy.getBySel('upgrade-choice-selector')
             .parent()
             .contains('Use image from registry')
             .click();
-          cy.get('[data-testid="os-image-box"]')
+          cy.getBySel('os-image-box')
             .type(upgradeImage)
         } else {
-          cy.get('[data-testid="upgrade-choice-selector"]')
+          cy.getBySel('upgrade-choice-selector')
             .parent()
             .contains('Use Managed OS version')
             .click();
-          cy.get('[data-testid="os-version-box"]')
+          cy.getBySel('os-version-box')
             .click()
-          cy.get('[data-testid="os-version-box"]')
+          cy.getBySel('os-version-box')
             .parents()
             .contains('staging')
             .click();
         };
       };
-      cy.contains('[data-testid="form-save"]', 'Create')
+      cy.getBySel('form-save')
+      .contains('Create')
         .click();
       // Status changes a lot right after the creation so let's wait 10 secondes
       // before checking
       cy.wait(10000);
-      cy.get('[data-testid="sortable-cell-0-0"]')
+      cy.getBySel('sortable-cell-0-0')
         .contains('Active');
 
       // Workaround to avoid sporadic issue with Upgrade
       // https://github.com/rancher/elemental/issues/410
       // Restart fleet agent inside downstream cluster
       topLevelMenu.openIfClosed();
-      cy.get('[data-testid="side-menu"]')
+      cy.getBySel('side-menu')
         .contains(clusterName)
         .click();
       cy.contains('Workload')
@@ -134,7 +141,7 @@ describe('Upgrade tests', () => {
       topLevelMenu.openIfClosed();
       elemental.accessElementalMenu();
       cy.clickNavMenu(["Dashboard"]);
-      cy.get('[data-testid="card-clusters"]')
+      cy.getBySel('card-clusters')
         .contains('Manage Elemental Clusters')
         .click()
       cy.get('.title')
@@ -155,7 +162,8 @@ describe('Upgrade tests', () => {
         .parent()
         .parent()
         .click();
-      cy.contains('[data-testid="sortable-table-promptRemove"]', 'Delete')
+      cy.getBySel('sortable-table-promptRemove')
+      .contains('Delete')
         .click()
       cy.confirmDelete();
       cy.contains('dev')
