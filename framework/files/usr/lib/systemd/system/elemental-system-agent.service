@@ -8,12 +8,14 @@ ConditionPathExists=!/run/cos/live_mode
 ConditionPathExists=!/etc/systemd/system/rancher-system-agent.service
 
 [Service]
+EnvironmentFile=-/etc/default/rancher-system-agent
+EnvironmentFile=-/etc/sysconfig/rancher-system-agent
+EnvironmentFile=-/etc/systemd/system/rancher-system-agent.env
 Type=simple
 Restart=always
 RestartSec=5s
 StandardOutput=journal+console
 StandardError=journal+console
 Environment="CATTLE_AGENT_CONFIG=/etc/rancher/elemental/agent/config.yaml"
-Environment="CATTLE_LOGLEVEL=debug"
+Environment="CATTLE_LOGLEVEL=info"
 ExecStart=/usr/sbin/elemental-system-agent sentinel
-ExecStop=sleep 10
