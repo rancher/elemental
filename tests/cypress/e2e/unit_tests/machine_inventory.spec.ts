@@ -45,14 +45,12 @@ describe('Machine inventory testing', () => {
   filterTests(['main'], () => {
     it('Check that machine inventory has been created', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
+      cy.contains('Namespace: fleet-default')
       cy.getBySel('sortable-cell-0-0')
         .contains('Active')
         .should('exist');
       cy.getBySel('sortable-cell-0-1')
         .contains('my-machine')
-        .should('exist');
-      cy.getBySel('sortable-cell-0-3')
-        .contains('fleet-default')
         .should('exist');
     });
 
