@@ -8,8 +8,8 @@
 .idea
 /tests/build
 /tests/build-box
-/tests/cypress/videos/*
-/tests/cypress/screenshots/*
-/tests/cypress/downloads/*
+/tests/cypress/*/videos/*
+/tests/cypress/*/screenshots/*
+/tests/cypress/*/downloads/*
 /tests/node_modules
 /tests/package-lock.json

@@ -242,12 +242,12 @@ jobs:
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
           SPEC: |
-            cypress/e2e/unit_tests/first_connection.spec.ts
-            cypress/e2e/unit_tests/elemental_plugin.spec.ts
-            cypress/e2e/unit_tests/user.spec.ts
-            cypress/e2e/unit_tests/menu.spec.ts
-            cypress/e2e/unit_tests/machine_registration.spec.ts
-            cypress/e2e/unit_tests/advanced_filtering.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/first_connection.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/elemental_plugin.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/user.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/menu.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_registration.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
@@ -292,10 +292,10 @@ jobs:
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
           SPEC: |
-            cypress/e2e/unit_tests/machine_selector.spec.ts
-            cypress/e2e/unit_tests/machine_inventory.spec.ts
-            cypress/e2e/unit_tests/deploy_app.spec.ts
-            cypress/e2e/unit_tests/upgrade.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_selector.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_inventory.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/deploy_app.spec.ts
+            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/upgrade.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
           UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
