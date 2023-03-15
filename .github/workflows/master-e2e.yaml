@@ -242,12 +242,12 @@ jobs:
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
           SPEC: |
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/first_connection.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/elemental_plugin.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/user.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/menu.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_registration.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/advanced_filtering.spec.ts
+            /workdir/e2e/unit_tests/first_connection.spec.ts
+            /workdir/e2e/unit_tests/elemental_plugin.spec.ts
+            /workdir/e2e/unit_tests/user.spec.ts
+            /workdir/e2e/unit_tests/menu.spec.ts
+            /workdir/e2e/unit_tests/machine_registration.spec.ts
+            /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
@@ -255,7 +255,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-basics-${{ inputs.cluster_name }}
-          path: tests/cypress/screenshots
+          path: tests/cypress/${{ inputs.elemental_ui_version }}/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Basics)
@@ -264,7 +264,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-basics-${{ inputs.cluster_name }}
-          path: tests/cypress/videos
+          path: tests/cypress/${{ inputs.elemental_ui_version }}/videos
           retention-days: 7
       - name: Deploy a node to join Rancher manager
         if: inputs.test_type == 'ui'
@@ -275,7 +275,7 @@ jobs:
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
-            sudo rm -rf cypress/downloads
+            sudo rm -rf cypress/${{ inputs.elemental_ui_version }}/downloads
 
             make e2e-ui-rancher
           )
@@ -292,10 +292,10 @@ jobs:
           RANCHER_URL: https://${{ steps.installation.outputs.MY_HOSTNAME }}/dashboard
           RANCHER_USER: admin
           SPEC: |
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_selector.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/machine_inventory.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/deploy_app.spec.ts
-            cypress/${{ inputs.elemental_ui_version }}/e2e/unit_tests/upgrade.spec.ts
+            /workdir/e2e/unit_tests/machine_selector.spec.ts
+            /workdir/e2e/unit_tests/machine_inventory.spec.ts
+            /workdir/e2e/unit_tests/deploy_app.spec.ts
+            /workdir/e2e/unit_tests/upgrade.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
           UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
@@ -313,7 +313,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
-          path: tests/cypress/screenshots
+          path: tests/cypress/${{ inputs.elemental_ui_version }}/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Advanced)
@@ -322,7 +322,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-advanced-${{ inputs.cluster_name }}
-          path: tests/cypress/videos
+          path: tests/cypress/${{ inputs.elemental_ui_version }}/videos
           retention-days: 7
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
@@ -407,7 +407,7 @@ jobs:
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
-            sudo rm -rf cypress/downloads
+            sudo rm -rf cypress/${{ inputs.elemental_ui_version }}/downloads
 
             make e2e-get-logs
           )

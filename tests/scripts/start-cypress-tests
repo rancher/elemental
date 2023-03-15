@@ -8,26 +8,32 @@ pushd ..
 setsid --fork ${HTTP_SRV_CMD} >/dev/null 2>&1
 popd
 
+pushd cypress/$ELEMENTAL_UI_VERSION
+
 # Needed to install Cypress plugins
 npm install
 
 # Start Cypress tests with docker
-docker run -v $PWD/$ELEMENTAL_UI_VERSION:/e2e -w /e2e                            \
-    -e RANCHER_USER=$RANCHER_USER                          \
-    -e RANCHER_PASSWORD=$RANCHER_PASSWORD                  \
-    -e RANCHER_URL=$RANCHER_URL                            \
-    -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION  \
-    -e UI_ACCOUNT=$UI_ACCOUNT                              \
-    -e OPERATOR_VERSION=$OPERATOR_VERSION                  \
-    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION          \
-    -e CYPRESS_TAGS=$CYPRESS_TAGS                          \
-    -e PROXY=$PROXY                                        \
-    -e UPGRADE_CHANNEL_LIST=$UPGRADE_CHANNEL_LIST          \
-    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                        \
-    --add-host host.docker.internal:host-gateway           \
-    --ipc=host                                             \
-    $CYPRESS_DOCKER                                        \
-    -s /e2e/$SPEC
+docker run -v $PWD:/workdir -w /workdir                     \
+    -e RANCHER_USER=$RANCHER_USER                           \
+    -e RANCHER_PASSWORD=$RANCHER_PASSWORD                   \
+    -e RANCHER_URL=$RANCHER_URL                             \
+    -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
+    -e UI_ACCOUNT=$UI_ACCOUNT                               \
+    -e OPERATOR_VERSION=$OPERATOR_VERSION                   \
+    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
+    -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
+    -e PROXY=$PROXY                                         \
+    -e UPGRADE_CHANNEL_LIST=$UPGRADE_CHANNEL_LIST           \
+    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                         \
+    --add-host host.docker.internal:host-gateway            \
+    --ipc=host                                              \
+    $CYPRESS_DOCKER                                         \
+    -s $SPEC
+
+pwd
+popd
+pwd
 
 # Kill the HTTP server
 pkill -f "${HTTP_SRV_CMD}"
