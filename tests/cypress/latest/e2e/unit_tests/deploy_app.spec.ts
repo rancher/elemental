@@ -12,9 +12,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
-import '~/cypress/support/functions';
-import filterTests from '~/cypress/support/filterTests.js';
+import { TopLevelMenu } from '~/support/toplevelmenu';
+import '~/support/functions';
+import filterTests from '~/support/filterTests.js';
 
 filterTests(['main'], () => {
   Cypress.config();

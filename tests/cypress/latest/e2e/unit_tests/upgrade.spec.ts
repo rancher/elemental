@@ -11,11 +11,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/cypress/support/toplevelmenu';
-import '~/cypress/support/functions';
-import { Elemental } from '~/cypress/support/elemental';
+import { TopLevelMenu } from '~/support/toplevelmenu';
+import '~/support/functions';
+import { Elemental } from '~/support/elemental';
 import 'cypress-file-upload';
-import filterTests from '~/cypress/support/filterTests.js';
+import filterTests from '~/support/filterTests.js';
 
 
 Cypress.config();
