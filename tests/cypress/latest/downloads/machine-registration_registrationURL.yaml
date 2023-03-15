@@ -1,0 +1,16 @@
+elemental:
+  registration:
+    url: https://rancher.adamek.ovh/elemental/registration/mj7x96jjfwc2vjlk7fw2cgqfkqm2ztkmgsp9hqc58rw7dgntkrd4d9
+    ca-cert: |-
+      -----BEGIN CERTIFICATE-----
+      MIIBvTCCAWOgAwIBAgIBADAKBggqhkjOPQQDAjBGMRwwGgYDVQQKExNkeW5hbWlj
+      bGlzdGVuZXItb3JnMSYwJAYDVQQDDB1keW5hbWljbGlzdGVuZXItY2FAMTY3ODg4
+      NTc3NjAeFw0yMzAzMTUxMzA5MzZaFw0zMzAzMTIxMzA5MzZaMEYxHDAaBgNVBAoT
+      E2R5bmFtaWNsaXN0ZW5lci1vcmcxJjAkBgNVBAMMHWR5bmFtaWNsaXN0ZW5lci1j
+      YUAxNjc4ODg1Nzc2MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEN/9teHHRb+zN
+      QSquFAfkm8rl8Da94SxTmhQ7Urq5zo9sF1crLw7hHAD7/S4bRxIbwDOLD4YjmioH
+      0pNb/tKUfaNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB/wQFMAMBAf8wHQYD
+      VR0OBBYEFBMGjia/enjlgfZh2PDe0RcPVXqBMAoGCCqGSM49BAMCA0gAMEUCIQDz
+      VXYxNi1Pd6K6kLQpJzCfhlYZ0AesyDyeWgqX2lU/RwIgFhrxY8+T8jSvy6hMKK55
+      JSJxQCyrtOU38f+tpLkjAzU=
+      -----END CERTIFICATE-----

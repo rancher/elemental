@@ -12,7 +12,7 @@ popd
 npm install
 
 # Start Cypress tests with docker
-docker run -v $PWD:/e2e -w /e2e                            \
+docker run -v $PWD/$ELEMENTAL_UI_VERSION:/e2e -w /e2e                            \
     -e RANCHER_USER=$RANCHER_USER                          \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD                  \
     -e RANCHER_URL=$RANCHER_URL                            \
