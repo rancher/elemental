@@ -12,6 +12,14 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 export CLOUD_INIT_ISO?=$(ROOT_DIR)/build/ci.iso
 
+# Define Ginkgo timeout for the bootstrapping test
+GINKGO_TIMEOUT?=3600
+ifdef VM_NUMBERS
+	ifeq ($(shell expr $(VM_NUMBERS) \> 100), 1)
+		GINKGO_TIMEOUT=6000
+	endif
+endif
+
 clean:
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 	VBoxManage unregistervm "test" --delete &>/dev/null || true
@@ -64,7 +72,7 @@ e2e-configure-rancher: deps
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e
 e2e-bootstrap-node: deps
-	ginkgo --label-filter bootstrap -r -v ./e2e
+	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade -r -v ./e2e
 start-cypress-tests:
