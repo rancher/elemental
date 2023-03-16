@@ -53,7 +53,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      cluster_name: cluster-k3s
+      cluster_name: my-own-cluster
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
