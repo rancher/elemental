@@ -28,7 +28,6 @@ stages:
       name: "Layout configuration"
       environment_file: /run/cos/cos-layout.env
       environment:
-        VOLUMES: "LABEL=COS_OEM:/oem LABEL=COS_PERSISTENT:/usr/local"
         OVERLAY: "tmpfs:25%"
         RW_PATHS: "/var /etc /srv"
         PERSISTENT_STATE_PATHS: >-
@@ -55,13 +54,4 @@ stages:
       name: "Layout configuration"
       environment_file: /run/cos/cos-layout.env
       environment:
-        VOLUMES: "LABEL=COS_OEM:/oem"
         OVERLAY: "tmpfs:25%"
-  rootfs.after:
-    - if: '[ ! -f /run/cos/recovery_mode ] && [ ! -f /run/cos/live_mode ]'
-      name: "Grow persistent"
-      layout:
-        device:
-          label: COS_PERSISTENT
-        expand_partition:
-          size: 0
