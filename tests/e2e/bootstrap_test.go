@@ -61,9 +61,22 @@ func randomSleep(index int) {
 	time.Sleep(time.Duration(value) * time.Millisecond)
 }
 
+func waitNodesBoot(i, v, b int) int {
+	if (i - v - b) == numberOfNodesMax {
+		// Save the number of nodes already bootstrapped for the next round
+		b = (i - v)
+
+		// Wait a little
+		time.Sleep(4 * time.Minute)
+	}
+
+	return b
+}
+
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
-		wg sync.WaitGroup
+		bootstrappedNodes int
+		wg                sync.WaitGroup
 	)
 
 	It("Provision the node", func() {
@@ -133,6 +146,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		// Loop on node provisionning
 		// NOTE: if numberOfVMs == vmIndex then only one node will be provisionned
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -160,6 +174,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					Expect(err).To(Not(HaveOccurred()))
 				})
 			}(installVMScript, hostName, macAdrs, index)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
 
 		// Wait for all parallel jobs
@@ -228,6 +245,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}, misc.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 		})
 
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -278,6 +296,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
 			}(clusterNS, hostName, index, emulateTPM, client)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
 
 		// Wait for all parallel jobs
@@ -368,6 +389,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			wg.Wait()
 		}
 
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -398,6 +420,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					})
 				}
 			}(hostName, poolType, index, client)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
 
 		// Wait for all parallel jobs
