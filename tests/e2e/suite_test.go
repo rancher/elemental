@@ -37,6 +37,7 @@ const (
 	installVMScript       = "../scripts/install-vm"
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	netDefaultFileName    = "../assets/net-default.xml"
+	numberOfNodesMax      = 30
 	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	selectorYaml          = "../assets/selector.yaml"

@@ -75,28 +75,27 @@ else
   INSTALL_FLAG+=" --pxe"
 fi
 
-# Wait randomly until 20s to avoid running virt-install at the same time
-# Because it can lead to some issues with hugepages
-sleep $((RANDOM % 20))
+# VM variables
+LOG_FILE=logs/bootstrap_${VM_NAME}.log
+CMD="sudo virt-install \
+       --name ${VM_NAME} \
+       --os-variant opensuse-unknown \
+       --virt-type kvm \
+       --machine q35 \
+       --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
+       --features smm.state=yes \
+       --vcpus 2 \
+       --cpu host \
+       --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
+       --check disk_size=off \
+       --graphics none \
+       --serial pty \
+       --console pty,target_type=virtio \
+       --rng random \
+       --tpm ${EMULATED_TPM} \
+       --noreboot \
+       --network network=default,bridge=virbr0,model=virtio,mac=${MAC} \
+       ${INSTALL_FLAG}"
 
 # Create VM
-script -e -O logs/bootstrap_${VM_NAME}.log \
-  -c "sudo virt-install \
-  --name ${VM_NAME} \
-  --os-variant opensuse-unknown \
-  --virt-type kvm \
-  --machine q35 \
-  --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
-  --features smm.state=yes \
-  --vcpus 2 \
-  --cpu host \
-  --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
-  --check disk_size=off \
-  --graphics none \
-  --serial pty \
-  --console pty,target_type=virtio \
-  --rng random \
-  --tpm ${EMULATED_TPM} \
-  --noreboot \
-  --network network=default,bridge=virbr0,model=virtio,mac=${MAC} \
-  ${INSTALL_FLAG}"
+script -E never -e -f -q -O ${LOG_FILE} -c "${CMD}" >/dev/null 2>&1
