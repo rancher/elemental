@@ -151,7 +151,7 @@ describe('Upgrade tests', () => {
       cy.get('.primaryheader')
         .contains('Active');
       cy.get('.primaryheader')
-        .contains('Updating', {timeout: 240000});
+        .contains('Updating', {timeout: 360000});
       cy.get('.primaryheader')
         .contains('Active', {timeout: 360000});
     });

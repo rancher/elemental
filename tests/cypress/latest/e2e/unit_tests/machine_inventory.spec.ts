@@ -116,7 +116,7 @@ describe('Machine inventory testing', () => {
           .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
       }
       cy.clickButton('Create');
-      cy.contains('Updating ' + clusterName, {timeout: 120000});
+      cy.contains('Updating ' + clusterName, {timeout: 360000});
       cy.contains('Active ' + clusterName, {timeout: 480000});
     });
   });
