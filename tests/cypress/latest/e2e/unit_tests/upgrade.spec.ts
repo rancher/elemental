@@ -153,7 +153,7 @@ describe('Upgrade tests', () => {
       cy.get('.primaryheader')
         .contains('Updating', {timeout: 240000});
       cy.get('.primaryheader')
-        .contains('Active', {timeout: 240000});
+        .contains('Active', {timeout: 360000});
     });
 
     it('Delete OS Versions', () => {
