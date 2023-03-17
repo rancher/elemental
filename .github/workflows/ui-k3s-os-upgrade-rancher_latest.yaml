@@ -36,7 +36,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest' }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.24.11+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}

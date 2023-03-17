@@ -7,6 +7,7 @@ name: K3s-E2E-Latest_RM
 on:
   schedule:
     - cron: '0 1 * * *'
+  pull_request:
 
 jobs:
   k3s:
@@ -17,6 +18,6 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.24.11+k3s1
       rancher_channel: latest
       rancher_version: devel

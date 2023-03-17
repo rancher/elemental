@@ -168,7 +168,7 @@ jobs:
       CLUSTER_TYPE: ${{ inputs.cluster_type }}
       # For K3s installation used to host Rancher Manager
       INSTALL_K3S_EXEC: ${{ inputs.k3s_flags }}
-      INSTALL_K3S_VERSION: v1.24.7+k3s1
+      INSTALL_K3S_VERSION: v1.24.11+k3s1
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       # For Rancher Manager
