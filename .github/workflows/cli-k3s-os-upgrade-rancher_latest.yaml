@@ -7,6 +7,7 @@ name: CLI-K3s-OS-Upgrade-Rancher_Latest
 on:
   schedule:
     - cron: '0 2 * * *'
+  pull_request:
 
 jobs:
   k3s:
@@ -18,7 +19,7 @@ jobs:
     with:
       cluster_name: cluster-k3s
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.24.11+k3s1
       # Force to only deploy the first 3 nodes
       node_number: 3
       rancher_channel: latest
