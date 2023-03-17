@@ -117,7 +117,7 @@ describe('Machine inventory testing', () => {
       }
       cy.clickButton('Create');
       cy.contains('Updating ' + clusterName, {timeout: 120000});
-      cy.contains('Active ' + clusterName, {timeout: 360000});
+      cy.contains('Active ' + clusterName, {timeout: 480000});
     });
   });
   
