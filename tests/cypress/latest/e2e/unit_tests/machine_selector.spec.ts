@@ -65,7 +65,7 @@ filterTests(['main'], () => {
       cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
         .contains('Add Rule')
         .click();
-      cy.get('#vs6__combobox')
+      cy.get('[data-testid="input-match-expression-key-0"]')
         .click()
       cy.contains('myInvLabel1')
         .click();
