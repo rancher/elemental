@@ -1,4 +1,156 @@
-# Tests description for cypress/e2e/unit_tests
+# Tests description for cypress/1.0.0/e2e/unit_tests
+
+## `advanced_filtering.spec.ts`
+
+- **Describe:** Advanced filtering testing
+    - **It:** Create fake machine inventories
+    - **It:** Two machine inventories should appear by filtering on test-filter
+    - **It:** One machine inventory should appear by filtering on test-filter-one
+    - **It:** No machine inventory should appear by filtering on test-bad-filter
+    - **It:** Delete all fake machine inventories
+
+## `deploy_app.spec.ts`
+
+- **Describe:** Deploy application in fresh Elemental Cluster
+    - **It:** Deploy CIS Benchmark application
+    - **It:** Remove CIS Benchmark application
+
+## `elemental_plugin.spec.ts`
+
+- **Describe:** Install Elemental plugin
+    - **It:** Add elemental-ui repo
+    - **It:** Enable extension support
+    - **It:** Install Elemental plugin
+
+## `first_connection.spec.ts`
+
+- **Describe:** First login on Rancher
+    - **It:** Log in and accept terms and conditions
+
+## `machine_inventory.spec.ts`
+
+- **Describe:** Machine inventory testing
+    - **It:** Check that machine inventory has been created
+    - **It:** Check we can see our embedded hardware labels
+    - **It:** Create Elemental cluster
+    - **It:** Check Elemental cluster status
+
+## `machine_registration.spec.ts`
+
+- **Describe:** Machine registration testing
+    - **It:** Create machine registration with default options
+    - **It:** Create machine registration with labels and annotations
+    - **It:** Delete machine registration
+    - **It:** Edit a machine registration with edit config button
+    - **It:** Edit a machine registration with edit YAML button
+    - **It:** Clone a machine registration
+    - **It:** Download Machine registration YAML
+    - **It:** Create Machine registration we will use to test adding a node
+
+## `machine_selector.spec.ts`
+
+- **Describe:** Machine selector testing
+    - **It:** Testing selector without any rule
+    - **It:** Testing selector with unmatching rule
+    - **It:** Testing selector with matching rule
+
+## `menu.spec.ts`
+
+- **Describe:** Menu testing
+    - **It:** Check Elemental logo
+    - **It:** Check Elemental menu
+
+## `upgrade.spec.ts`
+
+- **Describe:** Upgrade tests
+    - **It:** Upgrade one node different methods if rke2 or k3s)
+
+## `user.spec.ts`
+
+- **Describe:** User role testing
+    - **It:** Create elemental user
+    - **It:** Create standard user
+    - **It:** Elemental user should access the OS management menu
+    - **It:** Standard user should not access the OS management menu
+
+# Tests description for cypress/latest/e2e/unit_tests
+
+## `advanced_filtering.spec.ts`
+
+- **Describe:** Advanced filtering testing
+    - **It:** Create fake machine inventories
+    - **It:** Two machine inventories should appear by filtering on test-filter
+    - **It:** One machine inventory should appear by filtering on test-filter-one
+    - **It:** No machine inventory should appear by filtering on test-bad-filter
+    - **It:** Delete all fake machine inventories
+
+## `deploy_app.spec.ts`
+
+- **Describe:** Deploy application in fresh Elemental Cluster
+    - **It:** Deploy CIS Benchmark application
+    - **It:** Remove CIS Benchmark application
+
+## `elemental_plugin.spec.ts`
+
+- **Describe:** Install Elemental plugin
+    - **It:** Add elemental-ui repo
+    - **It:** Enable extension support
+    - **It:** Install Elemental plugin
+
+## `first_connection.spec.ts`
+
+- **Describe:** First login on Rancher
+    - **It:** Log in and accept terms and conditions
+
+## `machine_inventory.spec.ts`
+
+- **Describe:** Machine inventory testing
+    - **It:** Check that machine inventory has been created
+    - **It:** Check we can see our embedded hardware labels
+    - **It:** Create Elemental cluster
+    - **It:** Check Elemental cluster status
+
+## `machine_registration.spec.ts`
+
+- **Describe:** Machine registration testing
+    - **It:** Create machine registration with default options
+    - **It:** Create machine registration with labels and annotations
+    - **It:** Delete machine registration
+    - **It:** Edit a machine registration with edit config button
+    - **It:** Edit a machine registration with edit YAML button
+    - **It:** Clone a machine registration
+    - **It:** Download Machine registration YAML
+    - **It:** Create Machine registration we will use to test adding a node
+
+## `machine_selector.spec.ts`
+
+- **Describe:** Machine selector testing
+    - **It:** Testing selector without any rule
+    - **It:** Testing selector with unmatching rule
+    - **It:** Testing selector with matching rule
+
+## `menu.spec.ts`
+
+- **Describe:** Menu testing
+    - **It:** Check Elemental logo
+    - **It:** Check Elemental menu
+
+## `upgrade.spec.ts`
+
+- **Describe:** Upgrade tests
+    - **It:** Create an OS Version Channels
+    - **It:** Check OS Versions
+    - **It:** Upgrade one node different methods if rke2 or k3s)
+    - **It:** Delete OS Versions
+    - **It:** Delete OS Versions Channels
+
+## `user.spec.ts`
+
+- **Describe:** User role testing
+    - **It:** Create elemental user
+    - **It:** Create standard user
+    - **It:** Elemental user should access the OS management menu
+    - **It:** Standard user should not access the OS management menu
 
 # Tests description for e2e
 
