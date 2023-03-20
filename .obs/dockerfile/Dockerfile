@@ -13,6 +13,7 @@ RUN zypper in -y -- \
   NetworkManager-wwan \
   kernel-firmware-all \
   -systemd-presets-branding-SLE-Micro-for-Rancher \
+  cryptsetup \
   elemental
 
 # Install extra useful utilities
