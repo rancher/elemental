@@ -31,9 +31,12 @@ docker run -v $PWD:/workdir -w /workdir                     \
     $CYPRESS_DOCKER                                         \
     -s $SPEC
 
-pwd
 popd
-pwd
+
+# Move elemental.iso into the expected folder
+if [[ ${ISO_BOOT} == "true" ]]; then
+    sudo mv cypress/$ELEMENTAL_UI_VERSION/downloads/elemental.iso ../elemental-from-cypress.iso
+fi
 
 # Kill the HTTP server
 pkill -f "${HTTP_SRV_CMD}"

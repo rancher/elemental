@@ -35,7 +35,8 @@ declare global {
       clickElementalMenu(label: string,): Chainable<Element>;
       clickNavMenu(listLabel: string[],): Chainable<Element>;
       confirmDelete(): Chainable<Element>;
-      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
+      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, checkIsoBuilding?: boolean,
+        customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
       deleteAllResources():Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;

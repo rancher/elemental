@@ -143,15 +143,31 @@ describe('Machine registration testing', () => {
         .click();
       cy.verifyDownload('download-yaml-test.yaml');
     });
-  });
 
   // This test must stay the last one because we use this machine registration when we test adding a node.
   // It also tests using a custom cloud config by using read from file button.
-  filterTests(['main', 'upgrade'], () => {
     it('Create Machine registration we will use to test adding a node', () => {
       cy.createMachReg({machRegName: 'machine-registration',
         checkInventoryLabels: true,
         checkInventoryAnnotations: true,
+        customCloudConfig: 'custom_cloud-config.yaml',
+        checkDefaultCloudConfig: false});
+      cy.checkMachInvLabel({machRegName: 'machine-registration',
+        labelName: 'myInvLabel1',
+        labelValue: 'myInvLabelValue1'});
+    });
+  });
+
+  // In the upgrade test we test the ISO building feature 
+  // and boot from the stable ISO, mainly because we can
+  // only select stable ISO for now.
+  // We will move the test to the standard scenario later
+  filterTests(['upgrade'], () => {
+    it('Create Machine registration we will use to test adding a node', () => {
+      cy.createMachReg({machRegName: 'machine-registration',
+        checkInventoryLabels: true,
+        checkInventoryAnnotations: true,
+        checkIsoBuilding: true,
         customCloudConfig: 'custom_cloud-config.yaml',
         checkDefaultCloudConfig: false});
       cy.checkMachInvLabel({machRegName: 'machine-registration',

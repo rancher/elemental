@@ -54,6 +54,9 @@ on:
       iso_to_test:
         description: ISO to test (default built one is empty)
         type: string
+      iso_boot:
+        description: Choose booting from ISO
+        type: boolean
       k3s_flags:
         description: Argument to configure INSTALL_K3S_EXEC env variable 
         type: string
@@ -257,6 +260,7 @@ jobs:
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
+          ISO_BOOT: ${{ inputs.iso_boot }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
@@ -288,6 +292,7 @@ jobs:
       - name: Deploy a node to join Rancher manager
         if: inputs.test_type == 'ui'
         env:
+          ISO_BOOT: ${{ inputs.iso_boot }} 
           VM_INDEX: 1
           HOST_MEMORY_RESERVED: 50331648
         run: |
