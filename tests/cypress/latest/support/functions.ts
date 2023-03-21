@@ -198,6 +198,7 @@ Cypress.Commands.add('createMachReg', ({
   checkAnnotations=false,
   checkInventoryLabels=false,
   checkInventoryAnnotations=false,
+  checkIsoBuilding=false,
   customCloudConfig='',
   checkDefaultCloudConfig=true }) => {
     cy.clickNavMenu(["Dashboard"]);
@@ -255,6 +256,27 @@ Cypress.Commands.add('createMachReg', ({
     cy.verifyDownload(machRegName + '_registrationURL.yaml');
     cy.contains('Saving')
       .should('not.exist');
+
+    // Test ISO building feature
+    if (checkIsoBuilding) {
+      cy.getBySel('select-os-version-build-iso')
+        .contains('Elemental Teal');
+      cy.getBySel('build-iso-btn')
+        .click();
+      cy.getBySel('build-iso-btn')
+        .get('.icon-spin');
+      // Download button is disabled while ISO is building
+      cy.getBySel('download-iso-btn').should(($input) => {
+        expect($input).to.have.attr('disabled')
+      })
+      // Download button is enabled once ISO building done
+      cy.getBySel('download-iso-btn', { timeout: 180000 }).should(($input) => {
+        expect($input).to.not.have.attr('disabled')
+      })
+      cy.getBySel('download-iso-btn')
+        .click()
+      cy.verifyDownload('elemental.iso', { timeout: 180000, interval: 5000 });
+    }
   
       // Check Cloud configuration
     // TODO: Maybe the check may be improved in one line

@@ -55,11 +55,13 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Configuring iPXE boot script for network installation", func() {
-			numberOfFile, err := misc.ConfigureiPXE()
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(numberOfFile).To(BeNumerically(">=", 1))
-		})
+		if isoBoot != "true" {
+			By("Configuring iPXE boot script for network installation", func() {
+				numberOfFile, err := misc.ConfigureiPXE()
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(numberOfFile).To(BeNumerically(">=", 1))
+			})
+		}
 
 		By("Adding VM in default network", func() {
 			// Add node in network configuration if needed
