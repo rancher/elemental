@@ -7,7 +7,6 @@ name: CLI-K3s-OS-Upgrade-Rancher_Latest
 on:
   schedule:
     - cron: '0 2 * * *'
-  pull_request:
 
 jobs:
   k3s:
