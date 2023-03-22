@@ -267,6 +267,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			err = tools.Sed("%RANCHER_CA%", rancherCA, localKubeconfig)
 			Expect(err).To(Not(HaveOccurred()))
 
+			// Set correct file permissions
+			_ = exec.Command("chmod", "0600", localKubeconfig).Run()
+
 			// Remove the "old" kubeconfig file to force the use of the new one
 			// NOTE: in fact move it, just to keep it in case of issue
 			// Also don't check the returned error, as it will always not equal 0
