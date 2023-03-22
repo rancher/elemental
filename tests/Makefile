@@ -65,17 +65,19 @@ generate-readme:
 	@./scripts/generate-readme > README.md
 
 # E2E tests
-e2e-install-rancher: deps
-	ginkgo --label-filter install -r -v ./e2e
-e2e-configure-rancher: deps
-	ginkgo --label-filter configure -r -v ./e2e
-e2e-ui-rancher: deps
-	ginkgo --label-filter ui -r -v ./e2e
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
+e2e-configure-rancher: deps
+	ginkgo --label-filter configure -r -v ./e2e
+e2e-get-logs: deps
+	ginkgo --label-filter logs -r -v ./e2e
+e2e-install-rancher: deps
+	ginkgo --label-filter install -r -v ./e2e
+e2e-ui-rancher: deps
+	ginkgo --label-filter ui -r -v ./e2e
+e2e-uninstall-operator:
+	ginkgo --label-filter uninstall-operator -r -v ./e2e
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade -r -v ./e2e
 start-cypress-tests:
 	@./scripts/start-cypress-tests
-e2e-get-logs: deps
-	ginkgo --label-filter logs -r -v ./e2e

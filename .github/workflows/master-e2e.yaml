@@ -397,6 +397,10 @@ jobs:
       - name: List installed nodes
         if: inputs.test_type == 'cli'
         run: sudo virsh list
+      - name: Uninstall Elemental Operator
+        # Don't test Operator uninstall if we want to keep the runner for debugging purposes
+        if: inputs.destroy_runner == true && inputs.test_type == 'cli'
+        run: cd tests && make e2e-uninstall-operator
       - name: Store logs
         if: always()
         env:
