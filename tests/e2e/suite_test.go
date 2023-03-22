@@ -32,6 +32,7 @@ const (
 	emulateTPMYaml        = "../assets/emulateTPM.yaml"
 	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript = "../scripts/config-private-ca"
+	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
 	installConfigYaml     = "../../install-config.yaml"
 	installHardenedScript = "../scripts/config-hardened"
 	installVMScript       = "../scripts/install-vm"
