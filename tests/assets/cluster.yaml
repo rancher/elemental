@@ -8,16 +8,8 @@ spec:
     etcd:
       disableSnapshots: true
     machineGlobalConfig:
-      disable-apiserver: false
-      disable-cloud-controller: false
-      disable-controller-manager: false
-      disable-etcd: false
-      disable-kube-proxy: false
-      disable-network-policy: false
-      disable-scheduler: false
       etcd-expose-metrics: false
       profile: null
-      secrets-encryption: false
     machinePools:
       - controlPlaneRole: true
         etcdRole: true
@@ -41,8 +33,6 @@ spec:
         workerRole: true
     machineSelectorConfig:
       - config:
-          docker: false
           protect-kernel-defaults: false
-          selinux: false
     registries: {}
   kubernetesVersion: %K8S_VERSION%
