@@ -231,6 +231,22 @@
       -  **By:** Restarting the VM to add it in the cluster
       -  **By:** Checking VM connection
 
+## `uninstall-operator_test.go`
+
+- **Describe:** E2E - Uninstall Elemental Operator
+    - **It:** Uninstall Elemental Operator
+      -  **By:** Testing cluster resource availability BEFORE operator uninstallation
+      -  **By:** Uninstalling Operator via Helm
+      -  **By:** Testing cluster resource availability AFTER operator uninstallation
+      -  **By:** Checking that Elemental resources are gone
+      -  **By:** Deleting cluster resource
+      -  **By:** Testing cluster resource unavailability
+    - **It:** Re-install Elemental Operator
+      -  **By:** Installing Operator via Helm
+      -  **By:** Creating a dumb MachineRegistration
+      -  **By:** Creating cluster
+      -  **By:** Testing cluster resource availability
+
 ## `upgrade_test.go`
 
 - **Describe:** E2E - Upgrading node
