@@ -5,8 +5,8 @@ set -e -x
 # Variable(s)
 EMAIL=elemental@suse.de
 CA_NAME=elementalCA
-DOMAIN=$(hostname -d)
-FQDN=$(hostname -f)
+DOMAIN=${PUBLIC_DOMAIN}
+FQDN=${PUBLIC_DNS}
 VALUE=Elemental
 
 # Generate CA private key
