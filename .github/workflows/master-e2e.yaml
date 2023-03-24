@@ -224,17 +224,31 @@ jobs:
           # Looks a little bit weird but we have to keep the ISO in build!
           mv -f elemental-*.iso build/
       - name: Deploy Proxy
-        id: proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
       - name: Install Rancher
-        id: installation
         env:
           CA_TYPE: ${{ inputs.ca_type }}
           PROXY: ${{ inputs.proxy }}
           PUBLIC_DOMAIN: bc.googleusercontent.com
           TEST_TYPE: ${{ inputs.test_type }}
         run: cd tests && PUBLIC_DNS=${{ needs.create-runner.outputs.public_dns }} make e2e-install-rancher
+      - name: Extracts component versions/informations
+        id: component
+        run: |
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export values
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: inputs.test_type == 'ui'
@@ -306,12 +320,8 @@ jobs:
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
 
         run: |
-          export OPERATOR_VERSION=$(kubectl get pods \
-                                      -n cattle-elemental-system \
-                                      -l app=elemental-operator \
-                                      -o jsonpath={.items[*].status.containerStatuses[*].image} \
+          export OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                                     | awk -F ':' '{print substr($2,0,3)}')
-
           cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: failure() && inputs.test_type == 'ui'
@@ -340,10 +350,7 @@ jobs:
           VM_START: 1
           VM_END: 3
         run: |
-          OPERATOR_VERSION=$(kubectl get pods \
-                               -n cattle-elemental-system \
-                               -l app=elemental-operator \
-                               -o jsonpath={.items[*].status.containerStatuses[*].image} \
+          OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
 
           # If elemental-operator is a v1.0.x we should disable EMULATE_TPM
@@ -405,7 +412,16 @@ jobs:
       - name: Uninstall Elemental Operator
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
         if: inputs.destroy_runner == true && inputs.test_type == 'cli'
-        run: cd tests && make e2e-uninstall-operator
+        run: |
+          OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
+                             | awk -F ':' '{print substr($2,0,3)}')
+
+          # Uninstallation of elemental-operator isn't supported on version v1.0.x
+          if [[ "${OPERATOR_VERSION}" != "1.0" ]]; then
+            cd tests && make e2e-uninstall-operator
+          else
+            echo "Uninstallation of elemental-operator isn't supported on version v1.0.x!"
+          fi
       - name: Store logs
         if: always()
         env:
@@ -430,36 +446,26 @@ jobs:
       - name: Add summary
         if: always()
         run: |
-          # Extract Rancher Manager version
-          RM_VERSION=$(kubectl get pod \
-                         --namespace cattle-system \
-                         -l app=rancher \
-                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract elemental-operator version
-          OPERATOR_VERSION=$(kubectl get pod \
-                             --namespace cattle-elemental-system \
-                             -l app=elemental-operator \
-                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Add summary
-          echo "## General informations" >> $GITHUB_STEP_SUMMARY
+          echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.test_type == 'cli' }}; then
-            echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> $GITHUB_STEP_SUMMARY
+            echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
           fi
-          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> $GITHUB_STEP_SUMMARY
-          echo "## Versions used" >> $GITHUB_STEP_SUMMARY
-          echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "Rancher Manager Version: ${RM_VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "Elemental Operator Upgrade: ${{ env.UPGRADE_OPERATOR || 'N/A' }}" >> $GITHUB_STEP_SUMMARY
-          echo "Elemental Operator Version: ${OPERATOR_VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "Elemental UI Extension Version (if applicable): ${{ inputs.elemental_ui_version }}" >> $GITHUB_STEP_SUMMARY
-          echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> $GITHUB_STEP_SUMMARY
+          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> ${GITHUB_STEP_SUMMARY}
+          echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Version: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Upgrade: ${{ env.UPGRADE_OPERATOR || 'N/A' }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental UI Extension Version (if applicable): ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
           if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
-            echo "## Upgrade details" >> $GITHUB_STEP_SUMMARY
-            echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> $GITHUB_STEP_SUMMARY
-            echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> $GITHUB_STEP_SUMMARY
-            echo "Upgrade image: ${{ inputs.upgrade_image }}" >> $GITHUB_STEP_SUMMARY
+            echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
+            echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
       - name: Send failed status to slack
         if: failure() && github.event_name == 'schedule'
