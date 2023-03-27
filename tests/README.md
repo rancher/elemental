@@ -121,6 +121,7 @@
     - **It:** Clone a machine registration
     - **It:** Download Machine registration YAML
     - **It:** Create Machine registration we will use to test adding a node
+    - **It:** Create Machine registration we will use to test adding a node
 
 ## `machine_selector.spec.ts`
 
@@ -141,6 +142,7 @@
     - **It:** Create an OS Version Channels
     - **It:** Check OS Versions
     - **It:** Upgrade one node different methods if rke2 or k3s)
+    - **It:** Cannot create two upgrade groups targeting the same cluster
     - **It:** Delete OS Versions
     - **It:** Delete OS Versions Channels
 
