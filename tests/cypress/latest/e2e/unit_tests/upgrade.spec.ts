@@ -56,7 +56,11 @@ describe('Upgrade tests', () => {
       cy.getBySel('form-save')
         .contains('Create')
         .click();
-      cy.wait(10000);
+      // Status changes a lot right after the creation so let's wait 60 secondes
+      // before checking
+      cy.wait(60000);
+      cy.getBySel('sortable-cell-0-0')
+        .contains('Active');
     });
 
     it('Check OS Versions', () => {
