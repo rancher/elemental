@@ -56,6 +56,7 @@ describe('Upgrade tests', () => {
       cy.getBySel('form-save')
         .contains('Create')
         .click();
+      cy.wait(10000);
     });
 
     it('Check OS Versions', () => {
@@ -154,6 +155,18 @@ describe('Upgrade tests', () => {
         .contains('Updating', {timeout: 360000});
       cy.get('.primaryheader')
         .contains('Active', {timeout: 360000});
+    });
+
+    it('Cannot create two upgrade groups targeting the same cluster', () => {
+      cy.clickNavMenu(["Advanced", "Update Groups"]);
+      cy.getBySel('masthead-create')
+      .contains('Create')
+        .click();
+      cy.get('.primaryheader')
+        .contains('Update Group: Create');
+      cy.getBySel('cluster-target')
+        .click();
+      cy.contains('Sorry, no matching options');
     });
 
     it('Delete OS Versions', () => {
