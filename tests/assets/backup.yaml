@@ -1,0 +1,9 @@
+apiVersion: resources.cattle.io/v1
+kind: Backup
+metadata:
+  name: elemental-backup
+  annotations:
+    field.cattle.io/description: Backup Elemental/Rancher resources
+spec:
+  resourceSetName: rancher-resource-set
+  retentionCount: 1

@@ -67,6 +67,8 @@ generate-readme:
 # E2E tests
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
+e2e-backup-restore: deps
+	ginkgo --label-filter backup-restore -r -v ./e2e
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
 e2e-get-logs: deps
