@@ -29,6 +29,7 @@ import (
 
 const (
 	clusterYaml           = "../assets/cluster.yaml"
+	backupYaml            = "../assets/backup.yaml"
 	emulateTPMYaml        = "../assets/emulateTPM.yaml"
 	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript = "../scripts/config-private-ca"
@@ -41,6 +42,7 @@ const (
 	numberOfNodesMax      = 30
 	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
+	restoreYaml           = "../assets/restore.yaml"
 	selectorYaml          = "../assets/selector.yaml"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
@@ -49,35 +51,36 @@ const (
 )
 
 var (
-	arch                string
-	caType              string
-	CertManagerVersion  string
-	clusterName         string
-	clusterNS           string
-	clusterType         string
-	elementalSupport    string
-	emulateTPM          bool
-	rancherHostname     string
-	imageVersion        string
-	isoBoot             string
-	k8sVersion          string
-	numberOfVMs         int
-	osImage             string
-	poolType            string
-	proxy               string
-	rancherChannel      string
-	rancherLogCollector string
-	rancherVersion      string
-	sequential          bool
-	testType            string
-	upgradeChannelList  string
-	upgradeImage        string
-	upgradeOperator     string
-	upgradeOsChannel    string
-	upgradeType         string
-	usedNodes           int
-	vmIndex             int
-	vmName              string
+	arch                 string
+	backupRestoreVersion string
+	caType               string
+	CertManagerVersion   string
+	clusterName          string
+	clusterNS            string
+	clusterType          string
+	elementalSupport     string
+	emulateTPM           bool
+	rancherHostname      string
+	imageVersion         string
+	isoBoot              string
+	k8sVersion           string
+	numberOfVMs          int
+	osImage              string
+	poolType             string
+	proxy                string
+	rancherChannel       string
+	rancherLogCollector  string
+	rancherVersion       string
+	sequential           bool
+	testType             string
+	upgradeChannelList   string
+	upgradeImage         string
+	upgradeOperator      string
+	upgradeOsChannel     string
+	upgradeType          string
+	usedNodes            int
+	vmIndex              int
+	vmName               string
 )
 
 func CheckClusterState(ns, cluster string) {
@@ -130,6 +133,7 @@ func TestE2E(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
+	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
 	caType = os.Getenv("CA_TYPE")
 	CertManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")

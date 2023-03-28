@@ -414,6 +414,11 @@ jobs:
       - name: List installed nodes
         if: inputs.test_type == 'cli'
         run: sudo virsh list
+      - name: Test Backup/Restore Elemental resources with Rancher Manager
+        if: inputs.test_type == 'cli'
+        env:
+          BACKUP_RESTORE_VERSION: v3.1.0-rc5
+        run: cd tests && make e2e-backup-restore
       - name: Uninstall Elemental Operator
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
         if: inputs.destroy_runner == true && inputs.test_type == 'cli'
