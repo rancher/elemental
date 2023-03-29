@@ -92,7 +92,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+			err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Check elemental-operator image
