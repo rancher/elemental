@@ -300,7 +300,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+			err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Check if an upgrade to a specific version is configured
@@ -312,7 +312,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				)
 				Expect(err).To(Not(HaveOccurred()))
 
-				k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+				err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delay few seconds before checking
