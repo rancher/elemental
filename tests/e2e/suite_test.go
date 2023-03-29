@@ -131,7 +131,7 @@ func TestE2E(t *testing.T) {
 var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
 	caType = os.Getenv("CA_TYPE")
-	CertManagerVersion = os.Getenv("CERT-MANAGER_VERSION")
+	CertManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	clusterType = os.Getenv("CLUSTER_TYPE")

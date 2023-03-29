@@ -172,7 +172,7 @@ jobs:
     env:
       TIMEOUT_SCALE: 3
       ARCH: amd64
-      CERT-MANAGER_VERSION: ${{ inputs.cert-manager_version }}
+      CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
       CLUSTER_TYPE: ${{ inputs.cluster_type }}
