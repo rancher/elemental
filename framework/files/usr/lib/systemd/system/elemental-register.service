@@ -5,6 +5,10 @@ Wants=network-online.target
 After=network-online.target
 
 [Service]
+EnvironmentFile=-/etc/default/elemental
+EnvironmentFile=-/etc/sysconfig/proxy
 Type=oneshot
-ExecStart=bash --login -c "elemental-register --debug /run/initramfs/live"
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/sbin/elemental-register --debug /run/initramfs/live
 
