@@ -519,6 +519,15 @@ jobs:
           if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
             make e2e-check-app
           fi
+      - name: Test Backup/Restore Elemental resources with Rancher Manager
+        if: inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s')
+        env:
+          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
+        run: |
+          cd tests && make e2e-backup-restore
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
       - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
@@ -548,15 +557,6 @@ jobs:
       - name: List installed nodes
         if: inputs.test_type == 'cli'
         run: sudo virsh list
-      - name: Test Backup/Restore Elemental resources with Rancher Manager
-        if: inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s')
-        env:
-          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
-        run: |
-          cd tests && make e2e-backup-restore
-          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
       - name: Uninstall Elemental Operator
         env:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
