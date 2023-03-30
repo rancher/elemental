@@ -245,6 +245,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			// Getting Rancher Manager local cluster CA
 			// NOTE: loop until the cmd return something, it could take some time
+			var rancherCA string
 			cmd := []string{
 				"get", "secret",
 				"--namespace", "cattle-system",
@@ -252,11 +253,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				"-o", "jsonpath={.data.tls\\.crt}",
 			}
 			Eventually(func() error {
-				_, err := kubectl.Run(cmd...)
+				rancherCA, err = kubectl.Run(cmd...)
 				return err
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
-			rancherCA, err := kubectl.Run(cmd...)
-			Expect(err).To(Not(HaveOccurred()))
+			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 			// Copy skel file for ~/.kube/config
 			misc.CopyFile(localKubeconfigYaml, localKubeconfig)
