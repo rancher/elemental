@@ -63,21 +63,24 @@ type ClusterSpec struct {
 
 // RKEConfig has all RKE/K3s cluster information
 type RKEConfig struct {
-	Etcd                interface{}    `yaml:"etcd,omitempty"`
-	ChartValues         interface{}    `yaml:"chartValues"`
-	MachineGlobalConfig interface{}    `yaml:"machineGlobalConfig"`
-	MachinePools        []MachinePools `yaml:"machinePools"`
-	UpgradeStrategy     interface{}    `yaml:"upgradeStrategy,omitempty"`
+	Etcd                  interface{}            `yaml:"etcd,omitempty"`
+	ChartValues           map[string]interface{} `yaml:"chartValues,omitempty" wrangler:"nullable"`
+	MachineGlobalConfig   interface{}            `yaml:"machineGlobalConfig"`
+	MachinePools          []MachinePools         `yaml:"machinePools"`
+	MachineSelectorConfig interface{}            `yaml:"machineSelectorConfig"`
+	UpgradeStrategy       interface{}            `yaml:"upgradeStrategy,omitempty"`
+	Registries            interface{}            `yaml:"registries"`
 }
 
 // MachinePools has all pools information
 type MachinePools struct {
-	ControlPlaneRole bool             `yaml:"controlPlaneRole,omitempty"`
-	EtcdRole         bool             `yaml:"etcdRole,omitempty"`
-	MachineConfigRef MachineConfigRef `yaml:"machineConfigRef"`
-	Name             string           `yaml:"name"`
-	Quantity         int              `yaml:"quantity"`
-	WorkerRole       bool             `yaml:"workerRole,omitempty"`
+	ControlPlaneRole     bool             `yaml:"controlPlaneRole,omitempty"`
+	EtcdRole             bool             `yaml:"etcdRole,omitempty"`
+	MachineConfigRef     MachineConfigRef `yaml:"machineConfigRef"`
+	Name                 string           `yaml:"name"`
+	Quantity             int              `yaml:"quantity"`
+	UnhealthyNodeTimeout string           `yaml:"unhealthyNodeTimeout"`
+	WorkerRole           bool             `yaml:"workerRole,omitempty"`
 }
 
 // MachineConfigRef makes the link between the cluster, pool and the Elemental nodes
