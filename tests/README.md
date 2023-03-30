@@ -156,6 +156,22 @@
 
 # Tests description for e2e
 
+## `backup-restore_test.go`
+
+- **Describe:** E2E - Test Backup/Restore
+    - **It:** Install Backup/Restore Operator
+      -  **By:** Configuring Chart repository
+      -  **By:** Installing rancher-backup-operator
+      -  **By:** Waiting for rancher-backup-operator pod
+    - **It:** Do a backup
+      -  **By:** Adding a backup resource
+      -  **By:** Checking that the backup has been done
+    - **It:** Do a restore
+      -  **By:** Deleting some Elemental resources
+      -  **By:** Adding a restore resource
+      -  **By:** Checking that the restore has been done
+      -  **By:** Checking cluster state after restore
+
 ## `bootstrap_test.go`
 
 - **Describe:** E2E - Bootstrapping node
