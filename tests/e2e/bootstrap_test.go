@@ -377,10 +377,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					defer GinkgoRecover()
 
 					By("Checking cluster version on "+h, func() {
-						// Show cluster version, could be useful for debugging purposes
-						version, err := client.RunSSH("kubectl version")
-						Expect(err).To(Not(HaveOccurred()))
-						GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, version)
+						Eventually(func() error {
+							k8sVer, err := cl.RunSSH("kubectl version 2>/dev/null")
+							if strings.Contains(k8sVer, "Server Version:") {
+								// Show cluster version, could be useful for debugging purposes
+								GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, k8sVer)
+							}
+							return err
+						}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 					})
 				}(hostName, client)
 			}
