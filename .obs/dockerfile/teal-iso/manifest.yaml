@@ -1,0 +1,6 @@
+iso:
+  bootloader-in-rootfs: true
+  grub-entry-name: "Elemental Install"
+
+squash-no-compression: true
+
