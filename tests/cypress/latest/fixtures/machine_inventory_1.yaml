@@ -4,7 +4,7 @@ metadata:
   annotations:
     myInvAnnotation1: myInvAnnotationValue1
   labels:
-    testfilter: test-filter-one
+    testfilter: Test-Filter-One
   name: test-filter-one
   namespace: fleet-default
 spec:

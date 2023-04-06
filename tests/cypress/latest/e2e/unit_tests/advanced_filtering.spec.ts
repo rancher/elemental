@@ -38,13 +38,16 @@ filterTests(['main'], () => {
     });
   
     it('Create fake machine inventories', () => {
-      // TODO: Use loop?
-      cy.importMachineInventory({machineInventoryFile: 'machine_inventory_1.yaml',
-        machineInventoryName: 'test-filter-one'});
-      cy.importMachineInventory({machineInventoryFile: 'machine_inventory_2.yaml',
-        machineInventoryName: 'test-filter-two'});
-      cy.importMachineInventory({machineInventoryFile: 'machine_inventory_3.yaml',
-        machineInventoryName: 'shouldnotmatch'});
+      let machineInventoryMap = new Map([
+        ['machine_inventory_1', 'test-filter-one'],
+        ['machine_inventory_2', 'test-filter-two'],
+        ['machine_inventory_3', 'shouldnotmatch']
+      ]);
+
+      machineInventoryMap.forEach((value, key) => {
+        cy.importMachineInventory({machineInventoryFile: key +'.yaml',
+          machineInventoryName: value});
+      });
     });
   
     it('Two machine inventories should appear by filtering on test-filter', () => {
@@ -56,11 +59,14 @@ filterTests(['main'], () => {
     });
   
     it('One machine inventory should appear by filtering on test-filter-one', () => {
-      // Only test-filter-one should appear with test-filter-one as filter
-      cy.checkFilter({filterName: 'test-filter-one',
-        testFilterOne: true,
-        testFilterTwo: false,
-        shouldNotMatch: false});
+      // Only test-filter-one should appear with test-filter-one and Test-Filter_One as filter
+      // Checking with lower and upper case make sure we are not hitting https://github.com/rancher/elemental/issues/627
+      ['test-filter-one', 'Test-Filter-One'].forEach(filter => {
+        cy.checkFilter({filterName: filter,
+          testFilterOne: true,
+          testFilterTwo: false,
+          shouldNotMatch: false});
+      });
     });
   
     it('No machine inventory should appear by filtering on test-bad-filter', () => {
