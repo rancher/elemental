@@ -19,7 +19,6 @@ import filterTests from '~/support/filterTests.js';
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-    const elemental_ui_version = Cypress.env('elemental_ui_version');
     const topLevelMenu         = new TopLevelMenu();
   
     beforeEach(() => {
@@ -57,13 +56,6 @@ filterTests(['main', 'upgrade'], () => {
       cy.get('.plugin')
         .contains('Install')
         .click();
-      cy.contains('Install Extension elemental');
-      if (elemental_ui_version != 'latest') {
-        cy.get('.labeled-select')
-          .click();
-        cy.contains(elemental_ui_version)
-          .click();
-      }
       cy.clickButton('Install');
       cy.contains('Installing');
       cy.contains('Extensions changed - reload required', {timeout: 40000});

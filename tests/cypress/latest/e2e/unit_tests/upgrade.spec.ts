@@ -24,7 +24,6 @@ describe('Upgrade tests', () => {
   const clusterName        = "mycluster"
   const checkK3s: RegExp   = /k3s/
   const elemental          = new Elemental();
-  const elementalUIVersion = Cypress.env('elemental_ui_version')
   const elementalUser      = "elemental-user"
   const k8sVersion         = Cypress.env('k8s_version')
   const topLevelMenu       = new TopLevelMenu();
@@ -89,30 +88,24 @@ describe('Upgrade tests', () => {
         .click();
       cy.contains(clusterName)
         .click();
-      // TODO: REMOVE FIRST 'IF' BLOCK AFTER NEXT STABLE VERSION (> 1.0.0)
-      // Following 'if' code will be removed once we get a new stable version
-      if (elementalUIVersion == '1.0.0') {
-        cy.typeValue({label: 'OS Image', value: upgradeImage});
+      if (!checkK3s.test(k8sVersion)) {
+        cy.getBySel('upgrade-choice-selector')
+          .parent()
+          .contains('Use image from registry')
+          .click();
+        cy.getBySel('os-image-box')
+          .type(upgradeImage)
       } else {
-        if (!checkK3s.test(k8sVersion)) {
-          cy.getBySel('upgrade-choice-selector')
-            .parent()
-            .contains('Use image from registry')
-            .click();
-          cy.getBySel('os-image-box')
-            .type(upgradeImage)
-        } else {
-          cy.getBySel('upgrade-choice-selector')
-            .parent()
-            .contains('Use Managed OS version')
-            .click();
-          cy.getBySel('os-version-box')
-            .click()
-          cy.getBySel('os-version-box')
-            .parents()
-            .contains('staging')
-            .click();
-        };
+        cy.getBySel('upgrade-choice-selector')
+          .parent()
+          .contains('Use Managed OS version')
+          .click();
+        cy.getBySel('os-version-box')
+          .click()
+        cy.getBySel('os-version-box')
+          .parents()
+          .contains('staging')
+          .click();
       };
       cy.getBySel('form-save')
       .contains('Create')

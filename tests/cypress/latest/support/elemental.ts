@@ -56,11 +56,7 @@ export class Elemental {
 
   // Make sure Elemental logo appears
   elementalIcon() {
-    // TODO: REMOVE 'IF' BLOCK AFTER NEXT STABLE VERSION (> 1.0.0)
-    if (Cypress.env('elemental_ui_version') != '1.0.0') {
-      return cy.get('.option .icon.group-icon.icon-elemental');
-    }
-    return cy.get('.option .icon.group-icon.icon-os-management');
+    return cy.get('.option .icon.group-icon.icon-elemental');
   } 
   
   // Handle first login in Rancher
