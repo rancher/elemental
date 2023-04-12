@@ -44,13 +44,14 @@ export class Elemental {
     // Check all listed options once accordion is opened
     cy.get('li.child.nav-type')
       .should(($lis) => {
-    expect($lis).to.have.length(6);
+    expect($lis).to.have.length(7);
     expect($lis.eq(0)).to.contain('Dashboard');
     expect($lis.eq(1)).to.contain('Registration Endpoints');
     expect($lis.eq(2)).to.contain('Inventory of Machines');
     expect($lis.eq(3)).to.contain('Update Groups');
     expect($lis.eq(4)).to.contain('OS Versions');
     expect($lis.eq(5)).to.contain('OS Version Channels');
+    expect($lis.eq(6)).to.contain('Seed Images');
     })      
   }
 
