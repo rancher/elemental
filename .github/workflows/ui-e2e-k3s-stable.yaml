@@ -10,7 +10,7 @@ on:
         type: boolean
       elemental_ui_version:
         description: Version of the elemental ui which will be installed
-        default: '1.0.0'
+        default: 'latest'
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
@@ -37,7 +37,7 @@ jobs:
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner || true }}
-      elemental_ui_version: ${{ inputs.elemental_ui_version || '1.0.0' }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest' }}
       k8s_version_to_provision: v1.24.8+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_channel: 'stable'
