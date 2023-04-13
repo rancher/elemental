@@ -34,6 +34,7 @@ jobs:
       # https://github.com/rancher/elemental-ui/issues/64
       # Fixed in elemental-ui 1.1.0
       #ui_account: user
+      test_description: "CI/Manual - E2E UI - Deployment test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main

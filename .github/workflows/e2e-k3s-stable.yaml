@@ -18,6 +18,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
+      test_description: "CI - E2E CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.8+k3s1
       start_condition: ${{ github.event.workflow_run.conclusion }}
