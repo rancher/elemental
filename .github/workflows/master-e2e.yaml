@@ -33,7 +33,7 @@ on:
         required: true
         type: string
       cluster_type:
-        description: Type of the cluster
+        description: Cluster type (empty if normal or hardened)
         type: string
       cypress_tags:
         description: Tags to filter tests we want to run

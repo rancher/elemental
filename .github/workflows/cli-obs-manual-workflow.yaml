@@ -4,6 +4,9 @@ name: CLI-OBS-Manual-Workflow
 on:
   workflow_dispatch:
     inputs:
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -54,6 +57,7 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       cluster_name: my-own-cluster
+      cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
