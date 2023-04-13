@@ -33,6 +33,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
+      test_description: "Manual - E2E CLI - Parallel - Deployment test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}

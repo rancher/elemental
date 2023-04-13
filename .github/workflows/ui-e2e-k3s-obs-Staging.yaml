@@ -36,6 +36,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
+      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard K3s"
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}

@@ -16,6 +16,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
+      test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.24.11+k3s1

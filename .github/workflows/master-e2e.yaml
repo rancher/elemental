@@ -95,6 +95,9 @@ on:
         description: Start condition of the runner
         default: success
         type: string
+      test_description:
+        description: Short description of the test
+        type: string
       test_type:
         description: Type of test to run (cli or ui)
         default: cli
@@ -456,18 +459,37 @@ jobs:
       - name: Add summary
         if: always()
         run: |
+          # Define some variable(s)
+          BOOTSTRAP_METHOD="Parallel"
+          if ${{ inputs.sequential == 'true' }}; then
+            BOOTSTRAP_METHOD="Sequential"
+          fi
+          ISO_USED=$(ls build/elemental-*.iso 2>/dev/null)
+          if ${{ inputs.iso_to_test != '' }}; then
+            ISO_USED=${{ inputs.iso_to_test }}
+          fi
+
           # Add summary
           echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
+          echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.test_type == 'cli' }}; then
             echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
           fi
-          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}"  >> ${GITHUB_STEP_SUMMARY}
+          echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Type of cluster deployed: ${CLUSTER_TYPE:-normal}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
           echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Upgrade: ${{ env.UPGRADE_OPERATOR || 'N/A' }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental UI Extension Version (if applicable): ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
+          if ${{ inputs.elemental_ui_version != '' }}; then
+            echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
+          fi
+          if ${{ inputs.ui_account != '' }}; then
+            echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
+          fi
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
