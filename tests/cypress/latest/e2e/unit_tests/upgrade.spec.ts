@@ -98,7 +98,7 @@ describe('Upgrade tests', () => {
       } else {
         cy.getBySel('upgrade-choice-selector')
           .parent()
-          .contains('Use Managed OS version')
+          .contains('Use Managed OS Version')
           .click();
         cy.getBySel('os-version-box')
           .click()
