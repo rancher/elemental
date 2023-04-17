@@ -41,6 +41,6 @@ jobs:
       rancher_channel: 'stable'
       rancher_version: ${{ inputs.rancher_version || 'latest' }}
       test_type: ui
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
       upgrade_operator: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart

@@ -48,5 +48,5 @@ jobs:
       rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       test_type: ui
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
