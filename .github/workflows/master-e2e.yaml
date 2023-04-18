@@ -21,6 +21,9 @@ on:
         description: WebHook URL to use for Slack
         required: true
     inputs:
+      backup_restore_version:
+        description: Version of backup-restore-operator to use
+        type: string
       ca_type:
         description: CA type to use (selfsigned or private)
         default: selfsigned
@@ -252,9 +255,15 @@ jobs:
                          --namespace cattle-system \
                          -l app=rancher \
                          -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Export values
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: inputs.test_type == 'ui'
@@ -420,7 +429,7 @@ jobs:
       - name: Test Backup/Restore Elemental resources with Rancher Manager
         if: inputs.test_type == 'cli'
         env:
-          BACKUP_RESTORE_VERSION: v3.1.0-rc5
+          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
         run: cd tests && make e2e-backup-restore
       - name: Uninstall Elemental Operator
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
@@ -484,6 +493,7 @@ jobs:
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Upgrade: ${{ env.UPGRADE_OPERATOR || 'N/A' }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Backup-Restore Operator Version: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
             echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
           fi
