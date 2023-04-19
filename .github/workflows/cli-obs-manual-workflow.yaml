@@ -23,6 +23,10 @@ on:
         description: Number of nodes (>3) to deploy on the provisioned cluster
         default: 5
         type: number
+      operator_version:
+        description: Elemental operator version to use
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
+        type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)
         default: stable
@@ -38,10 +42,6 @@ on:
       sequential:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
-        type: string
-      upgrade_operator:
-        description: URL to elemental-operator version to upgrade to
-        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
         type: string
 
 concurrency:
@@ -63,8 +63,8 @@ jobs:
       iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
       node_number: ${{ inputs.node_number }}
+      operator_version: ${{ inputs.operator_version }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_template: ${{ inputs.runner_template }}
       sequential: ${{ inputs.sequential }}
-      upgrade_operator: ${{ inputs.upgrade_operator }}

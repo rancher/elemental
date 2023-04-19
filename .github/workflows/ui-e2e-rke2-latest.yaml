@@ -12,9 +12,6 @@ on:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: devel
         type: string
-      upgrade_operator:
-        description: URL to elemental-operator version to upgrade to
-        type: string
   schedule:
     - cron: '0 4 * * *'
 
@@ -37,4 +34,3 @@ jobs:
       rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}
       test_type: ui
-      upgrade_operator: ${{ inputs.upgrade_operator }}

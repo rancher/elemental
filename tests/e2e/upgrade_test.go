@@ -27,6 +27,31 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
+var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator"), func() {
+	// Create kubectl context
+	// Default timeout is too small, so New() cannot be used
+	k := &kubectl.Kubectl{
+		Namespace:    "",
+		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollInterval: 500 * time.Millisecond,
+	}
+
+	It("Upgrade operator", func() {
+		err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
+			operatorUpgrade,
+			"--namespace", "cattle-elemental-system",
+			"--create-namespace",
+		)
+		Expect(err).To(Not(HaveOccurred()))
+
+		// Delay few seconds before checking, needed because we may have 2 pods at the same time
+		time.Sleep(misc.SetTimeout(30 * time.Second))
+
+		err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+		Expect(err).To(Not(HaveOccurred()))
+	})
+})
+
 var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 	var (
 		wg           sync.WaitGroup
