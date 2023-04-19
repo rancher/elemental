@@ -25,7 +25,7 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
-var _ = Describe("E2E - Test Backup/Restore", Label("backup-restore"), func() {
+var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-restore"), func() {
 	// Create kubectl context
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
@@ -33,10 +33,6 @@ var _ = Describe("E2E - Test Backup/Restore", Label("backup-restore"), func() {
 		PollTimeout:  misc.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
-
-	// Variable(s)
-	backupResourceName := "elemental-backup"
-	restoreResourceName := "elemental-restore"
 
 	It("Install Backup/Restore Operator", func() {
 		// Default chart
@@ -90,6 +86,12 @@ var _ = Describe("E2E - Test Backup/Restore", Label("backup-restore"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 	})
+})
+
+var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func() {
+	// Variable(s)
+	backupResourceName := "elemental-backup"
+	restoreResourceName := "elemental-restore"
 
 	It("Do a backup", func() {
 		By("Adding a backup resource", func() {
