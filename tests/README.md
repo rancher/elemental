@@ -158,11 +158,12 @@
 
 ## `backup-restore_test.go`
 
-- **Describe:** E2E - Test Backup/Restore
+- **Describe:** E2E - Install Backup/Restore Operator
     - **It:** Install Backup/Restore Operator
       -  **By:** Configuring Chart repository
       -  **By:** Installing rancher-backup-operator
       -  **By:** Waiting for rancher-backup-operator pod
+- **Describe:** E2E - Test Backup/Restore
     - **It:** Do a backup
       -  **By:** Adding a backup resource
       -  **By:** Checking that the backup has been done
