@@ -20,10 +20,6 @@ on:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
         type: string
-      upgrade_operator:
-        description: URL to elemental-operator version to upgrade to
-        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
-        type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
         default: dev
@@ -49,10 +45,11 @@ jobs:
       k8s_version_to_provision: v1.25.7+rke2r1
       # Force to only deploy the first 3 nodes
       node_number: 3
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher/elemental-operator-chart
+      operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-8-v4
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/teal53/15.4/rancher/elemental-teal/5.3:latest
-      upgrade_operator: ${{ inputs.upgrade_operator }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

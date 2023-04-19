@@ -82,5 +82,7 @@ e2e-uninstall-operator:
 	ginkgo --label-filter uninstall-operator -r -v ./e2e
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade -r -v ./e2e
+e2e-upgrade-operator: deps
+	ginkgo --label-filter upgrade-operator -r -v ./e2e
 start-cypress-tests:
 	@./scripts/start-cypress-tests

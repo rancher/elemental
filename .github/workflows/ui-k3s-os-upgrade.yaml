@@ -12,6 +12,10 @@ on:
         description: ISO to test
         default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
         type: string
+      operator_version:
+        description: Elemental operator version to use
+        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
+        type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
@@ -23,10 +27,6 @@ on:
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
-        type: string
-      upgrade_operator:
-        description: URL to elemental-operator version to upgrade to
-        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
         type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
@@ -47,11 +47,11 @@ jobs:
       elemental_ui_version: dev
       iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: v1.25.7+k3s1
+      operator_version: ${{ inputs.operator_version }}
       proxy: ${{ inputs.proxy }}
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/teal53/15.4/rancher/elemental-teal/5.3:latest
-      upgrade_operator: ${{ inputs.upgrade_operator }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

@@ -65,6 +65,8 @@ var (
 	isoBoot              string
 	k8sVersion           string
 	numberOfVMs          int
+	operatorUpgrade      string
+	operatorVersion      string
 	osImage              string
 	poolType             string
 	proxy                string
@@ -75,7 +77,6 @@ var (
 	testType             string
 	upgradeChannelList   string
 	upgradeImage         string
-	upgradeOperator      string
 	upgradeOsChannel     string
 	upgradeType          string
 	usedNodes            int
@@ -146,6 +147,8 @@ var _ = BeforeSuite(func() {
 	isoBoot = os.Getenv("ISO_BOOT")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
+	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
+	operatorVersion = os.Getenv("OPERATOR_VERSION")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherChannel = os.Getenv("RANCHER_CHANNEL")
@@ -155,7 +158,6 @@ var _ = BeforeSuite(func() {
 	testType = os.Getenv("TEST_TYPE")
 	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
-	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
 	upgradeOsChannel = os.Getenv("UPGRADE_OS_CHANNEL")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 

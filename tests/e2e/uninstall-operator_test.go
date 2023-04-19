@@ -94,11 +94,6 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 			err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
-
-			// Check elemental-operator image
-			operatorImage, err := misc.GetOperatorImage()
-			Expect(err).To(Not(HaveOccurred()))
-			GinkgoWriter.Printf("Operator Image:\n%s\n", operatorImage)
 		})
 
 		By("Creating a dumb MachineRegistration", func() {

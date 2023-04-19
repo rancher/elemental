@@ -71,6 +71,13 @@ on:
         description: Number of nodes to deploy on the provisioned cluster
         default: 5
         type: string
+      operator_upgrade:
+        description: Elemental operator version to upgrade to
+        type: string
+      operator_version:
+        description: Elemental operator version to use
+        type: string
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
       proxy:
         description: Deploy a proxy
         type: string
@@ -114,9 +121,6 @@ on:
         type: string
       upgrade_image:
         description: Image to use for the Elemental OS upgrade
-        type: string
-      upgrade_operator:
-        description: URL to elemental-operator version to upgrade to
         type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
@@ -194,7 +198,6 @@ jobs:
       # For Rancher Manager
       RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
-      UPGRADE_OPERATOR: ${{ inputs.upgrade_operator }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
     steps:
@@ -239,9 +242,10 @@ jobs:
       - name: Deploy Proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
-      - name: Install Rancher
+      - name: Install Rancher+Elemental components
         env:
           CA_TYPE: ${{ inputs.ca_type }}
+          OPERATOR_VERSION: ${{ inputs.operator_version }}
           PROXY: ${{ inputs.proxy }}
           PUBLIC_DOMAIN: bc.googleusercontent.com
           TEST_TYPE: ${{ inputs.test_type }}
@@ -249,6 +253,11 @@ jobs:
       - name: Extracts component versions/informations
         id: component
         run: |
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Extract elemental-operator version
           OPERATOR_VERSION=$(kubectl get pod \
                              --namespace cattle-elemental-system \
@@ -259,15 +268,10 @@ jobs:
                          --namespace cattle-system \
                          -l app=rancher \
                          -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract rancher-backup-operator version
-          BACKUP_RESTORE_VERSION=$(kubectl get pod \
-                                     --namespace cattle-resources-system \
-                                     -l app.kubernetes.io/name=rancher-backup \
-                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Export values
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: inputs.test_type == 'ui'
@@ -394,6 +398,22 @@ jobs:
           else
             cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
           fi
+      - name: Upgrade Elemental Operator
+        if: inputs.test_type == 'cli' && inputs.operator_upgrade != ''
+        id: operator_upgrade
+        env:
+          OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
+        run: |
+          cd tests && make e2e-upgrade-operator
+
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export values
+          echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade node 1 to specified OS version with osImage
         if: inputs.test_type == 'cli' && inputs.upgrade_image != ''
         env:
@@ -495,7 +515,6 @@ jobs:
           echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental Operator Upgrade: ${{ env.UPGRADE_OPERATOR || 'N/A' }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup-Restore Operator Version: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
@@ -505,10 +524,12 @@ jobs:
             echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
           fi
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "K3s/RKE2 version deployed on the cluster: ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
           if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
             echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
+            echo "Elemental Operator Upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Elemental Operator Version: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
