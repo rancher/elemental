@@ -19,7 +19,7 @@ jobs:
     with:
       test_description: "CI/Manual - CLI - Sequential - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       rancher_channel: stable
       rancher_version: latest
       sequential: true

@@ -156,6 +156,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
 				"--set", "extraEnv[1].value=rancherpassword",
 				"--set", "replicas=1",
+				"--set", "global.cattle.psp.enabled=false",
 			}
 
 			// Set specified version if needed

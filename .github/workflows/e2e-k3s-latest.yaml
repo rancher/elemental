@@ -18,6 +18,6 @@ jobs:
     with:
       test_description: "CI - E2E CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.24.11+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       rancher_channel: latest
       rancher_version: devel

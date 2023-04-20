@@ -124,6 +124,10 @@ on:
       upgrade_type:
         description: Type of upgrade to use for the Elemental OS upgrade
         type: string
+      upstream_k3s_version:
+        description: Cluster upstream K3s version where to install Rancher
+        default: v1.25.7+k3s1
+        type: string
       workflow_download:
         description: build-ci workflow to use for artifacts
         default: build-ci.yaml
@@ -184,7 +188,7 @@ jobs:
       CLUSTER_TYPE: ${{ inputs.cluster_type }}
       # For K3s installation used to host Rancher Manager
       INSTALL_K3S_EXEC: ${{ inputs.k3s_flags }}
-      INSTALL_K3S_VERSION: v1.24.11+k3s1
+      INSTALL_K3S_VERSION: ${{ inputs.upstream_k3s_version }}
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       # For Rancher Manager

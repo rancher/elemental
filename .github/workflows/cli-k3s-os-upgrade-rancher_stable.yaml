@@ -19,7 +19,7 @@ jobs:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       # Force to only deploy the first 3 nodes
       node_number: 3
       rancher_channel: stable

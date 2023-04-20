@@ -45,7 +45,7 @@ jobs:
       cluster_name: cluster-k3s
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: ${{ inputs.iso_to_test }}
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       # Force to only deploy the first 3 nodes
       node_number: 3
       rancher_channel: ${{ inputs.rancher_channel }}

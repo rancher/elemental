@@ -39,7 +39,7 @@ jobs:
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest' }}
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_channel: 'stable'
       rancher_version: ${{ inputs.rancher_version || 'latest' }}
