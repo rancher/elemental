@@ -28,5 +28,6 @@ jobs:
         --kube-apiserver-arg=--service-account-lookup=true 
         --kubelet-arg=make-iptables-util-chains=true 
         --kube-apiserver-arg=--anonymous-auth=false"
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       node_number: 3
+      upstream_k3s_version: v1.24.11+k3s1

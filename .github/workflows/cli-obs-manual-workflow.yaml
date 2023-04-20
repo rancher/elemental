@@ -17,7 +17,7 @@ on:
         type: string
       k8s_version_to_provision:
         description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
-        default: v1.24.8+k3s1
+        default: v1.25.7+k3s1
         type: string
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster

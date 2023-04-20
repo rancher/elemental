@@ -23,6 +23,9 @@ on:
         description: URL to elemental-operator version to upgrade to
         default: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher/elemental-operator-chart
         type: string
+      upstream_k3s_version:
+        description: Cluster upstream K3s version where to install Rancher
+        type: string
 
 concurrency:
   group: e2e-k3s-obs-staging-${{ github.head_ref || github.ref }}-${{ github.repository }}
@@ -41,7 +44,8 @@ jobs:
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       upgrade_operator: ${{ inputs.upgrade_operator }}
+      upstream_k3s_version: ${{ inputs.upstream_k3s_version }}

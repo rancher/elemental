@@ -38,7 +38,7 @@ jobs:
       cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
-      k8s_version_to_provision: v1.24.8+rke2r1
+      k8s_version_to_provision: v1.25.7+rke2r1
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       upgrade_operator: ${{ inputs.upgrade_operator }}

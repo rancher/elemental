@@ -43,7 +43,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: ${{ inputs.elemental_ui_version || 'latest' }}
       iso_boot: true
-      k8s_version_to_provision: v1.24.11+k3s1
+      k8s_version_to_provision: v1.25.7+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_channel: 'latest'
       rancher_version: ${{ inputs.rancher_version || 'devel' }}

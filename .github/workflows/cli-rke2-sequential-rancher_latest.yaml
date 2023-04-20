@@ -19,7 +19,7 @@ jobs:
     with:
       test_description: "CI/Manual - CLI - Sequential - Deployment test with Standard RKE2"
       cluster_name: cluster-rke2
-      k8s_version_to_provision: v1.24.8+rke2r1
+      k8s_version_to_provision: v1.25.7+rke2r1
       rancher_channel: latest
       rancher_version: devel
       sequential: true
