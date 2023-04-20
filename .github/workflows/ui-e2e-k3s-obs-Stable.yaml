@@ -8,8 +8,8 @@ on:
         default: true
         type: boolean
       elemental_ui_version:
-        description: Version of the elemental ui which will be installed
-        default: latest
+        description: Version of the elemental ui which will be installed (dev/stable)
+        default: stable
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)

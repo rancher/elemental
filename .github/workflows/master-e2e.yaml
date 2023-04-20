@@ -51,8 +51,8 @@ on:
         default: https://github.com/rancher/elemental-operator/releases/download/v1.1.4/elemental-support_1.1.4_linux_amd64
         type: string
       elemental_ui_version:
-        description: Version of the elemental ui which will be installed
-        default: latest
+        description: Version of the elemental ui which will be installed (dev/stable)
+        default: dev
         type: string
       iso_to_test:
         description: ISO to test (default built one is empty)
@@ -294,7 +294,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-basics-${{ inputs.cluster_name }}
-          path: tests/cypress/${{ inputs.elemental_ui_version }}/screenshots
+          path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Basics)
@@ -303,7 +303,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-basics-${{ inputs.cluster_name }}
-          path: tests/cypress/${{ inputs.elemental_ui_version }}/videos
+          path: tests/cypress/latest/videos
           retention-days: 7
       - name: Deploy a node to join Rancher manager
         if: inputs.test_type == 'ui'
@@ -315,7 +315,7 @@ jobs:
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
-            sudo rm -rf cypress/${{ inputs.elemental_ui_version }}/downloads
+            sudo rm -rf cypress/latest/downloads
 
             make e2e-ui-rancher
           )
@@ -349,7 +349,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
-          path: tests/cypress/${{ inputs.elemental_ui_version }}/screenshots
+          path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Advanced)
@@ -358,7 +358,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-videos-advanced-${{ inputs.cluster_name }}
-          path: tests/cypress/${{ inputs.elemental_ui_version }}/videos
+          path: tests/cypress/latest/videos
           retention-days: 7
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
@@ -458,7 +458,7 @@ jobs:
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
-            sudo rm -rf cypress/${{ inputs.elemental_ui_version }}/downloads
+            sudo rm -rf cypress/latest/downloads
 
             make e2e-get-logs
           )
