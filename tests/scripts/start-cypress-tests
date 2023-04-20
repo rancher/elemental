@@ -8,7 +8,7 @@ pushd ..
 setsid --fork ${HTTP_SRV_CMD} >/dev/null 2>&1
 popd
 
-pushd cypress/$ELEMENTAL_UI_VERSION
+pushd cypress/latest
 
 # Needed to install Cypress plugins
 npm install
@@ -35,7 +35,7 @@ popd
 
 # Move elemental.iso into the expected folder
 if [[ ${ISO_BOOT} == "true" ]]; then
-    sudo mv cypress/$ELEMENTAL_UI_VERSION/downloads/elemental.iso ../elemental-from-cypress.iso
+    sudo mv cypress/latest/downloads/elemental.iso ../elemental-from-cypress.iso
 fi
 
 # Kill the HTTP server

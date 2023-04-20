@@ -9,8 +9,8 @@ on:
         default: true
         type: boolean
       elemental_ui_version:
-        description: Version of the elemental ui which will be installed
-        default: latest
+        description: Version of the elemental ui which will be installed (dev/stable)
+        default: stable
         type: string
       rancher_channel:
         description: Rancher Manager channel to use for installation (alpha/latest/stable)

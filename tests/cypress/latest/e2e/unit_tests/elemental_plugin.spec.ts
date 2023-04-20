@@ -27,12 +27,14 @@ filterTests(['main', 'upgrade'], () => {
     });
   
     it('Add elemental-ui repo', () => {
-      topLevelMenu.openIfClosed();
-      cy.contains('local')
-        .click();
-      cy.addHelmRepo({repoName: 'elemental-ui',
-        repoUrl: 'https://github.com/rancher/elemental-ui.git',
-        repoType: 'git'});
+      if ( Cypress.env('elemental_ui_version') != "stable") {
+        topLevelMenu.openIfClosed();
+        cy.contains('local')
+          .click();
+        cy.addHelmRepo({repoName: 'elemental-ui',
+          repoUrl: 'https://github.com/rancher/elemental-ui.git',
+          repoType: 'git'});
+      };
     });
     
     it('Enable extension support', () => {
@@ -41,8 +43,10 @@ filterTests(['main', 'upgrade'], () => {
         .click();
       cy.clickButton('Enable');
       cy.contains('Enable Extension Support?')
-      cy.contains('Add the Rancher Extension Repository')
-        .click();
+      if ( Cypress.env('elemental_ui_version') != "stable") {
+        cy.contains('Add the Rancher Extension Repository')
+          .click();
+      }
       cy.clickButton('OK');
       cy.get('.tabs', {timeout: 40000})
         .contains('Installed Available Updates All');
