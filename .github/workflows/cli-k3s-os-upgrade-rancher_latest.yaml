@@ -9,7 +9,7 @@ on:
     - cron: '0 2 * * *'
 
 jobs:
-  k3s:
+  cli:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
