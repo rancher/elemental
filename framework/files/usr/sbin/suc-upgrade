@@ -5,6 +5,7 @@ RELEASE_FILE="${RELEASE_FILE:-/etc/os-release}"
 CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
 LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
 LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/cos/upgrade.lock}"
+ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/cos/active_mode}"
 
 function config()
 {
@@ -45,6 +46,11 @@ function isEqualVersion() {
  return 1
 }
 
+function isActiveSystem() {
+  [ ! -f "${ACTIVE_FILE}" ] && return 1
+  return 0
+}
+
 (
   flock -w $LOCK_TIMEOUT 200 || exit 1
   if ! nsenter -i -m -t 1 -- systemctl is-system-running; then
@@ -65,6 +71,11 @@ function isEqualVersion() {
           echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
           cat ${HOST_DIR}${RELEASE_FILE}
           
+          exit 0
+      fi
+
+      if ! isActiveSystem; then
+          echo "Current OS is not booted in Active configuration, use FORCE to run upgrade."
           exit 0
       fi
   fi
