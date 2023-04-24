@@ -11,7 +11,7 @@ on:
       - completed
 
 jobs:
-  rke2:
+  cli:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}

@@ -27,7 +27,7 @@ on:
     - cron: '0 1 * * *'
 
 jobs:
-  ui-k3s:
+  ui:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
