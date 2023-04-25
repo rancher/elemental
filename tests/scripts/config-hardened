@@ -11,7 +11,7 @@ MANIFESTS_DIR="${K3S_SERVER_DIR}/manifests/"
 SYSCTL_DIR="/etc/sysctl.d"
 HARDENED_DIR="../assets/hardened_cluster"
 SYSCTL_CONF="${HARDENED_DIR}/90-kubelet.conf"
-POLICY_YAML="${HARDENED_DIR}/policy.yaml"
+PSA_YAML="${HARDENED_DIR}/psa.yaml"
 NETWORK_POLICY_YAML="${HARDENED_DIR}/networkpolicy.yaml"
 AUDIT_YAML="${HARDENED_DIR}/audit.yaml"
 
@@ -24,7 +24,7 @@ mkdir -p -m 700 ${MANIFESTS_DIR}
 mkdir ${K3S_SERVER_DIR}/logs
 
 # Copy policies to manifests directory
-cp ${POLICY_YAML} ${NETWORK_POLICY_YAML} ${MANIFESTS_DIR}
+cp ${NETWORK_POLICY_YAML} ${MANIFESTS_DIR}
 
 # Enable auditing
-cp ${AUDIT_YAML} ${K3S_SERVER_DIR}
+cp ${PSA_YAML} ${AUDIT_YAML} ${K3S_SERVER_DIR}
