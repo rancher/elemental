@@ -14,11 +14,11 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI - CLI - Parallel - Deployment test with Hardened K3s"
-      cert-manager_version: v1.9.2
+      cert-manager_version: v1.11.1
       cluster_name: cluster-k3s
       cluster_type: hardened
       k3s_flags: "--protect-kernel-defaults 
-        --kube-apiserver-arg=--enable-admission-plugins=NodeRestriction,PodSecurityPolicy,NamespaceLifecycle,ServiceAccount 
+        --kube-apiserver-arg=--admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml
         --kube-apiserver-arg=--audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log 
         --kube-apiserver-arg=--audit-policy-file=/var/lib/rancher/k3s/server/audit.yaml 
         --kube-apiserver-arg=--audit-log-maxage=30 
@@ -32,4 +32,4 @@ jobs:
       node_number: 3
       rancher_channel: latest
       rancher_version: devel
-      upstream_k3s_version: v1.24.11+k3s1
+      upstream_k3s_version: v1.25.7+k3s1
