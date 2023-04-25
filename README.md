@@ -12,6 +12,8 @@ CI with latest stable Rancher Manager:
 
 [![CLI-K3s-Hardened-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_stable.yaml)
 
+[![CLI-RKE2-Scalability-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml)
+
 [![K3s-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml)
 [![RKE2-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml)
 
