@@ -12,13 +12,9 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: stable
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: latest
-        type: string
       rancher_version:
-        description: Rancher Manager version to use for installation (fixed version or latest)
-        default: devel
+        description: Rancher Manager channel/version to use for installation
+        default: latest/devel
         type: string
 
 jobs:
@@ -39,6 +35,5 @@ jobs:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.25.7+rke2r1
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
-      rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui

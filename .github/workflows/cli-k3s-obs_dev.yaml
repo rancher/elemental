@@ -11,13 +11,9 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: stable
-        type: string
       rancher_version:
-        description: Rancher Manager version to use for installation (fixed version or latest)
-        default: latest
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
         type: string
       upstream_k3s_version:
         description: Cluster upstream K3s version where to install Rancher
@@ -42,6 +38,5 @@ jobs:
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.25.7+k3s1
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
-      rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       upstream_k3s_version: ${{ inputs.upstream_k3s_version }}

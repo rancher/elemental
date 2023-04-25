@@ -81,17 +81,13 @@ on:
       proxy:
         description: Deploy a proxy
         type: string
-      rancher_channel:
-        description: Rancher Manager channel to use for installation (alpha/latest/stable)
-        default: stable
-        type: string
       rancher_log_collector:
         description: URL of the Rancher log collector script
         default: https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh
         type: string
       rancher_version:
-        description: Rancher Manager version to use for installation (fixed version or latest)
-        default: latest
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
         type: string
       runner_template:
         description: Runner template to use
@@ -196,7 +192,6 @@ jobs:
       INSTALL_K3S_SKIP_ENABLE: true
       K3S_KUBECONFIG_MODE: 0644
       # For Rancher Manager
-      RANCHER_CHANNEL: ${{ inputs.rancher_channel }}
       RANCHER_VERSION: ${{ inputs.rancher_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
@@ -512,8 +507,8 @@ jobs:
           echo "Type of cluster deployed: ${CLUSTER_TYPE:-normal}" >> ${GITHUB_STEP_SUMMARY}
           echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
           echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
-          echo "Rancher Manager Channel: ${{ env.RANCHER_CHANNEL }}/${{ env.RANCHER_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Rancher Manager Version: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Image: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup-Restore Operator Version: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}

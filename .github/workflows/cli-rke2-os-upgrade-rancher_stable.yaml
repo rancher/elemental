@@ -25,8 +25,7 @@ jobs:
       node_number: 3
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
-      rancher_channel: stable
-      rancher_version: latest
+      rancher_version: stable/latest
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-8-v4
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
