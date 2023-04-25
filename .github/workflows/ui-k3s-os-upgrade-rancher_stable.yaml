@@ -13,8 +13,8 @@ on:
         default: elemental
         type: string
       rancher_version:
-        description: Rancher Manager version to use for installation (fixed version or latest)
-        default: latest
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
         type: string
   schedule:
     - cron: '0 1 * * *'
@@ -35,8 +35,7 @@ jobs:
       k8s_version_to_provision: v1.25.7+k3s1
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
       proxy: ${{ inputs.proxy || 'elemental' }}
-      rancher_channel: 'stable'
-      rancher_version: ${{ inputs.rancher_version || 'latest' }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
       test_type: ui
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest

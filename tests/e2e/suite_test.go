@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -151,7 +152,6 @@ var _ = BeforeSuite(func() {
 	operatorVersion = os.Getenv("OPERATOR_VERSION")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
-	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	seqString := os.Getenv("SEQUENTIAL")
@@ -202,6 +202,13 @@ var _ = BeforeSuite(func() {
 		sequential = true
 	default:
 		sequential = false
+	}
+
+	// Extract Rancher Manager channel/version to install
+	if rancherVersion != "" {
+		s := strings.Split(rancherVersion, "/")
+		rancherChannel = s[0]
+		rancherVersion = s[1]
 	}
 
 	// Start HTTP server

@@ -9,8 +9,8 @@ on:
         default: true
         type: boolean
       rancher_version:
-        description: Rancher Manager version to use for installation (fixed version or latest)
-        default: latest
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
         type: string
   schedule:
     - cron: '0 4 * * *'
@@ -34,6 +34,5 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: dev
       k8s_version_to_provision: v1.25.7+rke2r1
-      rancher_channel: 'stable'
-      rancher_version: ${{ inputs.rancher_version || 'latest' }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
       test_type: ui
