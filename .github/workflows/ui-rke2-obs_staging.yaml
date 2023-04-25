@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: RKE2-UI_E2E-Stable_RM
+name: UI-RKE2-OBS_Staging
 
 on:
   workflow_dispatch:
@@ -8,12 +8,14 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      rancher_channel:
+        description: Rancher Manager channel to use for installation (alpha/latest/stable)
+        default: stable
+        type: string
       rancher_version:
         description: Rancher Manager version to use for installation (fixed version or latest)
         default: latest
         type: string
-  schedule:
-    - cron: '0 4 * * *'
 
 jobs:
   ui:
@@ -23,17 +25,16 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      # Using user account has to be disable due to this bug
-      # https://github.com/rancher/elemental-ui/issues/64
-      # Fixed in elemental-ui 1.1.0
-      #ui_account: user
-      test_description: "CI/Manual - E2E UI - Deployment test with Standard RKE2"
+      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
+      ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
-      destroy_runner: ${{ inputs.destroy_runner || true }}
+      destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.25.7+rke2r1
-      rancher_channel: 'stable'
-      rancher_version: ${{ inputs.rancher_version || 'latest' }}
+      operator_version: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher/elemental-operator-chart
+      rancher_channel: ${{ inputs.rancher_channel }}
+      rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
