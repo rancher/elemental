@@ -1,8 +1,8 @@
 # Elemental
 CI with latest stable Rancher Manager:
 
-[![K3s-E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-stable.yaml)
-[![RKE2-E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-stable.yaml)
+[![CLI-K3s-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_stable.yaml)
+[![CLI-RKE2-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-rancher_stable.yaml)
 
 [![CLI-K3s-Sequential-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-sequential-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-sequential-rancher_stable.yaml)
 [![CLI-RKE2-Sequential-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-sequential-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-sequential-rancher_stable.yaml)
@@ -14,16 +14,16 @@ CI with latest stable Rancher Manager:
 
 [![CLI-RKE2-Scalability-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml)
 
-[![K3s-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-stable.yaml)
-[![RKE2-UI_E2E-Stable_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-stable.yaml)
+[![UI-K3s-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_stable.yaml)
+[![UI-RKE2-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_stable.yaml)
 
 [![UI-K3s-OS-Upgrade-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rancher_stable.yaml)
 [![UI-RKE2-OS-Upgrade-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rancher_stable.yaml)
 
 CI with latest devel Rancher Manager:
 
-[![K3s-E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-k3s-latest.yaml)
-[![RKE2-E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/e2e-rke2-latest.yaml)
+[![CLI-K3s-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_latest.yaml)
+[![CLI-RKE2-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-rke2-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-rancher_latest.yaml)
 
 [![CLI-K3s-Sequential-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-sequential-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-sequential-rancher_latest.yaml)
 [![CLI-RKE2-Sequential-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-rke2-sequential-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-sequential-rancher_latest.yaml)
@@ -33,8 +33,8 @@ CI with latest devel Rancher Manager:
 
 [![CLI-K3s-Hardened-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_latest.yaml)
 
-[![K3s-UI_E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-k3s-latest.yaml)
-[![RKE2-UI_E2E-Latest_RM](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-e2e-rke2-latest.yaml)
+[![UI-K3s-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_latest.yaml)
+[![UI-RKE2-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_latest.yaml)
 
 [![UI-K3s-OS-Upgrade-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rancher_latest.yaml)
 [![UI-RKE2-OS-Upgrade-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rancher_latest.yaml)

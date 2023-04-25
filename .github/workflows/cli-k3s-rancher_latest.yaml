@@ -1,14 +1,12 @@
 # This workflow calls the master E2E workflow with custom variables
-name: K3s-E2E-Stable_RM
+name: CLI-K3s-Rancher_Latest
 
+# This worflow is scheduled *after* build-ci to be sure that we have
+# the lastest version built. The scheduling is also to avoid running
+# the workflow on each push on main.
 on:
-  workflow_run:
-    workflows:
-      - build-ci
-    branches:
-      - main
-    types:
-      - completed
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
   cli:
@@ -18,8 +16,8 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "CI - E2E CLI - Parallel - Deployment test with Standard K3s"
+      test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.25.7+k3s1
-      start_condition: ${{ github.event.workflow_run.conclusion }}
-      workflow_download: ${{ github.event.workflow_run.workflow_id }}
+      rancher_channel: latest
+      rancher_version: devel
