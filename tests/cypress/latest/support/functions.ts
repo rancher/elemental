@@ -270,7 +270,7 @@ Cypress.Commands.add('createMachReg', ({
         expect($input).to.have.attr('disabled')
       })
       // Download button is enabled once ISO building done
-      cy.getBySel('download-iso-btn', { timeout: 180000 }).should(($input) => {
+      cy.getBySel('download-iso-btn', { timeout: 300000 }).should(($input) => {
         expect($input).to.not.have.attr('disabled')
       })
       cy.getBySel('download-iso-btn')
