@@ -253,6 +253,11 @@ jobs:
                                      --namespace cattle-resources-system \
                                      -l app.kubernetes.io/name=rancher-backup \
                                      -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Extract elemental-operator version
           OPERATOR_VERSION=$(kubectl get pod \
                              --namespace cattle-elemental-system \
@@ -265,6 +270,7 @@ jobs:
                          -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Export values
           echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
@@ -509,9 +515,10 @@ jobs:
           echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Image: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental Operator Version: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental Backup-Restore Operator Version: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
             echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
           fi
@@ -524,7 +531,7 @@ jobs:
           if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
             echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
-            echo "Elemental Operator Version: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
