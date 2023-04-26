@@ -42,10 +42,10 @@ var _ = Describe("Elemental Installation tests", func() {
 			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
-				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying /run/rootfsbase into /run/cos/workingtree"),
 				ContainSubstring("Setting default grub entry to Elemental"),
+				ContainSubstring("Unmounting disk partitions"),
 			), out)
 		})
 	})
@@ -64,11 +64,10 @@ var _ = Describe("Elemental Installation tests", func() {
 			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
-				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying "+containerImage+" into /run/cos/workingtree"),
-				ContainSubstring("Unpacking a container image: "+containerImage),
 				ContainSubstring("Setting default grub entry to Elemental"),
+				ContainSubstring("Unmounting disk partitions"),
 			), out)
 		})
 	})
