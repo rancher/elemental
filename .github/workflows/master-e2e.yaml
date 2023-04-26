@@ -173,9 +173,32 @@ jobs:
       - name: Get public dns name in GCP
         id: dns
         run: |
-          PUBLIC_IP=$(gcloud compute instances list | awk '/${{ steps.generator.outputs.runner }}/ {print $6}')
-          PUBLIC_DNS=$(host -l $PUBLIC_IP | awk '{sub(/\.$/, ""); print $5}')
+          # Do a timed out loop here, as gcloud can sometimes fail
+          typeset -i i=0
+          while true; do
+            # Get public IP
+            PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
+                        | awk '/${{ steps.generator.outputs.runner }}/ {print $6}')
+
+            # Exit if we reach the timeout or if IP is set
+            if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
+              break
+            fi
+
+            # Wait a little before retrying
+            sleep 2
+          done
+
+          # Get the public DNS
+          PUBLIC_DNS=$(host -l ${PUBLIC_IP} 2> /dev/null \
+                       | awk '{sub(/\.$/, ""); print $5}')
           echo "public_dns=${PUBLIC_DNS}" >> ${GITHUB_OUTPUT}
+
+          # Raise an error if either IP and/or DNS are empty
+          if [[ -z "${PUBLIC_IP}" || -z "${PUBLIC_DNS}" ]]; then
+            echo "PUBLIC_IP and/or PUBLIC_DNS are empty!" >&2
+            false
+          fi
   e2e:
     needs: create-runner
     runs-on: ${{ needs.create-runner.outputs.uuid }}
@@ -225,7 +248,7 @@ jobs:
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
-          ISO=$(ls build/elemental-*.iso 2>/dev/null)
+          ISO=$(ls build/elemental-*.iso 2> /dev/null)
           TAG=${ISO#*-}
           export TAG=${TAG%.iso}
           # Extract iPXE artifacts
@@ -498,7 +521,7 @@ jobs:
           if ${{ inputs.sequential == 'true' }}; then
             BOOTSTRAP_METHOD="Sequential"
           fi
-          ISO_USED=$(ls build/elemental-*.iso 2>/dev/null)
+          ISO_USED=$(ls build/elemental-*.iso 2> /dev/null)
           if ${{ inputs.iso_to_test != '' }}; then
             ISO_USED=${{ inputs.iso_to_test }}
           fi
