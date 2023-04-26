@@ -55,21 +55,20 @@ describe('Upgrade tests', () => {
       cy.getBySel('form-save')
         .contains('Create')
         .click();
-      // Status changes a lot right after the creation so let's wait 60 secondes
+      // Status changes a lot right after the creation so let's wait 10 secondes
       // before checking
-      cy.wait(60000);
+      cy.wait(10000);
       cy.getBySel('sortable-cell-0-0')
-        .contains('Active');
+        .contains('Active', {timeout: 50000});
     });
 
     it('Check OS Versions', () => {
+      let osVersionsTab = ["Active dev", "Active dev-rt", "Active stable", "Active stable-rt", "Active staging", "Active staging-rt"]
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      cy.getBySel('sortable-table-0-row')
-        .contains('Active dev', {timeout: 120000});
-      cy.getBySel('sortable-table-1-row')
-        .contains('Active stable');
-      cy.getBySel('sortable-table-2-row')
-        .contains('Active staging');
+      for (let i = 0; i < osVersionsTab.length; i++) {
+        cy.getBySel(`sortable-table-${i}-row`)
+          .contains(osVersionsTab[i], {timeout: 120000});
+      };
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
@@ -168,7 +167,7 @@ describe('Upgrade tests', () => {
 
     it('Delete OS Versions', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      cy.contains('dev')
+      cy.contains('dev-rt')
         .parent()
         .parent()
         .click();
@@ -176,7 +175,7 @@ describe('Upgrade tests', () => {
       .contains('Delete')
         .click()
       cy.confirmDelete();
-      cy.contains('dev')
+      cy.contains('dev-rt')
         .should('not.exist');
     });
 
