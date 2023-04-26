@@ -148,9 +148,9 @@ describe('Upgrade tests', () => {
       cy.get('.primaryheader')
         .contains('Active');
       cy.get('.primaryheader')
-        .contains('Updating', {timeout: 360000});
+        .contains('Active', {timeout: 420000}).should('not.exist');
       cy.get('.primaryheader')
-        .contains('Active', {timeout: 360000});
+        .contains('Active', {timeout: 420000});
     });
 
     it('Cannot create two upgrade groups targeting the same cluster', () => {

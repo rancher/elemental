@@ -275,7 +275,7 @@ Cypress.Commands.add('createMachReg', ({
       })
       cy.getBySel('download-iso-btn')
         .click()
-      cy.verifyDownload('elemental.iso', { timeout: 180000, interval: 5000 });
+      cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
     }
   
       // Check Cloud configuration

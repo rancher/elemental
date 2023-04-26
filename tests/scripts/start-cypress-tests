@@ -31,12 +31,14 @@ docker run -v $PWD:/workdir -w /workdir                     \
     $CYPRESS_DOCKER                                         \
     -s $SPEC
 
-popd
+[[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
 # Move elemental.iso into the expected folder
 if [[ ${ISO_BOOT} == "true" ]]; then
-    sudo mv cypress/latest/downloads/elemental.iso ../elemental-from-cypress.iso
+    mv downloads/*.iso ../../../elemental-from-cypress.iso
 fi
+
+popd
 
 # Kill the HTTP server
 pkill -f "${HTTP_SRV_CMD}"
