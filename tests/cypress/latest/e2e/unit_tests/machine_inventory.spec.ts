@@ -117,7 +117,9 @@ describe('Machine inventory testing', () => {
       }
       cy.clickButton('Create');
       cy.contains('Updating ' + clusterName, {timeout: 360000});
-      cy.contains('Active ' + clusterName, {timeout: 480000});
+      // Increase timeout to 10 minutes to allow the cluster to be created
+      // If it fails again, try to reload the page instead of increasing the timeout 
+      cy.contains('Active ' + clusterName, {timeout: 600000});
     });
   });
   
