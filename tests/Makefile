@@ -75,6 +75,7 @@ e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
 e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e
+e2e-install-backup-restore: deps
 	ginkgo --label-filter install-backup-restore -r -v ./e2e
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e

@@ -124,8 +124,12 @@ on:
       upgrade_type:
         description: Type of upgrade to use for the Elemental OS upgrade
         type: string
-      upstream_k3s_version:
-        description: Cluster upstream K3s version where to install Rancher
+      upstream_cluster_distribution:
+        description: Cluster upstream distribution where to install Rancher (K3s or RKE2)
+        default: k3s
+        type: string
+      upstream_cluster_version:
+        description: Cluster upstream version where to install Rancher (K3s or RKE2)
         default: v1.25.7+k3s1
         type: string
       workflow_download:
@@ -203,21 +207,24 @@ jobs:
     needs: create-runner
     runs-on: ${{ needs.create-runner.outputs.uuid }}
     env:
-      TIMEOUT_SCALE: 3
       ARCH: amd64
       CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: fleet-default
       CLUSTER_TYPE: ${{ inputs.cluster_type }}
-      # For K3s installation used to host Rancher Manager
+    # K3S / RKE2 flags to use for installation
       INSTALL_K3S_EXEC: ${{ inputs.k3s_flags }}
-      INSTALL_K3S_VERSION: ${{ inputs.upstream_k3s_version }}
       INSTALL_K3S_SKIP_ENABLE: true
+      INSTALL_K3S_VERSION: ${{ inputs.upstream_cluster_version }}
+      INSTALL_RKE2_VERSION: ${{ inputs.upstream_cluster_version }}
       K3S_KUBECONFIG_MODE: 0644
-      # For Rancher Manager
-      RANCHER_VERSION: ${{ inputs.rancher_version }}
+      # Distribution to use to host Rancher Manager (K3s or RKE2)
+      K8S_UPSTREAM_DISTRIBUTION: ${{ inputs.upstream_cluster_distribution }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+      # For Rancher Manager
+      RANCHER_VERSION: ${{ inputs.rancher_version }}
+      TIMEOUT_SCALE: 3
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -268,6 +275,9 @@ jobs:
           PUBLIC_DOMAIN: bc.googleusercontent.com
           TEST_TYPE: ${{ inputs.test_type }}
         run: cd tests && PUBLIC_DNS=${{ needs.create-runner.outputs.public_dns }} make e2e-install-rancher
+      - name: Install backup-restore components (K3s only for now)
+        if: inputs.upstream_cluster_distribution == 'k3s'
+        run: cd tests && make e2e-install-backup-restore
       - name: Extracts component versions/informations
         id: component
         run: |
