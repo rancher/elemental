@@ -6,6 +6,9 @@ push_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev:Teal53
         package: node-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev:Teal53
+        package: build-iso
   filters:
     branches:
       only:
@@ -26,6 +29,12 @@ tag_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev:Teal53
         package: node-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Staging:Teal53
+        package: build-iso
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev:Teal53
+        package: build-iso
   filters:
     event: tag_push
 
@@ -38,6 +47,10 @@ pr_workflow:
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev:Teal53
         source_package: node-image
+        target_project: isv:Rancher:Elemental:PR:Teal53
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev:Teal53
+        source_package: build-iso
         target_project: isv:Rancher:Elemental:PR:Teal53
   filters:
     event: pull_request
