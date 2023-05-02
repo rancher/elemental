@@ -40,60 +40,123 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	localKubeconfig := os.Getenv("HOME") + "/.kube/config"
 
 	It("Install Rancher Manager", func() {
-		By("Installing K3s", func() {
-			// Get K3s installation script
-			fileName := "k3s-install.sh"
-			err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
-			Expect(err).To(Not(HaveOccurred()))
+		if k8sUpstreamDistribution == "rke2" {
+			By("Installing RKE2", func() {
+				// Get RKE2 installation script
+				fileName := "rke2-install.sh"
+				err := tools.GetFileFromURL("https://get.rke2.io", fileName, true)
+				Expect(err).To(Not(HaveOccurred()))
 
-			// Retry in case of (sporadfic) failure...
-			count := 1
-			Eventually(func() error {
-				// Execute K3s installation
-				out, err := exec.Command("sh", fileName).CombinedOutput()
-				GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
-				count++
-				return err
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
-		})
-		if clusterType == "hardened" {
-			By("Configuring hardened cluster", func() {
-				err := exec.Command("sudo", installHardenedScript).Run()
+				// Retry in case of (sporadic) failure...
+				count := 1
+				Eventually(func() error {
+					// Execute RKE2 installation
+					out, err := exec.Command("sudo", "sh", fileName).CombinedOutput()
+					GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
+					count++
+					return err
+				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+			})
+			if clusterType == "hardened" {
+				By("Configuring hardened cluster", func() {
+					err := exec.Command("sudo", installHardenedScript).Run()
+					Expect(err).To(Not(HaveOccurred()))
+				})
+			}
+			By("Starting RKE2", func() {
+				err := exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Delay few seconds before checking
+				time.Sleep(misc.SetTimeout(20 * time.Second))
+
+				err = exec.Command("sudo", "chown", "gh-runner", "/etc/rancher/rke2/rke2.yaml").Run()
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+
+			By("Waiting for RKE2 to be started", func() {
+				// Wait for all pods to be started
+				err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "k8s-app=kube-dns", "rke2-coredns")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "app=rke2-metrics-server", "rke2-metrics-server")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "app.kubernetes.io/name=rke2-ingress-nginx", "rke2-ingress-nginx-controller")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Wait for all services to be started but it will be removed later
+				// after reworking WaitForPod function
+				time.Sleep(misc.SetTimeout(60 * time.Second))
+			})
+		} else {
+			By("Installing K3s", func() {
+				// Get K3s installation script
+				fileName := "k3s-install.sh"
+				err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Retry in case of (sporadic) failure...
+				count := 1
+				Eventually(func() error {
+					// Execute K3s installation
+					out, err := exec.Command("sh", fileName).CombinedOutput()
+					GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
+					count++
+					return err
+				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+			})
+			if clusterType == "hardened" {
+				By("Configuring hardened cluster", func() {
+					err := exec.Command("sudo", installHardenedScript).Run()
+					Expect(err).To(Not(HaveOccurred()))
+				})
+			}
+			By("Starting K3s", func() {
+				err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Delay few seconds before checking
+				time.Sleep(misc.SetTimeout(20 * time.Second))
+			})
+
+			By("Waiting for K3s to be started", func() {
+				// Wait for all pods to be started
+				err := k.WaitForPod("kube-system", "app=local-path-provisioner", "local-path-provisioner")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "k8s-app=kube-dns", "coredns")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "k8s-app=metrics-server", "metrics-server")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "app.kubernetes.io/name=traefik", "traefik")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
-		By("Starting K3s", func() {
-			err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
-			Expect(err).To(Not(HaveOccurred()))
-
-			// Delay few seconds before checking
-			time.Sleep(misc.SetTimeout(20 * time.Second))
-		})
-
-		By("Waiting for K3s to be started", func() {
-			// Wait for all pods to be started
-			err := k.WaitForPod("kube-system", "app=local-path-provisioner", "local-path-provisioner")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("kube-system", "k8s-app=kube-dns", "coredns")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("kube-system", "k8s-app=metrics-server", "metrics-server")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("kube-system", "app.kubernetes.io/name=traefik", "traefik")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
-			Expect(err).To(Not(HaveOccurred()))
-		})
 
 		By("Configuring Kubeconfig file", func() {
 			// Copy K3s file in ~/.kube/config
 			// NOTE: don't check for error, as it will happen anyway (only K3s or RKE2 is installed at a time)
-			file, _ := exec.Command("bash", "-c", "ls /etc/rancher/{k3s,rke2}/*.yaml").Output()
+			file, _ := exec.Command("bash", "-c", "ls /etc/rancher/{k3s,rke2}/{k3s,rke2}.yaml").Output()
 			Expect(file).To(Not(BeEmpty()))
 			misc.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
+
+			err := os.Setenv("KUBECONFIG", localKubeconfig)
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		if caType == "private" {

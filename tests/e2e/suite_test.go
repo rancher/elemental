@@ -52,37 +52,38 @@ const (
 )
 
 var (
-	arch                 string
-	backupRestoreVersion string
-	caType               string
-	CertManagerVersion   string
-	clusterName          string
-	clusterNS            string
-	clusterType          string
-	elementalSupport     string
-	emulateTPM           bool
-	rancherHostname      string
-	imageVersion         string
-	isoBoot              string
-	k8sVersion           string
-	numberOfVMs          int
-	operatorUpgrade      string
-	operatorVersion      string
-	osImage              string
-	poolType             string
-	proxy                string
-	rancherChannel       string
-	rancherLogCollector  string
-	rancherVersion       string
-	sequential           bool
-	testType             string
-	upgradeChannelList   string
-	upgradeImage         string
-	upgradeOsChannel     string
-	upgradeType          string
-	usedNodes            int
-	vmIndex              int
-	vmName               string
+	arch                    string
+	backupRestoreVersion    string
+	caType                  string
+	CertManagerVersion      string
+	clusterName             string
+	clusterNS               string
+	clusterType             string
+	elementalSupport        string
+	emulateTPM              bool
+	rancherHostname         string
+	imageVersion            string
+	isoBoot                 string
+	k8sVersion              string
+	k8sUpstreamDistribution string
+	numberOfVMs             int
+	operatorUpgrade         string
+	operatorVersion         string
+	osImage                 string
+	poolType                string
+	proxy                   string
+	rancherChannel          string
+	rancherLogCollector     string
+	rancherVersion          string
+	sequential              bool
+	testType                string
+	upgradeChannelList      string
+	upgradeImage            string
+	upgradeOsChannel        string
+	upgradeType             string
+	usedNodes               int
+	vmIndex                 int
+	vmName                  string
 )
 
 func CheckClusterState(ns, cluster string) {
@@ -146,6 +147,7 @@ var _ = BeforeSuite(func() {
 	rancherHostname = os.Getenv("PUBLIC_DNS")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
+	k8sUpstreamDistribution = os.Getenv("K8S_UPSTREAM_DISTRIBUTION")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
