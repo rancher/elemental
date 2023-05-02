@@ -30,7 +30,7 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: upgrade
-      destroy_runner: ${{ inputs.destroy_runner && true }}
+      destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: dev
       iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       k8s_version_to_provision: v1.25.7+rke2r1
