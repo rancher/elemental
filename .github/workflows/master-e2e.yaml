@@ -224,7 +224,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: '~1.18'
+          go-version-file: tests/go.mod
       - name: Cache ISO
         # NOTE: download the *default* ISO, not the one passed as a parameter
         if: inputs.iso_to_test == ''
