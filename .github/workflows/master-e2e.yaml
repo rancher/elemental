@@ -305,6 +305,7 @@ jobs:
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           ISO_BOOT: ${{ inputs.iso_boot }}
+          OPERATOR_VERSION: ${{ inputs.operator_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
@@ -355,6 +356,7 @@ jobs:
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
+          OPERATOR_VERSION: ${{ inputs.operator_version }}
           PROXY: ${{ inputs.proxy }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
@@ -367,11 +369,7 @@ jobs:
           UI_ACCOUNT: ${{ inputs.ui_account }}
           UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
-
-        run: |
-          export OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
-                                    | awk -F ':' '{print substr($2,0,3)}')
-          cd tests && make start-cypress-tests
+        run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: failure() && inputs.test_type == 'ui'
         uses: actions/upload-artifact@v3
