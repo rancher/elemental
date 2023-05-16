@@ -40,7 +40,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	localKubeconfig := os.Getenv("HOME") + "/.kube/config"
 
 	It("Install Rancher Manager", func() {
-		if k8sUpstreamDistribution == "rke2" {
+		if strings.Contains(k8sUpstreamVersion, "rke2") {
 			By("Installing RKE2", func() {
 				// Get RKE2 installation script
 				fileName := "rke2-install.sh"

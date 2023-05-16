@@ -15,9 +15,6 @@ on:
         description: Rancher Manager channel/version to use for installation
         default: stable/latest
         type: string
-      upstream_k3s_version:
-        description: Cluster upstream K3s version where to install Rancher
-        type: string
 
 concurrency:
   group: e2e-k3s-obs-stable-${{ github.head_ref || github.ref }}-${{ github.repository }}
@@ -39,4 +36,3 @@ jobs:
       k8s_version_to_provision: v1.25.7+k3s1
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
       rancher_version: ${{ inputs.rancher_version }}
-      upstream_k3s_version: ${{ inputs.upstream_k3s_version }}
