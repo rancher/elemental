@@ -311,6 +311,8 @@ jobs:
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           ISO_BOOT: ${{ inputs.iso_boot }}
+          ISO_TO_TEST: ${{ inputs.iso_to_test }}
+          K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
           OPERATOR_VERSION: ${{ inputs.operator_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
@@ -321,6 +323,7 @@ jobs:
             /workdir/e2e/unit_tests/user.spec.ts
             /workdir/e2e/unit_tests/menu.spec.ts
             /workdir/e2e/unit_tests/machine_registration.spec.ts
+            /workdir/e2e/unit_tests/seed_image.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests

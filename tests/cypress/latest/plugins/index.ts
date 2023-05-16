@@ -31,6 +31,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.cluster              = process.env.CLUSTER_NAME;
   config.env.cypress_tags         = process.env.CYPRESS_TAGS;
   config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
+  config.env.iso_to_test          = process.env.ISO_TO_TEST;
   config.env.k8s_version          = process.env.K8S_VERSION_TO_PROVISION;
   config.env.operator_version     = process.env.OPERATOR_VERSION;
   config.env.password             = process.env.RANCHER_PASSWORD;
