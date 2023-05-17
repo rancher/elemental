@@ -136,6 +136,11 @@
     - **It:** Check Elemental logo
     - **It:** Check Elemental menu
 
+## `seed_image.spec.ts`
+
+- **Describe:** SeedImage testing
+    - **It:** Create SeedImage with custom base image
+
 ## `upgrade.spec.ts`
 
 - **Describe:** Upgrade tests
