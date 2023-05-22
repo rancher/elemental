@@ -52,6 +52,12 @@ pr_workflow:
         source_project: isv:Rancher:Elemental:Dev:Teal53
         source_package: build-iso
         target_project: isv:Rancher:Elemental:PR:Teal53
+    - set_flags:
+        flags:
+          - type: build
+            repository: images
+            status: disable
+            project: isv:Rancher:Elemental:PR:Teal53
   filters:
     event: pull_request
     branches:
