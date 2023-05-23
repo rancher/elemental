@@ -253,9 +253,10 @@ jobs:
           # Extract iPXE artifacts
           make extract_kernel_init_squash
           make ipxe
-          mv -f build/* .
+          # Extend regexes (needed for the next 'mv' command)
+          shopt -s extglob
           # Looks a little bit weird but we have to keep the ISO in build!
-          mv -f elemental-*.iso build/
+          mv -f build/!(*.iso) .
       - name: Deploy Proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
@@ -293,9 +294,16 @@ jobs:
                          --namespace cattle-system \
                          -l app=rancher \
                          -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract OS version from ISO
+          isoinfo -i build/*.iso \
+                  -x /BOOT/INITRD.\;1 \
+            | xz -dc \
+            | cpio -i --to-stdout usr/lib/initrd-release > os-release
+          eval $(grep IMAGE_TAG os-release)
           # Export values
           echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
@@ -536,6 +544,7 @@ jobs:
           echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental OS version: ${{ steps.component.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
