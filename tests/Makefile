@@ -15,7 +15,7 @@ export CLOUD_INIT_ISO?=$(ROOT_DIR)/build/ci.iso
 # Define Ginkgo timeout for the bootstrapping test
 GINKGO_TIMEOUT?=3600
 ifdef VM_NUMBERS
-	ifeq ($(shell expr $(VM_NUMBERS) \> 100), 1)
+	ifeq ($(shell expr $(VM_NUMBERS) \> 80), 1)
 		GINKGO_TIMEOUT=6000
 	endif
 endif
