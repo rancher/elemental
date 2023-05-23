@@ -179,21 +179,17 @@ jobs:
             # Get public IP
             PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
                         | awk '/${{ steps.generator.outputs.runner }}/ {print $6}')
-
             # Exit if we reach the timeout or if IP is set
             if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
               break
             fi
-
             # Wait a little before retrying
             sleep 2
           done
-
           # Get the public DNS
           PUBLIC_DNS=$(host -l ${PUBLIC_IP} 2> /dev/null \
                        | awk '{sub(/\.$/, ""); print $5}')
           echo "public_dns=${PUBLIC_DNS}" >> ${GITHUB_OUTPUT}
-
           # Raise an error if either IP and/or DNS are empty
           if [[ -z "${PUBLIC_IP}" || -z "${PUBLIC_DNS}" ]]; then
             echo "PUBLIC_IP and/or PUBLIC_DNS are empty!" >&2
@@ -354,7 +350,6 @@ jobs:
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-
             make e2e-ui-rancher
           )
       - name: Cypress tests - Advanced
@@ -408,10 +403,8 @@ jobs:
         run: |
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
-
           # If elemental-operator is a v1.0.x we should disable EMULATE_TPM
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
-
           # Disable EMULATE_TPM in case of upgrade test
           # This is because we don't know the version in advance, so easier to not use it
           if ${{ inputs.upgrade_image != '' }}      || \
@@ -419,7 +412,7 @@ jobs:
              ${{ contains(inputs.iso_to_test, '/Stable:/') }}; then
             unset EMULATE_TPM
           fi
-
+          # Execute bootstrapping test
           if ${{ inputs.sequential == 'true' }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
@@ -436,7 +429,6 @@ jobs:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
           cd tests && make e2e-upgrade-operator
-
           # Extract elemental-operator version
           OPERATOR_VERSION=$(kubectl get pod \
                              --namespace cattle-elemental-system \
@@ -492,7 +484,6 @@ jobs:
         run: |
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
-
           # Uninstallation of elemental-operator isn't supported on version v1.0.x
           if [[ "${OPERATOR_VERSION}" != "1.0" ]]; then
             cd tests && make e2e-uninstall-operator
@@ -510,7 +501,6 @@ jobs:
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-
             make e2e-get-logs
           )
       - name: Upload cluster logs
@@ -532,7 +522,6 @@ jobs:
           if ${{ inputs.iso_to_test != '' }}; then
             ISO_USED=${{ inputs.iso_to_test }}
           fi
-
           # Add summary
           echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
           echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
