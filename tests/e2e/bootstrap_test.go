@@ -124,12 +124,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		}
 
 		if isoBoot == "true" {
-			By("Adding registration file to ISO", func() {
-				// Check if generated ISO is already here
-				isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
+			// Check if generated ISO is already here
+			isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
 
-				// No need to recreate the ISO twice
-				if len(isIso) == 0 {
+			// No need to recreate the ISO twice
+			if len(isIso) == 0 {
+				By("Adding registration file to ISO", func() {
 					out, err := exec.Command(
 						"bash", "-c",
 						"../../.github/elemental-iso-add-registration "+installConfigYaml+" ../../build/elemental-*.iso",
@@ -140,8 +140,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					// Move generated ISO to the destination directory
 					err = exec.Command("bash", "-c", "mv -f elemental-*.iso ../..").Run()
 					Expect(err).To(Not(HaveOccurred()))
-				}
-			})
+				})
+			}
 		}
 
 		// Loop on node provisionning
@@ -435,5 +435,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Checking cluster state after reboot", func() {
 			CheckClusterState(clusterNS, clusterName)
 		})
+
+		if isoBoot == "true" {
+			By("Removing the ISO", func() {
+				err := exec.Command("bash", "-c", "rm -f ../../*.iso").Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })

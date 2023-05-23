@@ -33,3 +33,4 @@ jobs:
       k8s_version_to_provision: v1.25.7+rke2r1
       operator_version: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
       rancher_version: ${{ inputs.rancher_version }}
+      upstream_cluster_version: v1.25.7+rke2r1

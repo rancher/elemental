@@ -401,7 +401,7 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1, 2 and 3 (with iPXE) in pool "master" (use Emulated TPM if possible)
+      - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
@@ -409,6 +409,11 @@ jobs:
           VM_START: 1
           VM_END: 3
         run: |
+          # Only use ISO boot if the upstream cluster is RKE2
+          # due to issue with pxe, dhcp traffic
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export ISO_BOOT=true
+          fi
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
           # If elemental-operator is a v1.0.x we should disable EMULATE_TPM
@@ -461,7 +466,7 @@ jobs:
           VM_INDEX: 2
           VM_NUMBERS: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap additional nodes (with ISO) in pool "worker" (total of ${{ inputs.node_number }})
+      - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
           ISO_BOOT: true
@@ -482,7 +487,7 @@ jobs:
         if: inputs.test_type == 'cli'
         run: sudo virsh list
       - name: Test Backup/Restore Elemental resources with Rancher Manager
-        if: inputs.test_type == 'cli'
+        if: inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s')
         env:
           BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
         run: cd tests && make e2e-backup-restore
