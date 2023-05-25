@@ -225,7 +225,15 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Set specified version if needed
 			if rancherVersion != "" && rancherVersion != "latest" {
 				if rancherVersion == "devel" {
-					flags = append(flags, "--devel")
+					flags = append(flags,
+						"--devel",
+						"--set", "rancherImageTag=v2.7-head",
+					)
+				} else if strings.Contains(rancherVersion, "-rc") {
+					flags = append(flags,
+						"--devel",
+						"--version", rancherVersion,
+					)
 				} else {
 					flags = append(flags, "--version", rancherVersion)
 				}
