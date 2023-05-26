@@ -16,6 +16,7 @@ package e2e_test
 
 import (
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -37,12 +38,28 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 	}
 
 	It("Upgrade operator", func() {
-		err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
-			operatorUpgrade,
+		upgradeOrder := []string{"elemental-operator-crds", "elemental-operator"}
+
+		// Check if CRDs chart is already installed (not always the case in older versions)
+		chartList, err := exec.Command("helm",
+			"list",
+			"--no-headers",
 			"--namespace", "cattle-elemental-system",
-			"--create-namespace",
-		)
+		).CombinedOutput()
 		Expect(err).To(Not(HaveOccurred()))
+
+		if !strings.Contains(string(chartList), "-crds") {
+			upgradeOrder = []string{"elemental-operator", "elemental-operator-crds"}
+		}
+
+		for _, chart := range upgradeOrder {
+			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+				operatorUpgrade+"/"+chart+"-chart",
+				"--namespace", "cattle-elemental-system",
+				"--create-namespace",
+			)
+			Expect(err).To(Not(HaveOccurred()))
+		}
 
 		// Delay few seconds before checking, needed because we may have 2 pods at the same time
 		time.Sleep(misc.SetTimeout(30 * time.Second))

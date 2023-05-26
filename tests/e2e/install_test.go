@@ -346,14 +346,24 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 
 		By("Installing Elemental Operator", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
-				operatorVersion,
-				"--namespace", "cattle-elemental-system",
-				"--create-namespace",
-			)
-			Expect(err).To(Not(HaveOccurred()))
+			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
+				// Check if CRDs chart is available (not always the case in older versions)
+				// Anyway, if it is needed and missing the next chart installation will fail too
+				if strings.Contains(chart, "-crds") {
+					noChart := kubectl.RunHelmBinaryWithCustomErr("show", "readme", operatorRepo+"/"+chart+"-chart")
+					if noChart != nil {
+						continue
+					}
+				}
+				err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+					operatorRepo+"/"+chart+"-chart",
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+			}
 
-			err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
+			err := k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
 			Expect(err).To(Not(HaveOccurred()))
 		})
 	})

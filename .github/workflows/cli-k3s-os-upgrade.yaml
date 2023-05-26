@@ -40,8 +40,8 @@ jobs:
       k8s_version_to_provision: v1.25.7+k3s1
       # Force to only deploy the first 3 nodes
       node_number: 3
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher/elemental-operator-chart
-      operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
       rancher_version: ${{ inputs.rancher_version }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-8-v4
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
