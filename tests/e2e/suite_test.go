@@ -68,7 +68,7 @@ var (
 	k8sVersion           string
 	numberOfVMs          int
 	operatorUpgrade      string
-	operatorVersion      string
+	operatorRepo         string
 	osImage              string
 	poolType             string
 	proxy                string
@@ -151,7 +151,7 @@ var _ = BeforeSuite(func() {
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
-	operatorVersion = os.Getenv("OPERATOR_VERSION")
+	operatorRepo = os.Getenv("OPERATOR_REPO")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
