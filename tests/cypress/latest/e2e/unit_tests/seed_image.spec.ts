@@ -30,23 +30,21 @@ describe('SeedImage testing', () => {
     topLevelMenu.openIfClosed();
   });
 
-  filterTests(['main'], () => {
-    it('Create SeedImage with custom base image', () => {
-      if (typeof isoToTest !== 'undefined') {
-        cy.exec(`sed -i "s|baseImage:.*|baseImage: ${isoToTest}|g" fixtures/${seedImageFile}`);
-      }
-        cy.contains('local')
-        .click();
-      cy.get('.header-buttons > :nth-child(1)')
-        .click();
-      cy.clickButton('Read from File');
-      cy.get('input[type="file"]')
-        .attachFile({filePath: seedImageFile});
-      cy.clickButton('Import');
-      cy.get('.badge-state')
-        .contains('Active');
-      cy.clickButton('Close');
-      cy.exec('ls');
-    });
+  it('Create SeedImage with custom base image', () => {
+    if (typeof isoToTest !== 'undefined') {
+      cy.exec(`sed -i "s|baseImage:.*|baseImage: ${isoToTest}|g" fixtures/${seedImageFile}`);
+    }
+      cy.contains('local')
+      .click();
+    cy.get('.header-buttons > :nth-child(1)')
+      .click();
+    cy.clickButton('Read from File');
+    cy.get('input[type="file"]')
+      .attachFile({filePath: seedImageFile});
+    cy.clickButton('Import');
+    cy.get('.badge-state')
+      .contains('Active');
+    cy.clickButton('Close');
+    cy.exec('ls');
   });
 });

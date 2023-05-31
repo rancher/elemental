@@ -167,7 +167,7 @@ describe('Machine registration testing', () => {
       cy.createMachReg({machRegName: 'machine-registration',
         checkInventoryLabels: true,
         checkInventoryAnnotations: true,
-        checkIsoBuilding: true,
+        checkIsoBuilding: false,
         customCloudConfig: 'custom_cloud-config.yaml',
         checkDefaultCloudConfig: false});
       cy.checkMachInvLabel({machRegName: 'machine-registration',
