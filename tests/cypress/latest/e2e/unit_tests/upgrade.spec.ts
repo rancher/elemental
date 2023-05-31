@@ -23,9 +23,7 @@ describe('Upgrade tests', () => {
   const channelName              = "mychannel"
   const clusterName              = "mycluster"
   const checkK3s: RegExp         = /k3s/
-  const checkStable: RegExp      = /stable/g
   const elemental                = new Elemental();
-  const elementalOperatorVersion = Cypress.env('operator_version')
   const elementalUser            = "elemental-user"
   const k8sVersion               = Cypress.env('k8s_version')
   const topLevelMenu             = new TopLevelMenu();
@@ -66,9 +64,6 @@ describe('Upgrade tests', () => {
 
     it('Check OS Versions', () => {
       let osVersionsTab = ["Active dev", "Active dev-rt", "Active stable", "Active stable-rt", "Active staging", "Active staging-rt"]
-      if (!checkStable.test(elementalOperatorVersion)) {
-        osVersionsTab.push("Active latest-dev");
-      };
       cy.clickNavMenu(["Advanced", "OS Versions"]);
       for (let i = 0; i < osVersionsTab.length; i++) {
         cy.contains(osVersionsTab[i], {timeout: 120000});
