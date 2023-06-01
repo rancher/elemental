@@ -9,7 +9,8 @@ ARCH=$(uname -m)
 FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 EMULATED_TPM="none"
-VM_MEM=3072
+# Give more memory to VM if UI is tested (only one VM for now)
+[[ $3 == "UI" ]] && VM_MEM=8192 || VM_MEM=3072
 
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
