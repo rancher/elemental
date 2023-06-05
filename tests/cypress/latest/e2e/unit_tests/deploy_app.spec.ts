@@ -26,7 +26,7 @@ filterTests(['main'], () => {
       cy.visit('/');
     });
     
-    it('Deploy CIS Benchmark application', () => {
+    it('Deploy Alerting Drivers application', () => {
       topLevelMenu.openIfClosed();
       cy.contains(clusterName)
         .click();
@@ -34,18 +34,19 @@ filterTests(['main'], () => {
         .click();
       cy.contains('Charts')
         .click();
-      cy.contains('CIS Benchmark')
+      cy.contains('Alerting Drivers')
         .click();
-      cy.contains('.name-logo-install', 'CIS Benchmark', {timeout:20000});
+      cy.contains('.name-logo-install', 'Alerting Drivers', {timeout:20000});
       cy.clickButton('Install');
+      cy.contains('.outer-container > .header', 'Alerting Drivers');
       cy.clickButton('Next');
       cy.clickButton('Install');
-      cy.contains('SUCCESS: helm upgrade', {timeout:30000});
+      cy.contains('SUCCESS: helm install', {timeout:30000});
       cy.reload;
-      cy.contains('CIS Benchmark');
+      cy.contains('Deployed rancher-alerting-drivers');
     });
   
-    it('Remove CIS Benchmark application', () => {
+    it('Remove Alerting Drivers application', () => {
       topLevelMenu.openIfClosed();
       cy.contains(clusterName)
         .click();
@@ -54,19 +55,12 @@ filterTests(['main'], () => {
       cy.contains('Installed Apps')
         .click();
       cy.contains('.title', 'Installed Apps', {timeout:20000});
-      cy.get('.ns-dropdown > .icon')
-        .click()
-        .type('cis-operator');
-      cy.contains('cis-operator')
-        .click();
-      cy.get('.ns-dropdown > .icon-chevron-up')
-        .click();
       cy.get('[width="30"] > .checkbox-outer-container')
         .click();
       cy.clickButton('Delete');
       cy.confirmDelete();
       cy.contains('SUCCESS: helm uninstall', {timeout:30000});
-      cy.contains('.apps', 'CIS Benchmark')
+      cy.contains('.apps', 'rancher-alerting-drivers')
         .should('not.exist');
     });
   });
