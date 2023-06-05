@@ -114,38 +114,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
 			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
-				// Get elemental-operator version
-				operatorVersion, err := misc.GetOperatorVersion()
-				Expect(err).To(Not(HaveOccurred()))
-				operatorVersionShort := strings.Split(operatorVersion, ".")
-
-				// Remove 'syncInterval' option if needed (only supported in operator v1.1+)
-				if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-					err := tools.Sed("syncInterval:.*", "", osListYaml)
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
-				// Add OS channel list
-				err = tools.Sed("%UPGRADE_CHANNEL_LIST%", upgradeChannelList, osListYaml)
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Apply the generated file
-				err = kubectl.Apply(clusterNS, osListYaml)
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Wait for ManagedOSVersion to be populated from ManagedOSVersionChannel
-				Eventually(func() string {
-					out, _ := kubectl.Run("get", "ManagedOSVersion",
-						"--namespace", clusterNS, upgradeOsChannel)
-					return out
-				}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
-
 				// Set OS image to use for upgrade
-				value = upgradeOsChannel
+				value = upgradeImage
 
 				// Extract the value to check after the upgrade
 				out, err := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS, upgradeOsChannel,
+					"--namespace", clusterNS, upgradeImage,
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))
 				valueToCheck = misc.TrimStringFromChar(out, ":")

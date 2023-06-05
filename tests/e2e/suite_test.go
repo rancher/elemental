@@ -41,7 +41,6 @@ const (
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	netDefaultFileName    = "../assets/net-default.xml"
 	numberOfNodesMax      = 30
-	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	restoreYaml           = "../assets/restore.yaml"
 	selectorYaml          = "../assets/selector.yaml"
@@ -79,7 +78,6 @@ var (
 	testType             string
 	upgradeChannelList   string
 	upgradeImage         string
-	upgradeOsChannel     string
 	upgradeType          string
 	usedNodes            int
 	vmIndex              int
@@ -158,9 +156,7 @@ var _ = BeforeSuite(func() {
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	seqString := os.Getenv("SEQUENTIAL")
 	testType = os.Getenv("TEST_TYPE")
-	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
-	upgradeOsChannel = os.Getenv("UPGRADE_OS_CHANNEL")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 
 	// Only if VM_INDEX is set

@@ -118,9 +118,6 @@ on:
       upgrade_image:
         description: Image to use for the Elemental OS upgrade
         type: string
-      upgrade_os_channel:
-        description: Channel to use for the Elemental OS upgrade
-        type: string
       upgrade_type:
         description: Type of upgrade to use for the Elemental OS upgrade
         type: string
@@ -421,7 +418,6 @@ jobs:
           # Disable EMULATE_TPM in case of upgrade test
           # This is because we don't know the version in advance, so easier to not use it
           if ${{ inputs.upgrade_image != '' }}      || \
-             ${{ inputs.upgrade_os_channel != '' }} || \
              ${{ contains(inputs.iso_to_test, '/Stable:/') }}; then
             unset EMULATE_TPM
           fi
@@ -451,17 +447,16 @@ jobs:
           echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade node 1 to specified OS version with osImage
-        if: inputs.test_type == 'cli' && inputs.upgrade_image != ''
+        if: inputs.test_type == 'cli' && inputs.upgrade_image != '' && contains(inputs.upgrade_image, ':')
         env:
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: cd tests && make e2e-upgrade-node
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
-        if: inputs.test_type == 'cli' && inputs.upgrade_os_channel != ''
+        if: inputs.test_type == 'cli' && inputs.upgrade_image != '' && !contains(inputs.upgrade_image, ':')
         env:
-          UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
-          UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
+          UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 2
           VM_NUMBERS: 3
@@ -563,12 +558,11 @@ jobs:
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
-          if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
+          if ${{ inputs.upgrade_image != '' }}; then
             echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
-            echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
       - name: Send failed status to slack
