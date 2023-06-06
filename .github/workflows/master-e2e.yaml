@@ -359,7 +359,8 @@ jobs:
         env:
           ISO_BOOT: ${{ inputs.iso_boot }} 
           VM_INDEX: 1
-          HOST_MEMORY_RESERVED: 50331648
+          VM_MEM: 8192
+          HOST_MEMORY_RESERVED: 49152
         run: |
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
@@ -413,6 +414,7 @@ jobs:
         env:
           EMULATE_TPM: true
           POOL: master
+          VM_MEM: 8192
           VM_START: 1
           VM_END: 3
         run: |
@@ -478,6 +480,7 @@ jobs:
         env:
           ISO_BOOT: true
           POOL: worker
+          VM_MEM: 8192
           VM_START: 4
           VM_END: ${{ inputs.node_number }}
         run: |
