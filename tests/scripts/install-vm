@@ -22,7 +22,7 @@ if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
   # Number of hugepages (with hugepagesize set to 2MB)
   # NOTE: keep 24GB by default for the hypervisor/Rancher Manager Server
   # And this value can be modified with HOST_MEMORY_RESERVED variable
-  (( VALUE = (MEMTOTAL_KB - (${HOST_MEMORY_RESERVED:-24576} * 1024) / 2048 ))
+  (( VALUE = (MEMTOTAL_KB - ${HOST_MEMORY_RESERVED:-24576} * 1024) / 2048 ))
 
   # Set nr_hugepage
   (( VALUE > 0 )) \
