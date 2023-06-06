@@ -9,8 +9,9 @@ ARCH=$(uname -m)
 FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 EMULATED_TPM="none"
-# Give more memory to VM if UI is tested (only one VM for now)
-[[ $3 == "UI" ]] && VM_MEM=8192 || VM_MEM=3072
+
+# Set default VM memory if not defined
+[[ -z "${VM_MEM}" ]] && VM_MEM=3072
 
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
@@ -21,7 +22,7 @@ if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
   # Number of hugepages (with hugepagesize set to 2MB)
   # NOTE: keep 24GB by default for the hypervisor/Rancher Manager Server
   # And this value can be modified with HOST_MEMORY_RESERVED variable
-  (( VALUE = ((MEMTOTAL_KB - ${HOST_MEMORY_RESERVED:-25165824}) / 2048) ))
+  (( VALUE = (MEMTOTAL_KB - (${HOST_MEMORY_RESERVED:-24576} * 1024) / 2048 ))
 
   # Set nr_hugepage
   (( VALUE > 0 )) \
