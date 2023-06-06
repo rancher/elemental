@@ -268,6 +268,13 @@ jobs:
           PUBLIC_DOMAIN: bc.googleusercontent.com
           TEST_TYPE: ${{ inputs.test_type }}
         run: cd tests && PUBLIC_DNS=${{ needs.create-runner.outputs.public_dns }} make e2e-install-rancher
+      - name: Workaround for DynamicSchemas (if needed)
+        run: |
+          # Check if DynamicSchemas for MachineInventorySelectorTemplate exists
+          if ! kubectl get dynamicschema machineinventoryselectortemplate >/dev/null 2>&1; then
+            # If not we have to add it to avoid weird issues!
+            kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
+          fi
       - name: Install backup-restore components (K3s only for now)
         if: contains(inputs.upstream_cluster_version, 'k3s')
         run: cd tests && make e2e-install-backup-restore
