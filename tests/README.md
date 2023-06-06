@@ -87,8 +87,8 @@
 ## `deploy_app.spec.ts`
 
 - **Describe:** Deploy application in fresh Elemental Cluster
-    - **It:** Deploy CIS Benchmark application
-    - **It:** Remove CIS Benchmark application
+    - **It:** Deploy Alerting Drivers application
+    - **It:** Remove Alerting Drivers application
 
 ## `elemental_plugin.spec.ts`
 
