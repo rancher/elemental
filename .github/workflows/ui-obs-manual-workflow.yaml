@@ -1,0 +1,62 @@
+# This workflow calls the master E2E workflow with custom variables
+name: UI-OBS-Manual-Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      elemental_ui_version:
+        description: Elemental UI version to use
+        default: dev
+        type: string
+      iso_to_test:
+        description: Defines the ISO to test
+        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
+        type: string
+      k8s_version_to_provision:
+        description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
+        default: v1.25.7+k3s1
+        type: string
+      operator_repo:
+        description: Elemental operator repository to use
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+        type: string
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
+        type: string
+      runner_template:
+        description: Runner template to use
+        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v4
+        type: string
+
+jobs:
+  ui:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test"
+      cluster_name: cluster-ui-obs-manual
+      cluster_type: ${{ inputs.cluster_type }}
+      destroy_runner: ${{ inputs.destroy_runner }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version }}
+      iso_to_test: ${{ inputs.iso_to_test }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      operator_repo: ${{ inputs.operator_repo }}
+      proxy: ${{ inputs.proxy }}
+      rancher_version: ${{ inputs.rancher_version }}
+      runner_template: ${{ inputs.runner_template }}
+      test_type: ui
