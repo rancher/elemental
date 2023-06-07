@@ -41,6 +41,8 @@ filterTests(['main', 'upgrade'], () => {
       topLevelMenu.openIfClosed();
       cy.contains('Extensions')
         .click();
+      // Make sure we are on the Extensions page
+      cy.contains('.message-icon', 'Extension support is not enabled');
       cy.clickButton('Enable');
       cy.contains('Enable Extension Support?')
       if ( Cypress.env('elemental_ui_version') != "stable") {
