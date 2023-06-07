@@ -529,3 +529,21 @@ Cypress.Commands.add('checkFilter', ({
     (testFilterTwo) ? cy.contains('test-filter-two').should('exist') : cy.contains('test-filter-two').should('not.exist');
     (shouldNotMatch) ? cy.contains('shouldnotmatch').should('exist') : cy.contains('shouldnotmatch').should('not.exist');
 });
+
+Cypress.Commands.add('checkLabelSize', ({
+  sizeToCheck}) => {
+    cy.clickNavMenu(["Dashboard"]);
+    cy.getBySel('button-create-registration-endpoint')
+      .click();
+    if (sizeToCheck == "name") {
+      cy.addMachInvLabel({labelName: 'labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', labelValue: 'mylabelvalue', useHardwareLabels: false});
+    } else if (sizeToCheck == "value") {
+      cy.addMachInvLabel({labelName: 'mylabelname', labelValue: 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', useHardwareLabels: false});
+    }
+    // A banner should appear alerting you about the size exceeded
+    cy.get('.banner > span');
+    // Create button should be disabled
+    cy.getBySel('form-save').should(($input) => {
+      expect($input).to.have.attr('disabled')
+    })
+});

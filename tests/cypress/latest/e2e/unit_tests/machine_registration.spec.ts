@@ -144,6 +144,14 @@ describe('Machine registration testing', () => {
       cy.verifyDownload('download-yaml-test.yaml');
     });
 
+    it('Check machine registration label name size', () => {
+      cy.checkLabelSize({sizeToCheck: 'name'});
+    });
+
+    it('Check machine registration label value size', () => {
+      cy.checkLabelSize({sizeToCheck: 'value'});
+    });
+
   // This test must stay the last one because we use this machine registration when we test adding a node.
   // It also tests using a custom cloud config by using read from file button.
     it('Create Machine registration we will use to test adding a node', () => {
