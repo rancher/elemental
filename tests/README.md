@@ -120,6 +120,8 @@
     - **It:** Edit a machine registration with edit YAML button
     - **It:** Clone a machine registration
     - **It:** Download Machine registration YAML
+    - **It:** Check machine registration label name size
+    - **It:** Check machine registration label value size
     - **It:** Create Machine registration we will use to test adding a node
     - **It:** Create Machine registration we will use to test adding a node
 
