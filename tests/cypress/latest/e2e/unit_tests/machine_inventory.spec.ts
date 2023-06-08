@@ -130,7 +130,7 @@ describe('Machine inventory testing', () => {
         .click();
       // The new cluster must be in active state
       cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active');
+        .contains('Active',  {timeout: 300000});
       // Go into the dedicated cluster page
       topLevelMenu.openIfClosed();
       cy.contains(clusterName)

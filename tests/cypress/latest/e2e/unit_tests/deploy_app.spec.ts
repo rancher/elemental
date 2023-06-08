@@ -27,21 +27,28 @@ filterTests(['main'], () => {
     });
     
     it('Deploy Alerting Drivers application', () => {
+      // Unfortunately, this wait is needed mainly with RKE2 because the cluster
+      // is switching status and it is hard to catch in automated way...
+      cy.wait(180000);
       topLevelMenu.openIfClosed();
+      cy.contains('Home')
+        .click();
+      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
+        .contains('Active',  {timeout: 300000});
       cy.contains(clusterName)
         .click();
       cy.contains('Apps')
         .click();
       cy.contains('Charts')
         .click();
-      cy.contains('Alerting Drivers')
+      cy.contains('Alerting Drivers', {timeout:30000})
         .click();
-      cy.contains('.name-logo-install', 'Alerting Drivers', {timeout:20000});
+      cy.contains('.name-logo-install', 'Alerting Drivers', {timeout:30000});
       cy.clickButton('Install');
       cy.contains('.outer-container > .header', 'Alerting Drivers');
       cy.clickButton('Next');
       cy.clickButton('Install');
-      cy.contains('SUCCESS: helm install', {timeout:30000});
+      cy.contains('SUCCESS: helm install', {timeout:120000});
       cy.reload;
       cy.contains('Deployed rancher-alerting-drivers');
     });
@@ -59,7 +66,7 @@ filterTests(['main'], () => {
         .click();
       cy.clickButton('Delete');
       cy.confirmDelete();
-      cy.contains('SUCCESS: helm uninstall', {timeout:30000});
+      cy.contains('SUCCESS: helm uninstall', {timeout:60000});
       cy.contains('.apps', 'rancher-alerting-drivers')
         .should('not.exist');
     });
