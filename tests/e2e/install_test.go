@@ -82,21 +82,17 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "k8s-app=kube-dns", "rke2-coredns")
+				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=kube-dns")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "app=rke2-metrics-server", "rke2-metrics-server")
+				err = k.WaitForNamespaceWithPod("kube-system", "app=rke2-metrics-server")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "app.kubernetes.io/name=rke2-ingress-nginx", "rke2-ingress-nginx-controller")
+				err = k.WaitForNamespaceWithPod("kube-system", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
 
 				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
-
-				// Wait for all services to be started but it will be removed later
-				// after reworking WaitForPod function
-				time.Sleep(misc.SetTimeout(60 * time.Second))
 			})
 		} else {
 			By("Installing K3s", func() {
@@ -131,19 +127,19 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			By("Waiting for K3s to be started", func() {
 				// Wait for all pods to be started
-				err := k.WaitForPod("kube-system", "app=local-path-provisioner", "local-path-provisioner")
+				err := k.WaitForNamespaceWithPod("kube-system", "app=local-path-provisioner")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "k8s-app=kube-dns", "coredns")
+				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=kube-dns")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "k8s-app=metrics-server", "metrics-server")
+				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=metrics-server")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "app.kubernetes.io/name=traefik", "traefik")
+				err = k.WaitForNamespaceWithPod("kube-system", "app.kubernetes.io/name=traefik")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik", "svclb-traefik")
+				err = k.WaitForNamespaceWithPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik")
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
@@ -287,9 +283,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			// Check issuer for Private CA
 			if caType == "private" {
-				out, err := exec.Command("bash", "-c", "curl -vk https://"+rancherHostname).CombinedOutput()
-				GinkgoWriter.Printf("%s\n", out)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					out, err := exec.Command("bash", "-c", "curl -vk https://"+rancherHostname).CombinedOutput()
+					if err != nil {
+						// Show only if there's no error
+						GinkgoWriter.Printf("%s\n", out)
+					}
+					return err
+				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 			}
 		})
 
