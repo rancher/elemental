@@ -364,12 +364,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 						continue
 					}
 				}
-				err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
-					operatorRepo+"/"+chart+"-chart",
-					"--namespace", "cattle-elemental-system",
-					"--create-namespace",
-				)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+						operatorRepo+"/"+chart+"-chart",
+						"--namespace", "cattle-elemental-system",
+						"--create-namespace",
+					)
+				}, misc.SetTimeout(1*time.Minute), 10*time.Second).Should(BeNil())
 			}
 
 			err := k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
