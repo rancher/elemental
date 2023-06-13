@@ -57,12 +57,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					return err
 				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 			})
+
 			if clusterType == "hardened" {
 				By("Configuring hardened cluster", func() {
 					err := exec.Command("sudo", installHardenedScript).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
 			}
+
 			By("Starting RKE2", func() {
 				err := exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
 				Expect(err).To(Not(HaveOccurred()))
@@ -82,14 +84,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=kube-dns")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "app=rke2-metrics-server")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "app.kubernetes.io/name=rke2-ingress-nginx")
-				Expect(err).To(Not(HaveOccurred()))
+				checkList := [][]string{
+					{"kube-system", "k8s-app=kube-dns"},
+					{"kube-system", "app=rke2-metrics-server"},
+					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
+				}
+				misc.CheckPod(k, checkList)
 
 				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
@@ -111,12 +111,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					return err
 				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 			})
+
 			if clusterType == "hardened" {
 				By("Configuring hardened cluster", func() {
 					err := exec.Command("sudo", installHardenedScript).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
 			}
+
 			By("Starting K3s", func() {
 				err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
 				Expect(err).To(Not(HaveOccurred()))
@@ -127,20 +129,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 			By("Waiting for K3s to be started", func() {
 				// Wait for all pods to be started
-				err := k.WaitForNamespaceWithPod("kube-system", "app=local-path-provisioner")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=kube-dns")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "k8s-app=metrics-server")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "app.kubernetes.io/name=traefik")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("kube-system", "svccontroller.k3s.cattle.io/svcname=traefik")
-				Expect(err).To(Not(HaveOccurred()))
+				checkList := [][]string{
+					{"kube-system", "app=local-path-provisioner"},
+					{"kube-system", "k8s-app=kube-dns"},
+					{"kube-system", "k8s-app=metrics-server"},
+					{"kube-system", "app.kubernetes.io/name=traefik"},
+					{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
+				}
+				misc.CheckPod(k, checkList)
 			})
 		}
 
@@ -184,14 +180,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				err = kubectl.RunHelmBinaryWithCustomErr(flags...)
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=controller")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=webhook")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = k.WaitForNamespaceWithPod("cert-manager", "app.kubernetes.io/component=cainjector")
-				Expect(err).To(Not(HaveOccurred()))
+				checkList := [][]string{
+					{"cert-manager", "app.kubernetes.io/component=controller"},
+					{"cert-manager", "app.kubernetes.io/component=webhook"},
+					{"cert-manager", "app.kubernetes.io/component=cainjector"},
+				}
+				misc.CheckPod(k, checkList)
 			})
 		}
 
@@ -272,14 +266,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
-			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForNamespaceWithPod("cattle-fleet-local-system", "app=fleet-agent")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = k.WaitForNamespaceWithPod("cattle-system", "app=rancher-webhook")
-			Expect(err).To(Not(HaveOccurred()))
+			// Wait for all pods to be started
+			checkList := [][]string{
+				{"cattle-system", "app=rancher"},
+				{"cattle-fleet-local-system", "app=fleet-agent"},
+				{"cattle-system", "app=rancher-webhook"},
+			}
+			misc.CheckPod(k, checkList)
 
 			// Check issuer for Private CA
 			if caType == "private" {
@@ -373,8 +366,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}, misc.SetTimeout(1*time.Minute), 10*time.Second).Should(BeNil())
 			}
 
-			err := k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
-			Expect(err).To(Not(HaveOccurred()))
+			// Wait for pod to be started
+			misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 		})
 	})
 })
