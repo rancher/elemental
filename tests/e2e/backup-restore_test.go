@@ -81,9 +81,8 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 		})
 
 		By("Waiting for rancher-backup-operator pod", func() {
-			// Wait for Pod to run
-			err := k.WaitForNamespaceWithPod("cattle-resources-system", "app.kubernetes.io/name=rancher-backup")
-			Expect(err).To(Not(HaveOccurred()))
+			// Wait for pod to be started
+			misc.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
 		})
 	})
 })

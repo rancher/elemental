@@ -118,8 +118,8 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
-			err := k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
-			Expect(err).To(Not(HaveOccurred()))
+			// Wait for pod to be started
+			misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 		})
 
 		By("Creating a dumb MachineRegistration", func() {

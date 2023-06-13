@@ -472,3 +472,13 @@ func CreateTemp(baseName string) (string, error) {
 	}
 	return t.Name(), nil
 }
+
+func CheckPod(k *kubectl.Kubectl, checkList [][]string) error {
+	for _, check := range checkList {
+		if err := k.WaitForNamespaceWithPod(check[0], check[1]); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
