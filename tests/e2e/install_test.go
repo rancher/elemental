@@ -24,6 +24,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/install"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
@@ -190,63 +191,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 
 		By("Installing Rancher", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "rancher",
-				"https://releases.rancher.com/server-charts/"+rancherChannel,
-			)
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
-			Expect(err).To(Not(HaveOccurred()))
-
-			// Set flags for Rancher Manager installation
-			flags := []string{
-				"upgrade", "--install", "rancher", "rancher/rancher",
-				"--namespace", "cattle-system",
-				"--create-namespace",
-				"--set", "hostname=" + rancherHostname,
-				"--set", "extraEnv[0].name=CATTLE_SERVER_URL",
-				"--set", "extraEnv[0].value=https://" + rancherHostname,
-				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
-				"--set", "extraEnv[1].value=rancherpassword",
-				"--set", "replicas=1",
-				"--set", "global.cattle.psp.enabled=false",
-			}
-
-			// Set specified version if needed
-			if rancherVersion != "" && rancherVersion != "latest" {
-				if rancherVersion == "devel" {
-					flags = append(flags,
-						"--devel",
-						"--set", "rancherImageTag=v2.7-head",
-					)
-				} else if strings.Contains(rancherVersion, "-rc") {
-					flags = append(flags,
-						"--devel",
-						"--version", rancherVersion,
-					)
-				} else {
-					flags = append(flags, "--version", rancherVersion)
-				}
-			}
-
-			// For Private CA
-			if caType == "private" {
-				flags = append(flags,
-					"--set", "ingress.tls.source=secret",
-					"--set", "privateCA=true",
-				)
-			}
-
-			// Use Rancher Manager behind proxy
-			if proxy == "rancher" {
-				flags = append(flags,
-					"--set", "proxy=http://172.17.0.1:3128",
-					"--set", "noProxy=127.0.0.0/8\\,10.0.0.0/8\\,cattle-system.svc\\,172.16.0.0/12\\,192.168.0.0/16\\,.svc\\,.cluster.local",
-				)
-			}
-
-			err = kubectl.RunHelmBinaryWithCustomErr(flags...)
-			Expect(err).To(Not(HaveOccurred()))
+			install.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, caType, proxy)
 
 			// Inject secret for Private CA
 			if caType == "private" {
