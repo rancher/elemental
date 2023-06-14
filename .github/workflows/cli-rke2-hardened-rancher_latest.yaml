@@ -1,0 +1,22 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-RKE2-Hardened-Rancher_Latest
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  cli:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI - CLI - Parallel - Deployment test with Hardened RKE2"
+      cluster_name: cluster-rke2
+      cluster_type: hardened
+      k8s_version_to_provision: v1.25.7+rke2r1
+      node_number: 3
+      rancher_version: latest/devel
+      upstream_cluster_version: v1.25.7+rke2r1
