@@ -282,6 +282,8 @@
 
 - **Describe:** E2E - Upgrading Elemental Operator
     - **It:** Upgrade operator
+- **Describe:** E2E - Upgrading Rancher Manager
+    - **It:** Upgrade Rancher Manager
 - **Describe:** E2E - Upgrading node
     - **It:** Upgrade node
       -  **By:** Checking if upgrade type is set
