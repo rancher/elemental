@@ -336,7 +336,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Remove the "old" kubeconfig file to force the use of the new one
 			// NOTE: in fact move it, just to keep it in case of issue
 			// Also don't check the returned error, as it will always not equal 0
-			_ = exec.Command("bash", "-c", "sudo mv -f /etc/rancher/{k3s,rke2}/*.yaml ~/").Run()
+			_ = exec.Command("bash", "-c", "sudo mv -f /etc/rancher/{k3s,rke2}/{k3s,rke2}.yaml ~/").Run()
 		})
 
 		if testType == "ui" {
