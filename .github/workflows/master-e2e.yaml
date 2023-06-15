@@ -247,6 +247,10 @@ jobs:
         run: |
           mkdir -p build
           wget -v -L -c ${ISO_TO_TEST} -O build/elemental-${TAG}.iso
+      - name: Create symbolic link to ISO for SeedImage
+        run: |
+          ISO=$(ls build/elemental-*.iso 2> /dev/null)
+          ln -sf ${ISO} base-image.iso
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
