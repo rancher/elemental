@@ -44,6 +44,7 @@ const (
 	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	restoreYaml           = "../assets/restore.yaml"
+	seedimageYaml         = "../assets/seedImage.yaml"
 	selectorYaml          = "../assets/selector.yaml"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
