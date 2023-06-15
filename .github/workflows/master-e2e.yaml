@@ -600,6 +600,7 @@ jobs:
             echo "Elemental Operator Upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Rancher Manager Image: ${{ steps.rancher_upgrade.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
