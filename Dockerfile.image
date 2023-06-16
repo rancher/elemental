@@ -2,30 +2,7 @@
 ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator-ci:latest
 ARG REGISTER_IMAGE=quay.io/costoolkit/elemental-register-ci:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
-ARG TOOL_IMAGE=quay.io/costoolkit/elemental-cli-ci:latest
-# Binaries and files needed from elemental-toolkit repository
-ARG LUET_VERSION=0.32.5
-FROM quay.io/luet/base:$LUET_VERSION AS framework-build
-COPY framework/files/etc/luet/luet.yaml /etc/luet/luet.yaml
-ENV LUET_NOLOCK=true
-SHELL ["/usr/bin/luet", "install", "-y", "--system-target", "/framework"]
-
-# elemental-toolkit essentials
-RUN system/immutable-rootfs
-RUN system/cos-setup
-RUN cloud-config/network
-RUN cloud-config/recovery
-RUN cloud-config/live
-RUN cloud-config/boot-assessment
-RUN cloud-config/default-services
-RUN system/grub2-config
-RUN system/base-dracut-modules
-
-# elemental-toolkit utilities
-RUN utils/k9s
-RUN utils/nerdctl
-RUN toolchain/cosign
-RUN selinux/rancher
+ARG TOOL_IMAGE=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
 
 # elemental-operator
 FROM $OPERATOR_IMAGE as elemental-operator
@@ -42,8 +19,6 @@ FROM $TOOL_IMAGE as elemental-cli
 # Base os
 FROM registry.suse.com/suse/sle-micro-rancher/5.3:latest as default
 
-# Copy installed files from the luet repos
-COPY --from=framework-build /framework /
 # Copy elemental-operator
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
 # Copy elemental-register
@@ -72,7 +47,7 @@ RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release
 RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
 
 # Rebuild initrd to setup dracut with the boot configurations
-RUN mkinitrd && \
+RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
     # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
     kernel=$(ls /boot/Image-* | head -n1) && \
     if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi

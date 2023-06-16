@@ -60,7 +60,7 @@ var _ = Describe("Elemental Smoke tests", func() {
 	})
 
 	Context("First boot", func() {
-		for _, unit := range []string{"cos-setup-initramfs", "cos-setup-network", "cos-setup-rootfs", "cos-setup-boot", "cos-setup-fs"} {
+		for _, unit := range []string{"elemental-setup-initramfs", "elemental-setup-network", "elemental-setup-rootfs", "elemental-setup-boot", "elemental-setup-fs"} {
 			It(fmt.Sprintf("starts successfully %s on boot", unit), func() {
 				systemdUnitIsStarted(unit, s)
 			})
