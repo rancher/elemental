@@ -1,0 +1,51 @@
+##########################################################
+#                        WARNING                         #
+#                                                        #
+#              This file is managed in GIT!              #
+# Any changes via the openQA WebUI could be overwritten! #
+#                                                        #
+# https://github.com/rancher/elemental/elemental         #
+# Maintainers: Elemental team <elemental@suse.de>        #
+##########################################################
+
+---
+.default_products: &default_products
+  distri: elemental
+  flavor: ISO
+
+.default_settings: &default_settings
+  HDDSIZEGB: '35'
+  PASSWORD: ros
+  QEMURAM: '3072'
+  TEST_PASSWORD: Elemental@R00t
+  YAML_SCHEDULE: schedule/elemental/iso.yaml
+
+defaults:
+  x86_64:
+    machine: uefi-virtio
+    priority: 50
+  aarch64:
+    machine: aarch64-virtio
+    priority: 50
+
+products:
+  elemental-ISO-x86_64:
+    <<: *default_products
+    version: Teal
+  elemental-ISO-aarch64:
+    <<: *default_products
+    version: Teal
+
+scenarios:
+  x86_64:
+    elemental-ISO-x86_64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+  aarch64:
+    elemental-ISO-aarch64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
