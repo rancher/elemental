@@ -422,14 +422,16 @@ jobs:
         env:
           EMULATE_TPM: true
           POOL: master
-          VM_MEM: 8192
           VM_START: 1
           VM_END: 3
         run: |
           # Only use ISO boot if the upstream cluster is RKE2
           # due to issue with pxe, dhcp traffic
+          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
           if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
             export ISO_BOOT=true
+            export VM_MEM=8192
+            export VM_CPU=4
           fi
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
@@ -506,10 +508,14 @@ jobs:
         env:
           ISO_BOOT: true
           POOL: worker
-          VM_MEM: 8192
           VM_START: 4
           VM_END: ${{ inputs.node_number }}
         run: |
+          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export VM_MEM=8192
+            export VM_CPU=4
+          fi
           if ${{ inputs.sequential == 'true' }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
@@ -573,6 +579,13 @@ jobs:
           if ${{ inputs.iso_to_test != '' }}; then
             ISO_USED=${{ inputs.iso_to_test }}
           fi
+          # Get nodes configuration (use the first one, they are all identical)
+          NODE=$(sudo virsh list --name | head -1)
+          if [[ -n "${NODE}" ]]; then
+            VCPU=$(sudo virsh vcpucount --live ${NODE})
+            VMEM=$(sudo virsh dommemstat --live ${NODE} | awk '/^actual/ { print $2 }')
+            (( VMEM /= 1048576 ))
+          fi
           # Add summary
           echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
           echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
@@ -582,10 +595,11 @@ jobs:
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Type of cluster deployed: ${CLUSTER_TYPE:-normal}" >> ${GITHUB_STEP_SUMMARY}
           echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
-          echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Image: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental OS version: ${{ steps.component.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
@@ -596,8 +610,12 @@ jobs:
           if ${{ inputs.ui_account != '' }}; then
             echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
           fi
+          echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}
+          echo "Number of CPU: ${VCPU:-unknown}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Memory size: ${VMEM:-unknown}GB" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
           if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
             echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}

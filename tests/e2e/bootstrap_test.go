@@ -137,6 +137,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
 			Expect(err).To(Not(HaveOccurred()))
 		})
+
 		if isoBoot == "true" {
 			By("Adding SeedImage", func() {
 				// Set temporary file

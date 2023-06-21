@@ -10,9 +10,6 @@ FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 EMULATED_TPM="none"
 
-# Set default VM memory if not defined
-[[ -z "${VM_MEM}" ]] && VM_MEM=3072
-
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
 if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
@@ -29,10 +26,10 @@ if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
     && sudo bash -c "echo ${VALUE} > /proc/sys/vm/nr_hugepages"
 
   # Set memory config on command line
-  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM},hugepages=yes"
+  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM:-2048},hugepages=yes"
 else
   # Set memory config on command line
-  INSTALL_FLAG+=" --memory ${VM_MEM}"
+  INSTALL_FLAG+=" --memory ${VM_MEM:-2048}"
 fi
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
@@ -86,7 +83,7 @@ CMD="sudo virt-install \
        --machine q35 \
        --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
        --features smm.state=yes \
-       --vcpus 2 \
+       --vcpus ${VM_CPU:-2} \
        --cpu host \
        --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
        --check disk_size=off \
