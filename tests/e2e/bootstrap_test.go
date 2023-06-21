@@ -145,6 +145,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 				defer os.Remove(seedimageTmp)
 
+				// Set poweroff to false for master pool to have time to check SeedImage cloud-config
+				if poolType == "master" {
+					out, err := kubectl.Run("patch", "MachineRegistration",
+						"--namespace", clusterNS, machineRegName,
+						"--type", "merge", "-p", "{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
+					Expect(err).To(Not(HaveOccurred()), out)
+				}
+
 				// Save original file as it will have to be modified twice
 				misc.CopyFile(seedimageYaml, seedimageTmp)
 
@@ -225,6 +233,49 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		// Wait for all parallel jobs
 		wg.Wait()
+
+		// Loop on nodes to check that SeedImage cloud-config is correctly applied
+		// Only for master pool
+		if poolType == "master" && isoBoot == "true" {
+			for index := vmIndex; index <= numberOfVMs; index++ {
+				hostName := misc.SetHostname(vmNameRoot, index)
+				Expect(hostName).To(Not(BeNil()))
+
+				client, _ := GetNodeInfo(hostName)
+				Expect(client).To(Not(BeNil()))
+
+				wg.Add(1)
+				go func(h string, cl *tools.Client) {
+					defer wg.Done()
+					defer GinkgoRecover()
+
+					By("Checking SeedImage cloud-config on "+h, func() {
+						// Wait for SSH to be available
+						// NOTE: this also checks that the root password was correctly set by cloud-config
+						Eventually(func() string {
+							out, _ := cl.RunSSH("echo SSH_OK")
+							out = strings.Trim(out, "\n")
+							return out
+						}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+
+						// Check that the cloud-config is correctly applied by checking the presence of a file
+						_, err := cl.RunSSH("ls /etc/elemental-test")
+						Expect(err).To(Not(HaveOccurred()))
+
+						// Check that the installation is completed before halting the VM
+						Eventually(func() error {
+							_, err := cl.RunSSH("journalctl -u elemental-register.service --no-pager | grep 'elemental installation completed'")
+							return err
+						}, misc.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+
+						// Halt the VM
+						_, err = cl.RunSSH("setsid -f init 0")
+						Expect(err).To(Not(HaveOccurred()))
+					})
+				}(hostName, client)
+			}
+			wg.Wait()
+		}
 	})
 
 	It("Add the nodes in Rancher Manager", func() {
