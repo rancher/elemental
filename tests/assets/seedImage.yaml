@@ -6,6 +6,9 @@ metadata:
 spec:
   baseImage: %BASE_IMAGE%
   cloud-config:
+    users:
+      - name: root
+        passwd: r0s@pwd1
     write_files:
       - append: true
         content: |

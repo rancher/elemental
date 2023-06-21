@@ -54,6 +54,10 @@ if [[ ${ISO_BOOT} == "true" ]]; then
 
   # Force ISO boot
   INSTALL_FLAG+=" --cdrom ${VM_NAME}/${ISO##*/}"
+  
+  # Use noautoconsole to check SeedImage cloud-config
+  # because we need to ssh into the VM when it is installing
+  [[ ${POOL} == "master" ]] && INSTALL_FLAG+=" --noautoconsole"
 else
   # Create symlink for binary but only if it doesn't exist
   SYM_LINK=../../ipxe.efi
