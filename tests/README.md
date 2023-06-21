@@ -186,8 +186,9 @@
     - **It:** Provision the node
       -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM)
       -  **By:** Downloading installation config file
+      -  **By:** Adding SeedImage
+      -  **By:** Downloading ISO built by SeedImage
       -  **By:** Configuring iPXE boot script for network installation
-      -  **By:** Adding registration file to ISO
       -  **By:** Installing node +h
     - **It:** Add the nodes in Rancher Manager
       -  **By:** Checking that node +h+ is available in Rancher
