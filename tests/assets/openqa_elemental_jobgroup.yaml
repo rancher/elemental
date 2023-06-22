@@ -14,9 +14,8 @@
   flavor: ISO
 
 .default_settings: &default_settings
-  HDDSIZEGB: '35'
   PASSWORD: ros
-  QEMURAM: '3072'
+  QEMURAM: '2048'
   TEST_PASSWORD: Elemental@R00t
   YAML_SCHEDULE: schedule/elemental/iso.yaml
 
