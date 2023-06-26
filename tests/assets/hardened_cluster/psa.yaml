@@ -20,6 +20,7 @@ plugins:
       namespaces:
       - ingress-nginx
       - kube-system
+      - fleet-default
       - cattle-system
       - cattle-epinio-system
       - cattle-fleet-system
