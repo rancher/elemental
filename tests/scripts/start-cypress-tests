@@ -19,10 +19,9 @@ npm install
 docker run -v $PWD:/workdir -w /workdir                     \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
-    -e ISO_TO_TEST=$ISO_TO_TEST                             \
     -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION           \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
-    -e OPERATOR_VERSION=$OPERATOR_VERSION                   \
+    -e OPERATOR_REPO=$OPERATOR_REPO                         \
     -e PROXY=$PROXY                                         \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD                   \
     -e RANCHER_URL=$RANCHER_URL                             \
@@ -39,17 +38,12 @@ docker run -v $PWD:/workdir -w /workdir                     \
 
 # Move elemental.iso into the expected folder
 if [[ ! -f ${ELEMENTAL_ISO} ]]; then
-  # Upgrade scenario
-  # We need to build the ISO with stable base image
-  # It can not be done from the UI for now
-  
   # RKE2 as upstream cluster
   # We cannot use PXE boot so we have to boot from ISO but we cannot use stable ISO
   # We need to use a custom ISO and the menu doesn't allow to do it now.
-  if [[ ${CYPRESS_TAGS} == "upgrade" ]] || grep rke <<< ${K8S_UPSTREAM_VERSION}; then
+  if grep rke <<< ${K8S_UPSTREAM_VERSION}; then
     # Wait a bit to let the ISO be built (could be improved)
-    sleep 180
-    wget $(kubectl get seedimage mycustomseedimage -n fleet-default -o=jsonpath='{.status.downloadURL}') --no-check-certificate -O ${ELEMENTAL_ISO}
+    mv downloads/*.iso ${ELEMENTAL_ISO}
   fi
 fi
 popd

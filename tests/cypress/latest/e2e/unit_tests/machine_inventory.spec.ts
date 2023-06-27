@@ -14,7 +14,7 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 Cypress.config();

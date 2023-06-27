@@ -13,7 +13,7 @@ limitations under the License.
 */
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 filterTests(['main', 'upgrade'], () => {

@@ -12,20 +12,19 @@ limitations under the License.
 */
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
-import '~/support/functions';
+import '~/support/commands';
 import { Elemental } from '~/support/elemental';
 import 'cypress-file-upload';
 import filterTests from '~/support/filterTests.js';
+import * as utils from "~/support/utils";
 
 
 Cypress.config();
 describe('Upgrade tests', () => {
   const channelName              = "mychannel"
   const clusterName              = "mycluster"
-  const checkK3s: RegExp         = /k3s/
   const elemental                = new Elemental();
   const elementalUser            = "elemental-user"
-  const k8sVersion               = Cypress.env('k8s_version')
   const topLevelMenu             = new TopLevelMenu();
   const uiAccount                = Cypress.env('ui_account');
   const uiPassword               = "rancherpassword"
@@ -44,30 +43,14 @@ describe('Upgrade tests', () => {
   });
   filterTests(['upgrade'], () => {
     it('Create an OS Version Channels', () => {
-      cy.clickNavMenu(["Advanced", "OS Version Channels"]);
-      cy.getBySel('masthead-create')
-        .contains('Create')
-        .click();
-      cy.getBySel('name-ns-description-name')
-        .type(channelName);
-      cy.getBySel('os-version-channel-path')
-        .type(upgradeChannelList);
-      cy.getBySel('form-save')
-        .contains('Create')
-        .click();
-      // Status changes a lot right after the creation so let's wait 10 secondes
-      // before checking
-      cy.wait(10000);
-      cy.getBySel('sortable-cell-0-0')
-        .contains('Active', {timeout: 50000});
+      // System was built with stable ISO, so we can upgrade either to staging or dev
+      utils.isOperatorVersion('staging') ? cy.addOsVersionChannel({channelVersion: 'staging'}): cy.addOsVersionChannel({channelVersion:'dev'});
     });
 
     it('Check OS Versions', () => {
-      let osVersionsTab = ["Active dev", "Active dev-rt", "Active stable", "Active stable-rt", "Active staging", "Active staging-rt"]
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      for (let i = 0; i < osVersionsTab.length; i++) {
-        cy.contains(osVersionsTab[i], {timeout: 120000});
-      };
+      utils.isOperatorVersion('dev') ? cy.contains('Active latest-dev', {timeout: 120000}): null;
+      utils.isOperatorVersion('staging') ? cy.contains('Active latest-staging', {timeout: 120000}): null;
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
@@ -86,7 +69,7 @@ describe('Upgrade tests', () => {
         .click();
       cy.contains(clusterName)
         .click();
-      if (!checkK3s.test(k8sVersion)) {
+      if (utils.isK8sVersion("k3s")) {
         cy.getBySel('upgrade-choice-selector')
           .parent()
           .contains('Use image from registry')
@@ -102,7 +85,7 @@ describe('Upgrade tests', () => {
           .click()
         cy.getBySel('os-version-box')
           .parents()
-          .contains('staging')
+          .contains('dev')
           .click();
       };
       cy.getBySel('form-save')
@@ -166,16 +149,30 @@ describe('Upgrade tests', () => {
 
     it('Delete OS Versions', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      cy.contains('dev-rt')
-        .parent()
-        .parent()
-        .click();
-      cy.getBySel('sortable-table-promptRemove')
-      .contains('Delete')
-        .click()
-      cy.confirmDelete();
-      cy.contains('dev-rt')
-        .should('not.exist');
+      // TODO: COULD BE IMPROVED / SIMPLIFIED
+      if (utils.isOperatorVersion('dev')) {
+        cy.contains('latest-dev')
+          .parent()
+          .parent()
+          .click();
+        cy.getBySel('sortable-table-promptRemove')
+        .contains('Delete')
+          .click()
+        cy.confirmDelete();
+        cy.contains('latest-dev')
+          .should('not.exist');
+      } else if (utils.isOperatorVersion('staging')) {
+        cy.contains('latest-staging')
+          .parent()
+          .parent()
+          .click();
+        cy.getBySel('sortable-table-promptRemove')
+        .contains('Delete')
+          .click()
+        cy.confirmDelete();
+        cy.contains('latest-staging')
+          .should('not.exist');
+      }
     });
 
     it('Delete OS Versions Channels', () => {

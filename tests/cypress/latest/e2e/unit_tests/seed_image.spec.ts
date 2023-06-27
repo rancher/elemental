@@ -13,8 +13,7 @@ limitations under the License.
 */
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
-import '~/support/functions';
-import filterTests from '~/support/filterTests.js';
+import '~/support/commands';
 
 Cypress.config();
 describe('SeedImage testing', () => {
