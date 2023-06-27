@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import './functions';
+import './commands';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
@@ -24,6 +24,7 @@ declare global {
       addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels: boolean):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
+      addOsVersionChannel(channelVersion: string): Chainable<Element>;
       byLabel(label: string,): Chainable<Element>;
       checkFilter(filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean): Chainable<Element>;
       checkLabelSize(sizeToCheck: string): Chainable<Element>;

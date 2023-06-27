@@ -13,6 +13,7 @@ limitations under the License.
 */
 
 import 'cypress-file-upload';
+import * as utils from "~/support/utils";
 
 // Global
 interface hardwareLabels {
@@ -29,7 +30,7 @@ const hwLabels: hardwareLabels = {
   'TotalMemory': '${System Data/Memory/Total Physical Bytes}'
 };
 
-// Generic functions
+// Generic commands
 
 // Log into Rancher
 Cypress.Commands.add('login', (
@@ -188,7 +189,7 @@ Cypress.Commands.add('deleteAllResources', () => {
   cy.contains('There are no rows to show', {timeout: 15000});
 });
 
-// Machine registration functions
+// Machine registration commands
 
 // Create a machine registration
 Cypress.Commands.add('createMachReg', ({
@@ -250,17 +251,23 @@ Cypress.Commands.add('createMachReg', ({
     cy.getBySel('registration-url')
       .contains(/https:\/\/.*elemental\/registration/);
 
-    // Try to download the registration file and check it
-    cy.getBySel('download-btn')
-      .click();
-    cy.verifyDownload(machRegName + '_registrationURL.yaml');
-    cy.contains('Saving')
-      .should('not.exist');
-
     // Test ISO building feature
-    if (checkIsoBuilding) {
+    if (checkIsoBuilding && utils.isK8sVersion('rke2')) {
+      // Build the ISO according to the elemental operator version
+      // Most of the time, it uses the latest-dev version but sometimes
+      // before releasing, we want to test staging/stable artifacts 
       cy.getBySel('select-os-version-build-iso')
-        .contains('Elemental Teal');
+      .click();
+      if (utils.isOperatorVersion('stable')) {
+        cy.contains('Elemental Teal ISO x86_64 v1.1.5')
+          .click();
+      } else if (utils.isOperatorVersion('staging')) {
+        cy.contains('Elemental Teal ISO x86_64 latest-staging')
+            .click();
+      } else {
+        cy.contains('Elemental Teal ISO x86_64 latest-dev')
+          .click();
+      }
       cy.getBySel('build-iso-btn')
         .click();
       cy.getBySel('build-iso-btn')
@@ -278,7 +285,14 @@ Cypress.Commands.add('createMachReg', ({
       cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
     }
   
-      // Check Cloud configuration
+    // Try to download the registration file and check it
+    cy.getBySel('download-btn')
+      .click();
+    cy.verifyDownload(machRegName + '_registrationURL.yaml');
+    cy.contains('Saving')
+      .should('not.exist');
+
+    // Check Cloud configuration
     // TODO: Maybe the check may be improved in one line
     if (checkDefaultCloudConfig) {
       cy.getBySel('yaml-editor-code-mirror')
@@ -495,7 +509,7 @@ Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
     .should('not.exist')
 });
 
-// Machine Inventory functions
+// Machine Inventory commands
 
 // Import machine inventory
 Cypress.Commands.add('importMachineInventory', ({
@@ -547,3 +561,27 @@ Cypress.Commands.add('checkLabelSize', ({
       expect($input).to.have.attr('disabled')
     })
 });
+
+// OS Versions commands
+
+// Add an OS version channel
+Cypress.Commands.add('addOsVersionChannel', ({
+  channelVersion}) => {
+    var channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/teal53/15.4/rancher/elemental-teal-channel/5.3:latest`;
+    cy.clickNavMenu(["Advanced", "OS Version Channels"]);
+    cy.getBySel('masthead-create')
+      .contains('Create')
+      .click();
+    cy.getBySel('name-ns-description-name')
+      .type(channelVersion + "-channel");
+    cy.getBySel('os-version-channel-path')
+      .type(channelRepo);
+    cy.getBySel('form-save')
+      .contains('Create')
+      .click();
+    // Status changes a lot right after the creation so let's wait 10 secondes
+    // before checking
+    cy.wait(10000);
+    // Make sure the new channel is in Active state
+    cy.contains("Active "+channelVersion+"-channel", {timeout: 50000});
+  });

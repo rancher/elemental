@@ -14,8 +14,9 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import * as utils from "~/support/utils";
 
 Cypress.config();
 describe('Machine registration testing', () => {
@@ -24,6 +25,23 @@ describe('Machine registration testing', () => {
   const topLevelMenu  = new TopLevelMenu();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
+
+  before(() => {
+    (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+    cy.visit('/');
+
+    // Open the navigation menu
+    topLevelMenu.openIfClosed();
+
+    // Click on the Elemental's icon
+    elemental.accessElementalMenu(); 
+
+    // Create OS Version Channels from which to build the ISO
+    // No need to create one if we test stable because it is already created
+    // by the elemental-operator
+    utils.isOperatorVersion('dev') ? cy.addOsVersionChannel({channelVersion:'dev'}): null;
+    utils.isOperatorVersion('staging') ? cy.addOsVersionChannel({channelVersion: 'staging'}): null;
+  });
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -158,6 +176,7 @@ describe('Machine registration testing', () => {
       cy.createMachReg({machRegName: 'machine-registration',
         checkInventoryLabels: true,
         checkInventoryAnnotations: true,
+        checkIsoBuilding: true,
         customCloudConfig: 'custom_cloud-config.yaml',
         checkDefaultCloudConfig: false});
       cy.checkMachInvLabel({machRegName: 'machine-registration',
@@ -175,7 +194,7 @@ describe('Machine registration testing', () => {
       cy.createMachReg({machRegName: 'machine-registration',
         checkInventoryLabels: true,
         checkInventoryAnnotations: true,
-        checkIsoBuilding: false,
+        checkIsoBuilding: true,
         customCloudConfig: 'custom_cloud-config.yaml',
         checkDefaultCloudConfig: false});
       cy.checkMachInvLabel({machRegName: 'machine-registration',

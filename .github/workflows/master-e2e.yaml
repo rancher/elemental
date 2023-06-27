@@ -342,7 +342,6 @@ jobs:
             /workdir/e2e/unit_tests/user.spec.ts
             /workdir/e2e/unit_tests/menu.spec.ts
             /workdir/e2e/unit_tests/machine_registration.spec.ts
-            /workdir/e2e/unit_tests/seed_image.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests
