@@ -190,6 +190,7 @@
       -  **By:** Downloading ISO built by SeedImage
       -  **By:** Configuring iPXE boot script for network installation
       -  **By:** Installing node +h
+      -  **By:** Checking SeedImage cloud-config on +h
     - **It:** Add the nodes in Rancher Manager
       -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Checking cluster state
