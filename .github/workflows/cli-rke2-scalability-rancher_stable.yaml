@@ -19,8 +19,10 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI/Manual - CLI - Scalability - Deployment test with Standard RKE2"
+      ca_type: private
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.25.7+rke2r1
       node_number: 60
       rancher_version: stable/latest
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
+      upstream_cluster_version: v1.25.7+rke2r1
