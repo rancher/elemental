@@ -18,7 +18,7 @@ declare global {
   // eslint-disable-next-line no-unused-vars
   namespace Cypress {
     interface Chainable {
-      // Functions declared in functions.ts
+      // Functions declared in commands.ts
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
       addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels: boolean):Chainable<Element>;
