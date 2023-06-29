@@ -36,15 +36,11 @@ docker run -v $PWD:/workdir -w /workdir                     \
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
-# Move elemental.iso into the expected folder
-if [[ ! -f ${ELEMENTAL_ISO} ]]; then
-  # RKE2 as upstream cluster
-  # We cannot use PXE boot so we have to boot from ISO but we cannot use stable ISO
-  # We need to use a custom ISO and the menu doesn't allow to do it now.
-  if grep rke <<< ${K8S_UPSTREAM_VERSION}; then
-    # Wait a bit to let the ISO be built (could be improved)
-    mv downloads/*.iso ${ELEMENTAL_ISO}
-  fi
+# RKE2 as upstream cluster
+# We cannot use PXE boot so we have to boot from ISO 
+if [[ ! -f ${ELEMENTAL_ISO} ]] && grep rke <<< ${K8S_UPSTREAM_VERSION}; then
+  # Move elemental.iso into the expected folder
+  mv downloads/*.iso ${ELEMENTAL_ISO}
 fi
 popd
 
