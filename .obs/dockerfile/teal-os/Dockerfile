@@ -14,7 +14,8 @@ RUN zypper in -y -- \
   kernel-firmware-all \
   -systemd-presets-branding-SLE-Micro-for-Rancher \
   cryptsetup \
-  elemental
+  elemental \
+  podman
 
 # Install extra useful utilities
 RUN zypper in -y k9s
