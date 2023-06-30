@@ -3,7 +3,7 @@
 #!BuildTag: rancher/elemental-teal/5.3:latest
 #!BuildTag: rancher/elemental-teal/5.3:%VERSION%
 #!BuildTag: rancher/elemental-teal/5.3:%VERSION%-%RELEASE%
-#
+#!BuildConstraint: hardware:disk:size unit=G 8
 
 FROM suse/sle-micro-rancher/5.3:latest
 
