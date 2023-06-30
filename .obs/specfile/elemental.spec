@@ -1,7 +1,7 @@
 #
 # spec file for package elemental
 #
-# Copyright (c) 2022 SUSE LLC
+# Copyright (c) 2022 - 2023 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -76,15 +76,23 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 
 %pre
 %service_add_pre elemental-populate-node-labels.service
+%service_add_pre shutdown-containerd.service
+%service_add_pre elemental-register.service
 
 %post
 %service_add_post elemental-populate-node-labels.service
+%service_add_post shutdown-containerd.service
+%service_add_post elemental-register.service
 
 %preun
 %service_del_preun elemental-populate-node-labels.service
+%service_del_preun shutdown-containerd.service
+%service_del_preun elemental-register.service
 
 %postun
 %service_del_postun elemental-populate-node-labels.service
+%service_del_postun shutdown-containerd.service
+%service_del_postun elemental-register.service
 
 %files
 %defattr(-,root,root,-)
@@ -99,6 +107,8 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %dir %{_sysconfdir}/NetworkManager/conf.d
 %config %{_sysconfdir}/NetworkManager/conf.d/rke2-canal.conf
 %dir %{_unitdir}
+%{_unitdir}/shutdown-containerd.service
+%{_unitdir}/elemental-register.service
 %{_unitdir}/elemental-populate-node-labels.service
 %{_sbindir}/elemental-populate-node-labels
 %dir /usr/libexec

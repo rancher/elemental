@@ -12,6 +12,14 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 export CLOUD_INIT_ISO?=$(ROOT_DIR)/build/ci.iso
 
+# Define Ginkgo timeout for the bootstrapping test
+GINKGO_TIMEOUT?=3600
+ifdef VM_NUMBERS
+	ifeq ($(shell expr $(VM_NUMBERS) \> 80), 1)
+		GINKGO_TIMEOUT=6000
+	endif
+endif
+
 clean:
 	VBoxManage controlvm "test" poweroff &>/dev/null || true
 	VBoxManage unregistervm "test" --delete &>/dev/null || true
@@ -57,17 +65,27 @@ generate-readme:
 	@./scripts/generate-readme > README.md
 
 # E2E tests
-e2e-install-rancher: deps
-	ginkgo --label-filter install -r -v ./e2e
+e2e-bootstrap-node: deps
+	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
+e2e-backup-restore: deps
+	ginkgo --label-filter test-backup-restore -r -v ./e2e
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
-e2e-ui-rancher: deps
-	ginkgo --label-filter ui -r -v ./e2e
-e2e-bootstrap-node: deps
-	ginkgo --label-filter bootstrap -r -v ./e2e
-e2e-upgrade-node: deps
-	ginkgo --label-filter upgrade -r -v ./e2e
-start-cypress-tests:
-	@./scripts/start-cypress-tests
 e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
+e2e-install-rancher: deps
+	ginkgo --label-filter install -r -v ./e2e
+e2e-install-backup-restore: deps
+	ginkgo --label-filter install-backup-restore -r -v ./e2e
+e2e-ui-rancher: deps
+	ginkgo --label-filter ui -r -v ./e2e
+e2e-uninstall-operator:
+	ginkgo --label-filter uninstall-operator -r -v ./e2e
+e2e-upgrade-node: deps
+	ginkgo --label-filter upgrade-node -r -v ./e2e
+e2e-upgrade-operator: deps
+	ginkgo --label-filter upgrade-operator -r -v ./e2e
+e2e-upgrade-rancher-manager: deps
+	ginkgo --label-filter upgrade-rancher-manager -r -v ./e2e
+start-cypress-tests:
+	@./scripts/start-cypress-tests

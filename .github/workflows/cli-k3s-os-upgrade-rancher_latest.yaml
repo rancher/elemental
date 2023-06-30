@@ -1,0 +1,29 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-OS-Upgrade-Rancher_Latest
+
+# This worflow is scheduled because it uses Dev artifacts from OBS and
+# not the ones built in the CI (build-ci workflow).
+# The scheduling is also to avoid running the workflow on each push on main.
+on:
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  cli:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
+      cluster_name: cluster-k3s
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+      k8s_version_to_provision: v1.25.7+k3s1
+      node_number: 5
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+      rancher_version: latest/devel
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
+      upgrade_os_channel: dev

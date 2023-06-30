@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# This script configures all we need to configure k3s / rke2 hardened cluster
+# Instructions from https://docs.k3s.io/security/hardening-guide and https://docs.rke2.io/security/hardening_guide
+
+set -e -x
+
+# Variables
+K3S_SERVER_DIR="/var/lib/rancher/k3s/server"
+RKE2_SERVER_DIR="/etc/rancher/rke2"
+RKE2_CONFIG_FILE="${RKE2_SERVER_DIR}/config.yaml"
+RKE2_BINARY="/usr/local/bin/rke2"
+MANIFESTS_DIR="${K3S_SERVER_DIR}/manifests/"
+SYSCTL_DIR="/etc/sysctl.d"
+HARDENED_DIR="../assets/hardened_cluster"
+SYSCTL_CONF="${HARDENED_DIR}/90-kubelet.conf"
+PSA_YAML="${HARDENED_DIR}/psa.yaml"
+NETWORK_POLICY_YAML="${HARDENED_DIR}/networkpolicy.yaml"
+AUDIT_YAML="${HARDENED_DIR}/audit.yaml"
+
+# Apply mandatory sysctl config
+cp ${SYSCTL_CONF} ${SYSCTL_DIR}
+sysctl -p ${SYSCTL_DIR}/90-kubelet.conf
+
+# Check if we are running RKE2 or K3S
+if [[ -f ${RKE2_BINARY} ]]; then
+  # Create RKE2 directory and config file
+  mkdir -p ${RKE2_SERVER_DIR}
+  # Enable hardened profile
+  cp ${PSA_YAML} ${RKE2_SERVER_DIR}
+  cat << EOF > ${RKE2_CONFIG_FILE}
+profile: cis-1.23
+pod-security-admission-config-file: ${RKE2_SERVER_DIR}/psa.yaml
+EOF
+  # Create etcd user
+  useradd -r -c "etcd user" -s /sbin/nologin -M etcd -U
+else
+  # Create K3S directories to preload manifests
+  mkdir -p -m 700 ${MANIFESTS_DIR}
+  mkdir ${K3S_SERVER_DIR}/logs
+
+  # Copy policies to manifests directory
+  cp ${NETWORK_POLICY_YAML} ${MANIFESTS_DIR}
+
+  # Enable auditing
+  cp ${PSA_YAML} ${AUDIT_YAML} ${K3S_SERVER_DIR}
+fi

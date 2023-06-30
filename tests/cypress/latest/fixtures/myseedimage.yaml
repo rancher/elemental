@@ -1,0 +1,14 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: SeedImage
+metadata:
+  name: mycustomseedimage
+  namespace: fleet-default
+spec:
+  baseImage: %BASE_IMAGE_URL%
+  cloud-config:
+  registrationRef:
+    apiVersion: elemental.cattle.io/v1beta1
+    kind: MachineRegistration
+    name: machine-registration
+    namespace: fleet-default
+

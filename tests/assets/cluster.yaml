@@ -5,26 +5,34 @@ metadata:
   # namespace: fleet-default
 spec:
   rkeConfig:
-    machinePools:
-    - controlPlaneRole: true
-      etcdRole: true
-      machineConfigRef:
-        apiVersion: elemental.cattle.io/v1beta1
-        kind: MachineInventorySelectorTemplate
-        name: selector-master-%CLUSTER_NAME%
-      name: pool-master-%CLUSTER_NAME%
-      quantity: 1
-      workerRole: true
-    - controlPlaneRole: false
-      etcdRole: false
-      labels: {}
-      machineConfigRef:
-        apiVersion: elemental.cattle.io/v1beta1
-        kind: MachineInventorySelectorTemplate
-        name: selector-worker-%CLUSTER_NAME%
-      name: pool-worker-%CLUSTER_NAME%
-      quantity: 0
-      workerRole: true
     etcd:
       disableSnapshots: true
+    machineGlobalConfig:
+      etcd-expose-metrics: false
+      profile: null
+    machinePools:
+      - controlPlaneRole: true
+        etcdRole: true
+        machineConfigRef:
+          apiVersion: elemental.cattle.io/v1beta1
+          kind: MachineInventorySelectorTemplate
+          name: selector-master-%CLUSTER_NAME%
+        name: pool-master-%CLUSTER_NAME%
+        quantity: 0
+        unhealthyNodeTimeout: 0s
+        workerRole: true
+      - controlPlaneRole: false
+        etcdRole: false
+        machineConfigRef:
+          apiVersion: elemental.cattle.io/v1beta1
+          kind: MachineInventorySelectorTemplate
+          name: selector-worker-%CLUSTER_NAME%
+        name: pool-worker-%CLUSTER_NAME%
+        quantity: 0
+        unhealthyNodeTimeout: 0s
+        workerRole: true
+    machineSelectorConfig:
+      - config:
+          protect-kernel-defaults: false
+    registries: {}
   kubernetesVersion: %K8S_VERSION%

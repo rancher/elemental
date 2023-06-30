@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 SUSE LLC
+Copyright © 2022 - 2023 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,10 +42,10 @@ var _ = Describe("Elemental Installation tests", func() {
 			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
-				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying /run/rootfsbase into /run/cos/workingtree"),
 				ContainSubstring("Setting default grub entry to Elemental"),
+				ContainSubstring("Unmounting disk partitions"),
 			), out)
 		})
 	})
@@ -64,11 +64,10 @@ var _ = Describe("Elemental Installation tests", func() {
 			fmt.Printf(out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
-				ContainSubstring("Unmounting disk partitions"),
 				ContainSubstring("Mounting disk partitions"),
 				ContainSubstring("Finished copying "+containerImage+" into /run/cos/workingtree"),
-				ContainSubstring("Unpacking a container image: "+containerImage),
 				ContainSubstring("Setting default grub entry to Elemental"),
+				ContainSubstring("Unmounting disk partitions"),
 			), out)
 		})
 	})

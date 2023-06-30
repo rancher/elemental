@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 SUSE LLC
+Copyright © 2022 - 2023 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,11 +55,13 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Configuring iPXE boot script for network installation", func() {
-			numberOfFile, err := misc.ConfigureiPXE()
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(numberOfFile).To(BeNumerically(">=", 1))
-		})
+		if isoBoot != "true" {
+			By("Configuring iPXE boot script for network installation", func() {
+				numberOfFile, err := misc.ConfigureiPXE()
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(numberOfFile).To(BeNumerically(">=", 1))
+			})
+		}
 
 		By("Adding VM in default network", func() {
 			// Add node in network configuration if needed
@@ -82,8 +84,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 
 		By("Creating and installing VM", func() {
 			// Install VM
-			cmd := exec.Command(installVMScript, vmName, macAdrs)
-			out, err := cmd.CombinedOutput()
+			out, err := exec.Command(installVMScript, vmName, macAdrs).CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))
 		})

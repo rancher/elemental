@@ -1,0 +1,12 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: MachineInventory
+metadata:
+  annotations:
+    myInvAnnotation1: myInvAnnotationValue1
+  labels:
+    testfilter: test-filter-two
+  name: test-filter-two
+  namespace: fleet-default
+spec:
+  tpmHash: 725d98e34a6d05336f1c8f3e1b468449b6952f91439df6f2b1b704efe87fe812
+

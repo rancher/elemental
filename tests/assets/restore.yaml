@@ -1,0 +1,10 @@
+apiVersion: resources.cattle.io/v1
+kind: Restore
+metadata:
+  name: elemental-restore
+  annotations:
+    field.cattle.io/description: Restore Elemental/Rancher resources
+spec:
+  backupFilename: %BACKUP_FILE%
+  deleteTimeoutSeconds: 10
+  prune: true

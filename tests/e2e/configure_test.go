@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 SUSE LLC
+Copyright © 2022 - 2023 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -67,10 +68,14 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 
 		By("Creating cluster selectors", func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "selector")
+			selectorTmp, err := misc.CreateTemp("selector")
 			Expect(err).To(Not(HaveOccurred()))
-			selectorTmp := tmp.Name()
 			defer os.Remove(selectorTmp)
+
+			// Get elemental-operator version
+			operatorVersion, err := misc.GetOperatorVersion()
+			Expect(err).To(Not(HaveOccurred()))
+			operatorVersionShort := strings.Split(operatorVersion, ".")
 
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
@@ -91,6 +96,12 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 					Expect(err).To(Not(HaveOccurred()))
 				}
 
+				// Remove 'just-a-dumb-value' if needed (multiple values only supported in operator v1.1+)
+				if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
+					err := tools.Sed(".*just-a-dumb-value.*", "", selectorTmp)
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
 				// Apply to k8s
 				err := kubectl.Apply(clusterNS, selectorTmp)
 				Expect(err).To(Not(HaveOccurred()))
@@ -102,25 +113,13 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 						"-o", "jsonpath={.items[*].metadata.name}")
 					return out
 				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
-
-				// Check that the selector for master is correctly created
-				// NOTE: the worker one is not created yet because 'quantity' is set to 0 for this one
-				if pool == "master" {
-					Eventually(func() string {
-						out, _ := kubectl.Run("get", "MachineInventorySelector",
-							"--namespace", clusterNS,
-							"-o", "jsonpath={.items[*].metadata.name}")
-						return out
-					}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
-				}
 			}
 		})
 
 		By("Adding MachineRegistration", func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "machineRegistration")
+			registrationTmp, err := misc.CreateTemp("machineRegistration")
 			Expect(err).To(Not(HaveOccurred()))
-			registrationTmp := tmp.Name()
 			defer os.Remove(registrationTmp)
 
 			for _, pool := range []string{"master", "worker"} {
@@ -174,6 +173,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				_ = exec.Command("sudo", "virsh", c, "default").Run()
 			}
 
+			// Wait a bit between virsh commands
+			time.Sleep(1 * time.Minute)
 			err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
 			Expect(err).To(Not(HaveOccurred()))
 		})

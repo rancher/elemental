@@ -1,0 +1,21 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: SeedImage
+metadata:
+  name: seed-image-%POOL_TYPE%-%CLUSTER_NAME%
+  # namespace: fleet-default
+spec:
+  baseImage: %BASE_IMAGE%
+  cloud-config:
+    users:
+      - name: root
+        passwd: r0s@pwd1
+    write_files:
+      - append: true
+        content: |
+          SeedImage cloud-config-test
+        path: /etc/elemental-test
+  registrationRef:
+    apiVersion: elemental.cattle.io/v1beta1
+    kind: MachineRegistration
+    name: machine-registration-%POOL_TYPE%-%CLUSTER_NAME%
+    namespace: fleet-default

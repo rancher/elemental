@@ -15,4 +15,5 @@ spec:
         - key: cluster-id
           operator: In
           values:
+          - just-a-dumb-value
           - id-%CLUSTER_NAME%
