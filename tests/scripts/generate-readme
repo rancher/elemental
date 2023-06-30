@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-DIR_LIST="cypress/e2e/unit_tests e2e install smoke"
+DIR_LIST="cypress/1.0.0/e2e/unit_tests cypress/latest/e2e/unit_tests e2e install smoke"
 
 for DIR in ${DIR_LIST}; do
   echo -e "# Tests description for ${DIR}\n"

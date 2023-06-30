@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 SUSE LLC
+Copyright © 2022 - 2023 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"math/rand"
 	"os"
 	"os/exec"
 	"strconv"
@@ -34,29 +35,7 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
-}
-
-func checkClusterState() {
-	// Check that a 'type' property named 'Ready' is set to true
-	Eventually(func() string {
-		clusterStatus, _ := kubectl.Run("get", "cluster",
-			"--namespace", clusterNS, clusterName,
-			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
-		return clusterStatus
-	}, misc.SetTimeout(2*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(Equal("True"))
-
-	// Wait a little bit for the cluster to be in a stable state
-	// NOTE: not SetTimeout needed here!
-	time.Sleep(30 * time.Second)
-
-	// There should be no 'reason' property set in a clean cluster
-	Eventually(func() string {
-		reason, _ := kubectl.Run("get", "cluster",
-			"--namespace", clusterNS, clusterName,
-			"-o", "jsonpath={.status.conditions[*].reason}")
-		return reason
-	}, misc.SetTimeout(3*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 func getClusterState(ns, cluster, condition string) string {
@@ -65,55 +44,79 @@ func getClusterState(ns, cluster, condition string) string {
 	return out
 }
 
-func getNodeInfo(hostName string, index int) (*tools.Client, string) {
-	// Get network data
-	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
-	Expect(err).To(Not(HaveOccurred()))
-
-	// Set 'client' to be able to access the node through SSH
-	c := &tools.Client{
-		Host:     string(hostData.IP) + ":22",
-		Username: userName,
-		Password: userPassword,
+func randomSleep(index int) {
+	// Only useful in parallel mode
+	if sequential == true {
+		return
 	}
 
-	return c, hostData.Mac
+	// Initialize the seed
+	rand.Seed(time.Now().UnixNano())
+
+	// Get a pseudo-random value
+	timeMax := 240000
+	value := rand.Intn(timeMax + (timeMax % index))
+
+	// Wait until value is reached
+	time.Sleep(time.Duration(value) * time.Millisecond)
+}
+
+func waitNodesBoot(i, v, b int) int {
+	if (i - v - b) == numberOfNodesMax {
+		// Save the number of nodes already bootstrapped for the next round
+		b = (i - v)
+
+		// Wait a little
+		time.Sleep(4 * time.Minute)
+	}
+
+	return b
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
-		machineRegName string
-		poolType       string
-		wg             sync.WaitGroup
+		bootstrappedNodes int
+		wg                sync.WaitGroup
 	)
 
-	BeforeEach(func() {
-		// Set pool type
-		if vmIndex < 4 {
-			// First third nodes are in Master pool
-			poolType = "master"
-		} else {
-			// The others are in Worker pool
-			poolType = "worker"
+	It("Provision the node", func() {
+		type pattern struct {
+			key   string
+			value string
 		}
 
 		// Set MachineRegistration name based on hostname
-		machineRegName = "machine-registration-" + poolType + "-" + clusterName
-	})
+		machineRegName := "machine-registration-" + poolType + "-" + clusterName
+		seedImageName := "seed-image-" + poolType + "-" + clusterName
+		baseImageURL := "http://192.168.122.1:8000/base-image.iso"
 
-	It("Provision the node", func() {
+		// Patterns to replace
+		patterns := []pattern{
+			{
+				key:   "%CLUSTER_NAME%",
+				value: clusterName,
+			},
+			{
+				key:   "%BASE_IMAGE%",
+				value: baseImageURL,
+			},
+			{
+				key:   "%POOL_TYPE%",
+				value: poolType,
+			},
+		}
+
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
-			tmp, err := os.CreateTemp("", "emulatedTPM")
+			emulatedTmp, err := misc.CreateTemp("emulatedTPM")
 			Expect(err).To(Not(HaveOccurred()))
-			emulatedTmp := tmp.Name()
 			defer os.Remove(emulatedTmp)
 
 			// Save original file as it can be modified multiple time
 			misc.CopyFile(emulateTPMYaml, emulatedTmp)
 
 			// Patch the yaml file
-			err = tools.Sed("emulate-tpm:.*", "emulate-tpm: "+strconv.FormatBool(emulateTPM), emulatedTmp)
+			err = tools.Sed("%EMULATE_TPM%", strconv.FormatBool(emulateTPM), emulatedTmp)
 			Expect(err).To(Not(HaveOccurred()))
 
 			// And apply it
@@ -135,6 +138,56 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
+		if isoBoot == "true" {
+			By("Adding SeedImage", func() {
+				// Set temporary file
+				seedimageTmp, err := misc.CreateTemp("seedimage")
+				Expect(err).To(Not(HaveOccurred()))
+				defer os.Remove(seedimageTmp)
+
+				// Set poweroff to false for master pool to have time to check SeedImage cloud-config
+				if poolType == "master" {
+					out, err := kubectl.Run("patch", "MachineRegistration",
+						"--namespace", clusterNS, machineRegName,
+						"--type", "merge", "-p", "{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
+					Expect(err).To(Not(HaveOccurred()), out)
+				}
+
+				// Save original file as it will have to be modified twice
+				misc.CopyFile(seedimageYaml, seedimageTmp)
+
+				// Create Yaml file
+				for _, p := range patterns {
+					err := tools.Sed(p.key, p.value, seedimageTmp)
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
+				// Apply to k8s
+				err = kubectl.Apply(clusterNS, seedimageTmp)
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Check that the seed image is correctly created
+				Eventually(func() string {
+					out, _ := kubectl.Run("get", "SeedImage",
+						"--namespace", clusterNS,
+						seedImageName,
+						"-o", "jsonpath={.status}")
+					return out
+				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+			})
+
+			By("Downloading ISO built by SeedImage", func() {
+				seedImageURL, err := kubectl.Run("get", "SeedImage",
+					"--namespace", clusterNS,
+					seedImageName,
+					"-o", "jsonpath={.status.downloadURL}")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = tools.GetFileFromURL(seedImageURL, "../../elemental-"+poolType+".iso", false)
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
+
 		if isoBoot != "true" {
 			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := misc.ConfigureiPXE()
@@ -143,30 +196,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			})
 		}
 
-		if isoBoot == "true" {
-			By("Adding registration file to ISO", func() {
-				// Check if generated ISO is already here
-				isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
-
-				// No need to recreate the ISO twice
-				if len(isIso) == 0 {
-					cmd := exec.Command(
-						"bash", "-c",
-						"../../.github/elemental-iso-add-registration "+installConfigYaml+" ../../build/elemental-*.iso",
-					)
-					out, err := cmd.CombinedOutput()
-					GinkgoWriter.Printf("%s\n", out)
-					Expect(err).To(Not(HaveOccurred()))
-
-					// Move generated ISO to the destination directory
-					err = exec.Command("bash", "-c", "mv -f elemental-*.iso ../..").Run()
-					Expect(err).To(Not(HaveOccurred()))
-				}
-			})
-		}
-
 		// Loop on node provisionning
 		// NOTE: if numberOfVMs == vmIndex then only one node will be provisionned
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -177,26 +209,76 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Get generated MAC address
-			_, macAdrs := getNodeInfo(hostName, index)
+			_, macAdrs := GetNodeInfo(hostName)
 			Expect(macAdrs).To(Not(BeNil()))
 
 			wg.Add(1)
-			go func(s, h, m string) {
+			go func(s, h, m string, i int) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
 				By("Installing node "+h, func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					// Execute node deployment in parallel
 					err := exec.Command(s, h, m).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
-			}(installVMScript, hostName, macAdrs)
+			}(installVMScript, hostName, macAdrs, index)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
+
+		// Loop on nodes to check that SeedImage cloud-config is correctly applied
+		// Only for master pool
+		if poolType == "master" && isoBoot == "true" {
+			for index := vmIndex; index <= numberOfVMs; index++ {
+				hostName := misc.SetHostname(vmNameRoot, index)
+				Expect(hostName).To(Not(BeNil()))
+
+				client, _ := GetNodeInfo(hostName)
+				Expect(client).To(Not(BeNil()))
+
+				wg.Add(1)
+				go func(h string, cl *tools.Client) {
+					defer wg.Done()
+					defer GinkgoRecover()
+
+					By("Checking SeedImage cloud-config on "+h, func() {
+						// Wait for SSH to be available
+						// NOTE: this also checks that the root password was correctly set by cloud-config
+						Eventually(func() string {
+							out, _ := cl.RunSSH("echo SSH_OK")
+							out = strings.Trim(out, "\n")
+							return out
+						}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+
+						// Check that the cloud-config is correctly applied by checking the presence of a file
+						_, err := cl.RunSSH("ls /etc/elemental-test")
+						Expect(err).To(Not(HaveOccurred()))
+
+						// Check that the installation is completed before halting the VM
+						Eventually(func() error {
+							_, err := cl.RunSSH("journalctl -u elemental-register.service --no-pager | grep 'elemental installation completed'")
+							return err
+						}, misc.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+
+						// Halt the VM
+						_, err = cl.RunSSH("setsid -f init 0")
+						Expect(err).To(Not(HaveOccurred()))
+					})
+				}(hostName, client)
+			}
+			wg.Wait()
+		}
 	})
 
-	It("Add the node in Rancher Manager", func() {
+	It("Add the nodes in Rancher Manager", func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
@@ -209,35 +291,39 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				defer GinkgoRecover()
 
 				By("Checking that node "+h+" is available in Rancher", func() {
-					id, err := misc.GetServerId(c, i)
-					Expect(err).To(Not(HaveOccurred()))
-					Expect(id).To(Not(BeEmpty()))
+					Eventually(func() string {
+						id, _ := misc.GetServerId(c, i)
+						return id
+					}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
 				})
 			}(clusterNS, hostName, index)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
 		if vmIndex > 1 {
-			By("Ensuring that the cluster is in healthy state", func() {
-				checkClusterState()
-			})
-
-			By("Increasing 'quantity' node of predefined cluster", func() {
-				comparator := ">"
-				if poolType == "worker" {
-					// In case of worker the first value could be equal to 1
-					comparator = ">="
-				}
-
-				// Increase 'quantity' field
-				value, err := misc.IncreaseQuantity(clusterNS,
-					clusterName,
-					"pool-"+poolType+"-"+clusterName, addedNode)
-				Expect(err).To(Not(HaveOccurred()))
-				Expect(value).To(BeNumerically(comparator, 1))
+			By("Checking cluster state", func() {
+				CheckClusterState(clusterNS, clusterName)
 			})
 		}
+
+		By("Incrementing number of nodes in "+poolType+" pool", func() {
+			// Increase 'quantity' field
+			value, err := misc.IncreaseQuantity(clusterNS,
+				clusterName,
+				"pool-"+poolType+"-"+clusterName, usedNodes)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(value).To(BeNumerically(">=", 1))
+
+			// Check that the selector has been correctly created
+			Eventually(func() string {
+				out, _ := kubectl.Run("get", "MachineInventorySelector",
+					"--namespace", clusterNS,
+					"-o", "jsonpath={.items[*].metadata.name}")
+				return out
+			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + poolType + "-" + clusterName))
+		})
 
 		By("Waiting for known cluster state before adding the node(s)", func() {
 			msg := `(configuring .* node\(s\)|waiting for viable init node)`
@@ -251,16 +337,17 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 
 				return clusterMsg
-			}, misc.SetTimeout(5*time.Duration(addedNode)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
+			}, misc.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 		})
 
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
-			client, _ := getNodeInfo(hostName, index)
+			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
 			// Execute in parallel
@@ -271,6 +358,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				// Restart the node(s)
 				By("Restarting "+h+" to add it in the cluster", func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					err := exec.Command("sudo", "virsh", "start", h).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
@@ -301,7 +391,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
 			}(clusterNS, hostName, index, emulateTPM, client)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
@@ -312,7 +406,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
-				client, _ := getNodeInfo(hostName, index)
+				client, _ := GetNodeInfo(hostName)
 				Expect(client).To(Not(BeNil()))
 
 				// Execute in parallel
@@ -352,12 +446,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					})
 				}(hostName, client)
 			}
+
+			// Wait for all parallel jobs
+			wg.Wait()
 		}
-		// Wait for all parallel jobs
-		wg.Wait()
 
 		By("Checking cluster state", func() {
-			checkClusterState()
+			CheckClusterState(clusterNS, clusterName)
 		})
 
 		if poolType != "worker" {
@@ -367,7 +462,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
-				client, _ := getNodeInfo(hostName, index)
+				client, _ := GetNodeInfo(hostName)
 				Expect(client).To(Not(BeNil()))
 
 				// Execute in parallel
@@ -377,39 +472,45 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					defer GinkgoRecover()
 
 					By("Checking cluster version on "+h, func() {
-						// Show cluster version, could be useful for debugging purposes
-						version, err := client.RunSSH("kubectl version")
-						Expect(err).To(Not(HaveOccurred()))
-						GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, version)
+						Eventually(func() error {
+							k8sVer, err := cl.RunSSH("kubectl version 2>/dev/null")
+							if strings.Contains(k8sVer, "Server Version:") {
+								// Show cluster version, could be useful for debugging purposes
+								GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, k8sVer)
+							}
+							return err
+						}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 					})
 				}(hostName, client)
 			}
-		}
-		// Wait for all parallel jobs
-		wg.Wait()
 
+			// Wait for all parallel jobs
+			wg.Wait()
+		}
+
+		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := misc.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
-			client, _ := getNodeInfo(hostName, index)
+			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
 			// Execute in parallel
 			wg.Add(1)
-			go func(h, p string, cl *tools.Client) {
+			go func(h, p string, i int, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
 				By("Rebooting "+h, func() {
+					// Wait a little bit to avoid starting all VMs at the same time
+					randomSleep(i)
+
 					// Execute 'reboot' in background, to avoid SSH locking
 					_, err := cl.RunSSH("setsid -f reboot")
 					Expect(err).To(Not(HaveOccurred()))
-
-					// Wait a little bit for the cluster to be in an unstable state (yes!)
-					time.Sleep(misc.SetTimeout(2 * time.Minute))
 				})
 
 				if p != "worker" {
@@ -417,13 +518,24 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						checkClusterAgent(cl)
 					})
 				}
-			}(hostName, poolType, client)
+			}(hostName, poolType, index, client)
+
+			// Wait a bit before starting more nodes to reduce CPU and I/O load
+			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
 		}
+
 		// Wait for all parallel jobs
 		wg.Wait()
 
 		By("Checking cluster state after reboot", func() {
-			checkClusterState()
+			CheckClusterState(clusterNS, clusterName)
 		})
+
+		if isoBoot == "true" {
+			By("Removing the ISO", func() {
+				err := exec.Command("bash", "-c", "rm -f ../../elemental-*.iso").Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })

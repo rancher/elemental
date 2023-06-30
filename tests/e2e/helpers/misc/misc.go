@@ -1,3 +1,17 @@
+/*
+Copyright © 2022 - 2023 SUSE LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package misc
 
 import (
@@ -49,21 +63,24 @@ type ClusterSpec struct {
 
 // RKEConfig has all RKE/K3s cluster information
 type RKEConfig struct {
-	Etcd                interface{}    `yaml:"etcd,omitempty"`
-	ChartValues         interface{}    `yaml:"chartValues"`
-	MachineGlobalConfig interface{}    `yaml:"machineGlobalConfig"`
-	MachinePools        []MachinePools `yaml:"machinePools"`
-	UpgradeStrategy     interface{}    `yaml:"upgradeStrategy,omitempty"`
+	Etcd                  interface{}            `yaml:"etcd,omitempty"`
+	ChartValues           map[string]interface{} `yaml:"chartValues,omitempty" wrangler:"nullable"`
+	MachineGlobalConfig   interface{}            `yaml:"machineGlobalConfig"`
+	MachinePools          []MachinePools         `yaml:"machinePools"`
+	MachineSelectorConfig interface{}            `yaml:"machineSelectorConfig"`
+	UpgradeStrategy       interface{}            `yaml:"upgradeStrategy,omitempty"`
+	Registries            interface{}            `yaml:"registries"`
 }
 
 // MachinePools has all pools information
 type MachinePools struct {
-	ControlPlaneRole bool             `yaml:"controlPlaneRole,omitempty"`
-	EtcdRole         bool             `yaml:"etcdRole,omitempty"`
-	MachineConfigRef MachineConfigRef `yaml:"machineConfigRef"`
-	Name             string           `yaml:"name"`
-	Quantity         int              `yaml:"quantity"`
-	WorkerRole       bool             `yaml:"workerRole,omitempty"`
+	ControlPlaneRole     bool             `yaml:"controlPlaneRole,omitempty"`
+	EtcdRole             bool             `yaml:"etcdRole,omitempty"`
+	MachineConfigRef     MachineConfigRef `yaml:"machineConfigRef"`
+	Name                 string           `yaml:"name"`
+	Quantity             int              `yaml:"quantity"`
+	UnhealthyNodeTimeout string           `yaml:"unhealthyNodeTimeout"`
+	WorkerRole           bool             `yaml:"workerRole,omitempty"`
 }
 
 // MachineConfigRef makes the link between the cluster, pool and the Elemental nodes
@@ -349,7 +366,7 @@ func ConcateFiles(srcfile, dstfile string, data []byte) error {
 	defer f.Close()
 
 	// Open/create destination file
-	d, err := os.OpenFile(dstfile, os.O_CREATE|os.O_WRONLY, 0644)
+	d, err := os.OpenFile(dstfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
 	}
@@ -446,4 +463,22 @@ func SetHostname(baseName string, index int) string {
 		index = 0
 	}
 	return baseName + "-" + fmt.Sprintf("%03d", index)
+}
+
+func CreateTemp(baseName string) (string, error) {
+	t, err := os.CreateTemp("", baseName)
+	if err != nil {
+		return "", err
+	}
+	return t.Name(), nil
+}
+
+func CheckPod(k *kubectl.Kubectl, checkList [][]string) error {
+	for _, check := range checkList {
+		if err := k.WaitForNamespaceWithPod(check[0], check[1]); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

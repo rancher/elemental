@@ -1,0 +1,25 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-Rancher_Stable
+
+on:
+  workflow_run:
+    workflows:
+      - build-ci
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  cli:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
+      cluster_name: cluster-k3s
+      k8s_version_to_provision: v1.25.7+k3s1
+      start_condition: ${{ github.event.workflow_run.conclusion }}
+      workflow_download: ${{ github.event.workflow_run.workflow_id }}

@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 SUSE LLC
+Copyright © 2022 - 2023 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,54 +17,116 @@ package e2e_test
 import (
 	"os"
 	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 const (
-	clusterYaml               = "../assets/cluster.yaml"
-	emulateTPMYaml            = "../assets/emulateTPM.yaml"
-	configPrivateCAScript     = "../scripts/config-private-ca"
-	installConfigYaml         = "../../install-config.yaml"
-	installVMScript           = "../scripts/install-vm"
-	netDefaultFileName        = "../assets/net-default.xml"
-	osListYaml                = "../assets/managedOSVersionChannel.yaml"
-	registrationYaml          = "../assets/machineRegistration.yaml"
-	selectorYaml              = "../assets/selector.yaml"
-	upgradeClusterTargetsYaml = "../assets/upgrade_clusterTargets.yaml"
-	upgradeOSVersionNameYaml  = "../assets/upgrade_managedOSVersionName.yaml"
-	userName                  = "root"
-	userPassword              = "r0s@pwd1"
-	vmNameRoot                = "node"
+	clusterYaml           = "../assets/cluster.yaml"
+	backupYaml            = "../assets/backup.yaml"
+	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
+	configPrivateCAScript = "../scripts/config-private-ca"
+	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
+	installConfigYaml     = "../../install-config.yaml"
+	installHardenedScript = "../scripts/config-hardened"
+	installVMScript       = "../scripts/install-vm"
+	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
+	netDefaultFileName    = "../assets/net-default.xml"
+	numberOfNodesMax      = 30
+	osListYaml            = "../assets/managedOSVersionChannel.yaml"
+	registrationYaml      = "../assets/machineRegistration.yaml"
+	restoreYaml           = "../assets/restore.yaml"
+	seedimageYaml         = "../assets/seedImage.yaml"
+	selectorYaml          = "../assets/selector.yaml"
+	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
+	userName              = "root"
+	userPassword          = "r0s@pwd1"
+	vmNameRoot            = "node"
 )
 
 var (
-	addedNode           int
-	arch                string
-	caType              string
-	clusterName         string
-	clusterNS           string
-	elementalSupport    string
-	emulateTPM          bool
-	eTPM                string
-	imageVersion        string
-	isoBoot             string
-	k8sVersion          string
-	numberOfVMs         int
-	osImage             string
-	proxy               string
-	rancherChannel      string
-	rancherLogCollector string
-	rancherVersion      string
-	testType            string
-	upgradeType         string
-	upgradeOperator     string
-	vmIndex             int
-	vmName              string
+	arch                  string
+	backupRestoreVersion  string
+	caType                string
+	CertManagerVersion    string
+	clusterName           string
+	clusterNS             string
+	clusterType           string
+	elementalSupport      string
+	emulateTPM            bool
+	rancherHostname       string
+	imageVersion          string
+	isoBoot               string
+	k8sUpstreamVersion    string
+	k8sVersion            string
+	numberOfVMs           int
+	operatorUpgrade       string
+	operatorRepo          string
+	osImage               string
+	poolType              string
+	proxy                 string
+	rancherChannel        string
+	rancherLogCollector   string
+	rancherVersion        string
+	rancherUpgrade        string
+	rancherUpgradeChannel string
+	rancherUpgradeVersion string
+	sequential            bool
+	testType              string
+	upgradeChannelList    string
+	upgradeImage          string
+	upgradeOsChannel      string
+	upgradeType           string
+	usedNodes             int
+	vmIndex               int
+	vmName                string
 )
+
+func CheckClusterState(ns, cluster string) {
+	// Check that a 'type' property named 'Ready' is set to true
+	Eventually(func() string {
+		clusterStatus, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns, cluster,
+			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
+		return clusterStatus
+	}, misc.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("True"))
+
+	// Wait a little bit for the cluster to be in a stable state
+	// Because if we do the next test too quickly it can be a false positive!
+	// NOTE: no SetTimeout needed here!
+	time.Sleep(30 * time.Second)
+
+	// There should be no 'reason' property set in a clean cluster
+	Eventually(func() string {
+		reason, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns, cluster,
+			"-o", "jsonpath={.status.conditions[*].reason}")
+		return reason
+	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(BeEmpty())
+}
+
+func GetNodeInfo(hostName string) (*tools.Client, string) {
+	// Get network data
+	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Set 'client' to be able to access the node through SSH
+	c := &tools.Client{
+		Host:     string(hostData.IP) + ":22",
+		Username: userName,
+		Password: userPassword,
+	}
+
+	return c, hostData.Mac
+}
 
 func FailWithReport(message string, callerSkip ...int) {
 	// Ensures the correct line numbers are reported
@@ -78,24 +140,33 @@ func TestE2E(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
+	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
 	caType = os.Getenv("CA_TYPE")
+	CertManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
+	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
-	eTPM = os.Getenv("EMULATE_TPM")
-	imageVersion = os.Getenv("IMAGE_VERSION")
+	eTPM := os.Getenv("EMULATE_TPM")
+	rancherHostname = os.Getenv("PUBLIC_DNS")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
+	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
-	osImage = os.Getenv("CONTAINER_IMAGE")
+	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
+	operatorRepo = os.Getenv("OPERATOR_REPO")
+	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
-	rancherChannel = os.Getenv("RANCHER_CHANNEL")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
+	rancherUpgrade = os.Getenv("RANCHER_UPGRADE")
+	seqString := os.Getenv("SEQUENTIAL")
 	testType = os.Getenv("TEST_TYPE")
+	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
+	upgradeImage = os.Getenv("UPGRADE_IMAGE")
+	upgradeOsChannel = os.Getenv("UPGRADE_OS_CHANNEL")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
-	upgradeOperator = os.Getenv("UPGRADE_OPERATOR")
 
 	// Only if VM_INDEX is set
 	if index != "" {
@@ -105,6 +176,9 @@ var _ = BeforeSuite(func() {
 
 		// Set default hostname
 		vmName = misc.SetHostname(vmNameRoot, vmIndex)
+	} else {
+		// Default value for vmIndex
+		vmIndex = 0
 	}
 
 	// Only if VM_NUMBER is set
@@ -117,8 +191,9 @@ var _ = BeforeSuite(func() {
 		numberOfVMs = vmIndex
 	}
 
-	// Set number of added node
-	addedNode = (numberOfVMs - vmIndex) + 1
+	// Set number of "used" nodes
+	// NOTE: could be the number added nodes or the number of nodes to use/upgrade
+	usedNodes = (numberOfVMs - vmIndex) + 1
 
 	// Force a correct value for emulateTPM
 	switch eTPM {
@@ -126,6 +201,28 @@ var _ = BeforeSuite(func() {
 		emulateTPM = true
 	default:
 		emulateTPM = false
+	}
+
+	// Same for sequential
+	switch seqString {
+	case "true":
+		sequential = true
+	default:
+		sequential = false
+	}
+
+	// Extract Rancher Manager channel/version to install
+	if rancherVersion != "" {
+		s := strings.Split(rancherVersion, "/")
+		rancherChannel = s[0]
+		rancherVersion = s[1]
+	}
+
+	// Extract Rancher Manager channel/version to upgrade
+	if rancherUpgrade != "" {
+		s := strings.Split(rancherUpgrade, "/")
+		rancherUpgradeChannel = s[0]
+		rancherUpgradeVersion = s[1]
 	}
 
 	// Start HTTP server

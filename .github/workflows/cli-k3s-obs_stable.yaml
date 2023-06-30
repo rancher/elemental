@@ -1,0 +1,38 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-OBS_Stable
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      rancher_version:
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
+        type: string
+
+concurrency:
+  group: e2e-k3s-obs-stable-${{ github.head_ref || github.ref }}-${{ github.repository }}
+  cancel-in-progress: true
+
+jobs:
+  cli:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "Manual - CLI - Parallel - Deployment test with Standard K3s"
+      cluster_name: cluster-k3s
+      cluster_type: ${{ inputs.cluster_type }}
+      destroy_runner: ${{ inputs.destroy_runner }}
+      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+      k8s_version_to_provision: v1.25.7+k3s1
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+      rancher_version: ${{ inputs.rancher_version }}

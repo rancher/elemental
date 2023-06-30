@@ -1,0 +1,38 @@
+# This workflow calls the master E2E workflow with custom variables
+name: UI-K3s-Rancher_Stable
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
+        type: string
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  ui:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI/Manual - UI - Deployment test with Standard K3s"
+      cluster_name: cluster-k3s
+      cypress_tags: main
+      destroy_runner: ${{ inputs.destroy_runner || true }}
+      elemental_ui_version: dev
+      k8s_version_to_provision: v1.25.7+k3s1
+      proxy: ${{ inputs.proxy || 'elemental' }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
+      test_type: ui
