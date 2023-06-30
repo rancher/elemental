@@ -36,7 +36,7 @@ iso_repack() {
 
   case ${ISO_URL} in
     http*)
-      wget -O "${TEMPDIR}/iso/${ISO_FILE}" "${ISO_URL}"
+      curl -Lo "${TEMPDIR}/iso/${ISO_FILE}" "${ISO_URL}"
       ;;
     *)
       # Assume it is a local path
