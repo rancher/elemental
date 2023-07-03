@@ -58,10 +58,7 @@ describe('Machine inventory testing', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('my-machine')
         .click()
-      cy.checkMachInvLabel({machRegName: 'machine-registration',
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1',
-        afterBoot: true});
+      cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', true);
       for (var hwLabel in hwLabels) { 
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.get('.table-options-group > .btn > .icon')
