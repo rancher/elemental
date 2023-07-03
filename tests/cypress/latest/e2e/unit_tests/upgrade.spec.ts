@@ -44,7 +44,7 @@ describe('Upgrade tests', () => {
   filterTests(['upgrade'], () => {
     it('Create an OS Version Channels', () => {
       // System was built with stable ISO, so we can upgrade either to staging or dev
-      utils.isOperatorVersion('staging') ? cy.addOsVersionChannel({channelVersion: 'staging'}): cy.addOsVersionChannel({channelVersion:'dev'});
+      utils.isOperatorVersion('staging') ? cy.addOsVersionChannel('staging'): cy.addOsVersionChannel('dev');
     });
 
     it('Check OS Versions', () => {

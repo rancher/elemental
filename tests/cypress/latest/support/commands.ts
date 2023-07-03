@@ -95,7 +95,7 @@ Cypress.Commands.add('clickNavMenu', (listLabel: string[]) => {
 });
 
 // Insert a value in a field *BUT* force a clear before!
-Cypress.Commands.add('typeValue', ({label, value, noLabel, log=true}) => {
+Cypress.Commands.add('typeValue', (label, value, noLabel, log=true) => {
   if (noLabel === true) {
     cy.get(label)
       .focus()
@@ -117,7 +117,7 @@ Cypress.Commands.add('clickClusterMenu', (listLabel: string[]) => {
 });
 
 // Insert a key/value pair
-Cypress.Commands.add('typeKeyValue', ({key, value}) => {
+Cypress.Commands.add('typeKeyValue', (key, value) => {
   cy.get(key)
     .clear()
     .type(value);
@@ -145,7 +145,7 @@ for (const command of ['visit', 'click', 'trigger', 'type', 'clear', 'reload', '
 }; 
 
 // Add Helm repo
-Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
+Cypress.Commands.add('addHelmRepo', (repoName, repoUrl, repoType) => {
   cy.clickClusterMenu(['Apps', 'Repositories'])
 
   // Make sure we are in the 'Repositories' screen (test failed here before)
@@ -157,14 +157,14 @@ Cypress.Commands.add('addHelmRepo', ({repoName, repoUrl, repoType}) => {
   cy.clickButton('Create');
   cy.contains('Repository: Create')
     .should('be.visible');
-  cy.typeValue({label: 'Name', value: repoName});
+  cy.typeValue('Name', repoName);
   if (repoType === 'git') {
     cy.contains('Git repository')
       .click();
-    cy.typeValue({label: 'Git Repo URL', value: repoUrl});
-    cy.typeValue({label: 'Git Branch', value: 'main'});
+    cy.typeValue('Git Repo URL', repoUrl);
+    cy.typeValue('Git Branch', 'main');
   } else {
-    cy.typeValue({label: 'Index URL', value: repoUrl});
+    cy.typeValue('Index URL', repoUrl);
   }
   cy.clickButton('Create');
 });
@@ -192,7 +192,7 @@ Cypress.Commands.add('deleteAllResources', () => {
 // Machine registration commands
 
 // Create a machine registration
-Cypress.Commands.add('createMachReg', ({
+Cypress.Commands.add('createMachReg', (
   machRegName,
   namespace='fleet-default',
   checkLabels=false,
@@ -201,7 +201,7 @@ Cypress.Commands.add('createMachReg', ({
   checkInventoryAnnotations=false,
   checkIsoBuilding=false,
   customCloudConfig='',
-  checkDefaultCloudConfig=true }) => {
+  checkDefaultCloudConfig=true ) => {
     cy.clickNavMenu(["Dashboard"]);
     cy.getBySel('button-create-registration-endpoint')
       .click();
@@ -213,27 +213,10 @@ Cypress.Commands.add('createMachReg', ({
         .attachFile({filePath: customCloudConfig});
     }
 
-    if (checkLabels) {
-      cy.addMachRegLabel({labelName: 'myLabel1', labelValue: 'myLabelValue1'});
-      }
-
-    if (checkAnnotations) {
-      cy.addMachRegAnnotation({
-        annotationName: 'myAnnotation1',
-        annotationValue: 'myAnnotationValue1'});
-    }
-
-    if (checkInventoryLabels) {
-      cy.addMachInvLabel({
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1'});
-    }
-
-    if (checkInventoryAnnotations) {
-      cy.addMachInvAnnotation({
-        annotationName: 'myInvAnnotation1',
-        annotationValue: 'myInvAnnotationValue1'});
-    }
+    checkLabels ? cy.addMachRegLabel('myLabel1', 'myLabelValue1') : null;
+    checkAnnotations? cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1') : null;
+    checkInventoryLabels ? cy.addMachInvLabel('myInvLabel1', 'myInvLabelValue1') : null;
+    checkInventoryAnnotations ? cy.addMachInvAnnotation('myInvAnnotation1', 'myInvAnnotationValue1') : null;
 
     cy.getBySel('form-save')
       .contains('Create')
@@ -312,18 +295,12 @@ Cypress.Commands.add('createMachReg', ({
     // It looks like we can use shadow DOM to catch it but too complicated for now
     cy.contains('Registration Endpoint')
       .click();
-    if (checkLabels) {cy.checkMachRegLabel({
-      machRegName: machRegName,
-      labelName: 'myLabel1',
-      labelValue: 'myLabelValue1'})};
-    if (checkAnnotations) {cy.checkMachRegAnnotation({
-      machRegName: machRegName,
-      annotationName: 'myAnnotation1',
-      annotationValue: 'myAnnotationValue1'});}
+    checkLabels ? cy.checkMachRegLabel(machRegName, 'myLabel1', 'myLabelValue1') : null;
+    checkAnnotations ? cy.checkMachRegAnnotation(machRegName, 'myAnnotation1', 'myAnnotationValue1') : null;
 });
 
 // Add Label to machine registration
-Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
+Cypress.Commands.add('addMachRegLabel', (labelName, labelValue) => {
   cy.getBySel('labels-and-annotations-block')
     .contains('Registration Endpoint')
     .click();
@@ -336,7 +313,7 @@ Cypress.Commands.add('addMachRegLabel', ({labelName, labelValue}) => {
 });
 
 // Add Annotation to machine registration
-Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue}) => {
+Cypress.Commands.add('addMachRegAnnotation', (annotationName, annotationValue) => {
   cy.getBySel('labels-and-annotations-block')
     .contains('Registration Endpoint')
     .click();
@@ -349,7 +326,7 @@ Cypress.Commands.add('addMachRegAnnotation', ({annotationName, annotationValue})
 });
 
 // Add Label to machine inventory
-Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue, useHardwareLabels=true}) => {
+Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabels=true) => {
   cy.getBySel('labels-and-annotations-block')
     .contains('Inventory of Machines')
     .click();
@@ -371,7 +348,7 @@ Cypress.Commands.add('addMachInvLabel', ({labelName, labelValue, useHardwareLabe
 });
 
 // Add Annotation to machine inventory
-Cypress.Commands.add('addMachInvAnnotation', ({annotationName, annotationValue}) => {
+Cypress.Commands.add('addMachInvAnnotation', (annotationName, annotationValue) => {
   cy.getBySel('labels-and-annotations-block')
     .contains('Inventory of Machines')
     .click();
@@ -383,7 +360,7 @@ Cypress.Commands.add('addMachInvAnnotation', ({annotationName, annotationValue})
 });
 
 // Check machine inventory label in YAML
-Cypress.Commands.add('checkMachInvLabel', ({machRegName, labelName, labelValue, userHardwareLabels=true, afterBoot=false}) => {
+Cypress.Commands.add('checkMachInvLabel', (machRegName, labelName, labelValue, afterBoot=false, userHardwareLabels=true) => {
   if (afterBoot == false ) {
     cy.contains(machRegName)
       .click();
@@ -417,10 +394,7 @@ Cypress.Commands.add('checkMachInvLabel', ({machRegName, labelName, labelValue, 
 });
 
 // Check machine registration label in YAML
-Cypress.Commands.add('checkMachRegLabel', ({
-  machRegName,
-  labelName,
-  labelValue}) => {
+Cypress.Commands.add('checkMachRegLabel', (machRegName, labelName, labelValue) => {
     cy.contains(machRegName)
       .click();
     cy.get('div.actions > .role-multi-action')
@@ -435,10 +409,7 @@ Cypress.Commands.add('checkMachRegLabel', ({
 });
 
 // Check machine registration annotation in YAML
-Cypress.Commands.add('checkMachRegAnnotation', ({
-  machRegName,
-  annotationName,
-  annotationValue}) => {
+Cypress.Commands.add('checkMachRegAnnotation', ( machRegName, annotationName, annotationValue) => {
     cy.contains(machRegName)
       .click();
     cy.get('div.actions > .role-multi-action')
@@ -453,11 +424,7 @@ Cypress.Commands.add('checkMachRegAnnotation', ({
 });
 
 // Edit a machine registration
-Cypress.Commands.add('editMachReg', ({
-  machRegName,
-  addLabel=false,
-  addAnnotation=false,
-  withYAML=false}) => {
+Cypress.Commands.add('editMachReg', ( machRegName, addLabel=false, addAnnotation=false, withYAML=false) => {
     cy.contains(machRegName)
       .click();
     // Select the 3dots button and edit configuration
@@ -475,17 +442,13 @@ Cypress.Commands.add('editMachReg', ({
     } else {
       cy.contains('li', 'Edit Config')
         .click();
-      if (addLabel) {cy.addMachRegLabel({labelName: 'myLabel1',
-        labelValue: 'myLabelValue1',
-        withYAML: withYAML})};
-      if (addAnnotation) {cy.addMachRegAnnotation({annotationName: 'myAnnotation1',
-        annotationValue: 'myAnnotationValue1',
-        withYAML: withYAML})};
+      addLabel ? cy.addMachRegLabel('myLabel1', 'myLabelValue1' ) : null;
+      addAnnotation ? cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1') : null;
     }
 });
 
 // Delete a machine registration
-Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
+Cypress.Commands.add('deleteMachReg', (machRegName) => {
   cy.contains('Registration Endpoint')
     .click();
   /*  This code cannot be used anymore for now because of
@@ -512,9 +475,7 @@ Cypress.Commands.add('deleteMachReg', ({machRegName}) => {
 // Machine Inventory commands
 
 // Import machine inventory
-Cypress.Commands.add('importMachineInventory', ({
-  machineInventoryFile,
-  machineInventoryName}) => {
+Cypress.Commands.add('importMachineInventory', (machineInventoryFile, machineInventoryName) => {
     cy.clickNavMenu(["Inventory of Machines"]);
     cy.getBySel('masthead-create-yaml')
       .click();
@@ -530,11 +491,7 @@ Cypress.Commands.add('importMachineInventory', ({
       .should('exist');
 });
 
-Cypress.Commands.add('checkFilter', ({
-  filterName,
-  testFilterOne,
-  testFilterTwo,
-  shouldNotMatch}) => {
+Cypress.Commands.add('checkFilter', (filterName, testFilterOne, testFilterTwo, shouldNotMatch) => {
     cy.clickNavMenu(["Inventory of Machines"]);
     cy.clickButton("Add Filter");
     cy.get('.advanced-search-box').type(filterName);
@@ -544,16 +501,12 @@ Cypress.Commands.add('checkFilter', ({
     (shouldNotMatch) ? cy.contains('shouldnotmatch').should('exist') : cy.contains('shouldnotmatch').should('not.exist');
 });
 
-Cypress.Commands.add('checkLabelSize', ({
-  sizeToCheck}) => {
+Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
     cy.clickNavMenu(["Dashboard"]);
     cy.getBySel('button-create-registration-endpoint')
       .click();
-    if (sizeToCheck == "name") {
-      cy.addMachInvLabel({labelName: 'labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', labelValue: 'mylabelvalue', useHardwareLabels: false});
-    } else if (sizeToCheck == "value") {
-      cy.addMachInvLabel({labelName: 'mylabelname', labelValue: 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', useHardwareLabels: false});
-    }
+    sizeToCheck == "name" ? cy.addMachInvLabel('labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', 'mylabelvalue', false) : null;
+    sizeToCheck == "value" ? cy.addMachInvLabel('mylabelname', 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', false) : null;
     // A banner should appear alerting you about the size exceeded
     cy.get('.banner > span');
     // Create button should be disabled
@@ -565,8 +518,7 @@ Cypress.Commands.add('checkLabelSize', ({
 // OS Versions commands
 
 // Add an OS version channel
-Cypress.Commands.add('addOsVersionChannel', ({
-  channelVersion}) => {
+Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
     var channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/teal53/15.4/rancher/elemental-teal-channel/5.3:latest`;
     cy.clickNavMenu(["Advanced", "OS Version Channels"]);
     cy.getBySel('masthead-create')

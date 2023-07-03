@@ -21,7 +21,7 @@ declare global {
       // Functions declared in commands.ts
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
       addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
-      addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels: boolean):Chainable<Element>;
+      addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels?: boolean):Chainable<Element>;
       addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
       addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
       addOsVersionChannel(channelVersion: string): Chainable<Element>;
@@ -29,7 +29,7 @@ declare global {
       checkFilter(filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean): Chainable<Element>;
       checkLabelSize(sizeToCheck: string): Chainable<Element>;
       checkMachInvAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
-      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string, useHardwareLabels: boolean, afterBoot: boolean):Chainable<Element>;
+      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string, afterBoot: boolean, useHardwareLabels?: boolean):Chainable<Element>;
       checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
       checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
       clickButton(label: string,): Chainable<Element>;
@@ -37,8 +37,8 @@ declare global {
       clickElementalMenu(label: string,): Chainable<Element>;
       clickNavMenu(listLabel: string[],): Chainable<Element>;
       confirmDelete(): Chainable<Element>;
-      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, checkIsoBuilding?: boolean,
-        customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
+      createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, checkInventoryLabels?: boolean,
+        checkInventoryAnnotations?: boolean, checkIsoBuilding?: boolean, customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;
       deleteAllResources():Chainable<Element>;
       deleteMachReg(machRegName: string): Chainable<Element>;
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;

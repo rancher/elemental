@@ -19,7 +19,7 @@ import filterTests from '~/support/filterTests.js';
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-    const topLevelMenu         = new TopLevelMenu();
+    const topLevelMenu = new TopLevelMenu();
   
     beforeEach(() => {
       cy.login();
@@ -31,9 +31,7 @@ filterTests(['main', 'upgrade'], () => {
         topLevelMenu.openIfClosed();
         cy.contains('local')
           .click();
-        cy.addHelmRepo({repoName: 'elemental-ui',
-          repoUrl: 'https://github.com/rancher/elemental-ui.git',
-          repoType: 'git'});
+        cy.addHelmRepo('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git');
       };
     });
     
