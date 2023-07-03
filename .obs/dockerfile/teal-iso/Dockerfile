@@ -2,6 +2,8 @@
 #!BuildTag: rancher/elemental-teal-iso/5.3:latest
 #!BuildTag: rancher/elemental-teal-iso/5.3:%VERSION%
 #!BuildTag: rancher/elemental-teal-iso/5.3:%VERSION%-%RELEASE%
+#!BuildConstraint: hardware:disk:size unit=G 10
+#!BuildConstraint: hardware:memory:size unit=G 16
 
 FROM rancher/elemental-teal/5.3:latest AS os
 FROM rancher/elemental-builder-image/5.3:latest AS builder
