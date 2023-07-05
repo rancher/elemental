@@ -14,3 +14,8 @@ export const isK8sVersion = (version: string) => {
 export const isOperatorVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("operator_repo"));
 }
+
+// Check rancher manager version
+export const isRancherManagerVersion = (version: string) => {
+  return (new RegExp(version)).test(Cypress.env("rancher_version"));
+}
