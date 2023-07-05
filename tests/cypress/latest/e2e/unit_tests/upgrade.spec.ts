@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 import { Rancher } from '~/support/rancher';
-import { TopLevelMenu } from '~/support/toplevelmenu';
 import '~/support/commands';
 import { Elemental } from '~/support/elemental';
 import 'cypress-file-upload';
@@ -26,10 +25,9 @@ describe('Upgrade tests', () => {
   const clusterName              = "mycluster"
   const elemental                = new Elemental();
   const elementalUser            = "elemental-user"
-  const topLevelMenu             = new TopLevelMenu();
+  const rancher                  = new Rancher();
   const uiAccount                = Cypress.env('ui_account');
   const uiPassword               = "rancherpassword"
-  const upgradeChannelList       = Cypress.env('upgrade_channel_list')
   const upgradeImage             = Cypress.env('upgrade_image')
 
   beforeEach(() => {
@@ -37,7 +35,7 @@ describe('Upgrade tests', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();    
 
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
@@ -124,7 +122,7 @@ describe('Upgrade tests', () => {
         .type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
 
       // Check if the node reboots to apply the upgrade
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();    
       elemental.accessElementalMenu();
       cy.clickNavMenu(["Dashboard"]);
       cy.getBySel('card-clusters')

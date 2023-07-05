@@ -13,29 +13,51 @@ limitations under the License.
 */
 
 // RANCHER FUNCTIONS
+// /////////////////
+
 export class Rancher {
   burgerMenuToggle() {
     cy.getBySel('top-level-menu', {timeout: 12000})
       .click();
-  }
+  };
 
   burgerMenuOpenIfClosed() {
     cy.get('body').then((body) => {
       if (body.find('.menu.raised').length === 0) {
         this.burgerMenuToggle();
-      }
+      };
     });
-  }
+  };
 
   addRepository(repositoryName: string, repositoryURL: string, repositoryType: string) {
     this.burgerMenuOpenIfClosed();
     cy.contains('local')
       .click();
     cy.addHelmRepo(repositoryName, repositoryURL, repositoryType);
-  }
-}
+  };
+  
+  // Handle first login in Rancher
+  firstLogin() {
+    cy.visit('/auth/login');
+    cy.get("span").then($text => {
+      if ($text.text().includes('your first time visiting Rancher')) {
+        cy.get('input')
+          .type(Cypress.env('password'), {log: false});
+        cy.clickButton('Log in with Local User');
+        cy.contains('By checking')
+          .click('left');
+        cy.clickButton('Continue');
+        cy.getBySel('banner-title')
+          .contains('Welcome to Rancher');
+      } else {
+        cy.log('Rancher already initialized, no need to handle first login.');
+      };
+    });
+  };
+};
 
 // RANCHER CUSTOM CYPRESS COMMANDS
+// ///////////////////////////////
 
 declare global {
   namespace Cypress {
@@ -43,9 +65,12 @@ declare global {
       addHelmRepo(repoName: string, repoUrl: string, repoType?: string,): Chainable<Element>;
       byLabel(label: string,): Chainable<Element>;
       clickButton(label: string,): Chainable<Element>;
+      clickNavMenu(listLabel: string[],): Chainable<Element>;
       confirmDelete(): Chainable<Element>;
+      deleteAllResources():Chainable<Element>;
       login(username?: string, password?: string, cacheSession?: boolean,): Chainable<Element>;
       getBySel(dataTestAttribute: string, args?: any): Chainable<JQuery<HTMLElement>>;
+      typeValue(label: string, value: string, noLabel?: boolean, log?: boolean): Chainable<Element>;
     }
 }}
 
@@ -79,6 +104,13 @@ Cypress.Commands.add('login', (
     }
 });
 
+// Make sure we are in the desired menu inside a cluster (local by default)
+// You can access submenu by giving submenu name in the array
+// ex:  cy.clickNavMenu(['Menu', 'Submenu'])
+Cypress.Commands.add('clickNavMenu', (listLabel: string[]) => {
+  listLabel.forEach(label => cy.get('nav').contains(label).click());
+});
+
 // Search by data-testid selector
 Cypress.Commands.add("getBySel", (selector, ...args) => {
   return cy.get(`[data-testid=${selector}]`, ...args);
@@ -104,9 +136,45 @@ Cypress.Commands.add('confirmDelete', () => {
     .click()
 });
 
+// Insert a value in a field *BUT* force a clear before!
+Cypress.Commands.add('typeValue', (label, value, noLabel, log=true) => {
+  if (noLabel === true) {
+    cy.get(label)
+      .focus()
+      .clear()
+      .type(value, {log: log});
+  } else {
+    cy.byLabel(label)
+      .focus()
+      .clear()
+      .type(value, {log: log});
+  }
+});
+
+// Delete all resources from a page
+Cypress.Commands.add('deleteAllResources', () => {  
+  cy.get('[width="30"] > .checkbox-outer-container')
+    .click();
+  cy.getBySel('sortable-table-promptRemove')
+    .contains('Delete')
+    .click()
+  cy.confirmDelete();
+  // Sometimes, UI is crashing when a resource is deleted
+  // A reload should workaround the failure
+  cy.get('body').then(($body) => {
+    if (!$body.text().includes('There are no rows to show.')) {
+        cy.reload();
+        cy.log('RELOAD TRIGGERED');
+        cy.screenshot('reload-triggered');
+      };
+    });
+  cy.contains('There are no rows to show', {timeout: 15000});
+});
+
 // Add Helm repo
 Cypress.Commands.add('addHelmRepo', (repoName, repoUrl, repoType) => {
-  cy.clickClusterMenu(['Apps', 'Repositories'])
+  //cy.clickClusterMenu(['Apps', 'Repositories'])
+  cy.clickNavMenu(['Apps', 'Repositories'])
 
   // Make sure we are in the 'Repositories' screen (test failed here before)
   cy.contains('header', 'Repositories')
@@ -127,4 +195,4 @@ Cypress.Commands.add('addHelmRepo', (repoName, repoUrl, repoType) => {
     cy.typeValue('Index URL', repoUrl);
   }
   cy.clickButton('Create');
-});1
+});
