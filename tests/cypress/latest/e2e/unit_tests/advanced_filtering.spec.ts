@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -22,16 +22,16 @@ filterTests(['main'], () => {
   describe('Advanced filtering testing', () => {
     const elemental     = new Elemental();
     const elementalUser = "elemental-user"
+    const rancher       = new Rancher();
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
-    const topLevelMenu  = new TopLevelMenu();
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
   
       // Open the navigation menu
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
   
       // Click on the Elemental's icon
       elemental.accessElementalMenu(); 

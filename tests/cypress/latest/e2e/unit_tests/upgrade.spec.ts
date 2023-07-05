@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import { Rancher } from '~/support/rancher';
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import '~/support/commands';
 import { Elemental } from '~/support/elemental';

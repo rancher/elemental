@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -21,8 +21,8 @@ Cypress.config();
 describe('User role testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
+  const rancher       = new Rancher();
   const stdUser       = "std-user"
-  const topLevelMenu  = new TopLevelMenu();
   const uiPassword    = "rancherpassword"
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('User role testing', () => {
     it('Create elemental user', () => {
       // User with the elemental-administrator role
       cy.login();
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.getBySel('side-menu')
         .contains('Users & Authentication')
         .click();
@@ -49,7 +49,7 @@ describe('User role testing', () => {
     it('Create standard user', () => {
       // User without the elemental-administrator role
       cy.login();
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.getBySel('side-menu')
         .contains('Users & Authentication')
         .click();
@@ -74,7 +74,7 @@ describe('User role testing', () => {
       cy.login(elementalUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
       elemental.checkElementalNav();
@@ -84,7 +84,7 @@ describe('User role testing', () => {
       cy.login(stdUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       elemental.elementalIcon().should('exist');
       elemental.accessElementalMenu();
       // User without appropriate role will get a specific page

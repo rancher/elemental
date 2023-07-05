@@ -12,14 +12,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 filterTests(['main'], () => {
   Cypress.config();
   describe('Deploy application in fresh Elemental Cluster', () => {
-    const topLevelMenu = new TopLevelMenu();
+    const rancher      = new Rancher();
     const clusterName  = "mycluster"
     beforeEach(() => {
       cy.login();
@@ -30,7 +30,7 @@ filterTests(['main'], () => {
       // Unfortunately, this wait is needed mainly with RKE2 because the cluster
       // is switching status and it is hard to catch in automated way...
       cy.wait(180000);
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.contains('Home')
         .click();
       cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
@@ -54,7 +54,7 @@ filterTests(['main'], () => {
     });
   
     it('Remove Alerting Drivers application', () => {
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();
       cy.contains('Apps')

@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -22,7 +22,7 @@ Cypress.config();
 describe('Machine registration testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
-  const topLevelMenu  = new TopLevelMenu();
+  const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
 
@@ -31,7 +31,7 @@ describe('Machine registration testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
@@ -45,7 +45,7 @@ describe('Machine registration testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 

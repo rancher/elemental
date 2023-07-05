@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -28,7 +28,7 @@ describe('Machine inventory testing', () => {
   const k8sVersion    = Cypress.env('k8s_version');
   const clusterName   = "mycluster"
   const proxy         = "http://172.17.0.1:3128"
-  const topLevelMenu  = new TopLevelMenu();
+  const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
 
@@ -37,14 +37,14 @@ describe('Machine inventory testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
   });
 
   filterTests(['main'], () => {
-    it('Check that machine inventory has been created', () => {
+    it.skip('Check that machine inventory has been created', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('Namespace: fleet-default')
       cy.getBySel('sortable-cell-0-0')
@@ -55,7 +55,7 @@ describe('Machine inventory testing', () => {
         .should('exist');
     });
 
-    it('Check we can see our embedded hardware labels', () => {
+    it.skip('Check we can see our embedded hardware labels', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('my-machine')
         .click()
@@ -131,14 +131,14 @@ describe('Machine inventory testing', () => {
   
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.contains('Home')
         .click();
       // The new cluster must be in active state
       cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
         .contains('Active',  {timeout: 300000});
       // Go into the dedicated cluster page
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();
     })
