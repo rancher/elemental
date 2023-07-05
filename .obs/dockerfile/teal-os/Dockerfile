@@ -3,7 +3,7 @@
 #!BuildTag: rancher/elemental-teal/5.3:latest
 #!BuildTag: rancher/elemental-teal/5.3:%VERSION%
 #!BuildTag: rancher/elemental-teal/5.3:%VERSION%-%RELEASE%
-#
+#!BuildConstraint: hardware:disk:size unit=G 8
 
 FROM suse/sle-micro-rancher/5.3:latest
 
@@ -14,7 +14,8 @@ RUN zypper in -y -- \
   kernel-firmware-all \
   -systemd-presets-branding-SLE-Micro-for-Rancher \
   cryptsetup \
-  elemental
+  elemental \
+  podman
 
 # Install extra useful utilities
 RUN zypper in -y k9s

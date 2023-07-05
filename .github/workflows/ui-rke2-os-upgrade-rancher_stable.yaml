@@ -40,12 +40,11 @@ jobs:
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: dev
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
       iso_boot: true
       k8s_version_to_provision: v1.25.7+rke2r1
-      operator_version: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher/elemental-operator-chart
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
       rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
       test_type: ui
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-channel/5.3:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
       upstream_cluster_version: v1.25.7+rke2r1

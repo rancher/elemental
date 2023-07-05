@@ -71,13 +71,13 @@ on:
         description: Number of nodes to deploy on the provisioned cluster
         default: 5
         type: string
+      operator_repo:
+        description: Elemental operator repository to use
+        type: string
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_upgrade:
         description: Elemental operator version to upgrade to
         type: string
-      operator_version:
-        description: Elemental operator version to use
-        type: string
-        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
       proxy:
         description: Deploy a proxy
         type: string
@@ -88,6 +88,9 @@ on:
       rancher_version:
         description: Rancher Manager channel/version to use for installation
         default: stable/latest
+        type: string
+      rancher_upgrade:
+        description: Rancher Manager channel/version to upgrade to
         type: string
       runner_template:
         description: Runner template to use
@@ -179,21 +182,17 @@ jobs:
             # Get public IP
             PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
                         | awk '/${{ steps.generator.outputs.runner }}/ {print $6}')
-
             # Exit if we reach the timeout or if IP is set
             if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
               break
             fi
-
             # Wait a little before retrying
             sleep 2
           done
-
           # Get the public DNS
           PUBLIC_DNS=$(host -l ${PUBLIC_IP} 2> /dev/null \
                        | awk '{sub(/\.$/, ""); print $5}')
           echo "public_dns=${PUBLIC_DNS}" >> ${GITHUB_OUTPUT}
-
           # Raise an error if either IP and/or DNS are empty
           if [[ -z "${PUBLIC_IP}" || -z "${PUBLIC_DNS}" ]]; then
             echo "PUBLIC_IP and/or PUBLIC_DNS are empty!" >&2
@@ -248,6 +247,10 @@ jobs:
         run: |
           mkdir -p build
           wget -v -L -c ${ISO_TO_TEST} -O build/elemental-${TAG}.iso
+      - name: Create symbolic link to ISO for SeedImage
+        run: |
+          ISO=$(ls build/elemental-*.iso 2> /dev/null)
+          ln -sf ${ISO} base-image.iso
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
@@ -257,20 +260,29 @@ jobs:
           # Extract iPXE artifacts
           make extract_kernel_init_squash
           make ipxe
-          mv -f build/* .
+          # Extend regexes (needed for the next 'mv' command)
+          shopt -s extglob
           # Looks a little bit weird but we have to keep the ISO in build!
-          mv -f elemental-*.iso build/
+          mv -f build/!(*.iso) .
       - name: Deploy Proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
       - name: Install Rancher+Elemental components
         env:
           CA_TYPE: ${{ inputs.ca_type }}
-          OPERATOR_VERSION: ${{ inputs.operator_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
           PROXY: ${{ inputs.proxy }}
+          PUBLIC_DNS: ${{ needs.create-runner.outputs.public_dns }}
           PUBLIC_DOMAIN: bc.googleusercontent.com
           TEST_TYPE: ${{ inputs.test_type }}
-        run: cd tests && PUBLIC_DNS=${{ needs.create-runner.outputs.public_dns }} make e2e-install-rancher
+        run: cd tests && make e2e-install-rancher
+      - name: Workaround for DynamicSchemas (if needed)
+        run: |
+          # Check if DynamicSchemas for MachineInventorySelectorTemplate exists
+          if ! kubectl get dynamicschema machineinventoryselectortemplate >/dev/null 2>&1; then
+            # If not we have to add it to avoid weird issues!
+            kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
+          fi
       - name: Install backup-restore components (K3s only for now)
         if: contains(inputs.upstream_cluster_version, 'k3s')
         run: cd tests && make e2e-install-backup-restore
@@ -297,9 +309,16 @@ jobs:
                          --namespace cattle-system \
                          -l app=rancher \
                          -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract OS version from ISO
+          isoinfo -i build/*.iso \
+                  -x /BOOT/INITRD.\;1 \
+            | xz -dc \
+            | cpio -i --to-stdout usr/lib/initrd-release > os-release
+          eval $(grep IMAGE_TAG os-release)
           # Export values
           echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
@@ -313,7 +332,8 @@ jobs:
           ISO_BOOT: ${{ inputs.iso_boot }}
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
-          OPERATOR_VERSION: ${{ inputs.operator_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rm_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
@@ -323,7 +343,6 @@ jobs:
             /workdir/e2e/unit_tests/user.spec.ts
             /workdir/e2e/unit_tests/menu.spec.ts
             /workdir/e2e/unit_tests/machine_registration.spec.ts
-            /workdir/e2e/unit_tests/seed_image.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests
@@ -348,13 +367,13 @@ jobs:
         env:
           ISO_BOOT: ${{ inputs.iso_boot }} 
           VM_INDEX: 1
-          HOST_MEMORY_RESERVED: 50331648
+          VM_MEM: 8192
+          HOST_MEMORY_RESERVED: 49152
         run: |
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-
             make e2e-ui-rancher
           )
       - name: Cypress tests - Advanced
@@ -365,8 +384,9 @@ jobs:
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
-          OPERATOR_VERSION: ${{ inputs.operator_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
           PROXY: ${{ inputs.proxy }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rm_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
@@ -398,7 +418,7 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
-      - name: Bootstrap node 1, 2 and 3 (with iPXE) in pool "master" (use Emulated TPM if possible)
+      - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
           EMULATE_TPM: true
@@ -406,12 +426,18 @@ jobs:
           VM_START: 1
           VM_END: 3
         run: |
+          # Only use ISO boot if the upstream cluster is RKE2
+          # due to issue with pxe, dhcp traffic
+          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export ISO_BOOT=true
+            export VM_MEM=8192
+            export VM_CPU=4
+          fi
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
-
           # If elemental-operator is a v1.0.x we should disable EMULATE_TPM
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
-
           # Disable EMULATE_TPM in case of upgrade test
           # This is because we don't know the version in advance, so easier to not use it
           if ${{ inputs.upgrade_image != '' }}      || \
@@ -419,7 +445,7 @@ jobs:
              ${{ contains(inputs.iso_to_test, '/Stable:/') }}; then
             unset EMULATE_TPM
           fi
-
+          # Execute bootstrapping test
           if ${{ inputs.sequential == 'true' }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
@@ -436,7 +462,6 @@ jobs:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
           cd tests && make e2e-upgrade-operator
-
           # Extract elemental-operator version
           OPERATOR_VERSION=$(kubectl get pod \
                              --namespace cattle-elemental-system \
@@ -445,6 +470,24 @@ jobs:
           # Export values
           echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+      - name: Upgrade Rancher Manager
+        if: inputs.test_type == 'cli' && inputs.rancher_upgrade != ''
+        id: rancher_upgrade
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
+          PROXY: ${{ inputs.proxy }}
+          PUBLIC_DNS: ${{ needs.create-runner.outputs.public_dns }}
+          PUBLIC_DOMAIN: bc.googleusercontent.com
+          RANCHER_UPGRADE: ${{ inputs.rancher_upgrade }}
+        run: |
+          cd tests && make e2e-upgrade-rancher-manager
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export values
+          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade node 1 to specified OS version with osImage
         if: inputs.test_type == 'cli' && inputs.upgrade_image != ''
         env:
@@ -461,7 +504,7 @@ jobs:
           VM_INDEX: 2
           VM_NUMBERS: 3
         run: cd tests && make e2e-upgrade-node
-      - name: Bootstrap additional nodes (with ISO) in pool "worker" (total of ${{ inputs.node_number }})
+      - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
           ISO_BOOT: true
@@ -469,6 +512,11 @@ jobs:
           VM_START: 4
           VM_END: ${{ inputs.node_number }}
         run: |
+          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export VM_MEM=8192
+            export VM_CPU=4
+          fi
           if ${{ inputs.sequential == 'true' }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
@@ -482,17 +530,18 @@ jobs:
         if: inputs.test_type == 'cli'
         run: sudo virsh list
       - name: Test Backup/Restore Elemental resources with Rancher Manager
-        if: inputs.test_type == 'cli'
+        if: inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s')
         env:
           BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
         run: cd tests && make e2e-backup-restore
       - name: Uninstall Elemental Operator
+        env:
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
         if: inputs.destroy_runner == true && inputs.test_type == 'cli'
         run: |
           OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
                              | awk -F ':' '{print substr($2,0,3)}')
-
           # Uninstallation of elemental-operator isn't supported on version v1.0.x
           if [[ "${OPERATOR_VERSION}" != "1.0" ]]; then
             cd tests && make e2e-uninstall-operator
@@ -510,7 +559,6 @@ jobs:
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-
             make e2e-get-logs
           )
       - name: Upload cluster logs
@@ -532,7 +580,13 @@ jobs:
           if ${{ inputs.iso_to_test != '' }}; then
             ISO_USED=${{ inputs.iso_to_test }}
           fi
-
+          # Get nodes configuration (use the first one, they are all identical)
+          NODE=$(sudo virsh list --name | head -1)
+          if [[ -n "${NODE}" ]]; then
+            VCPU=$(sudo virsh vcpucount --live ${NODE})
+            VMEM=$(sudo virsh dommemstat --live ${NODE} | awk '/^actual/ { print $2 }')
+            (( VMEM /= 1048576 ))
+          fi
           # Add summary
           echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
           echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
@@ -542,11 +596,13 @@ jobs:
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Type of cluster deployed: ${CLUSTER_TYPE:-normal}" >> ${GITHUB_STEP_SUMMARY}
           echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
-          echo "## Versions used" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Image: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental OS version: ${{ steps.component.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
@@ -555,13 +611,19 @@ jobs:
           if ${{ inputs.ui_account != '' }}; then
             echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
           fi
+          echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
           echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
           echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}
+          echo "Number of CPU: ${VCPU:-unknown}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Memory size: ${VMEM:-unknown}GB" >> ${GITHUB_STEP_SUMMARY}
           # Upgrade details
           if ${{ inputs.upgrade_image != '' }} || ${{ inputs.upgrade_os_channel != '' }}; then
             echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Rancher Manager Image: ${{ steps.rancher_upgrade.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
