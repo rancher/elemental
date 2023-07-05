@@ -2,6 +2,8 @@
 
 set -evx
 
+ELEMENTAL_ISO="/home/gh-runner/actions-runner/_work/elemental/elemental/elemental-from-cypress.iso"
+
 # Start a simple HTTP server for sharing some config files
 HTTP_SRV_CMD="python3 -m http.server"
 pushd ..
@@ -15,15 +17,16 @@ npm install
 
 # Start Cypress tests with docker
 docker run -v $PWD:/workdir -w /workdir                     \
-    -e RANCHER_USER=$RANCHER_USER                           \
+    -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
+    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
+    -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION           \
+    -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
+    -e OPERATOR_REPO=$OPERATOR_REPO                         \
+    -e PROXY=$PROXY                                         \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD                   \
     -e RANCHER_URL=$RANCHER_URL                             \
-    -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
+    -e RANCHER_USER=$RANCHER_USER                           \
     -e UI_ACCOUNT=$UI_ACCOUNT                               \
-    -e OPERATOR_VERSION=$OPERATOR_VERSION                   \
-    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
-    -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
-    -e PROXY=$PROXY                                         \
     -e UPGRADE_CHANNEL_LIST=$UPGRADE_CHANNEL_LIST           \
     -e UPGRADE_IMAGE=$UPGRADE_IMAGE                         \
     --add-host host.docker.internal:host-gateway            \
@@ -33,11 +36,12 @@ docker run -v $PWD:/workdir -w /workdir                     \
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
-# Move elemental.iso into the expected folder
-if [[ ${ISO_BOOT} == "true" ]]; then
-    mv downloads/*.iso ../../../elemental-from-cypress.iso
+# RKE2 as upstream cluster
+# We cannot use PXE boot so we have to boot from ISO 
+if [[ ! -f ${ELEMENTAL_ISO} ]] && grep rke <<< ${K8S_UPSTREAM_VERSION}; then
+  # Move elemental.iso into the expected folder
+  mv downloads/*.iso ${ELEMENTAL_ISO}
 fi
-
 popd
 
 # Kill the HTTP server

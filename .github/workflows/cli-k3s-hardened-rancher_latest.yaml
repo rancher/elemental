@@ -31,4 +31,3 @@ jobs:
       k8s_version_to_provision: v1.25.7+k3s1
       node_number: 3
       rancher_version: latest/devel
-      upstream_k3s_version: v1.25.7+k3s1

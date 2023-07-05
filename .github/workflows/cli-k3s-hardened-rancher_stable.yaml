@@ -30,4 +30,3 @@ jobs:
         --kube-apiserver-arg=--anonymous-auth=false"
       k8s_version_to_provision: v1.25.7+k3s1
       node_number: 3
-      upstream_k3s_version: v1.25.7+k3s1

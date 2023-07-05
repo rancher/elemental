@@ -1,0 +1,6 @@
+apiVersion: management.cattle.io/v3
+kind: DynamicSchema
+metadata:
+  labels:
+    cattle.io/creator: norman
+  name: machineinventoryselectortemplate

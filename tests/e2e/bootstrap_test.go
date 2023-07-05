@@ -80,8 +80,31 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	)
 
 	It("Provision the node", func() {
+		type pattern struct {
+			key   string
+			value string
+		}
+
 		// Set MachineRegistration name based on hostname
 		machineRegName := "machine-registration-" + poolType + "-" + clusterName
+		seedImageName := "seed-image-" + poolType + "-" + clusterName
+		baseImageURL := "http://192.168.122.1:8000/base-image.iso"
+
+		// Patterns to replace
+		patterns := []pattern{
+			{
+				key:   "%CLUSTER_NAME%",
+				value: clusterName,
+			},
+			{
+				key:   "%BASE_IMAGE%",
+				value: baseImageURL,
+			},
+			{
+				key:   "%POOL_TYPE%",
+				value: poolType,
+			},
+		}
 
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
@@ -115,32 +138,61 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
+		if isoBoot == "true" {
+			By("Adding SeedImage", func() {
+				// Set temporary file
+				seedimageTmp, err := misc.CreateTemp("seedimage")
+				Expect(err).To(Not(HaveOccurred()))
+				defer os.Remove(seedimageTmp)
+
+				// Set poweroff to false for master pool to have time to check SeedImage cloud-config
+				if poolType == "master" {
+					out, err := kubectl.Run("patch", "MachineRegistration",
+						"--namespace", clusterNS, machineRegName,
+						"--type", "merge", "-p", "{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
+					Expect(err).To(Not(HaveOccurred()), out)
+				}
+
+				// Save original file as it will have to be modified twice
+				misc.CopyFile(seedimageYaml, seedimageTmp)
+
+				// Create Yaml file
+				for _, p := range patterns {
+					err := tools.Sed(p.key, p.value, seedimageTmp)
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
+				// Apply to k8s
+				err = kubectl.Apply(clusterNS, seedimageTmp)
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Check that the seed image is correctly created
+				Eventually(func() string {
+					out, _ := kubectl.Run("get", "SeedImage",
+						"--namespace", clusterNS,
+						seedImageName,
+						"-o", "jsonpath={.status}")
+					return out
+				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+			})
+
+			By("Downloading ISO built by SeedImage", func() {
+				seedImageURL, err := kubectl.Run("get", "SeedImage",
+					"--namespace", clusterNS,
+					seedImageName,
+					"-o", "jsonpath={.status.downloadURL}")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = tools.GetFileFromURL(seedImageURL, "../../elemental-"+poolType+".iso", false)
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
+
 		if isoBoot != "true" {
 			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := misc.ConfigureiPXE()
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(numberOfFile).To(BeNumerically(">=", 1))
-			})
-		}
-
-		if isoBoot == "true" {
-			By("Adding registration file to ISO", func() {
-				// Check if generated ISO is already here
-				isIso, _ := exec.Command("bash", "-c", "ls ../../elemental-*.iso").Output()
-
-				// No need to recreate the ISO twice
-				if len(isIso) == 0 {
-					out, err := exec.Command(
-						"bash", "-c",
-						"../../.github/elemental-iso-add-registration "+installConfigYaml+" ../../build/elemental-*.iso",
-					).CombinedOutput()
-					GinkgoWriter.Printf("%s\n", out)
-					Expect(err).To(Not(HaveOccurred()))
-
-					// Move generated ISO to the destination directory
-					err = exec.Command("bash", "-c", "mv -f elemental-*.iso ../..").Run()
-					Expect(err).To(Not(HaveOccurred()))
-				}
 			})
 		}
 
@@ -181,6 +233,49 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		// Wait for all parallel jobs
 		wg.Wait()
+
+		// Loop on nodes to check that SeedImage cloud-config is correctly applied
+		// Only for master pool
+		if poolType == "master" && isoBoot == "true" {
+			for index := vmIndex; index <= numberOfVMs; index++ {
+				hostName := misc.SetHostname(vmNameRoot, index)
+				Expect(hostName).To(Not(BeNil()))
+
+				client, _ := GetNodeInfo(hostName)
+				Expect(client).To(Not(BeNil()))
+
+				wg.Add(1)
+				go func(h string, cl *tools.Client) {
+					defer wg.Done()
+					defer GinkgoRecover()
+
+					By("Checking SeedImage cloud-config on "+h, func() {
+						// Wait for SSH to be available
+						// NOTE: this also checks that the root password was correctly set by cloud-config
+						Eventually(func() string {
+							out, _ := cl.RunSSH("echo SSH_OK")
+							out = strings.Trim(out, "\n")
+							return out
+						}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+
+						// Check that the cloud-config is correctly applied by checking the presence of a file
+						_, err := cl.RunSSH("ls /etc/elemental-test")
+						Expect(err).To(Not(HaveOccurred()))
+
+						// Check that the installation is completed before halting the VM
+						Eventually(func() error {
+							_, err := cl.RunSSH("journalctl -u elemental-register.service --no-pager | grep 'elemental installation completed'")
+							return err
+						}, misc.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+
+						// Halt the VM
+						_, err = cl.RunSSH("setsid -f init 0")
+						Expect(err).To(Not(HaveOccurred()))
+					})
+				}(hostName, client)
+			}
+			wg.Wait()
+		}
 	})
 
 	It("Add the nodes in Rancher Manager", func() {
@@ -435,5 +530,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Checking cluster state after reboot", func() {
 			CheckClusterState(clusterNS, clusterName)
 		})
+
+		if isoBoot == "true" {
+			By("Removing the ISO", func() {
+				err := exec.Command("bash", "-c", "rm -f ../../elemental-*.iso").Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })

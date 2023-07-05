@@ -13,7 +13,7 @@ limitations under the License.
 */
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 filterTests(['main'], () => {
@@ -26,26 +26,34 @@ filterTests(['main'], () => {
       cy.visit('/');
     });
     
-    it('Deploy CIS Benchmark application', () => {
+    it('Deploy Alerting Drivers application', () => {
+      // Unfortunately, this wait is needed mainly with RKE2 because the cluster
+      // is switching status and it is hard to catch in automated way...
+      cy.wait(180000);
       topLevelMenu.openIfClosed();
+      cy.contains('Home')
+        .click();
+      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
+        .contains('Active',  {timeout: 300000});
       cy.contains(clusterName)
         .click();
       cy.contains('Apps')
         .click();
       cy.contains('Charts')
         .click();
-      cy.contains('CIS Benchmark')
+      cy.contains('Alerting Drivers', {timeout:30000})
         .click();
-      cy.contains('.name-logo-install', 'CIS Benchmark', {timeout:20000});
+      cy.contains('.name-logo-install', 'Alerting Drivers', {timeout:30000});
       cy.clickButton('Install');
+      cy.contains('.outer-container > .header', 'Alerting Drivers');
       cy.clickButton('Next');
       cy.clickButton('Install');
-      cy.contains('SUCCESS: helm upgrade', {timeout:30000});
+      cy.contains('SUCCESS: helm install', {timeout:120000});
       cy.reload;
-      cy.contains('CIS Benchmark');
+      cy.contains('Deployed rancher-alerting-drivers');
     });
   
-    it('Remove CIS Benchmark application', () => {
+    it('Remove Alerting Drivers application', () => {
       topLevelMenu.openIfClosed();
       cy.contains(clusterName)
         .click();
@@ -54,19 +62,12 @@ filterTests(['main'], () => {
       cy.contains('Installed Apps')
         .click();
       cy.contains('.title', 'Installed Apps', {timeout:20000});
-      cy.get('.ns-dropdown > .icon')
-        .click()
-        .type('cis-operator');
-      cy.contains('cis-operator')
-        .click();
-      cy.get('.ns-dropdown > .icon-chevron-up')
-        .click();
       cy.get('[width="30"] > .checkbox-outer-container')
         .click();
       cy.clickButton('Delete');
       cy.confirmDelete();
-      cy.contains('SUCCESS: helm uninstall', {timeout:30000});
-      cy.contains('.apps', 'CIS Benchmark')
+      cy.contains('SUCCESS: helm uninstall', {timeout:60000});
+      cy.contains('.apps', 'rancher-alerting-drivers')
         .should('not.exist');
     });
   });

@@ -44,6 +44,7 @@ const (
 	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	restoreYaml           = "../assets/restore.yaml"
+	seedimageYaml         = "../assets/seedImage.yaml"
 	selectorYaml          = "../assets/selector.yaml"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
@@ -52,37 +53,41 @@ const (
 )
 
 var (
-	arch                 string
-	backupRestoreVersion string
-	caType               string
-	CertManagerVersion   string
-	clusterName          string
-	clusterNS            string
-	clusterType          string
-	elementalSupport     string
-	emulateTPM           bool
-	rancherHostname      string
-	imageVersion         string
-	isoBoot              string
-	k8sVersion           string
-	numberOfVMs          int
-	operatorUpgrade      string
-	operatorVersion      string
-	osImage              string
-	poolType             string
-	proxy                string
-	rancherChannel       string
-	rancherLogCollector  string
-	rancherVersion       string
-	sequential           bool
-	testType             string
-	upgradeChannelList   string
-	upgradeImage         string
-	upgradeOsChannel     string
-	upgradeType          string
-	usedNodes            int
-	vmIndex              int
-	vmName               string
+	arch                  string
+	backupRestoreVersion  string
+	caType                string
+	CertManagerVersion    string
+	clusterName           string
+	clusterNS             string
+	clusterType           string
+	elementalSupport      string
+	emulateTPM            bool
+	rancherHostname       string
+	imageVersion          string
+	isoBoot               string
+	k8sUpstreamVersion    string
+	k8sVersion            string
+	numberOfVMs           int
+	operatorUpgrade       string
+	operatorRepo          string
+	osImage               string
+	poolType              string
+	proxy                 string
+	rancherChannel        string
+	rancherLogCollector   string
+	rancherVersion        string
+	rancherUpgrade        string
+	rancherUpgradeChannel string
+	rancherUpgradeVersion string
+	sequential            bool
+	testType              string
+	upgradeChannelList    string
+	upgradeImage          string
+	upgradeOsChannel      string
+	upgradeType           string
+	usedNodes             int
+	vmIndex               int
+	vmName                string
 )
 
 func CheckClusterState(ns, cluster string) {
@@ -146,14 +151,16 @@ var _ = BeforeSuite(func() {
 	rancherHostname = os.Getenv("PUBLIC_DNS")
 	index := os.Getenv("VM_INDEX")
 	isoBoot = os.Getenv("ISO_BOOT")
+	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
-	operatorVersion = os.Getenv("OPERATOR_VERSION")
+	operatorRepo = os.Getenv("OPERATOR_REPO")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
+	rancherUpgrade = os.Getenv("RANCHER_UPGRADE")
 	seqString := os.Getenv("SEQUENTIAL")
 	testType = os.Getenv("TEST_TYPE")
 	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
@@ -209,6 +216,13 @@ var _ = BeforeSuite(func() {
 		s := strings.Split(rancherVersion, "/")
 		rancherChannel = s[0]
 		rancherVersion = s[1]
+	}
+
+	// Extract Rancher Manager channel/version to upgrade
+	if rancherUpgrade != "" {
+		s := strings.Split(rancherUpgrade, "/")
+		rancherUpgradeChannel = s[0]
+		rancherUpgradeVersion = s[1]
 	}
 
 	// Start HTTP server

@@ -16,6 +16,7 @@ package e2e_test
 
 import (
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -24,6 +25,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/install"
 	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
@@ -37,22 +39,83 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 	}
 
 	It("Upgrade operator", func() {
-		err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
-			operatorUpgrade,
+		upgradeOrder := []string{"elemental-operator-crds", "elemental-operator"}
+
+		// Check if CRDs chart is already installed (not always the case in older versions)
+		chartList, err := exec.Command("helm",
+			"list",
+			"--no-headers",
 			"--namespace", "cattle-elemental-system",
-			"--create-namespace",
-		)
+		).CombinedOutput()
 		Expect(err).To(Not(HaveOccurred()))
+
+		if !strings.Contains(string(chartList), "-crds") {
+			upgradeOrder = []string{"elemental-operator", "elemental-operator-crds"}
+		}
+
+		for _, chart := range upgradeOrder {
+			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+				operatorUpgrade+"/"+chart+"-chart",
+				"--namespace", "cattle-elemental-system",
+				"--create-namespace",
+			)
+			Expect(err).To(Not(HaveOccurred()))
+		}
 
 		// Delay few seconds before checking, needed because we may have 2 pods at the same time
 		time.Sleep(misc.SetTimeout(30 * time.Second))
 
-		err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
-		Expect(err).To(Not(HaveOccurred()))
+		// Wait for all pods to be started
+		misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 	})
 })
 
-var _ = Describe("E2E - Upgrading node", Label("upgrade"), func() {
+var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manager"), func() {
+	// Create kubectl context
+	// Default timeout is too small, so New() cannot be used
+	k := &kubectl.Kubectl{
+		Namespace:    "",
+		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollInterval: 500 * time.Millisecond,
+	}
+
+	It("Upgrade Rancher Manager", func() {
+		// Get before-upgrade Rancher Manager version
+		getImageVersion := []string{
+			"get", "pod",
+			"--namespace", "cattle-system",
+			"-l", "app=rancher",
+			"-o", "jsonpath={.items[*].status.containerStatuses[*].image}",
+		}
+		versionBeforeUpgrade, err := kubectl.Run(getImageVersion...)
+		Expect(err).To(Not(HaveOccurred()))
+
+		// Upgrade Rancher Manager
+		install.DeployRancherManager(rancherHostname, rancherUpgradeChannel, rancherUpgradeVersion, caType, proxy)
+
+		// Wait for Rancher Manager to be running
+		checkList := [][]string{
+			{"cattle-system", "app=rancher"},
+			{"cattle-fleet-local-system", "app=fleet-agent"},
+			{"cattle-system", "app=rancher-webhook"},
+		}
+		misc.CheckPod(k, checkList)
+
+		// Check that all pods are using the same version
+		Eventually(func() int {
+			out, _ := kubectl.Run(getImageVersion...)
+			return len(strings.Fields(out))
+		}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(1))
+
+		// Get after-upgrade Rancher Manager version
+		// and check that it's different to the before-upgrade version
+		versionAfterUpgrade, err := kubectl.Run(getImageVersion...)
+		Expect(err).To(Not(HaveOccurred()))
+		Expect(versionAfterUpgrade).To(Not(Equal(versionBeforeUpgrade)))
+	})
+})
+
+var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 	var (
 		wg           sync.WaitGroup
 		value        string

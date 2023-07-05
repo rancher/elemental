@@ -14,8 +14,9 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import * as utils from "~/support/utils";
 
 Cypress.config();
 describe('Machine registration testing', () => {
@@ -24,6 +25,23 @@ describe('Machine registration testing', () => {
   const topLevelMenu  = new TopLevelMenu();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
+
+  before(() => {
+    (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+    cy.visit('/');
+
+    // Open the navigation menu
+    topLevelMenu.openIfClosed();
+
+    // Click on the Elemental's icon
+    elemental.accessElementalMenu(); 
+
+    // Create OS Version Channels from which to build the ISO
+    // No need to create one if we test stable because it is already created
+    // by the elemental-operator
+    utils.isOperatorVersion('dev') ? cy.addOsVersionChannel('dev'): null;
+    utils.isOperatorVersion('staging') ? cy.addOsVersionChannel('staging'): null;
+  });
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -51,61 +69,44 @@ describe('Machine registration testing', () => {
 
   filterTests(['main'], () => {
     it('Create machine registration with default options', () => {
-      cy.createMachReg({machRegName: 'default-options-test'});
+      cy.createMachReg('default-options-test');
     });
 
     it('Create machine registration with labels and annotations', () => {
-      cy.createMachReg({machRegName: 'labels-annotations-test',
-        checkLabels: true,
-        checkAnnotations: true});
+      cy.createMachReg('labels-annotations-test', 'fleet-default', true, true);
     });
 
     it('Delete machine registration', () => {
-      cy.createMachReg({machRegName: 'delete-test'});
-      cy.deleteMachReg({machRegName: 'delete-test'});
+      cy.createMachReg('delete-test');
+      cy.deleteMachReg('delete-test');
     });
 
     it('Edit a machine registration with edit config button', () => {
-      cy.createMachReg({machRegName: 'edit-config-test'});
-      cy.editMachReg({machRegName: 'edit-config-test',
-        addLabel: true,
-        addAnnotation: true });
+      cy.createMachReg('edit-config-test');
+      cy.editMachReg('edit-config-test', true, true);
       cy.getBySel('form-save')
         .contains('Save')
         .click();
 
       // Check that we can see our label and annotation in the YAML
-      cy.checkMachRegLabel({machRegName: 'edit-config-test',
-        labelName: 'myLabel1',
-        labelValue: 'myLabelValue1'});
-      cy.checkMachRegAnnotation({machRegName: 'edit-config-test',
-        annotationName: 'myAnnotation1',
-        annotationValue: 'myAnnotationValue1'});
+      cy.checkMachRegLabel('edit-config-test', 'myLabel1', 'myLabelValue1');
+      cy.checkMachRegAnnotation('edit-config-test', 'myAnnotation1', 'myAnnotationValue1');
     });
 
     it('Edit a machine registration with edit YAML button', () => {
-      cy.createMachReg({machRegName: 'edit-yaml-test'});
-      cy.editMachReg({machRegName: 'edit-yaml-test',
-        addLabel: true,
-        addAnnotation: true,
-        withYAML: true });
+      cy.createMachReg('edit-yaml-test');
+      cy.editMachReg('edit-yaml-test', true, true, true);
       cy.getBySel('action-button-async-button')
         .contains('Save')
         .click();
 
       // Check that we can see our label and annotation in the YAML
-      cy.checkMachRegLabel({machRegName: 'edit-yaml-test',
-        labelName: 'myLabel1',
-        labelValue: 'myLabelValue1'});
-      cy.checkMachRegAnnotation({machRegName: 'edit-yaml-test',
-        annotationName: 'myAnnotation1',
-        annotationValue: 'myAnnotationValue1'});
+      cy.checkMachRegLabel('edit-yaml-test', 'myLabel1', 'myLabelValue1');
+      cy.checkMachRegAnnotation('edit-yaml-test', 'myAnnotation1', 'myAnnotationValue1');
     });
 
     it('Clone a machine registration', () => {
-      cy.createMachReg({machRegName: 'clone-test',
-        checkLabels: true,
-        checkAnnotations: true});
+      cy.createMachReg('clone-test', 'fleet-default', true, true);
       cy.contains('clone-test')
         .click();
       cy.get('div.actions > .role-multi-action')
@@ -121,20 +122,16 @@ describe('Machine registration testing', () => {
         .should('exist');
       
       // Check that we got the same label and annotation in both machine registration
-      cy.checkMachRegLabel({machRegName: 'cloned-machine-reg',
-        labelName: 'myLabel1',
-        labelValue: 'myLabelValue1'});
+      cy.checkMachRegLabel('cloned-machine-reg','myLabel1', 'myLabelValue1');
       cy.contains('cloned-machine-reg')
         .click();
-      cy.checkMachRegAnnotation({machRegName: 'cloned-machine-reg',
-        annotationName: 'myAnnotation1',
-        annotationValue: 'myAnnotationValue1'});
+      cy.checkMachRegAnnotation('cloned-machine-reg', 'myAnnotation1', 'myAnnotationValue1');
       cy.contains('cloned-machine-reg')
         .click();
     });
 
     it('Download Machine registration YAML', () => {
-      cy.createMachReg({machRegName: 'download-yaml-test'});
+      cy.createMachReg('download-yaml-test');
       cy.contains('download-yaml-test')
         .click();
       cy.get('div.actions > .role-multi-action')
@@ -144,17 +141,33 @@ describe('Machine registration testing', () => {
       cy.verifyDownload('download-yaml-test.yaml');
     });
 
+    it('Check machine registration label name size', () => {
+      cy.checkLabelSize('name');
+    });
+
+    it('Check machine registration label value size', () => {
+      cy.checkLabelSize('value');
+    });
+
   // This test must stay the last one because we use this machine registration when we test adding a node.
   // It also tests using a custom cloud config by using read from file button.
     it('Create Machine registration we will use to test adding a node', () => {
-      cy.createMachReg({machRegName: 'machine-registration',
-        checkInventoryLabels: true,
-        checkInventoryAnnotations: true,
-        customCloudConfig: 'custom_cloud-config.yaml',
-        checkDefaultCloudConfig: false});
-      cy.checkMachInvLabel({machRegName: 'machine-registration',
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1'});
+      cy.createMachReg('machine-registration',
+        'fleet-default',
+        //checkLabels
+        false,
+        //checkAnnotations
+        false,
+        //checkInventoryLabels
+        true,
+        //checkInventoryAnnotations
+        true,
+        //checkIsoBuilding
+        true,
+        'custom_cloud-config.yaml',
+        //checkDefaultCloudConfig
+        false);
+      cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);
     });
   });
 
@@ -164,15 +177,22 @@ describe('Machine registration testing', () => {
   // We will move the test to the standard scenario later
   filterTests(['upgrade'], () => {
     it('Create Machine registration we will use to test adding a node', () => {
-      cy.createMachReg({machRegName: 'machine-registration',
-        checkInventoryLabels: true,
-        checkInventoryAnnotations: true,
-        checkIsoBuilding: true,
-        customCloudConfig: 'custom_cloud-config.yaml',
-        checkDefaultCloudConfig: false});
-      cy.checkMachInvLabel({machRegName: 'machine-registration',
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1'});
+      cy.createMachReg('machine-registration',
+      'fleet-default',
+      //checkLabels
+      false,
+      //checkAnnotations
+      false,
+      //checkInventoryLabels
+      true,
+      //checkInventoryAnnotations
+      true,
+      //checkIsoBuilding
+      true,
+      'custom_cloud-config.yaml',
+      //checkDefaultCloudConfig
+      false);
+      cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);
     });
   });
 });

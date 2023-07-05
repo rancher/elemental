@@ -51,7 +51,7 @@ stages:
         PERSISTENT_STATE_BIND: "true"
     - if: '[ -f "/run/cos/recovery_mode" ]'
       # omit the persistent partition on recovery mode
-      name: "Layout configuration"
+      name: "Layout configuration for recovery"
       environment_file: /run/cos/cos-layout.env
       environment:
         OVERLAY: "tmpfs:25%"

@@ -14,7 +14,7 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 Cypress.config();
@@ -58,10 +58,7 @@ describe('Machine inventory testing', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('my-machine')
         .click()
-      cy.checkMachInvLabel({machRegName: 'machine-registration',
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1',
-        afterBoot: true});
+      cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', true);
       for (var hwLabel in hwLabels) { 
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.get('.table-options-group > .btn > .icon')
@@ -130,7 +127,7 @@ describe('Machine inventory testing', () => {
         .click();
       // The new cluster must be in active state
       cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active');
+        .contains('Active',  {timeout: 300000});
       // Go into the dedicated cluster page
       topLevelMenu.openIfClosed();
       cy.contains(clusterName)

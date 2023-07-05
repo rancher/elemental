@@ -15,6 +15,8 @@ limitations under the License.
 package e2e_test
 
 import (
+	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -47,11 +49,26 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		})
 
 		By("Uninstalling Operator via Helm", func() {
-			err := kubectl.RunHelmBinaryWithCustomErr(
-				"uninstall", "elemental-operator",
-				"--namespace", "cattle-elemental-system",
-			)
-			Expect(err).To(Not(HaveOccurred()))
+			for _, chart := range []string{"elemental-operator", "elemental-operator-crds"} {
+				if strings.Contains(chart, "-crds") {
+					// Check if CRDs chart is available (not always the case in older versions)
+					chartList, err := exec.Command("helm",
+						"list",
+						"--no-headers",
+						"--namespace", "cattle-elemental-system",
+					).CombinedOutput()
+					Expect(err).To(Not(HaveOccurred()))
+
+					if !strings.Contains(string(chartList), chart) {
+						continue
+					}
+				}
+				err := kubectl.RunHelmBinaryWithCustomErr(
+					"uninstall", chart,
+					"--namespace", "cattle-elemental-system",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+			}
 		})
 
 		By("Testing cluster resource availability AFTER operator uninstallation", func() {
@@ -84,16 +101,25 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 	It("Re-install Elemental Operator", func() {
 		By("Installing Operator via Helm", func() {
-			operatorChart := "oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart"
-			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", "elemental-operator",
-				operatorChart,
-				"--namespace", "cattle-elemental-system",
-				"--create-namespace",
-			)
-			Expect(err).To(Not(HaveOccurred()))
+			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
+				// Check if CRDs chart is available (not always the case in older versions)
+				// Anyway, if it is needed and missing the next chart installation will fail too
+				if strings.Contains(chart, "-crds") {
+					noChart := kubectl.RunHelmBinaryWithCustomErr("show", "readme", operatorRepo+"/"+chart+"-chart")
+					if noChart != nil {
+						continue
+					}
+				}
+				err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+					operatorRepo+"/"+chart+"-chart",
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+				)
+				Expect(err).To(Not(HaveOccurred()))
+			}
 
-			err = k.WaitForNamespaceWithPod("cattle-elemental-system", "app=elemental-operator")
-			Expect(err).To(Not(HaveOccurred()))
+			// Wait for pod to be started
+			misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 		})
 
 		By("Creating a dumb MachineRegistration", func() {
