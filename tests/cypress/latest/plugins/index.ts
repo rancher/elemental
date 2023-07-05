@@ -36,6 +36,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.password             = process.env.RANCHER_PASSWORD;
   config.env.proxy_ip             = process.env.PROXY_IP;
   config.env.proxy                = process.env.PROXY;
+  config.env.rancher_version      = process.env.RANCHER_VERSION;
   config.env.ui_account           = process.env.UI_ACCOUNT;
   config.env.upgrade_channel_list = process.env.UPGRADE_CHANNEL_LIST;
   config.env.upgrade_image        = process.env.UPGRADE_IMAGE;
