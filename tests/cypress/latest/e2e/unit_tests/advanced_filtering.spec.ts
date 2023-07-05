@@ -45,36 +45,26 @@ filterTests(['main'], () => {
       ]);
 
       machineInventoryMap.forEach((value, key) => {
-        cy.importMachineInventory({machineInventoryFile: key +'.yaml',
-          machineInventoryName: value});
+        cy.importMachineInventory(key +'.yaml', value);
       });
     });
   
     it('Two machine inventories should appear by filtering on test-filter', () => {
       // Only test-filter-one and test-filter-two should appear with test-filter as filter
-      cy.checkFilter({filterName: 'test-filter',
-        testFilterOne: true,
-        testFilterTwo: true,
-        shouldNotMatch: false});
+      cy.checkFilter('test-filter', true, true, false);
     });
   
     it('One machine inventory should appear by filtering on test-filter-one', () => {
       // Only test-filter-one should appear with test-filter-one and Test-Filter_One as filter
       // Checking with lower and upper case make sure we are not hitting https://github.com/rancher/elemental/issues/627
       ['test-filter-one', 'Test-Filter-One'].forEach(filter => {
-        cy.checkFilter({filterName: filter,
-          testFilterOne: true,
-          testFilterTwo: false,
-          shouldNotMatch: false});
+        cy.checkFilter(filter, true, false, false);
       });
     });
   
     it('No machine inventory should appear by filtering on test-bad-filter', () => {
       // This test will also serve as no regression test for https://github.com/rancher/elemental-ui/issues/41
-      cy.checkFilter({filterName: 'test-bad-filter',
-        testFilterOne: false,
-        testFilterTwo: false,
-        shouldNotMatch: false});
+      cy.checkFilter('test-bad-filter', false, false, false);
       cy.contains('There are no rows which match your search query.')
     });
   
