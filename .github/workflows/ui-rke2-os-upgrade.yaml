@@ -45,6 +45,6 @@ jobs:
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal-dev-channel/5.3:latest
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/teal53/15.4/rancher/elemental-teal/5.3:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upstream_cluster_version: v1.25.7+rke2r1
