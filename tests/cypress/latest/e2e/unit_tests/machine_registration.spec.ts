@@ -36,11 +36,8 @@ describe('Machine registration testing', () => {
     // Click on the Elemental's icon
     elemental.accessElementalMenu(); 
 
-    // Create OS Version Channels from which to build the ISO
-    // No need to create one if we test stable because it is already created
-    // by the elemental-operator
-    utils.isOperatorVersion('dev') ? cy.addOsVersionChannel('dev'): null;
-    utils.isOperatorVersion('staging') ? cy.addOsVersionChannel('staging'): null;
+    // In upgrade scenario, we want to build ISO from stable channel
+    utils.isCypressTag('upgrade') ? cy.addOsVersionChannel('stable'): null;
   });
 
   beforeEach(() => {
