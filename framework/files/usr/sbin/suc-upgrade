@@ -60,19 +60,19 @@ function isActiveSystem() {
 (
     flock -w $LOCK_TIMEOUT 200 || exit 1
 
-    if [ "$FORCE" != "true" ]; then
-        if ! SYSSTATUS=`nsenter -i -m -t 1 -- systemctl is-system-running`; then
-           case "$SYSSTATUS" in
-           stopping)
-               # Exit if there is a shutdown process already going on
-               exit 1
-               ;;
-           *)
-               # other states (degraded, maintenance...) should not stop OS upgrades, see https://github.com/rancher/elemental/issues/901
-               ;;
-           esac
-        fi
+    if ! SYSSTATUS=`nsenter -i -m -t 1 -- systemctl is-system-running`; then
+        case "$SYSSTATUS" in
+        stopping)
+            # Exit if there is a shutdown process already going on
+            exit 1
+            ;;
+        *)
+            # other states (degraded, maintenance...) should not stop OS upgrades, see https://github.com/rancher/elemental/issues/901
+            ;;
+        esac
+    fi
 
+    if [ "$FORCE" != "true" ]; then
         if isEqualVersion; then
             echo "Upgrade already done with release:"
             cat ${HOST_DIR}${RELEASE_FILE}
