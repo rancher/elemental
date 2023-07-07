@@ -8,7 +8,5 @@ After=network-online.target
 EnvironmentFile=-/etc/default/elemental
 EnvironmentFile=-/etc/sysconfig/proxy
 Type=oneshot
-Restart=on-failure
-RestartSec=5s
-ExecStart=/usr/sbin/elemental-register --debug /run/initramfs/live
+ExecStart=/usr/sbin/elemental-register --debug
 
