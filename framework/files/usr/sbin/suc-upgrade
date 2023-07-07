@@ -59,27 +59,28 @@ function isActiveSystem() {
 
 (
     flock -w $LOCK_TIMEOUT 200 || exit 1
-    if ! SYSSTATUS=`nsenter -i -m -t 1 -- systemctl is-system-running`; then
-        case "$SYSSTATUS" in
-        degraded)
-            # degraded state should not stop OS upgrades, see https://github.com/rancher/elemental/issues/901
-            ;;
-	*)
-            # Exit if there is a shutdown process already going on or if the system is booting
-            exit 1
-	    ;;
-        esac
-    fi
-
-    if isEqualVersion; then
-        echo "Upgrade already done with release:"
-        cat ${HOST_DIR}${RELEASE_FILE}
-
-        config
-        exit 0
-    fi
 
     if [ "$FORCE" != "true" ]; then
+        if ! SYSSTATUS=`nsenter -i -m -t 1 -- systemctl is-system-running`; then
+           case "$SYSSTATUS" in
+           stopping)
+               # Exit if there is a shutdown process already going on
+               exit 1
+               ;;
+           *)
+               # other states (degraded, maintenance...) should not stop OS upgrades, see https://github.com/rancher/elemental/issues/901
+               ;;
+           esac
+        fi
+
+        if isEqualVersion; then
+            echo "Upgrade already done with release:"
+            cat ${HOST_DIR}${RELEASE_FILE}
+
+            config
+            exit 0
+        fi
+
         if ! isHigherVersion; then
             echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
             cat ${HOST_DIR}${RELEASE_FILE}
