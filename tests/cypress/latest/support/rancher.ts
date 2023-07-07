@@ -54,6 +54,25 @@ export class Rancher {
     return cy.get('.option .icon.group-icon.icon-'+iconName);
   } 
   
+  createUser(username: string, password: string, role?: string) {
+    this.burgerMenuOpenIfClosed();
+    cy.contains('Users & Authentication')
+      .click();
+    cy.contains('.title', 'Users')
+      .should('exist');
+    cy.clickButton('Create');
+    cy.typeValue('Username', username);
+    cy.typeValue('New Password', password);
+    cy.typeValue('Confirm Password', password);
+    if (role) {
+      cy.contains(role)
+        .click();
+    }
+    cy.getBySel('form-save')
+      .contains('Create')
+      .click();
+  }
+
   enableExtensionSupport(withRancherRepo: boolean) {
     cy.contains('Extensions')
       .click();
@@ -69,7 +88,7 @@ export class Rancher {
   cy.get('.tabs', {timeout: 40000})
     .contains('Installed Available Updates All');
   };
-  
+
   // Handle first login in Rancher
   firstLogin() {
     cy.visit('/auth/login');

@@ -30,42 +30,18 @@ describe('User role testing', () => {
   });
 
   filterTests(['main', 'upgrade'], () => {
-    it('Create elemental user', () => {
-      // User with the elemental-administrator role
-      cy.login();
-      rancher.burgerMenuOpenIfClosed();
-      cy.getBySel('side-menu')
-        .contains('Users & Authentication')
-        .click();
-      cy.contains('.title', 'Users')
-        .should('exist');
-      cy.clickButton('Create');
-      cy.typeValue('Username', stdUser);
-      cy.typeValue('New Password', uiPassword);
-      cy.typeValue('Confirm Password', uiPassword);
-      cy.clickButton('Create');
-    });
-
     it('Create standard user', () => {
       // User without the elemental-administrator role
       cy.login();
       rancher.burgerMenuOpenIfClosed();
-      cy.getBySel('side-menu')
-        .contains('Users & Authentication')
-        .click();
-      cy.contains('.title', 'Users')
-        .should('exist');
-      cy.getBySel('masthead-create')
-        .contains('Create')
-        .click();
-      cy.typeValue('Username', elementalUser);
-      cy.typeValue('New Password', uiPassword);
-      cy.typeValue('Confirm Password', uiPassword);
-      cy.contains('Elemental Administrator')
-        .click();
-      cy.getBySel('form-save')
-        .contains('Create')
-        .click();
+      rancher.createUser(stdUser, uiPassword);
+    });
+
+    it('Create elemental user', () => {
+      // User with the elemental-administrator role
+      cy.login();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.createUser(elementalUser, uiPassword, 'Elemental Administrator');
     });
   });
 
