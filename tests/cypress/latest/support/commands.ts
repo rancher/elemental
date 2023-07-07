@@ -241,7 +241,12 @@ Cypress.Commands.add('createMachReg', (
       // before releasing, we want to test staging/stable artifacts 
       cy.getBySel('select-os-version-build-iso')
       .click();
-      if (utils.isOperatorVersion('stable')) {
+      // Never build from dev ISO in upgrade scenario
+      if (utils.isCypressTag('upgrade')) {
+        // Stable operator version is hardcoded for now
+        // Will try to improve it in next version
+        utils.isOperatorVersion('staging') ? cy.contains('Elemental Teal ISO x86_64 latest-staging').click() : cy.contains('Elemental Teal ISO x86_64 v1.1.5').click();
+      } else if (utils.isOperatorVersion('stable')) {
         cy.contains('Elemental Teal ISO x86_64 v1.1.5')
           .click();
       } else if (utils.isOperatorVersion('staging')) {

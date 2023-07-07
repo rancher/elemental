@@ -41,7 +41,7 @@ LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
 LABEL org.opensuse.reference="%%IMG_REPO%%/rancher/elemental-teal/5.3"
 LABEL org.openbuildservice.disturl="%DISTURL%"
-LABEL com.suse.supportlevel="techpreview"
+LABEL com.suse.supportlevel="l3"
 # endlabelprefix
 
 # Ensure /tmp is mounted as tmpfs by default

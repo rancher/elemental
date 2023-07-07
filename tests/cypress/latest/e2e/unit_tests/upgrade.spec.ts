@@ -42,11 +42,6 @@ describe('Upgrade tests', () => {
     elemental.accessElementalMenu(); 
   });
   filterTests(['upgrade'], () => {
-    it('Create an OS Version Channels', () => {
-      // System was built with stable ISO, so we can upgrade either to staging or dev
-      utils.isOperatorVersion('staging') ? cy.addOsVersionChannel('staging'): cy.addOsVersionChannel('dev');
-    });
-
     it('Check OS Versions', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
       utils.isOperatorVersion('dev') ? cy.contains('Active latest-dev', {timeout: 120000}): null;
@@ -54,6 +49,17 @@ describe('Upgrade tests', () => {
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
+      // TODO: Make function to check cluster status
+      // Will come in the refactoring PR
+      topLevelMenu.openIfClosed();
+      cy.contains('Home')
+        .click();
+      // The new cluster must be in active state
+      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
+        .contains('Active',  {timeout: 600000});
+      topLevelMenu.openIfClosed();
+      elemental.accessElementalMenu();
+      /////////////////////////////////////////
       // K3s cluster upgraded with OS Image
       // RKE2 cluster upgraded with OS version channel
       cy.clickNavMenu(["Advanced", "Update Groups"]);
@@ -145,34 +151,6 @@ describe('Upgrade tests', () => {
       cy.getBySel('cluster-target')
         .click();
       cy.contains('Sorry, no matching options');
-    });
-
-    it('Delete OS Versions', () => {
-      cy.clickNavMenu(["Advanced", "OS Versions"]);
-      // TODO: COULD BE IMPROVED / SIMPLIFIED
-      if (utils.isOperatorVersion('dev')) {
-        cy.contains('latest-dev')
-          .parent()
-          .parent()
-          .click();
-        cy.getBySel('sortable-table-promptRemove')
-        .contains('Delete')
-          .click()
-        cy.confirmDelete();
-        cy.contains('latest-dev')
-          .should('not.exist');
-      } else if (utils.isOperatorVersion('staging')) {
-        cy.contains('latest-staging')
-          .parent()
-          .parent()
-          .click();
-        cy.getBySel('sortable-table-promptRemove')
-        .contains('Delete')
-          .click()
-        cy.confirmDelete();
-        cy.contains('latest-staging')
-          .should('not.exist');
-      }
     });
 
     it('Delete OS Versions Channels', () => {
