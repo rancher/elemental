@@ -29,12 +29,14 @@ filterTests(['main'], () => {
     it('Deploy Alerting Drivers application', () => {
       // Unfortunately, this wait is needed mainly with RKE2 because the cluster
       // is switching status and it is hard to catch in automated way...
-      cy.wait(180000);
-      rancher.burgerMenuOpenIfClosed();
-      cy.contains('Home')
-        .click();
-      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active',  {timeout: 300000});
+      //cy.wait(180000);
+      //rancher.burgerMenuOpenIfClosed();
+      //cy.contains('Home')
+      //  .click();
+      //cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
+      //  .contains('Active',  {timeout: 300000});
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      // TODO: function to deploy app?
       cy.contains(clusterName)
         .click();
       cy.contains('Apps')
