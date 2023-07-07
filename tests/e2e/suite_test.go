@@ -29,6 +29,7 @@ import (
 )
 
 const (
+	appYaml               = "../assets/hello-world_app.yaml"
 	clusterYaml           = "../assets/cluster.yaml"
 	backupYaml            = "../assets/backup.yaml"
 	emulateTPMYaml        = "../assets/emulateTPM.yaml"

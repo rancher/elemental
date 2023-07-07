@@ -222,7 +222,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Check issuer for Private CA
 			if caType == "private" {
 				Eventually(func() error {
-					out, err := exec.Command("bash", "-c", "curl -vk https://"+rancherHostname).CombinedOutput()
+					out, err := exec.Command("curl", "-vk", "https://"+rancherHostname).CombinedOutput()
 					if err != nil {
 						// Show only if there's no error
 						GinkgoWriter.Printf("%s\n", out)
@@ -248,14 +248,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Getting Rancher Manager local cluster CA
 			// NOTE: loop until the cmd return something, it could take some time
 			var rancherCA string
-			cmd := []string{
-				"get", "secret",
-				"--namespace", "cattle-system",
-				"tls-rancher-ingress",
-				"-o", "jsonpath={.data.tls\\.crt}",
-			}
 			Eventually(func() error {
-				rancherCA, err = kubectl.Run(cmd...)
+				rancherCA, err = kubectl.Run("get", "secret",
+					"--namespace", "cattle-system",
+					"tls-rancher-ingress",
+					"-o", "jsonpath={.data.tls\\.crt}",
+				)
 				return err
 			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 

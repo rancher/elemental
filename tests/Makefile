@@ -69,12 +69,16 @@ e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
 e2e-backup-restore: deps
 	ginkgo --label-filter test-backup-restore -r -v ./e2e
+e2e-check-app: deps
+	ginkgo --label-filter check-app -r -v ./e2e
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
 e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
 e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e
+e2e-install-app: deps
+	ginkgo --label-filter install-app -r -v ./e2e
 e2e-install-backup-restore: deps
 	ginkgo --label-filter install-backup-restore -r -v ./e2e
 e2e-ui-rancher: deps
