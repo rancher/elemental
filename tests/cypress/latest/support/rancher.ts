@@ -21,9 +21,11 @@ export class Rancher {
       .click();
   }
 
-  burgerMenuToggle() {
-    cy.getBySel('top-level-menu', {timeout: 12000})
+  addRepository(repositoryName: string, repositoryURL: string, repositoryType: string) {
+    this.burgerMenuOpenIfClosed();
+    cy.contains('local')
       .click();
+    cy.addHelmRepo(repositoryName, repositoryURL, repositoryType);
   };
 
   burgerMenuOpenIfClosed() {
@@ -34,11 +36,18 @@ export class Rancher {
     });
   };
 
-  addRepository(repositoryName: string, repositoryURL: string, repositoryType: string) {
-    this.burgerMenuOpenIfClosed();
-    cy.contains('local')
+  burgerMenuToggle() {
+    cy.getBySel('top-level-menu', {timeout: 12000})
       .click();
-    cy.addHelmRepo(repositoryName, repositoryURL, repositoryType);
+  };
+
+  checkClusterStatus(clusterName: string, clusterStatus: string, timeout: number) {
+    this.burgerMenuOpenIfClosed();
+      cy.contains('Home')
+        .click();
+      // The new cluster must be in active state
+      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
+        .contains(clusterStatus,  {timeout: timeout});
   };
 
   checkNavIcon(iconName: string) {

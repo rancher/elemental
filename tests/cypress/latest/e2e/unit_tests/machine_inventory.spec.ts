@@ -44,7 +44,7 @@ describe('Machine inventory testing', () => {
   });
 
   filterTests(['main'], () => {
-    it.skip('Check that machine inventory has been created', () => {
+    it('Check that machine inventory has been created', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('Namespace: fleet-default')
       cy.getBySel('sortable-cell-0-0')
@@ -55,7 +55,7 @@ describe('Machine inventory testing', () => {
         .should('exist');
     });
 
-    it.skip('Check we can see our embedded hardware labels', () => {
+    it('Check we can see our embedded hardware labels', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('my-machine')
         .click()
@@ -122,22 +122,16 @@ describe('Machine inventory testing', () => {
         }
       }
       cy.clickButton('Create');
-      cy.contains('Updating ' + clusterName, {timeout: 360000});
-      // Increase timeout to 10 minutes to allow the cluster to be created
-      // If it fails again, try to reload the page instead of increasing the timeout 
-      cy.contains('Active ' + clusterName, {timeout: 600000});
+      // This wait can be replaced by something cleaner
+      cy.wait(3000);
+      rancher.checkClusterStatus(clusterName, 'Updating', 300000);
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
     });
   });
   
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
-      rancher.burgerMenuOpenIfClosed();
-      cy.contains('Home')
-        .click();
-      // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active',  {timeout: 300000});
-      // Go into the dedicated cluster page
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
       rancher.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();

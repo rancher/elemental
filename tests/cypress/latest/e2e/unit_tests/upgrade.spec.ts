@@ -46,14 +46,7 @@ describe('Upgrade tests', () => {
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
-      // TODO: Make function to check cluster status
-      // Will come in the refactoring PR
-      rancher.burgerMenuOpenIfClosed();
-      cy.contains('Home')
-        .click();
-      // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active',  {timeout: 600000});
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
       rancher.burgerMenuOpenIfClosed();
       rancher.accesMenu('OS Management');
       /////////////////////////////////////////
@@ -103,7 +96,7 @@ describe('Upgrade tests', () => {
       // Workaround to avoid sporadic issue with Upgrade
       // https://github.com/rancher/elemental/issues/410
       // Restart fleet agent inside downstream cluster
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.getBySel('side-menu')
         .contains(clusterName)
         .click();
