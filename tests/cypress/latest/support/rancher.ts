@@ -16,6 +16,11 @@ limitations under the License.
 // /////////////////
 
 export class Rancher {
+  accesMenu(menu: string) {
+    cy.contains(menu)
+      .click();
+  }
+
   burgerMenuToggle() {
     cy.getBySel('top-level-menu', {timeout: 12000})
       .click();
@@ -35,6 +40,10 @@ export class Rancher {
       .click();
     cy.addHelmRepo(repositoryName, repositoryURL, repositoryType);
   };
+
+  checkNavIcon(iconName: string) {
+    return cy.get('.option .icon.group-icon.icon-'+iconName);
+  } 
   
   // Handle first login in Rancher
   firstLogin() {

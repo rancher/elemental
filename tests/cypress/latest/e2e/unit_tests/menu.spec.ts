@@ -31,22 +31,21 @@ filterTests(['main'], () => {
     });
   
     it('Check Elemental logo', () => {
-      rancher.burgerMenuOpenIfClosed();
-  
       // Elemental's icon should appear in the side menu
-        elemental.elementalIcon()
-          .should('exist');
+      rancher.burgerMenuOpenIfClosed();
+      rancher.checkNavIcon('elemental')
+        .should('exist');
     });
     
     it('Check Elemental menu', () => {
       rancher.burgerMenuOpenIfClosed();
   
       // Elemental's icon should appear in the side menu
-      elemental.elementalIcon()
+      rancher.checkNavIcon('elemental')
         .should('exist');
   
       // Click on the Elemental's icon
-      elemental.accessElementalMenu(); 
+      rancher.accesMenu('OS Management');
   
       // Check Elemental's side menu
       elemental.checkElementalNav();

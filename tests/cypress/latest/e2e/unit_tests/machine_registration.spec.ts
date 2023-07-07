@@ -34,7 +34,7 @@ describe('Machine registration testing', () => {
     rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
 
     // In upgrade scenario, we want to build ISO from stable channel
     utils.isCypressTag('upgrade') ? cy.addOsVersionChannel('stable'): null;
@@ -48,7 +48,7 @@ describe('Machine registration testing', () => {
     rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
     
     // Delete all files previously downloaded
     cy.exec('rm cypress/downloads/*', {failOnNonZeroExit: false});

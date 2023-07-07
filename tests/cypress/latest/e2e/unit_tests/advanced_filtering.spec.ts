@@ -34,7 +34,7 @@ filterTests(['main'], () => {
       rancher.burgerMenuOpenIfClosed();
   
       // Click on the Elemental's icon
-      elemental.accessElementalMenu(); 
+      rancher.accesMenu('OS Management');
     });
   
     it('Create fake machine inventories', () => {

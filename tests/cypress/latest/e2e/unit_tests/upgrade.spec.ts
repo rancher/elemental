@@ -13,7 +13,6 @@ limitations under the License.
 
 import { Rancher } from '~/support/rancher';
 import '~/support/commands';
-import { Elemental } from '~/support/elemental';
 import 'cypress-file-upload';
 import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
@@ -23,7 +22,6 @@ Cypress.config();
 describe('Upgrade tests', () => {
   const channelName              = "mychannel"
   const clusterName              = "mycluster"
-  const elemental                = new Elemental();
   const elementalUser            = "elemental-user"
   const rancher                  = new Rancher();
   const uiAccount                = Cypress.env('ui_account');
@@ -38,7 +36,7 @@ describe('Upgrade tests', () => {
     rancher.burgerMenuOpenIfClosed();    
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
   });
   filterTests(['upgrade'], () => {
     it('Check OS Versions', () => {
@@ -50,14 +48,14 @@ describe('Upgrade tests', () => {
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
       // TODO: Make function to check cluster status
       // Will come in the refactoring PR
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.contains('Home')
         .click();
       // The new cluster must be in active state
       cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
         .contains('Active',  {timeout: 600000});
-      topLevelMenu.openIfClosed();
-      elemental.accessElementalMenu();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.accesMenu('OS Management');
       /////////////////////////////////////////
       // K3s cluster upgraded with OS Image
       // RKE2 cluster upgraded with OS version channel
@@ -123,7 +121,7 @@ describe('Upgrade tests', () => {
 
       // Check if the node reboots to apply the upgrade
       rancher.burgerMenuOpenIfClosed();    
-      elemental.accessElementalMenu();
+      rancher.accesMenu('OS Management');
       cy.clickNavMenu(["Dashboard"]);
       cy.getBySel('card-clusters')
         .contains('Manage Elemental Clusters')

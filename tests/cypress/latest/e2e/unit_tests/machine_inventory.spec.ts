@@ -40,7 +40,7 @@ describe('Machine inventory testing', () => {
     rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
   });
 
   filterTests(['main'], () => {

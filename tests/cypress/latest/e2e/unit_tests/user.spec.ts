@@ -75,8 +75,8 @@ describe('User role testing', () => {
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
       rancher.burgerMenuOpenIfClosed();
-      elemental.elementalIcon().should('exist');
-      elemental.accessElementalMenu();
+      rancher.checkNavIcon('elemental').should('exist');
+      rancher.accesMenu('OS Management');
       elemental.checkElementalNav();
     });
 
@@ -85,8 +85,8 @@ describe('User role testing', () => {
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
       rancher.burgerMenuOpenIfClosed();
-      elemental.elementalIcon().should('exist');
-      elemental.accessElementalMenu();
+      rancher.checkNavIcon('elemental').should('exist');
+      rancher.accesMenu('OS Management');
       // User without appropriate role will get a specific page
       cy.getBySel('elemental-icon')
         .should('exist');

@@ -26,12 +26,6 @@ export class Elemental {
       .click();
   }
 
-  // Go into the Elemental menu
-  accessElementalMenu() {
-    cy.contains('OS Management')
-      .click();
-  }
-
   // Make sure we get all menus
   checkElementalNav() {
     // Open advanced accordion
@@ -54,9 +48,4 @@ export class Elemental {
     expect($lis.eq(6)).to.contain('Seed Images');
     })      
   }
-
-  // Make sure Elemental logo appears
-  elementalIcon() {
-    return cy.get('.option .icon.group-icon.icon-elemental');
-  } 
 }
