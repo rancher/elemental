@@ -68,11 +68,9 @@
 ## `upgrade.spec.ts`
 
 - **Describe:** Upgrade tests
-    - **It:** Create an OS Version Channels
     - **It:** Check OS Versions
     - **It:** Upgrade one node different methods if rke2 or k3s)
     - **It:** Cannot create two upgrade groups targeting the same cluster
-    - **It:** Delete OS Versions
     - **It:** Delete OS Versions Channels
 
 ## `user.spec.ts`
