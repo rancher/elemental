@@ -14,7 +14,7 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 Cypress.config();
@@ -40,9 +40,9 @@ describe('User role testing', () => {
       cy.contains('.title', 'Users')
         .should('exist');
       cy.clickButton('Create');
-      cy.typeValue({label: 'Username', value: stdUser});
-      cy.typeValue({label: 'New Password', value: uiPassword});
-      cy.typeValue({label: 'Confirm Password', value: uiPassword});
+      cy.typeValue('Username', stdUser);
+      cy.typeValue('New Password', uiPassword);
+      cy.typeValue('Confirm Password', uiPassword);
       cy.clickButton('Create');
     });
 
@@ -58,9 +58,9 @@ describe('User role testing', () => {
       cy.getBySel('masthead-create')
         .contains('Create')
         .click();
-      cy.typeValue({label: 'Username', value: elementalUser});
-      cy.typeValue({label: 'New Password', value: uiPassword});
-      cy.typeValue({label: 'Confirm Password', value: uiPassword});
+      cy.typeValue('Username', elementalUser);
+      cy.typeValue('New Password', uiPassword);
+      cy.typeValue('Confirm Password', uiPassword);
       cy.contains('Elemental Administrator')
         .click();
       cy.getBySel('form-save')

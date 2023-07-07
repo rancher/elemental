@@ -14,8 +14,9 @@ limitations under the License.
 
 import { TopLevelMenu } from '~/support/toplevelmenu';
 import { Elemental } from '~/support/elemental';
-import '~/support/functions';
+import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import { isRancherManagerVersion } from '../../support/utils';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
@@ -58,10 +59,7 @@ describe('Machine inventory testing', () => {
       cy.clickNavMenu(["Inventory of Machines"]);
       cy.contains('my-machine')
         .click()
-      cy.checkMachInvLabel({machRegName: 'machine-registration',
-        labelName: 'myInvLabel1',
-        labelValue: 'myInvLabelValue1',
-        afterBoot: true});
+      cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', true);
       for (var hwLabel in hwLabels) { 
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.get('.table-options-group > .btn > .icon')
@@ -105,15 +103,23 @@ describe('Machine inventory testing', () => {
           .click();
         cy.get(':nth-child(7) > input')
           .type('HTTPS_PROXY');
-        cy.get(':nth-child(8) > .no-resize')
-          .type(proxy);
+        if (isRancherManagerVersion('-head')) {
+          cy.get(':nth-child(8) > > [data-testid="text-area-auto-grow"]').type(proxy);
+        } else {
+          cy.get(':nth-child(8) > .no-resize').type(proxy);
+        }
         cy.get('#agentEnv > .key-value')
           .contains('Add')
           .click();
         cy.get(':nth-child(10) > input')
           .type('NO_PROXY');
-        cy.get(':nth-child(11) > .no-resize')
+        if (isRancherManagerVersion('-head')) {
+          cy.get(':nth-child(11) > > [data-testid="text-area-auto-grow"]')
+            .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+        } else {
+          cy.get(':nth-child(11) > .no-resize')
           .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+        }
       }
       cy.clickButton('Create');
       cy.contains('Updating ' + clusterName, {timeout: 360000});

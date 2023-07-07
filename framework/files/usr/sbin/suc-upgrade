@@ -46,63 +46,70 @@ function isHigherVersion()
 }
 
 function isEqualVersion() {
- if diff $RELEASE_FILE ${HOST_DIR}${RELEASE_FILE} >/dev/null; then
-     return 0
- fi
- return 1
+    if diff $RELEASE_FILE ${HOST_DIR}${RELEASE_FILE} >/dev/null; then
+        return 0
+    fi
+    return 1
 }
 
 function isActiveSystem() {
-  [ ! -f "${ACTIVE_FILE}" ] && return 1
-  return 0
+    [ ! -f "${ACTIVE_FILE}" ] && return 1
+    return 0
 }
 
 (
-  flock -w $LOCK_TIMEOUT 200 || exit 1
-  if ! nsenter -i -m -t 1 -- systemctl is-system-running; then
-      # Exit if there is a shutdown process already going on
-      exit 1
-  fi
+    flock -w $LOCK_TIMEOUT 200 || exit 1
+    if ! SYSSTATUS=`nsenter -i -m -t 1 -- systemctl is-system-running`; then
+        case "$SYSSTATUS" in
+        degraded)
+            # degraded state should not stop OS upgrades, see https://github.com/rancher/elemental/issues/901
+            ;;
+	*)
+            # Exit if there is a shutdown process already going on or if the system is booting
+            exit 1
+	    ;;
+        esac
+    fi
 
-  if isEqualVersion; then
-      echo "Upgrade already done with release:"
-      cat ${HOST_DIR}${RELEASE_FILE}
+    if isEqualVersion; then
+        echo "Upgrade already done with release:"
+        cat ${HOST_DIR}${RELEASE_FILE}
 
-      config
-      exit 0
-  fi
+        config
+        exit 0
+    fi
 
-  if [ "$FORCE" != "true" ]; then
-      if ! isHigherVersion; then
-          echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
-          cat ${HOST_DIR}${RELEASE_FILE}
-          
-          exit 0
-      fi
+    if [ "$FORCE" != "true" ]; then
+        if ! isHigherVersion; then
+            echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
+            cat ${HOST_DIR}${RELEASE_FILE}
 
-      if ! isActiveSystem; then
-          echo "Current OS is not booted in Active configuration, use FORCE to run upgrade."
-          exit 0
-      fi
-  fi
-  
-  config
-  mount --rbind $HOST_DIR/dev /dev
-  mount --rbind $HOST_DIR/run /run
-  elemental --debug upgrade --system.uri dir:/
+            exit 0
+        fi
 
-  # After elemental upgrade we have to also copy
-  # /etc/resolv.conf from /host filesystem, otherwise 
-  # it will be taken from container context
-  mount -o remount,rw /run/initramfs/cos-state
-  LOOP_DEV=$(losetup -f)
-  losetup $LOOP_DEV /run/initramfs/cos-state/cOS/active.img
-  mkdir -p /tmp/cOS
-  mount $LOOP_DEV /tmp/cOS
-  rsync -av $HOST_DIR/etc/resolv.conf /tmp/cOS/etc/resolv.conf
-  umount /tmp/cOS
-  losetup -d $LOOP_DEV
+        if ! isActiveSystem; then
+            echo "Current OS is not booted in Active configuration, use FORCE to run upgrade."
+            exit 0
+        fi
+    fi
 
-  nsenter -i -m -t 1 -- reboot
-  exit 1
+    config
+    mount --rbind $HOST_DIR/dev /dev
+    mount --rbind $HOST_DIR/run /run
+    elemental --debug upgrade --system.uri dir:/
+
+    # After elemental upgrade we have to also copy
+    # /etc/resolv.conf from /host filesystem, otherwise
+    # it will be taken from container context
+    mount -o remount,rw /run/initramfs/cos-state
+    LOOP_DEV=$(losetup -f)
+    losetup $LOOP_DEV /run/initramfs/cos-state/cOS/active.img
+    mkdir -p /tmp/cOS
+    mount $LOOP_DEV /tmp/cOS
+    rsync -av $HOST_DIR/etc/resolv.conf /tmp/cOS/etc/resolv.conf
+    umount /tmp/cOS
+    losetup -d $LOOP_DEV
+
+    nsenter -i -m -t 1 -- reboot
+    exit 1
 ) 200> $LOCK_FILE

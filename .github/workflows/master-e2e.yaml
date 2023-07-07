@@ -333,6 +333,7 @@ jobs:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rm_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
@@ -342,7 +343,6 @@ jobs:
             /workdir/e2e/unit_tests/user.spec.ts
             /workdir/e2e/unit_tests/menu.spec.ts
             /workdir/e2e/unit_tests/machine_registration.spec.ts
-            /workdir/e2e/unit_tests/seed_image.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
         run: cd tests && make start-cypress-tests
@@ -386,6 +386,7 @@ jobs:
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           PROXY: ${{ inputs.proxy }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rm_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ needs.create-runner.outputs.public_dns }}/dashboard
           RANCHER_USER: admin
