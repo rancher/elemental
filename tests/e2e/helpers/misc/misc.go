@@ -15,6 +15,7 @@ limitations under the License.
 package misc
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -382,7 +383,22 @@ func ConcateFiles(srcfile, dstfile string, data []byte) error {
 		return err
 	}
 
-	// All good!
+	return nil
+}
+
+func WriteFile(dstfile string, data []byte) error {
+	// Open/create destination file
+	d, err := os.OpenFile(dstfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+
+	// Add data to dest
+	if _, err = d.Write([]byte(data)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -395,6 +411,7 @@ func TrimStringFromChar(s, c string) string {
 	if idx := strings.Index(s, c); idx != -1 {
 		return s[:idx]
 	}
+
 	return s
 }
 
@@ -441,7 +458,6 @@ func AddNode(file, name string, index int) error {
 		return err
 	}
 
-	// All good!
 	return nil
 }
 
@@ -459,9 +475,11 @@ func SetHostname(baseName string, index int) string {
 	if baseName == "" {
 		baseName = "emtpy"
 	}
+
 	if index < 0 {
 		index = 0
 	}
+
 	return baseName + "-" + fmt.Sprintf("%03d", index)
 }
 
@@ -470,6 +488,7 @@ func CreateTemp(baseName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return t.Name(), nil
 }
 
@@ -481,4 +500,41 @@ func CheckPod(k *kubectl.Kubectl, checkList [][]string) error {
 	}
 
 	return nil
+}
+
+func SetClientKubeConfig(ns, name string) (string, error) {
+	clientKubeConfig, err := CreateTemp("clientKubeConfig")
+	if err != nil {
+		return "", err
+	}
+
+	// Get Kubeconfig of client cluster
+	out, err := kubectl.Run("get", "secret",
+		"--namespace", ns,
+		name+"-kubeconfig", "-o", "jsonpath={.data.value}")
+	if err != nil {
+		os.Remove(clientKubeConfig)
+		return "", err
+	}
+
+	// Decode Kubeconfig data and write into file
+	data, err := base64.StdEncoding.DecodeString(out)
+	if err != nil {
+		os.Remove(clientKubeConfig)
+		return "", err
+	}
+	err = WriteFile(clientKubeConfig, data)
+	if err != nil {
+		os.Remove(clientKubeConfig)
+		return "", err
+	}
+
+	// Export KUBECONFIG envar
+	err = os.Setenv("KUBECONFIG", clientKubeConfig)
+	if err != nil {
+		os.Remove(clientKubeConfig)
+		return "", err
+	}
+
+	return clientKubeConfig, nil
 }
