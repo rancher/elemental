@@ -54,6 +54,22 @@ export class Rancher {
     return cy.get('.option .icon.group-icon.icon-'+iconName);
   } 
   
+  enableExtensionSupport(withRancherRepo: boolean) {
+    cy.contains('Extensions')
+      .click();
+    // Make sure we are on the Extensions page
+    cy.contains('.message-icon', 'Extension support is not enabled');
+    cy.clickButton('Enable');
+    cy.contains('Enable Extension Support?')
+    if (!withRancherRepo) {
+      cy.contains('Add the Rancher Extension Repository')
+        .click();
+    }
+  cy.clickButton('OK');
+  cy.get('.tabs', {timeout: 40000})
+    .contains('Installed Available Updates All');
+  };
+  
   // Handle first login in Rancher
   firstLogin() {
     cy.visit('/auth/login');

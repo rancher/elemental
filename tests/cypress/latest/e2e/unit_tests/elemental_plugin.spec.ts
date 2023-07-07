@@ -15,6 +15,7 @@ limitations under the License.
 import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import { isUIVersion } from '../../support/utils';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
@@ -27,30 +28,17 @@ filterTests(['main', 'upgrade'], () => {
     });
   
     it('Add elemental-ui repo', () => {
-      if ( Cypress.env('elemental_ui_version') != "stable") {
-        rancher.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git');
-      };
+      !isUIVersion('stable') ? rancher.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
     });
     
     it('Enable extension support', () => {
       rancher.burgerMenuOpenIfClosed();
-      cy.contains('Extensions')
-        .click();
-      // Make sure we are on the Extensions page
-      cy.contains('.message-icon', 'Extension support is not enabled');
-      cy.clickButton('Enable');
-      cy.contains('Enable Extension Support?')
-      if ( Cypress.env('elemental_ui_version') != "stable") {
-        cy.contains('Add the Rancher Extension Repository')
-          .click();
-      }
-      cy.clickButton('OK');
-      cy.get('.tabs', {timeout: 40000})
-        .contains('Installed Available Updates All');
+      isUIVersion('stable') ? rancher.enableExtensionSupport(true) : rancher.enableExtensionSupport(false);
     });
   
     it('Install Elemental plugin', () => {
       rancher.burgerMenuOpenIfClosed();
+      // TODO: create a function to install any plugin and not elemental only
       cy.contains('Extensions')
         .click();
       cy.contains('elemental');

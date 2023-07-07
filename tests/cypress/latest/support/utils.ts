@@ -19,3 +19,8 @@ export const isOperatorVersion = (version: string) => {
 export const isRancherManagerVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("rancher_version"));
 }
+
+// Check Elemental UI version
+export const isUIVersion = (version: string) => {
+  return (new RegExp(version)).test(Cypress.env("elemental_ui_version"));
+}
