@@ -5,7 +5,7 @@ This document outlines the process to get your pull request accepted.
 
 Elemental does accept external contributions in general, however the team's time is limited.
 
- Elemental is on a quarterly release cycle, so it might take a long time
+Elemental is on a quarterly release cycle, so it might take a long time
 for external contributions to be commented on, let alone reviewed and
 merged. We expect review times to improve in the future.
 
