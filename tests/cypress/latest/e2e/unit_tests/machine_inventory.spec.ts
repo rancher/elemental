@@ -126,6 +126,8 @@ describe('Machine inventory testing', () => {
       cy.wait(3000);
       rancher.checkClusterStatus(clusterName, 'Updating', 300000);
       rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      // Ugly but needed unfortunately to make sure the cluster stops switching status
+      cy.wait(240000);
     });
   });
   
