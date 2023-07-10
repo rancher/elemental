@@ -13,14 +13,12 @@ limitations under the License.
 */
 
 import { Rancher } from '~/support/rancher';
-import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import { isRancherManagerVersion } from '../../support/utils';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const elemental     = new Elemental();
   const elementalUser = "elemental-user"
   const hwLabels      = ["TotalCPUThread", "TotalMemory", "CPUModel",
                         "CPUVendor", "NumberBlockDevices", "NumberNetInterface",

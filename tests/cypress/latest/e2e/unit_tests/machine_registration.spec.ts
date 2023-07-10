@@ -13,14 +13,12 @@ limitations under the License.
 */
 
 import { Rancher } from '~/support/rancher';
-import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 
 Cypress.config();
 describe('Machine registration testing', () => {
-  const elemental     = new Elemental();
   const elementalUser = "elemental-user"
   const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
