@@ -36,6 +36,8 @@ filterTests(['main'], () => {
       //cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
       //  .contains('Active',  {timeout: 300000});
       rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      cy.wait(20000);
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
       // TODO: function to deploy app?
       cy.contains(clusterName)
         .click();
