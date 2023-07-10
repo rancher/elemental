@@ -28,7 +28,6 @@ docker run -v $PWD:/workdir -w /workdir                     \
     -e RANCHER_URL=$RANCHER_URL                             \
     -e RANCHER_USER=$RANCHER_USER                           \
     -e UI_ACCOUNT=$UI_ACCOUNT                               \
-    -e UPGRADE_CHANNEL_LIST=$UPGRADE_CHANNEL_LIST           \
     -e UPGRADE_IMAGE=$UPGRADE_IMAGE                         \
     --add-host host.docker.internal:host-gateway            \
     --ipc=host                                              \
