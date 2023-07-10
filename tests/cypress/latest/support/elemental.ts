@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
+import './rancher';
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
@@ -23,12 +23,6 @@ export class Elemental {
       .contains('Create Elemental Cluster')
       .should('exist');
     cy.getBySel('button-create-elemental-cluster')
-      .click();
-  }
-
-  // Go into the Elemental menu
-  accessElementalMenu() {
-    cy.contains('OS Management')
       .click();
   }
 
@@ -53,22 +47,5 @@ export class Elemental {
     expect($lis.eq(5)).to.contain('OS Version Channels');
     expect($lis.eq(6)).to.contain('Seed Images');
     })      
-  }
-
-  // Make sure Elemental logo appears
-  elementalIcon() {
-    return cy.get('.option .icon.group-icon.icon-elemental');
-  } 
-  
-  // Handle first login in Rancher
-  firstLogin() {
-    cy.get('input')
-      .type(Cypress.env('password'), {log: false});
-    cy.clickButton('Log in with Local User');
-    cy.contains('By checking')
-      .click('left');
-    cy.clickButton('Continue');
-    cy.getBySel('banner-title')
-      .contains('Welcome to Rancher');
   }
 }

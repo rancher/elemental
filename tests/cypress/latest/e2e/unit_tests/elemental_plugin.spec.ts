@@ -12,14 +12,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import { isUIVersion } from '../../support/utils';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-    const topLevelMenu = new TopLevelMenu();
+    const rancher = new Rancher();
   
     beforeEach(() => {
       cy.login();
@@ -27,33 +28,17 @@ filterTests(['main', 'upgrade'], () => {
     });
   
     it('Add elemental-ui repo', () => {
-      if ( Cypress.env('elemental_ui_version') != "stable") {
-        topLevelMenu.openIfClosed();
-        cy.contains('local')
-          .click();
-        cy.addHelmRepo('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git');
-      };
+      !isUIVersion('stable') ? rancher.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
     });
     
     it('Enable extension support', () => {
-      topLevelMenu.openIfClosed();
-      cy.contains('Extensions')
-        .click();
-      // Make sure we are on the Extensions page
-      cy.contains('.message-icon', 'Extension support is not enabled');
-      cy.clickButton('Enable');
-      cy.contains('Enable Extension Support?')
-      if ( Cypress.env('elemental_ui_version') != "stable") {
-        cy.contains('Add the Rancher Extension Repository')
-          .click();
-      }
-      cy.clickButton('OK');
-      cy.get('.tabs', {timeout: 40000})
-        .contains('Installed Available Updates All');
+      rancher.burgerMenuOpenIfClosed();
+      isUIVersion('stable') ? rancher.enableExtensionSupport(true) : rancher.enableExtensionSupport(false);
     });
   
     it('Install Elemental plugin', () => {
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
+      // TODO: create a function to install any plugin and not elemental only
       cy.contains('Extensions')
         .click();
       cy.contains('elemental');

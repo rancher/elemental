@@ -11,8 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -22,8 +21,7 @@ filterTests(['main'], () => {
   describe('Machine selector testing', () => {
     const elemental     = new Elemental();
     const elementalUser = "elemental-user"
-    const k8sVersion    = Cypress.env('k8s_version');
-    const topLevelMenu  = new TopLevelMenu();
+    const rancher       = new Rancher();
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
   
@@ -32,10 +30,10 @@ filterTests(['main'], () => {
       cy.visit('/');
   
       // Open the navigation menu
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
   
       // Click on the Elemental's icon
-      elemental.accessElementalMenu(); 
+      rancher.accesMenu('OS Management');
   
       // Go to the cluster creation page
       elemental.accessClusterMenu(); 

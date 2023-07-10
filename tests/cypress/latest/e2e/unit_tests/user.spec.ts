@@ -12,7 +12,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -21,8 +21,8 @@ Cypress.config();
 describe('User role testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
+  const rancher       = new Rancher();
   const stdUser       = "std-user"
-  const topLevelMenu  = new TopLevelMenu();
   const uiPassword    = "rancherpassword"
 
   beforeEach(() => {
@@ -30,42 +30,18 @@ describe('User role testing', () => {
   });
 
   filterTests(['main', 'upgrade'], () => {
-    it('Create elemental user', () => {
-      // User with the elemental-administrator role
-      cy.login();
-      topLevelMenu.openIfClosed();
-      cy.getBySel('side-menu')
-        .contains('Users & Authentication')
-        .click();
-      cy.contains('.title', 'Users')
-        .should('exist');
-      cy.clickButton('Create');
-      cy.typeValue('Username', stdUser);
-      cy.typeValue('New Password', uiPassword);
-      cy.typeValue('Confirm Password', uiPassword);
-      cy.clickButton('Create');
-    });
-
     it('Create standard user', () => {
       // User without the elemental-administrator role
       cy.login();
-      topLevelMenu.openIfClosed();
-      cy.getBySel('side-menu')
-        .contains('Users & Authentication')
-        .click();
-      cy.contains('.title', 'Users')
-        .should('exist');
-      cy.getBySel('masthead-create')
-        .contains('Create')
-        .click();
-      cy.typeValue('Username', elementalUser);
-      cy.typeValue('New Password', uiPassword);
-      cy.typeValue('Confirm Password', uiPassword);
-      cy.contains('Elemental Administrator')
-        .click();
-      cy.getBySel('form-save')
-        .contains('Create')
-        .click();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.createUser(stdUser, uiPassword);
+    });
+
+    it('Create elemental user', () => {
+      // User with the elemental-administrator role
+      cy.login();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.createUser(elementalUser, uiPassword, 'Elemental Administrator');
     });
   });
 
@@ -74,9 +50,9 @@ describe('User role testing', () => {
       cy.login(elementalUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      topLevelMenu.openIfClosed();
-      elemental.elementalIcon().should('exist');
-      elemental.accessElementalMenu();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.checkNavIcon('elemental').should('exist');
+      rancher.accesMenu('OS Management');
       elemental.checkElementalNav();
     });
 
@@ -84,9 +60,9 @@ describe('User role testing', () => {
       cy.login(stdUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      topLevelMenu.openIfClosed();
-      elemental.elementalIcon().should('exist');
-      elemental.accessElementalMenu();
+      rancher.burgerMenuOpenIfClosed();
+      rancher.checkNavIcon('elemental').should('exist');
+      rancher.accesMenu('OS Management');
       // User without appropriate role will get a specific page
       cy.getBySel('elemental-icon')
         .should('exist');

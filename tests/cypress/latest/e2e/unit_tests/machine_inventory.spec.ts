@@ -12,15 +12,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
-import { Elemental } from '~/support/elemental';
+import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import { isRancherManagerVersion } from '../../support/utils';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const elemental     = new Elemental();
   const elementalUser = "elemental-user"
   const hwLabels      = ["TotalCPUThread", "TotalMemory", "CPUModel",
                         "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
@@ -28,7 +26,7 @@ describe('Machine inventory testing', () => {
   const k8sVersion    = Cypress.env('k8s_version');
   const clusterName   = "mycluster"
   const proxy         = "http://172.17.0.1:3128"
-  const topLevelMenu  = new TopLevelMenu();
+  const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
 
@@ -37,10 +35,10 @@ describe('Machine inventory testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
   });
 
   filterTests(['main'], () => {
@@ -122,23 +120,19 @@ describe('Machine inventory testing', () => {
         }
       }
       cy.clickButton('Create');
-      cy.contains('Updating ' + clusterName, {timeout: 360000});
-      // Increase timeout to 10 minutes to allow the cluster to be created
-      // If it fails again, try to reload the page instead of increasing the timeout 
-      cy.contains('Active ' + clusterName, {timeout: 600000});
+      // This wait can be replaced by something cleaner
+      cy.wait(3000);
+      rancher.checkClusterStatus(clusterName, 'Updating', 300000);
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      // Ugly but needed unfortunately to make sure the cluster stops switching status
+      cy.wait(240000);
     });
   });
   
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
-      topLevelMenu.openIfClosed();
-      cy.contains('Home')
-        .click();
-      // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active',  {timeout: 300000});
-      // Go into the dedicated cluster page
-      topLevelMenu.openIfClosed();
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      rancher.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();
     })

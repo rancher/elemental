@@ -11,8 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
@@ -22,7 +21,7 @@ filterTests(['main'], () => {
   describe('Menu testing', () => {
     const elemental     = new Elemental();
     const elementalUser = "elemental-user"
-    const topLevelMenu  = new TopLevelMenu();
+    const rancher       = new Rancher();
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
   
@@ -32,22 +31,21 @@ filterTests(['main'], () => {
     });
   
     it('Check Elemental logo', () => {
-      topLevelMenu.openIfClosed();
-  
       // Elemental's icon should appear in the side menu
-        elemental.elementalIcon()
-          .should('exist');
+      rancher.burgerMenuOpenIfClosed();
+      rancher.checkNavIcon('elemental')
+        .should('exist');
     });
     
     it('Check Elemental menu', () => {
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
   
       // Elemental's icon should appear in the side menu
-      elemental.elementalIcon()
+      rancher.checkNavIcon('elemental')
         .should('exist');
   
       // Click on the Elemental's icon
-      elemental.accessElementalMenu(); 
+      rancher.accesMenu('OS Management');
   
       // Check Elemental's side menu
       elemental.checkElementalNav();

@@ -12,29 +12,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
-import { Elemental } from '~/support/elemental';
+import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 
 filterTests(['main'], () => {
   Cypress.config();
   describe('Advanced filtering testing', () => {
-    const elemental     = new Elemental();
     const elementalUser = "elemental-user"
+    const rancher       = new Rancher();
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
-    const topLevelMenu  = new TopLevelMenu();
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
   
       // Open the navigation menu
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
   
       // Click on the Elemental's icon
-      elemental.accessElementalMenu(); 
+      rancher.accesMenu('OS Management');
     });
   
     it('Create fake machine inventories', () => {

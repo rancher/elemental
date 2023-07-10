@@ -11,9 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TopLevelMenu } from '~/support/toplevelmenu';
+import { Rancher } from '~/support/rancher';
 import '~/support/commands';
-import { Elemental } from '~/support/elemental';
 import 'cypress-file-upload';
 import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
@@ -23,12 +22,10 @@ Cypress.config();
 describe('Upgrade tests', () => {
   const channelName              = "mychannel"
   const clusterName              = "mycluster"
-  const elemental                = new Elemental();
   const elementalUser            = "elemental-user"
-  const topLevelMenu             = new TopLevelMenu();
+  const rancher                  = new Rancher();
   const uiAccount                = Cypress.env('ui_account');
   const uiPassword               = "rancherpassword"
-  const upgradeChannelList       = Cypress.env('upgrade_channel_list')
   const upgradeImage             = Cypress.env('upgrade_image')
 
   beforeEach(() => {
@@ -36,10 +33,10 @@ describe('Upgrade tests', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    topLevelMenu.openIfClosed();
+    rancher.burgerMenuOpenIfClosed();    
 
     // Click on the Elemental's icon
-    elemental.accessElementalMenu(); 
+    rancher.accesMenu('OS Management');
   });
   filterTests(['upgrade'], () => {
     it('Check OS Versions', () => {
@@ -49,16 +46,9 @@ describe('Upgrade tests', () => {
     });
 
     it('Upgrade one node (different methods if rke2 or k3s)', () => {
-      // TODO: Make function to check cluster status
-      // Will come in the refactoring PR
-      topLevelMenu.openIfClosed();
-      cy.contains('Home')
-        .click();
-      // The new cluster must be in active state
-      cy.get('[data-node-id="fleet-default/'+clusterName+'"]')
-        .contains('Active',  {timeout: 600000});
-      topLevelMenu.openIfClosed();
-      elemental.accessElementalMenu();
+      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      rancher.burgerMenuOpenIfClosed();
+      rancher.accesMenu('OS Management');
       /////////////////////////////////////////
       // K3s cluster upgraded with OS Image
       // RKE2 cluster upgraded with OS version channel
@@ -106,7 +96,7 @@ describe('Upgrade tests', () => {
       // Workaround to avoid sporadic issue with Upgrade
       // https://github.com/rancher/elemental/issues/410
       // Restart fleet agent inside downstream cluster
-      topLevelMenu.openIfClosed();
+      rancher.burgerMenuOpenIfClosed();
       cy.getBySel('side-menu')
         .contains(clusterName)
         .click();
@@ -123,8 +113,8 @@ describe('Upgrade tests', () => {
         .type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
 
       // Check if the node reboots to apply the upgrade
-      topLevelMenu.openIfClosed();
-      elemental.accessElementalMenu();
+      rancher.burgerMenuOpenIfClosed();    
+      rancher.accesMenu('OS Management');
       cy.clickNavMenu(["Dashboard"]);
       cy.getBySel('card-clusters')
         .contains('Manage Elemental Clusters')
