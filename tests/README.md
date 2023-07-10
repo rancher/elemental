@@ -76,8 +76,8 @@
 ## `user.spec.ts`
 
 - **Describe:** User role testing
-    - **It:** Create elemental user
     - **It:** Create standard user
+    - **It:** Create elemental user
     - **It:** Elemental user should access the OS management menu
     - **It:** Standard user should not access the OS management menu
 
