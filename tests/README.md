@@ -83,6 +83,16 @@
 
 # Tests description for e2e
 
+## `app_test.go`
+
+- **Describe:** E2E - Install a simple application
+    - **It:** Install HelloWorld application
+      -  **By:** Installing application
+- **Describe:** E2E - Checking a simple application
+    - **It:** Check HelloWorld application
+      -  **By:** Waiting for deployment to be rollout
+      -  **By:** Checking application
+
 ## `backup-restore_test.go`
 
 - **Describe:** E2E - Install Backup/Restore Operator
