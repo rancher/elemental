@@ -1,4 +1,19 @@
-# Tests description for cypress/1.0.0/e2e/unit_tests
+# Tests description for install
+
+## `install_suite_test.go`
+
+*No test defined!*
+
+## `install_test.go`
+
+- **Describe:** Elemental Installation tests
+  - **Context:** From ISO
+    - **It:** can install
+  - **Context:** From container
+    - **It:** can install
+    - **It:** has customization applied
+      -  **By:** Checking we booted from the installed OS
+      -  **By:** Checking config file was run
 
 # Tests description for cypress/latest/e2e/unit_tests
 
@@ -69,7 +84,7 @@
 
 - **Describe:** Upgrade tests
     - **It:** Check OS Versions
-    - **It:** Upgrade one node different methods if rke2 or k3s)
+    - **It:** Upgrade one node different methods if rke2 or k3s
     - **It:** Cannot create two upgrade groups targeting the same cluster
     - **It:** Delete OS Versions Channels
 
@@ -80,6 +95,21 @@
     - **It:** Create elemental user
     - **It:** Elemental user should access the OS management menu
     - **It:** Standard user should not access the OS management menu
+
+# Tests description for smoke
+
+## `smoke_suite_test.go`
+
+*No test defined!*
+
+## `smoke_test.go`
+
+- **Describe:** Elemental Smoke tests
+  - **Context:** First boot
+    - **It:** fmt.Sprintfstarts successfully %s on boot, unit
+    - **It:** has default mounts
+    - **It:** has default cmdline
+    - **It:** has the user added via cloud-init
 
 # Tests description for e2e
 
@@ -114,7 +144,7 @@
 
 - **Describe:** E2E - Bootstrapping node
     - **It:** Provision the node
-      -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM)
+      -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM
       -  **By:** Downloading installation config file
       -  **By:** Adding SeedImage
       -  **By:** Downloading ISO built by SeedImage
@@ -125,7 +155,7 @@
       -  **By:** Checking that node +h+ is available in Rancher
       -  **By:** Checking cluster state
       -  **By:** Incrementing number of nodes in +poolType+ pool
-      -  **By:** Waiting for known cluster state before adding the nodes)
+      -  **By:** Waiting for known cluster state before adding the nodes
       -  **By:** Restarting +h+ to add it in the cluster
       -  **By:** Checking +h+ SSH connection
       -  **By:** Checking that TPM is correctly configured on +h
@@ -224,36 +254,4 @@
       -  **By:** Checking VM upgrade on +h
       -  **By:** Checking OS version on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
-
-# Tests description for install
-
-## `install_suite_test.go`
-
-*No test defined!*
-
-## `install_test.go`
-
-- **Describe:** Elemental Installation tests
-  - **Context:** From ISO
-    - **It:** can install
-  - **Context:** From container
-    - **It:** can install
-    - **It:** has customization applied
-      -  **By:** Checking we booted from the installed OS)
-      -  **By:** Checking config file was run)
-
-# Tests description for smoke
-
-## `smoke_suite_test.go`
-
-*No test defined!*
-
-## `smoke_test.go`
-
-- **Describe:** Elemental Smoke tests
-  - **Context:** First boot
-    - **It:** fmt.Sprintfstarts successfully %s on boot, unit)
-    - **It:** has default mounts
-    - **It:** has default cmdline
-    - **It:** has the user added via cloud-init
 
