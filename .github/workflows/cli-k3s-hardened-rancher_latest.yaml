@@ -17,17 +17,6 @@ jobs:
       cert-manager_version: v1.11.1
       cluster_name: cluster-k3s
       cluster_type: hardened
-      k3s_flags: "--protect-kernel-defaults 
-        --kube-apiserver-arg=--admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml
-        --kube-apiserver-arg=--audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log 
-        --kube-apiserver-arg=--audit-policy-file=/var/lib/rancher/k3s/server/audit.yaml 
-        --kube-apiserver-arg=--audit-log-maxage=30 
-        --kube-apiserver-arg=--audit-log-maxbackup=10 
-        --kube-apiserver-arg=--audit-log-maxsize=100 
-        --kube-apiserver-arg=--request-timeout=300s 
-        --kube-apiserver-arg=--service-account-lookup=true 
-        --kubelet-arg=make-iptables-util-chains=true 
-        --kube-apiserver-arg=--anonymous-auth=false"
       k8s_version_to_provision: v1.25.7+k3s1
       node_number: 3
       rancher_version: latest/devel

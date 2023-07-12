@@ -7,6 +7,8 @@ set -e -x
 
 # Variables
 K3S_SERVER_DIR="/var/lib/rancher/k3s/server"
+K3S_CONFIG_DIR="/etc/rancher/k3s"
+K3S_CONFIG_FILE="${K3S_CONFIG_DIR}/config.yaml"
 RKE2_SERVER_DIR="/etc/rancher/rke2"
 RKE2_CONFIG_FILE="${RKE2_SERVER_DIR}/config.yaml"
 RKE2_BINARY="/usr/local/bin/rke2"
@@ -44,4 +46,22 @@ else
 
   # Enable auditing
   cp ${PSA_YAML} ${AUDIT_YAML} ${K3S_SERVER_DIR}
+
+  # Create K3S config file
+  mkdir -p ${K3S_CONFIG_DIR}
+  cat << EOF > ${K3S_CONFIG_FILE}
+protect-kernel-defaults: true
+kube-apiserver-arg:
+  - "admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml"
+  - "audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log"
+  - "audit-policy-file=/var/lib/rancher/k3s/server/audit.yaml"
+  - "audit-log-maxage=30"
+  - "audit-log-maxbackup=10"
+  - "audit-log-maxsize=100"
+  - "request-timeout=300s"
+  - "service-account-lookup=true"
+  - "anonymous-auth=false"
+kubelet-arg:
+  - "make-iptables-util-chains=true" 
+EOF
 fi
