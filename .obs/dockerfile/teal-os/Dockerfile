@@ -1,11 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: rancher/elemental-teal/5.3:latest
-#!BuildTag: rancher/elemental-teal/5.3:%VERSION%
-#!BuildTag: rancher/elemental-teal/5.3:%VERSION%-%RELEASE%
+#!BuildTag: rancher/elemental-teal:latest
+#!BuildTag: rancher/elemental-teal:%VERSION%
+#!BuildTag: rancher/elemental-teal:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 
-FROM suse/sle-micro-rancher/5.3:latest
+ARG SLEMICRO_VERSION
+
+FROM suse/sle-micro-rancher/$SLEMICRO_VERSION:latest
 
 # Elemental Teal essentials
 # kernel-firmware-amdgpu installed here until 5.4 is released and includes it
@@ -20,11 +22,13 @@ RUN zypper in -y -- \
 # Install extra useful utilities
 RUN zypper in -y k9s
 
+ARG BUILD_REPO=registry.suse.com
+ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal
+ARG IMAGE_TAG=%VERSION%-%RELEASE%
+
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
 # Also used by elemental-populate-labels
-ARG IMAGE_TAG=%VERSION%-%RELEASE%
-ARG IMAGE_REPO=%%IMG_REPO%%/rancher/elemental-teal/5.3
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"         >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"           >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
@@ -39,7 +43,7 @@ LABEL org.opencontainers.image.version="%VERSION%"
 LABEL org.opencontainers.image.url="https://github.com/rancher/elemental"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
-LABEL org.opensuse.reference="%%IMG_REPO%%/rancher/elemental-teal/5.3"
+LABEL org.opensuse.reference=$IMAGE_REPO
 LABEL org.openbuildservice.disturl="%DISTURL%"
 LABEL com.suse.supportlevel="l3"
 # endlabelprefix
