@@ -1,11 +1,14 @@
 #!/bin/bash
 
-# Variables
-DIR_LIST="cypress/1.0.0/e2e/unit_tests cypress/latest/e2e/unit_tests e2e install smoke"
-
-for DIR in ${DIR_LIST}; do
-  echo -e "# Tests description for ${DIR}\n"
-  scripts/generate-tests-description ${DIR}
+# Execute script on all directories
+for DIR in $(find $1 -type d); do
+  if [[ -d ${DIR} ]]; then
+    VALUE=$(scripts/generate-tests-description ${DIR})
+    if [[ -n "${VALUE}" ]]; then
+      echo -e "# Tests description for ${DIR#./}\n"
+      echo -e "${VALUE}\n"
+    fi
+  fi
 done
 
 # Done!

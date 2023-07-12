@@ -39,8 +39,11 @@ for TST_FILE in $(ls ${EXT} 2>/dev/null); do
       | tr -d "('\"" \
       | sed -E \
             -e "s/${REGEX}/${FIELDS}: /" \
-            -e 's/, (func|Label).*//' \
-            -e 's/, \) => \{//' \
+            -e 's/,[[:space:]]*(func|Label).*//' \
+            -e 's/,[[:space:]]*\)[[:space:]]*=>[[:space:]]*\{//' \
+            -e 's/\{[[:space:]]*tags:.*\}//' \
+            -e 's/\)$//' \
+            -e 's/,[[:space:]]*$//' \
             -e 's/^[Dd]escribe:/- **Describe:**/' \
             -e 's/^[Cc]ontext:/\t- **Context:**/' \
             -e 's/^[Ii]t:/\t\t- **It:**/' \
