@@ -208,7 +208,6 @@ jobs:
       CLUSTER_NS: fleet-default
       CLUSTER_TYPE: ${{ inputs.cluster_type }}
       # K3S / RKE2 flags to use for installation
-      INSTALL_K3S_EXEC: ${{ inputs.k3s_flags }}
       INSTALL_K3S_SKIP_ENABLE: true
       INSTALL_K3S_VERSION: ${{ inputs.upstream_cluster_version }}
       INSTALL_RKE2_VERSION: ${{ inputs.upstream_cluster_version }}
