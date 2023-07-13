@@ -27,6 +27,7 @@
     "cypress-file-upload": "^5.0.8",
     "cypress-plugin-tab": "^1.0.5",
     "dotenv": "^10.0.0",
+    "@rancher-ecp-qa/cypress-library": "1.0.1",
     "typescript": "^4.5.2"
   }
 }

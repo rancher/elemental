@@ -12,10 +12,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import { isRancherManagerVersion } from '../../support/utils';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
@@ -26,7 +26,6 @@ describe('Machine inventory testing', () => {
   const k8sVersion    = Cypress.env('k8s_version');
   const clusterName   = "mycluster"
   const proxy         = "http://172.17.0.1:3128"
-  const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
 
@@ -35,10 +34,10 @@ describe('Machine inventory testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    rancher.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    rancher.accesMenu('OS Management');
+    cypressLib.accesMenu('OS Management');
   });
 
   filterTests(['main'], () => {
@@ -122,8 +121,8 @@ describe('Machine inventory testing', () => {
       cy.clickButton('Create');
       // This wait can be replaced by something cleaner
       cy.wait(3000);
-      rancher.checkClusterStatus(clusterName, 'Updating', 300000);
-      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.checkClusterStatus(clusterName, 'Updating', 300000);
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
       // Ugly but needed unfortunately to make sure the cluster stops switching status
       cy.wait(240000);
     });
@@ -131,8 +130,8 @@ describe('Machine inventory testing', () => {
   
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
-      rancher.checkClusterStatus(clusterName, 'Active', 600000);
-      rancher.burgerMenuOpenIfClosed();
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();
     })

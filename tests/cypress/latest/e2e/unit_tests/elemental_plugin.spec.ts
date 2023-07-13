@@ -12,15 +12,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import { isUIVersion } from '../../support/utils';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-    const rancher = new Rancher();
   
     beforeEach(() => {
       cy.login();
@@ -28,16 +27,16 @@ filterTests(['main', 'upgrade'], () => {
     });
   
     it('Add elemental-ui repo', () => {
-      !isUIVersion('stable') ? rancher.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
+      !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
     });
     
     it('Enable extension support', () => {
-      rancher.burgerMenuOpenIfClosed();
-      isUIVersion('stable') ? rancher.enableExtensionSupport(true) : rancher.enableExtensionSupport(false);
+      cypressLib.burgerMenuOpenIfClosed();
+      isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
     });
   
     it('Install Elemental plugin', () => {
-      rancher.burgerMenuOpenIfClosed();
+      cypressLib.burgerMenuOpenIfClosed();
       // TODO: create a function to install any plugin and not elemental only
       cy.contains('Extensions')
         .click();
