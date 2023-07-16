@@ -1,3 +1,18 @@
+# Tests description for smoke
+
+## `smoke_suite_test.go`
+
+*No test defined!*
+
+## `smoke_test.go`
+
+- **Describe:** Elemental Smoke tests
+  - **Context:** First boot
+    - **It:** fmt.Sprintfstarts successfully %s on boot, unit
+    - **It:** has default mounts
+    - **It:** has default cmdline
+    - **It:** has the user added via cloud-init
+
 # Tests description for install
 
 ## `install_suite_test.go`
@@ -95,21 +110,6 @@
     - **It:** Create elemental user
     - **It:** Elemental user should access the OS management menu
     - **It:** Standard user should not access the OS management menu
-
-# Tests description for smoke
-
-## `smoke_suite_test.go`
-
-*No test defined!*
-
-## `smoke_test.go`
-
-- **Describe:** Elemental Smoke tests
-  - **Context:** First boot
-    - **It:** fmt.Sprintfstarts successfully %s on boot, unit
-    - **It:** has default mounts
-    - **It:** has default cmdline
-    - **It:** has the user added via cloud-init
 
 # Tests description for e2e
 
