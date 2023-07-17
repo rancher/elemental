@@ -98,8 +98,6 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
-%dir %{_sysconfdir}/cos
-%config %{_sysconfdir}/cos/bootargs.cfg
 %dir %{_sysconfdir}/dracut.conf.d
 %config %{_sysconfdir}/dracut.conf.d/51-certificates-initrd.conf
 %config %{_sysconfdir}/dracut.conf.d/99-teal-systemd.conf
