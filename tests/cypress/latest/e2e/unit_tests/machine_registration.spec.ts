@@ -12,15 +12,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 Cypress.config();
 describe('Machine registration testing', () => {
   const elementalUser = "elemental-user"
-  const rancher       = new Rancher();
   const uiAccount     = Cypress.env('ui_account');
   const uiPassword    = "rancherpassword"
 
@@ -29,10 +28,10 @@ describe('Machine registration testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    rancher.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    rancher.accesMenu('OS Management');
+    cypressLib.accesMenu('OS Management');
 
     // In upgrade scenario, we want to build ISO from stable channel
     utils.isCypressTag('upgrade') ? cy.addOsVersionChannel('stable'): null;
@@ -43,10 +42,10 @@ describe('Machine registration testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    rancher.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuOpenIfClosed();
 
     // Click on the Elemental's icon
-    rancher.accesMenu('OS Management');
+    cypressLib.accesMenu('OS Management');
     
     // Delete all files previously downloaded
     cy.exec('rm cypress/downloads/*', {failOnNonZeroExit: false});

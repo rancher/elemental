@@ -12,14 +12,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 filterTests(['main'], () => {
   Cypress.config();
   describe('Deploy application in fresh Elemental Cluster', () => {
-    const rancher      = new Rancher();
     const clusterName  = "mycluster"
     beforeEach(() => {
       cy.login();
@@ -27,9 +26,10 @@ filterTests(['main'], () => {
     });
     
     it('Deploy Alerting Drivers application', () => {
-      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
       cy.wait(20000);
-      rancher.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
       // TODO: function to deploy app?
       cy.contains(clusterName)
         .click();
@@ -50,7 +50,8 @@ filterTests(['main'], () => {
     });
   
     it('Remove Alerting Drivers application', () => {
-      rancher.burgerMenuOpenIfClosed();
+      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+      cypressLib.burgerMenuOpenIfClosed();
       cy.contains(clusterName)
         .click();
       cy.contains('Apps')

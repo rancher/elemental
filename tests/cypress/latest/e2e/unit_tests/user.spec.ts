@@ -12,16 +12,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 Cypress.config();
 describe('User role testing', () => {
   const elemental     = new Elemental();
   const elementalUser = "elemental-user"
-  const rancher       = new Rancher();
   const stdUser       = "std-user"
   const uiPassword    = "rancherpassword"
 
@@ -33,15 +32,15 @@ describe('User role testing', () => {
     it('Create standard user', () => {
       // User without the elemental-administrator role
       cy.login();
-      rancher.burgerMenuOpenIfClosed();
-      rancher.createUser(stdUser, uiPassword);
+      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.createUser(stdUser, uiPassword);
     });
 
     it('Create elemental user', () => {
       // User with the elemental-administrator role
       cy.login();
-      rancher.burgerMenuOpenIfClosed();
-      rancher.createUser(elementalUser, uiPassword, 'Elemental Administrator');
+      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.createUser(elementalUser, uiPassword, 'Elemental Administrator');
     });
   });
 
@@ -50,9 +49,9 @@ describe('User role testing', () => {
       cy.login(elementalUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      rancher.burgerMenuOpenIfClosed();
-      rancher.checkNavIcon('elemental').should('exist');
-      rancher.accesMenu('OS Management');
+      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.checkNavIcon('elemental').should('exist');
+      cypressLib.accesMenu('OS Management');
       elemental.checkElementalNav();
     });
 
@@ -60,9 +59,9 @@ describe('User role testing', () => {
       cy.login(stdUser, uiPassword);
       cy.getBySel('banner-title')
         .contains('Welcome to Rancher');
-      rancher.burgerMenuOpenIfClosed();
-      rancher.checkNavIcon('elemental').should('exist');
-      rancher.accesMenu('OS Management');
+      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.checkNavIcon('elemental').should('exist');
+      cypressLib.accesMenu('OS Management');
       // User without appropriate role will get a specific page
       cy.getBySel('elemental-icon')
         .should('exist');

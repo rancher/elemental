@@ -11,17 +11,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { Rancher } from '~/support/rancher';
 import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 filterTests(['main'], () => {
   Cypress.config();
   describe('Menu testing', () => {
     const elemental     = new Elemental();
     const elementalUser = "elemental-user"
-    const rancher       = new Rancher();
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
   
@@ -32,20 +31,20 @@ filterTests(['main'], () => {
   
     it('Check Elemental logo', () => {
       // Elemental's icon should appear in the side menu
-      rancher.burgerMenuOpenIfClosed();
-      rancher.checkNavIcon('elemental')
+      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.checkNavIcon('elemental')
         .should('exist');
     });
     
     it('Check Elemental menu', () => {
-      rancher.burgerMenuOpenIfClosed();
+      cypressLib.burgerMenuOpenIfClosed();
   
       // Elemental's icon should appear in the side menu
-      rancher.checkNavIcon('elemental')
+      cypressLib.checkNavIcon('elemental')
         .should('exist');
   
       // Click on the Elemental's icon
-      rancher.accesMenu('OS Management');
+      cypressLib.accesMenu('OS Management');
   
       // Check Elemental's side menu
       elemental.checkElementalNav();

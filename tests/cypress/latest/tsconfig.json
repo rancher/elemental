@@ -27,6 +27,7 @@
       "@nuxt/types",
       "cypress",
       "cy-verify-downloads",
+      "@rancher-ecp-qa/cypress-library",
       "cypress-file-upload"
     ]
   },

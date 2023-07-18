@@ -12,15 +12,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { Rancher } from '~/support/rancher';
 import filterTests from '~/support/filterTests.js';
+import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('First login on Rancher', () => {
-    const rancher = new Rancher();
     it('Log in and accept terms and conditions', () => {
-      rancher.firstLogin();
+      cypressLib.firstLogin();
     });
   });
 });
