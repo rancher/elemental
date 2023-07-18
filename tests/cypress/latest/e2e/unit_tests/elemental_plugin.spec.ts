@@ -14,7 +14,7 @@ limitations under the License.
 
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
-import { isUIVersion } from '../../support/utils';
+import { isUIVersion, isRancherManagerVersion } from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 filterTests(['main', 'upgrade'], () => {
@@ -32,7 +32,7 @@ filterTests(['main', 'upgrade'], () => {
     
     it('Enable extension support', () => {
       cypressLib.burgerMenuOpenIfClosed();
-      isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
+      isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
     });
   
     it('Install Elemental plugin', () => {
