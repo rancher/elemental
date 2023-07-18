@@ -78,21 +78,25 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_pre elemental-populate-node-labels.service
 %service_add_pre shutdown-containerd.service
 %service_add_pre elemental-register.service
+%service_add_pre elemental-register.timer
 
 %post
 %service_add_post elemental-populate-node-labels.service
 %service_add_post shutdown-containerd.service
 %service_add_post elemental-register.service
+%service_add_post elemental-register.timer
 
 %preun
 %service_del_preun elemental-populate-node-labels.service
 %service_del_preun shutdown-containerd.service
 %service_del_preun elemental-register.service
+%service_del_preun elemental-register.timer
 
 %postun
 %service_del_postun elemental-populate-node-labels.service
 %service_del_postun shutdown-containerd.service
 %service_del_postun elemental-register.service
+%service_del_postun elemental-register.timer
 
 %files
 %defattr(-,root,root,-)
@@ -109,6 +113,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %dir %{_unitdir}
 %{_unitdir}/shutdown-containerd.service
 %{_unitdir}/elemental-register.service
+%{_unitdir}/elemental-register.timer
 %{_unitdir}/elemental-populate-node-labels.service
 %{_sbindir}/elemental-populate-node-labels
 %dir /usr/libexec

@@ -1,0 +1,15 @@
+[Unit]
+Description=Run elemental-register every 30 minutes
+Documentation=https://elemental.docs.rancher.com
+
+[Timer]
+OnStartupSec=5
+# Keep the schedule lower than the service's StartLimitIntervalSec
+OnUnitInactiveSec=30min
+Persistent=true
+# Stagger multiple machines booting at the same time
+RandomizedDelaySec=30
+FixedRandomDelay=true
+
+[Install]
+WantedBy=timers.target
