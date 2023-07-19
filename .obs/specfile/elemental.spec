@@ -80,11 +80,6 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_pre shutdown-containerd.service
 %service_add_pre elemental-register.service
 %service_add_pre elemental-register.timer
-%else
-%systemd_pre elemental-populate-node-labels.service
-%systemd_pre shutdown-containerd.service
-%systemd_pre elemental-register.service
-%systemd_pre elemental-register.timer
 %endif
 
 %post
