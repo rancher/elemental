@@ -75,28 +75,56 @@ rm %{buildroot}%{_unitdir}/elemental-system-agent.service
 rm -rf %{buildroot}/usr/libexec/.placeholder
 
 %pre
+%if 0%{?suse_version}
 %service_add_pre elemental-populate-node-labels.service
 %service_add_pre shutdown-containerd.service
 %service_add_pre elemental-register.service
 %service_add_pre elemental-register.timer
+%else
+%systemd_pre elemental-populate-node-labels.service
+%systemd_pre shutdown-containerd.service
+%systemd_pre elemental-register.service
+%systemd_pre elemental-register.timer
+%endif
 
 %post
+%if 0%{?suse_version}
 %service_add_post elemental-populate-node-labels.service
 %service_add_post shutdown-containerd.service
 %service_add_post elemental-register.service
 %service_add_post elemental-register.timer
+%else
+%systemd_post elemental-populate-node-labels.service
+%systemd_post shutdown-containerd.service
+%systemd_post elemental-register.service
+%systemd_post elemental-register.timer
+%endif
 
 %preun
+%if 0%{?suse_version}
 %service_del_preun elemental-populate-node-labels.service
 %service_del_preun shutdown-containerd.service
 %service_del_preun elemental-register.service
 %service_del_preun elemental-register.timer
+%else
+%systemd_preun elemental-populate-node-labels.service
+%systemd_preun shutdown-containerd.service
+%systemd_preun elemental-register.service
+%systemd_preun elemental-register.timer
+%endif
 
 %postun
+%if 0%{?suse_version}
 %service_del_postun elemental-populate-node-labels.service
 %service_del_postun shutdown-containerd.service
 %service_del_postun elemental-register.service
 %service_del_postun elemental-register.timer
+%else
+%systemd_postun elemental-populate-node-labels.service
+%systemd_postun shutdown-containerd.service
+%systemd_postun elemental-register.service
+%systemd_postun elemental-register.timer
+%endif
 
 %files
 %defattr(-,root,root,-)
