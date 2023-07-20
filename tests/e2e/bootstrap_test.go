@@ -51,11 +51,11 @@ func randomSleep(index int) {
 	}
 
 	// Initialize the seed
-	rand.Seed(time.Now().UnixNano())
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Get a pseudo-random value
 	timeMax := 240000
-	value := rand.Intn(timeMax + (timeMax % index))
+	value := r.Intn(timeMax + (timeMax % index))
 
 	// Wait until value is reached
 	time.Sleep(time.Duration(value) * time.Millisecond)
