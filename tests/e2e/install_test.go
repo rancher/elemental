@@ -23,9 +23,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/install"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
@@ -33,7 +32,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollTimeout:  tools.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -56,7 +55,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
 					count++
 					return err
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 			})
 
 			if clusterType == "hardened" {
@@ -71,7 +70,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delay few seconds before checking
-				time.Sleep(misc.SetTimeout(20 * time.Second))
+				time.Sleep(tools.SetTimeout(20 * time.Second))
 
 				err = exec.Command("sudo", "chown", "gh-runner", "/etc/rancher/rke2/rke2.yaml").Run()
 				Expect(err).To(Not(HaveOccurred()))
@@ -90,7 +89,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"kube-system", "app=rke2-metrics-server"},
 					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
 				}
-				misc.CheckPod(k, checkList)
+				err = rancher.CheckPod(k, checkList)
+				Expect(err).To(Not(HaveOccurred()))
 
 				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
@@ -110,7 +110,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
 					count++
 					return err
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
 			})
 
 			if clusterType == "hardened" {
@@ -125,7 +125,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delay few seconds before checking
-				time.Sleep(misc.SetTimeout(20 * time.Second))
+				time.Sleep(tools.SetTimeout(20 * time.Second))
 			})
 
 			By("Waiting for K3s to be started", func() {
@@ -137,7 +137,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"kube-system", "app.kubernetes.io/name=traefik"},
 					{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
 				}
-				misc.CheckPod(k, checkList)
+				err := rancher.CheckPod(k, checkList)
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
 
@@ -146,7 +147,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// NOTE: don't check for error, as it will happen anyway (only K3s or RKE2 is installed at a time)
 			file, _ := exec.Command("bash", "-c", "ls /etc/rancher/{k3s,rke2}/{k3s,rke2}.yaml").Output()
 			Expect(file).To(Not(BeEmpty()))
-			misc.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
+			tools.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
 
 			err := os.Setenv("KUBECONFIG", localKubeconfig)
 			Expect(err).To(Not(HaveOccurred()))
@@ -186,12 +187,14 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"cert-manager", "app.kubernetes.io/component=webhook"},
 					{"cert-manager", "app.kubernetes.io/component=cainjector"},
 				}
-				misc.CheckPod(k, checkList)
+				err = rancher.CheckPod(k, checkList)
+				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
 
 		By("Installing Rancher", func() {
-			install.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, caType, proxy)
+			err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, caType, proxy)
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Inject secret for Private CA
 			if caType == "private" {
@@ -217,7 +220,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				{"cattle-fleet-local-system", "app=fleet-agent"},
 				{"cattle-system", "app=rancher-webhook"},
 			}
-			misc.CheckPod(k, checkList)
+			err = rancher.CheckPod(k, checkList)
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Check issuer for Private CA
 			if caType == "private" {
@@ -228,7 +232,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 						GinkgoWriter.Printf("%s\n", out)
 					}
 					return err
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 			}
 		})
 
@@ -255,10 +259,10 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					"-o", "jsonpath={.data.tls\\.crt}",
 				)
 				return err
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 			// Copy skel file for ~/.kube/config
-			misc.CopyFile(localKubeconfigYaml, localKubeconfig)
+			tools.CopyFile(localKubeconfigYaml, localKubeconfig)
 
 			// Create kubeconfig for local cluster
 			err = tools.Sed("%RANCHER_URL%", rancherHostname, localKubeconfig)
@@ -278,7 +282,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		if testType == "ui" {
 			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
 				// https://github.com/rancher/elemental/issues/410
-				time.Sleep(misc.SetTimeout(120 * time.Second))
+				time.Sleep(tools.SetTimeout(120 * time.Second))
 				_, err := kubectl.Run("scale", "deployment/fleet-agent", "-n", "cattle-fleet-local-system", "--replicas=0")
 				Expect(err).To(Not(HaveOccurred()))
 				_, err = kubectl.Run("scale", "deployment/fleet-controller", "-n", "cattle-fleet-system", "--replicas=0")
@@ -306,11 +310,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 						"--namespace", "cattle-elemental-system",
 						"--create-namespace",
 					)
-				}, misc.SetTimeout(1*time.Minute), 10*time.Second).Should(BeNil())
+				}, tools.SetTimeout(1*time.Minute), 10*time.Second).Should(BeNil())
 			}
 
 			// Wait for pod to be started
-			misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			err := rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			Expect(err).To(Not(HaveOccurred()))
 		})
 	})
 })

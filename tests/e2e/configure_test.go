@@ -24,7 +24,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
 var _ = Describe("E2E - Configure test", Label("configure"), func() {
@@ -63,17 +63,17 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 					"--namespace", clusterNS,
 					clusterName, "-o", "jsonpath={.metadata.name}")
 				return out
-			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(clusterName))
+			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(clusterName))
 		})
 
 		By("Creating cluster selectors", func() {
 			// Set temporary file
-			selectorTmp, err := misc.CreateTemp("selector")
+			selectorTmp, err := tools.CreateTemp("selector")
 			Expect(err).To(Not(HaveOccurred()))
 			defer os.Remove(selectorTmp)
 
 			// Get elemental-operator version
-			operatorVersion, err := misc.GetOperatorVersion()
+			operatorVersion, err := elemental.GetOperatorVersion()
 			Expect(err).To(Not(HaveOccurred()))
 			operatorVersionShort := strings.Split(operatorVersion, ".")
 
@@ -88,7 +88,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				patterns := append(basePatterns, addPatterns...)
 
 				// Save original file as it will have to be modified twice
-				misc.CopyFile(selectorYaml, selectorTmp)
+				tools.CopyFile(selectorYaml, selectorTmp)
 
 				// Create Yaml file
 				for _, p := range patterns {
@@ -112,13 +112,13 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 						"--namespace", clusterNS,
 						"-o", "jsonpath={.items[*].metadata.name}")
 					return out
-				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
+				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
 			}
 		})
 
 		By("Adding MachineRegistration", func() {
 			// Set temporary file
-			registrationTmp, err := misc.CreateTemp("machineRegistration")
+			registrationTmp, err := tools.CreateTemp("machineRegistration")
 			Expect(err).To(Not(HaveOccurred()))
 			defer os.Remove(registrationTmp)
 
@@ -145,7 +145,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				patterns := append(basePatterns, addPatterns...)
 
 				// Save original file as it will have to be modified twice
-				misc.CopyFile(registrationYaml, registrationTmp)
+				tools.CopyFile(registrationYaml, registrationTmp)
 
 				// Create Yaml file
 				for _, p := range patterns {
@@ -163,7 +163,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 						"--namespace", clusterNS,
 						"-o", "jsonpath={.items[*].metadata.name}")
 					return out
-				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("machine-registration-" + pool + "-" + clusterName))
+				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("machine-registration-" + pool + "-" + clusterName))
 			}
 		})
 

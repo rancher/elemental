@@ -23,12 +23,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
 var _ = Describe("E2E - Install a simple application", Label("install-app"), func() {
 	It("Install HelloWorld application", func() {
-		kubeConfig, err := misc.SetClientKubeConfig(clusterNS, clusterName)
+		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
 
@@ -44,7 +45,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		appName := "hello-world"
 
 		// File where to host client cluster kubeconfig
-		kubeConfig, err := misc.SetClientKubeConfig(clusterNS, clusterName)
+		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
 
@@ -72,7 +73,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 				Eventually(func() error {
 					htmlPage, err = exec.Command("curl", "http://"+ip+":8080").CombinedOutput()
 					return err
-				}, misc.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 				// Check HTML page content
 				Expect(string(htmlPage)).To(And(

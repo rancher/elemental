@@ -26,8 +26,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"github.com/rancher/elemental/tests/e2e/helpers/network"
 )
 
 func checkClusterAgent(client *tools.Client) {
@@ -35,7 +37,7 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
+	}, tools.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 func getClusterState(ns, cluster, condition string) string {
@@ -108,12 +110,12 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
 			// Set temporary file
-			emulatedTmp, err := misc.CreateTemp("emulatedTPM")
+			emulatedTmp, err := tools.CreateTemp("emulatedTPM")
 			Expect(err).To(Not(HaveOccurred()))
 			defer os.Remove(emulatedTmp)
 
 			// Save original file as it can be modified multiple time
-			misc.CopyFile(emulateTPMYaml, emulatedTmp)
+			tools.CopyFile(emulateTPMYaml, emulatedTmp)
 
 			// Patch the yaml file
 			err = tools.Sed("%EMULATE_TPM%", strconv.FormatBool(emulateTPM), emulatedTmp)
@@ -141,7 +143,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		if isoBoot == "true" {
 			By("Adding SeedImage", func() {
 				// Set temporary file
-				seedimageTmp, err := misc.CreateTemp("seedimage")
+				seedimageTmp, err := tools.CreateTemp("seedimage")
 				Expect(err).To(Not(HaveOccurred()))
 				defer os.Remove(seedimageTmp)
 
@@ -154,7 +156,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 
 				// Save original file as it will have to be modified twice
-				misc.CopyFile(seedimageYaml, seedimageTmp)
+				tools.CopyFile(seedimageYaml, seedimageTmp)
 
 				// Create Yaml file
 				for _, p := range patterns {
@@ -173,7 +175,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						seedImageName,
 						"-o", "jsonpath={.status}")
 					return out
-				}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
 			})
 
 			By("Downloading ISO built by SeedImage", func() {
@@ -190,7 +192,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		if isoBoot != "true" {
 			By("Configuring iPXE boot script for network installation", func() {
-				numberOfFile, err := misc.ConfigureiPXE()
+				numberOfFile, err := network.ConfigureiPXE(httpSrv)
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(numberOfFile).To(BeNumerically(">=", 1))
 			})
@@ -201,11 +203,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Add node in network configuration
-			err := misc.AddNode(netDefaultFileName, hostName, index)
+			err := rancher.AddNode(netDefaultFileName, hostName, index)
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Get generated MAC address
@@ -238,7 +240,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		// Only for master pool
 		if poolType == "master" && isoBoot == "true" {
 			for index := vmIndex; index <= numberOfVMs; index++ {
-				hostName := misc.SetHostname(vmNameRoot, index)
+				hostName := elemental.SetHostname(vmNameRoot, index)
 				Expect(hostName).To(Not(BeNil()))
 
 				client, _ := GetNodeInfo(hostName)
@@ -256,7 +258,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 							out, _ := cl.RunSSH("echo SSH_OK")
 							out = strings.Trim(out, "\n")
 							return out
-						}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+						}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
 
 						// Check that the cloud-config is correctly applied by checking the presence of a file
 						_, err := cl.RunSSH("ls /etc/elemental-test")
@@ -266,7 +268,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						Eventually(func() error {
 							_, err := cl.RunSSH("journalctl -u elemental-register.service --no-pager | grep -i 'elemental installation completed'")
 							return err
-						}, misc.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+						}, tools.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
 						// Halt the VM
 						_, err = cl.RunSSH("setsid -f init 0")
@@ -281,7 +283,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	It("Add the nodes in Rancher Manager", func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Execute node deployment in parallel
@@ -292,9 +294,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				By("Checking that node "+h+" is available in Rancher", func() {
 					Eventually(func() string {
-						id, _ := misc.GetServerId(c, i)
+						id, _ := elemental.GetServerId(c, i)
 						return id
-					}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
+					}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
 				})
 			}(clusterNS, hostName, index)
 		}
@@ -310,7 +312,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Incrementing number of nodes in "+poolType+" pool", func() {
 			// Increase 'quantity' field
-			value, err := misc.IncreaseQuantity(clusterNS,
+			value, err := rancher.SetNodeQuantity(clusterNS,
 				clusterName,
 				"pool-"+poolType+"-"+clusterName, usedNodes)
 			Expect(err).To(Not(HaveOccurred()))
@@ -322,7 +324,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + poolType + "-" + clusterName))
+			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + poolType + "-" + clusterName))
 		})
 
 		By("Waiting for known cluster state before adding the node(s)", func() {
@@ -337,13 +339,13 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 
 				return clusterMsg
-			}, misc.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
+			}, tools.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(MatchRegexp(msg))
 		})
 
 		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
@@ -371,7 +373,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						out, _ := cl.RunSSH("echo SSH_OK")
 						out = strings.Trim(out, "\n")
 						return out
-					}, misc.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+					}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
 				})
 
 				By("Checking that TPM is correctly configured on "+h, func() {
@@ -382,7 +384,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					Eventually(func() error {
 						_, err := cl.RunSSH("[[ " + testValue + " /dev/tpm0 ]]")
 						return err
-					}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+					}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 				})
 
 				By("Checking OS version on "+h, func() {
@@ -402,7 +404,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		if poolType != "worker" {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				// Set node hostname
-				hostName := misc.SetHostname(vmNameRoot, index)
+				hostName := elemental.SetHostname(vmNameRoot, index)
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
@@ -425,7 +427,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 							Eventually(func() error {
 								_, err := cl.RunSSH("[[ -d " + dir + " ]]")
 								return err
-							}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+							}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 							// Configure kubectl
 							_, err := cl.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
@@ -438,7 +440,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						Eventually(func() string {
 							out, _ := cl.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
 							return out
-						}, misc.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+						}, tools.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
 					})
 
 					By("Checking cluster agent on "+h, func() {
@@ -458,7 +460,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		if poolType != "worker" {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				// Set node hostname
-				hostName := misc.SetHostname(vmNameRoot, index)
+				hostName := elemental.SetHostname(vmNameRoot, index)
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
@@ -479,7 +481,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 								GinkgoWriter.Printf("K8s version on %s:\n%s\n", h, k8sVer)
 							}
 							return err
-						}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+						}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 					})
 				}(hostName, client)
 			}
@@ -491,7 +493,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		bootstrappedNodes = 0
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information

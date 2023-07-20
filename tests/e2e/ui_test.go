@@ -22,8 +22,10 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"github.com/rancher/elemental/tests/e2e/helpers/network"
 )
 
 var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
@@ -57,7 +59,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 
 		if isoBoot != "true" {
 			By("Configuring iPXE boot script for network installation", func() {
-				numberOfFile, err := misc.ConfigureiPXE()
+				numberOfFile, err := network.ConfigureiPXE(httpSrv)
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(numberOfFile).To(BeNumerically(">=", 1))
 			})
@@ -66,7 +68,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		By("Adding VM in default network", func() {
 			// Add node in network configuration if needed
 			if macAdrs == "" {
-				err := misc.AddNode(netDefaultFileName, vmName, vmIndex)
+				err := rancher.AddNode(netDefaultFileName, vmName, vmIndex)
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
@@ -90,7 +92,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
-			id, err := misc.GetServerId(clusterNS, vmIndex)
+			id, err := elemental.GetServerId(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
 		})
@@ -101,7 +103,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		})
 
 		By("Checking VM connection", func() {
-			id, err := misc.GetServerId(clusterNS, vmIndex)
+			id, err := elemental.GetServerId(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
 
@@ -110,7 +112,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 				out, _ := client.RunSSH("uname -n")
 				out = strings.Trim(out, "\n")
 				return out
-			}, misc.SetTimeout(2*time.Minute), 5*time.Second)
+			}, tools.SetTimeout(2*time.Minute), 5*time.Second)
 		})
 	})
 })

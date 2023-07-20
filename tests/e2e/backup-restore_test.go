@@ -21,8 +21,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 )
 
 var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-restore"), func() {
@@ -30,7 +30,7 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollTimeout:  tools.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -82,7 +82,8 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 
 		By("Waiting for rancher-backup-operator pod", func() {
 			// Wait for pod to be started
-			misc.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
+			err := rancher.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
+			Expect(err).To(Not(HaveOccurred()))
 		})
 	})
 })
@@ -110,7 +111,7 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 					"--tail=-1", "--since=5m",
 					"--namespace", "cattle-resources-system")
 				return out
-			}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring("Done with backup"))
+			}, tools.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring("Done with backup"))
 		})
 	})
 
@@ -151,7 +152,7 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 				out, _ := kubectl.Run("get", "restore", restoreResourceName,
 					"-o", "jsonpath={.metadata.name}")
 				return out
-			}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(restoreResourceName))
+			}, tools.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(restoreResourceName))
 
 			// Check operator logs
 			Eventually(func() string {
@@ -159,7 +160,7 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 					"--tail=-1", "--since=5m",
 					"--namespace", "cattle-resources-system")
 				return out
-			}, misc.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring("Done restoring"))
+			}, tools.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring("Done restoring"))
 		})
 
 		By("Checking cluster state after restore", func() {

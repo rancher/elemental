@@ -24,9 +24,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/install"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
 var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator"), func() {
@@ -34,7 +34,7 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollTimeout:  tools.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -63,10 +63,11 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		}
 
 		// Delay few seconds before checking, needed because we may have 2 pods at the same time
-		time.Sleep(misc.SetTimeout(30 * time.Second))
+		time.Sleep(tools.SetTimeout(30 * time.Second))
 
 		// Wait for all pods to be started
-		misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+		err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+		Expect(err).To(Not(HaveOccurred()))
 	})
 })
 
@@ -75,7 +76,7 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollTimeout:  tools.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -91,21 +92,32 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Upgrade Rancher Manager
-		install.DeployRancherManager(rancherHostname, rancherUpgradeChannel, rancherUpgradeVersion, caType, proxy)
+		err = rancher.DeployRancherManager(rancherHostname, rancherUpgradeChannel, rancherUpgradeVersion, caType, proxy)
+		Expect(err).To(Not(HaveOccurred()))
 
-		// Wait for Rancher Manager to be running
+		// Wait for Rancher Manager to be restarted
+		status, err := kubectl.Run(
+			"rollout",
+			"--namespace", "cattle-system",
+			"status", "deployment/rancher",
+		)
+		Expect(err).To(Not(HaveOccurred()))
+		Expect(status).To(ContainSubstring("successfully rolled out"))
+
+		// Check that all Rancher Manager pods are running
 		checkList := [][]string{
 			{"cattle-system", "app=rancher"},
 			{"cattle-fleet-local-system", "app=fleet-agent"},
 			{"cattle-system", "app=rancher-webhook"},
 		}
-		misc.CheckPod(k, checkList)
+		err = rancher.CheckPod(k, checkList)
+		Expect(err).To(Not(HaveOccurred()))
 
 		// Check that all pods are using the same version
 		Eventually(func() int {
 			out, _ := kubectl.Run(getImageVersion...)
 			return len(strings.Fields(out))
-		}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(1))
+		}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(1))
 
 		// Get after-upgrade Rancher Manager version
 		// and check that it's different to the before-upgrade version
@@ -129,7 +141,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
@@ -155,13 +167,13 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 
 		By("Triggering Upgrade in Rancher with "+upgradeType, func() {
 			// Set temporary file
-			upgradeTmp, err := misc.CreateTemp("upgrade")
+			upgradeTmp, err := tools.CreateTemp("upgrade")
 			Expect(err).To(Not(HaveOccurred()))
 			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
 				// Get elemental-operator version
-				operatorVersion, err := misc.GetOperatorVersion()
+				operatorVersion, err := elemental.GetOperatorVersion()
 				Expect(err).To(Not(HaveOccurred()))
 				operatorVersionShort := strings.Split(operatorVersion, ".")
 
@@ -184,7 +196,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					out, _ := kubectl.Run("get", "ManagedOSVersion",
 						"--namespace", clusterNS, upgradeOsChannel)
 					return out
-				}, misc.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
+				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
 
 				// Set OS image to use for upgrade
 				value = upgradeOsChannel
@@ -194,19 +206,19 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					"--namespace", clusterNS, upgradeOsChannel,
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))
-				valueToCheck = misc.TrimStringFromChar(out, ":")
+				valueToCheck = tools.TrimStringFromChar(out, ":")
 			} else if upgradeType == "osImage" {
 				// Set OS image to use for upgrade
 				value = upgradeImage
 
 				// Extract the value to check after the upgrade
-				valueToCheck = misc.TrimStringFromChar(upgradeImage, ":")
+				valueToCheck = tools.TrimStringFromChar(upgradeImage, ":")
 			}
 
 			// Add a nodeSelector if needed
 			if usedNodes == 1 {
 				// Set node hostname
-				hostName := misc.SetHostname(vmNameRoot, vmIndex)
+				hostName := elemental.SetHostname(vmNameRoot, vmIndex)
 				Expect(hostName).To(Not(BeNil()))
 
 				// Get node information
@@ -219,15 +231,15 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				hostname = strings.Trim(hostname, "\n")
 
 				label := "kubernetes.io/hostname"
-				selector, err := misc.AddSelector(label, hostname)
+				selector, err := elemental.AddSelector(label, hostname)
 				Expect(err).To(Not(HaveOccurred()), selector)
 
 				// Create new file for this specific upgrade
-				err = misc.ConcateFiles(upgradeSkelYaml, upgradeTmp, selector)
+				err = tools.AddDataToFile(upgradeSkelYaml, upgradeTmp, selector)
 				Expect(err).To(Not(HaveOccurred()))
 			} else {
 				// Use original file as-is
-				misc.CopyFile(upgradeSkelYaml, upgradeTmp)
+				tools.CopyFile(upgradeSkelYaml, upgradeTmp)
 			}
 
 			// Set values
@@ -245,7 +257,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
-			hostName := misc.SetHostname(vmNameRoot, index)
+			hostName := elemental.SetHostname(vmNameRoot, index)
 			Expect(hostName).To(Not(BeNil()))
 
 			// Get node information
@@ -265,8 +277,8 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 
 						// This remove the version and keep only the repo, as in the file
 						// we have the exact version and we don't know it before the upgrade
-						return misc.TrimStringFromChar(strings.Trim(out, "\n"), ":")
-					}, misc.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
+						return tools.TrimStringFromChar(strings.Trim(out, "\n"), ":")
+					}, tools.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
 				})
 
 				By("Checking OS version on "+h+" after upgrade", func() {
