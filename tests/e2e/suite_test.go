@@ -64,14 +64,12 @@ var (
 	elementalSupport      string
 	emulateTPM            bool
 	rancherHostname       string
-	imageVersion          string
 	isoBoot               string
 	k8sUpstreamVersion    string
 	k8sVersion            string
 	numberOfVMs           int
 	operatorUpgrade       string
 	operatorRepo          string
-	osImage               string
 	poolType              string
 	proxy                 string
 	rancherChannel        string
