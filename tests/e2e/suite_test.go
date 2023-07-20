@@ -25,17 +25,19 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"github.com/rancher/elemental/tests/e2e/helpers/network"
 )
 
 const (
 	appYaml               = "../assets/hello-world_app.yaml"
-	clusterYaml           = "../assets/cluster.yaml"
 	backupYaml            = "../assets/backup.yaml"
-	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	clusterYaml           = "../assets/cluster.yaml"
 	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript = "../scripts/config-private-ca"
 	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
+	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	httpSrv               = "http://192.168.122.1:8000"
 	installConfigYaml     = "../../install-config.yaml"
 	installHardenedScript = "../scripts/config-hardened"
 	installVMScript       = "../scripts/install-vm"
@@ -96,7 +98,7 @@ func CheckClusterState(ns, cluster string) {
 			"--namespace", ns, cluster,
 			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
 		return clusterStatus
-	}, misc.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("True"))
+	}, tools.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("True"))
 
 	// Wait a little bit for the cluster to be in a stable state
 	// Because if we do the next test too quickly it can be a false positive!
@@ -109,7 +111,7 @@ func CheckClusterState(ns, cluster string) {
 			"--namespace", ns, cluster,
 			"-o", "jsonpath={.status.conditions[*].reason}")
 		return reason
-	}, misc.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(BeEmpty())
+	}, tools.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
 func GetNodeInfo(hostName string) (*tools.Client, string) {
@@ -174,7 +176,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Set default hostname
-		vmName = misc.SetHostname(vmNameRoot, vmIndex)
+		vmName = elemental.SetHostname(vmNameRoot, vmIndex)
 	} else {
 		// Default value for vmIndex
 		vmIndex = 0
@@ -225,5 +227,5 @@ var _ = BeforeSuite(func() {
 	}
 
 	// Start HTTP server
-	misc.FileShare("../..", ":8000")
+	network.HttpShare("../..", ":8000")
 })

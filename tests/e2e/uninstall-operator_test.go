@@ -22,7 +22,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
 func testClusterAvailability(ns, cluster string) {
@@ -31,7 +32,7 @@ func testClusterAvailability(ns, cluster string) {
 			"--namespace", ns, cluster,
 			"-o", "jsonpath={.metadata.name}")
 		return out
-	}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(clusterName))
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(clusterName))
 }
 
 var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator"), func() {
@@ -39,7 +40,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 	// Default timeout is too small, so New() cannot be used
 	k := &kubectl.Kubectl{
 		Namespace:    "",
-		PollTimeout:  misc.SetTimeout(300 * time.Second),
+		PollTimeout:  tools.SetTimeout(300 * time.Second),
 		PollInterval: 500 * time.Millisecond,
 	}
 
@@ -81,7 +82,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, misc.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("NotFound"))
+			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("NotFound"))
 		})
 
 		By("Deleting cluster resource", func() {
@@ -119,7 +120,8 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			}
 
 			// Wait for pod to be started
-			misc.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			err := rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Creating a dumb MachineRegistration", func() {

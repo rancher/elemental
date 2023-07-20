@@ -22,7 +22,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"github.com/rancher/elemental/tests/e2e/helpers/misc"
+	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
 func checkRC(err error) {
@@ -61,7 +61,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			for _, b := range []binary{elemental, logCollector} {
 				Eventually(func() error {
 					return exec.Command("curl", "-L", b.Url, "-o", b.Name).Run()
-				}, misc.SetTimeout(1*time.Minute), 5*time.Second).Should(BeNil())
+				}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(BeNil())
 
 				err := exec.Command("chmod", "+x", b.Name).Run()
 				checkRC(err)
