@@ -1,4 +1,7 @@
 # Elemental
+
+[![Code style](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
+
 CI with latest stable Rancher Manager:
 
 [![CLI-K3s-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-rancher_stable.yaml)

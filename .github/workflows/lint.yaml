@@ -1,0 +1,47 @@
+name: Lint
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  golang-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: tests/go.mod
+      - name: Analysis
+        uses: golangci/golangci-lint-action@v3
+        with:
+          args: -v
+          working-directory: tests
+  cypress-lint:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: current
+      WORKING_DIR: tests/cypress/latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install npm
+        run: |
+          cd ${{ env.WORKING_DIR }}
+          npm install --save-dev
+          npm ls --depth=0
+      - name: Analysis
+        uses: sibiraj-s/action-eslint@v3
+        with:
+          extensions: 'js,ts'
+          working-directory: ${{ env.WORKING_DIR }}
