@@ -29,5 +29,10 @@
     "dotenv": "^10.0.0",
     "@rancher-ecp-qa/cypress-library": "1.0.6",
     "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "eslint-plugin-cypress": "latest"
   }
 }
