@@ -13,8 +13,10 @@ limitations under the License.
 */
 
 import './commands';
+
 declare global {
-  // eslint-disable-next-line no-unused-vars
+  // In Cypress functions should be declared with 'namespace'
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Cypress {
     interface Chainable {
       // Functions declared in commands.ts
@@ -35,11 +37,12 @@ declare global {
       editMachReg(machRegName: string, addLabel?: boolean, addAnnotation?: boolean, withYAML?: boolean): Chainable<Element>;
       importMachineInventory(machineInventoryFile: string, machineInventoryName: string): Chainable<Element>;
     }
-}}
+  }
+}
 
 // TODO handle redirection errors better?
 // we see a lot of 'error navigation cancelled' uncaught exceptions that don't actually break anything; ignore them here
-Cypress.on('uncaught:exception', (err, runnable) => {
+Cypress.on('uncaught:exception', (err) => {
   // returning false here prevents Cypress from failing the test
   if (err.message.includes('navigation guard')) {
     return false;
@@ -47,7 +50,7 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 });
 
 require('cypress-dark');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 require('cy-verify-downloads').addCustomCommand();
 require('cypress-plugin-tab');
 require('@rancher-ecp-qa/cypress-library');
-

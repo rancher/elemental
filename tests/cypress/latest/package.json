@@ -31,8 +31,8 @@
     "typescript": "^4.5.2"
   },
   "devDependencies": {
-    "@typescript-eslint/parser": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "eslint-plugin-cypress": "latest"
+    "@typescript-eslint/parser": "^6.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "eslint-plugin-cypress": "^2.13.0"
   }
 }

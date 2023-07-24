@@ -205,13 +205,12 @@ Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabel
   cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.key').type(labelName);
   cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.value').type(labelValue);
   if (useHardwareLabels) {
-    var nthChildIndex = 7;
+    let nthChildIndex = 7;
     for (const key in hwLabels) {
-      const value = hwLabels[key];
       cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
         .click();
       cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
-      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) > .no-resize`).type(value, {parseSpecialCharSequences: false});
+      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) > .no-resize`).type(hwLabels[key], {parseSpecialCharSequences: false});
       nthChildIndex += 3;
     };
   };
@@ -244,9 +243,8 @@ Cypress.Commands.add('checkMachInvLabel', (machRegName, labelName, labelValue, a
       .contains(labelName + ': ' + labelValue);
     if (userHardwareLabels) {
       for (const key in hwLabels) {
-        const value = hwLabels[key];
         cy.getBySel('yaml-editor-code-mirror')
-          .contains(key +': ' + value);
+          .contains(key +': ' + hwLabels[key]);
       };
     };
     cy.clickButton('Cancel');
@@ -255,7 +253,6 @@ Cypress.Commands.add('checkMachInvLabel', (machRegName, labelName, labelValue, a
         .contains(labelName + ': ' + labelValue);
       if (userHardwareLabels) {
         for (const key in hwLabels) {
-          const value = hwLabels[key];
           cy.getBySel('yaml-editor-code-mirror')
             .contains(key +': ');
       };
@@ -303,12 +300,12 @@ Cypress.Commands.add('editMachReg', ( machRegName, addLabel=false, addAnnotation
     if (withYAML) {
       cy.contains('li', 'Edit YAML')
         .click();
-      cy.contains('metadata')
-        .click(0,0)
-        .type('{end}{enter}  labels:{enter}  myLabel1: myLabelValue1');
-      cy.contains('metadata')
-        .click(0,0)
-        .type('{end}{enter}  annotations:{enter}  myAnnotation1: myAnnotationValue1');
+      cy.contains('metadata').as('meta')
+      cy.get('@meta').click(0,0)
+      cy.get('@meta').type('{end}{enter}  labels:{enter}  myLabel1: myLabelValue1');
+      cy.contains('metadata').as('meta')
+      cy.get('@meta').click(0,0)
+      cy.get('@meta').type('{end}{enter}  annotations:{enter}  myAnnotation1: myAnnotationValue1');
     } else {
       cy.contains('li', 'Edit Config')
         .click();
@@ -391,7 +388,7 @@ Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
 
 // Add an OS version channel
 Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
-    var channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/teal53/15.4/rancher/elemental-teal-channel/5.3:latest`;
+    const channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/teal53/15.4/rancher/elemental-teal-channel/5.3:latest`;
     cy.clickNavMenu(["Advanced", "OS Version Channels"]);
     cy.getBySel('masthead-create')
       .contains('Create')
@@ -405,6 +402,7 @@ Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
       .click();
     // Status changes a lot right after the creation so let's wait 10 secondes
     // before checking
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(10000);
     // Make sure the new channel is in Active state
     cy.contains("Active "+channelVersion+"-channel", {timeout: 50000});

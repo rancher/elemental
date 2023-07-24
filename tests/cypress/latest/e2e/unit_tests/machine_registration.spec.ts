@@ -57,7 +57,7 @@ describe('Machine registration testing', () => {
     cy.get('body').then(($body) => {
       if (!$body.text().includes('There are no rows to show.')) {
         cy.deleteAllResources();
-      };
+      }
     });
   });
 

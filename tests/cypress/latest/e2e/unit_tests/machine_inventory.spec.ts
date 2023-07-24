@@ -57,15 +57,18 @@ describe('Machine inventory testing', () => {
       cy.contains('my-machine')
         .click()
       cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', true);
-      for (var hwLabel in hwLabels) { 
+      for (const key in hwLabels) {
         cy.clickNavMenu(["Inventory of Machines"]);
+        // Because of the double .parent() call we have to keep this ugly chain
+        // TODO: try to use something more elegant later!
+        // eslint-disable-next-line cypress/unsafe-to-chain-command
         cy.get('.table-options-group > .btn > .icon')
           .click()
           .parent()
           .parent()
-          .contains(hwLabels[hwLabel])
+          .contains(hwLabels[key])
           .click({force: true})
-        cy.contains(hwLabels[hwLabel]);
+        cy.contains(hwLabels[key]);
       }
     });
   });
@@ -120,10 +123,12 @@ describe('Machine inventory testing', () => {
       }
       cy.clickButton('Create');
       // This wait can be replaced by something cleaner
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(3000);
       cypressLib.checkClusterStatus(clusterName, 'Updating', 300000);
       cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
       // Ugly but needed unfortunately to make sure the cluster stops switching status
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(240000);
     });
   });

@@ -8,6 +8,6 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
       "sourceType": "module",
-      "ecmaVersion": "latest"
+      "ecmaVersion": "2015"
   }
 }

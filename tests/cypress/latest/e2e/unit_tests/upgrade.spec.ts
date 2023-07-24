@@ -20,12 +20,12 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
 Cypress.config();
 describe('Upgrade tests', () => {
-  const channelName              = "mychannel"
-  const clusterName              = "mycluster"
-  const elementalUser            = "elemental-user"
-  const uiAccount                = Cypress.env('ui_account');
-  const uiPassword               = "rancherpassword"
-  const upgradeImage             = Cypress.env('upgrade_image')
+  const channelName   = "mychannel"
+  const clusterName   = "mycluster"
+  const elementalUser = "elemental-user"
+  const uiAccount     = Cypress.env('ui_account');
+  const uiPassword    = "rancherpassword"
+  const upgradeImage  = Cypress.env('upgrade_image')
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -37,6 +37,7 @@ describe('Upgrade tests', () => {
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
   });
+
   filterTests(['upgrade'], () => {
     it('Check OS Versions', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
@@ -82,12 +83,14 @@ describe('Upgrade tests', () => {
           .parents()
           .contains('dev')
           .click();
-      };
+      }
+
       cy.getBySel('form-save')
       .contains('Create')
         .click();
       // Status changes a lot right after the creation so let's wait 10 secondes
       // before checking
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000);
       cy.getBySel('sortable-cell-0-0')
         .contains('Active');
@@ -105,6 +108,7 @@ describe('Upgrade tests', () => {
         .click();
       cy.get('.header-buttons > :nth-child(2)')
         .click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(20000);
       cy.get('.shell-body')
         .type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=0{enter}');
