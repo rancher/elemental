@@ -17,7 +17,6 @@ limitations under the License.
 package smoke_test
 
 import (
-	"fmt"
 	"os"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -39,7 +38,7 @@ var _ = Describe("Elemental Installation tests", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			out, err := s.Command(s.ElementalCmd("install", "/dev/sda", "--cloud-init", "/tmp/cloud_init.yaml"))
-			fmt.Printf(out)
+			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Mounting disk partitions"),
@@ -61,7 +60,7 @@ var _ = Describe("Elemental Installation tests", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			out, err := s.Command(s.ElementalCmd("install", "/dev/sda", "--cloud-init", "/tmp/cloud_init.yaml", "--system.uri", "docker:"+containerImage))
-			fmt.Printf(out)
+			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(out).To(And(
 				ContainSubstring("Mounting disk partitions"),

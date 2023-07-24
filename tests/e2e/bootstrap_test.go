@@ -115,7 +115,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			defer os.Remove(emulatedTmp)
 
 			// Save original file as it can be modified multiple time
-			tools.CopyFile(emulateTPMYaml, emulatedTmp)
+			err = tools.CopyFile(emulateTPMYaml, emulatedTmp)
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Patch the yaml file
 			err = tools.Sed("%EMULATE_TPM%", strconv.FormatBool(emulateTPM), emulatedTmp)
@@ -156,7 +157,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				}
 
 				// Save original file as it will have to be modified twice
-				tools.CopyFile(seedimageYaml, seedimageTmp)
+				err = tools.CopyFile(seedimageYaml, seedimageTmp)
+				Expect(err).To(Not(HaveOccurred()))
 
 				// Create Yaml file
 				for _, p := range patterns {

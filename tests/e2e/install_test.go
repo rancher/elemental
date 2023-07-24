@@ -147,9 +147,10 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// NOTE: don't check for error, as it will happen anyway (only K3s or RKE2 is installed at a time)
 			file, _ := exec.Command("bash", "-c", "ls /etc/rancher/{k3s,rke2}/{k3s,rke2}.yaml").Output()
 			Expect(file).To(Not(BeEmpty()))
-			tools.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
+			err := tools.CopyFile(strings.Trim(string(file), "\n"), localKubeconfig)
+			Expect(err).To(Not(HaveOccurred()))
 
-			err := os.Setenv("KUBECONFIG", localKubeconfig)
+			err = os.Setenv("KUBECONFIG", localKubeconfig)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
@@ -262,7 +263,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
 			// Copy skel file for ~/.kube/config
-			tools.CopyFile(localKubeconfigYaml, localKubeconfig)
+			err = tools.CopyFile(localKubeconfigYaml, localKubeconfig)
+			Expect(err).To(Not(HaveOccurred()))
 
 			// Create kubeconfig for local cluster
 			err = tools.Sed("%RANCHER_URL%", rancherHostname, localKubeconfig)
