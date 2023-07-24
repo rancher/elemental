@@ -25,7 +25,8 @@ import (
 )
 
 func systemdUnitIsStarted(s string, st *sut.SUT) {
-	out, _ := st.Command(fmt.Sprintf("systemctl status %s", s))
+	out, err := st.Command(fmt.Sprintf("systemctl status %s", s))
+	Expect(err).To(Not(HaveOccurred()))
 
 	Expect(out).To(And(
 		ContainSubstring(fmt.Sprintf("%s.service; enabled", s)),
@@ -44,11 +45,15 @@ var _ = Describe("Elemental Smoke tests", func() {
 		if CurrentSpecReport().Failed() {
 			cmds := []string{"pods", "events", "helmcharts", "ingress"}
 			for _, c := range cmds {
-				s.Command("k3s kubectl get " + c + " -A -o json > /tmp/" + c + ".json")
+				_, err := s.Command("k3s kubectl get " + c + " -A -o json > /tmp/" + c + ".json")
+				Expect(err).To(Not(HaveOccurred()))
 			}
-			s.Command("df -h > /tmp/disk")
-			s.Command("mount > /tmp/mounts")
-			s.Command("blkid > /tmp/blkid")
+			_, err := s.Command("df -h > /tmp/disk")
+			Expect(err).To(Not(HaveOccurred()))
+			_, err = s.Command("mount > /tmp/mounts")
+			Expect(err).To(Not(HaveOccurred()))
+			_, err = s.Command("blkid > /tmp/blkid")
+			Expect(err).To(Not(HaveOccurred()))
 
 			s.GatherAllLogs()
 		}
@@ -62,7 +67,8 @@ var _ = Describe("Elemental Smoke tests", func() {
 		}
 
 		It("has default mounts", func() {
-			out, _ := s.Command("mount")
+			out, err := s.Command("mount")
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(And(
 				ContainSubstring("/var/lib/rancher"),
 				ContainSubstring("/etc/ssh"),
@@ -71,7 +77,8 @@ var _ = Describe("Elemental Smoke tests", func() {
 		})
 
 		It("has default cmdline", func() {
-			out, _ := s.Command("cat /proc/cmdline")
+			out, err := s.Command("cat /proc/cmdline")
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(And(
 				ContainSubstring("rd.neednet=0"),
 			))
@@ -79,12 +86,15 @@ var _ = Describe("Elemental Smoke tests", func() {
 
 		// Added user via cloud-init is functional
 		It("has the user added via cloud-init", func() {
-			out, _ := s.Command(`su - vagrant -c 'id -un'`)
+			out, err := s.Command("su - vagrant -c 'id -un'")
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(Equal("vagrant\n"))
 
-			out, _ = s.Command(`cat /run/vagrant/.ssh/authorized_keys`)
+			out, err = s.Command("cat /run/vagrant/.ssh/authorized_keys")
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(ContainSubstring("ssh-rsa"))
-			out, _ = s.Command(`sudo cat /root/.ssh/authorized_keys`)
+			out, err = s.Command("sudo cat /root/.ssh/authorized_keys")
+			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(ContainSubstring("ssh-rsa"))
 		})
 	})

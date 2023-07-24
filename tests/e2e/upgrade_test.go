@@ -239,7 +239,8 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			} else {
 				// Use original file as-is
-				tools.CopyFile(upgradeSkelYaml, upgradeTmp)
+				err := tools.CopyFile(upgradeSkelYaml, upgradeTmp)
+				Expect(err).To(Not(HaveOccurred()))
 			}
 
 			// Set values

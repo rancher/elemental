@@ -88,7 +88,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				patterns := append(basePatterns, addPatterns...)
 
 				// Save original file as it will have to be modified twice
-				tools.CopyFile(selectorYaml, selectorTmp)
+				err := tools.CopyFile(selectorYaml, selectorTmp)
+				Expect(err).To(Not(HaveOccurred()))
 
 				// Create Yaml file
 				for _, p := range patterns {
@@ -103,7 +104,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				}
 
 				// Apply to k8s
-				err := kubectl.Apply(clusterNS, selectorTmp)
+				err = kubectl.Apply(clusterNS, selectorTmp)
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Check that the selector template is correctly created
@@ -145,7 +146,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				patterns := append(basePatterns, addPatterns...)
 
 				// Save original file as it will have to be modified twice
-				tools.CopyFile(registrationYaml, registrationTmp)
+				err := tools.CopyFile(registrationYaml, registrationTmp)
+				Expect(err).To(Not(HaveOccurred()))
 
 				// Create Yaml file
 				for _, p := range patterns {
@@ -154,7 +156,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				}
 
 				// Apply to k8s
-				err := kubectl.Apply(clusterNS, registrationTmp)
+				err = kubectl.Apply(clusterNS, registrationTmp)
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Check that the machine registration is correctly created
