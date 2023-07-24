@@ -35,7 +35,7 @@ filterTests(['main'], () => {
     });
   
     it('Create fake machine inventories', () => {
-      let machineInventoryMap = new Map([
+      const machineInventoryMap = new Map([
         ['machine_inventory_1', 'test-filter-one'],
         ['machine_inventory_2', 'test-filter-two'],
         ['machine_inventory_3', 'shouldnotmatch']

@@ -49,9 +49,9 @@ filterTests(['main'], () => {
       cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
         .contains('Add Rule')
         .click();
-      cy.get('[data-testid="input-match-expression-values-0"] > input')
-        .click()
-        .type('wrong');
+      cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
+      cy.get('@match-value').click()
+      cy.get('@match-value').type('wrong');
       cy.contains('.banner', 'Matches no existing Inventory of Machines')
         .should('exist');
     });
@@ -66,9 +66,9 @@ filterTests(['main'], () => {
         .click()
       cy.contains('myInvLabel1')
         .click();
-      cy.get('[data-testid="input-match-expression-values-0"] > input')
-        .click()
-        .type('myInvLabelValue1');
+      cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
+      cy.get('@match-value').click()
+      cy.get('@match-value').type('myInvLabelValue1');
       cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
         .should('exist');
     });

@@ -27,6 +27,7 @@ filterTests(['main'], () => {
     
     it('Deploy Alerting Drivers application', () => {
       cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(20000);
       cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
       cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
