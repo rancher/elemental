@@ -92,7 +92,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		})
 
 		By("Checking that the VM is available in Rancher", func() {
-			id, err := elemental.GetServerId(clusterNS, vmIndex)
+			id, err := elemental.GetServerID(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
 		})
@@ -103,7 +103,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 		})
 
 		By("Checking VM connection", func() {
-			id, err := elemental.GetServerId(clusterNS, vmIndex)
+			id, err := elemental.GetServerID(clusterNS, vmIndex)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(id).To(Not(BeEmpty()))
 

@@ -29,15 +29,15 @@ import (
  * @param index URL of the repository
  * @returns The name/id of the server or an error
  */
-func GetServerId(clusterNS string, index int) (string, error) {
-	serverId, err := kubectl.Run("get", "MachineInventories",
+func GetServerID(clusterNS string, index int) (string, error) {
+	serverID, err := kubectl.Run("get", "MachineInventories",
 		"--namespace", clusterNS,
 		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
 	if err != nil {
 		return "", err
 	}
 
-	return serverId, nil
+	return serverID, nil
 }
 
 /**
