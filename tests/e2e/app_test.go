@@ -51,9 +51,11 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 
 		By("Waiting for deployment to be rollout", func() {
 			// Wait for application to be started
-			status, err := kubectl.Run("rollout", "status", "deployment/"+appName)
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(status).To(ContainSubstring("successfully rolled out"))
+			// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
+			Eventually(func() string {
+				status, _ := kubectl.Run("rollout", "status", "deployment/"+appName)
+				return status
+			}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
 		})
 
 		By("Checking application", func() {
