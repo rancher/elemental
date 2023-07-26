@@ -96,28 +96,31 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Wait for Rancher Manager to be restarted
-		status, err := kubectl.Run(
-			"rollout",
-			"--namespace", "cattle-system",
-			"status", "deployment/rancher",
-		)
-		Expect(err).To(Not(HaveOccurred()))
-		Expect(status).To(ContainSubstring("successfully rolled out"))
+		// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
+		Eventually(func() string {
+			status, _ := kubectl.Run(
+				"rollout",
+				"--namespace", "cattle-system",
+				"status", "deployment/rancher",
+			)
+			return status
+		}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
 
 		// Check that all Rancher Manager pods are running
-		checkList := [][]string{
-			{"cattle-system", "app=rancher"},
-			{"cattle-fleet-local-system", "app=fleet-agent"},
-			{"cattle-system", "app=rancher-webhook"},
-		}
-		err = rancher.CheckPod(k, checkList)
-		Expect(err).To(Not(HaveOccurred()))
+		Eventually(func() error {
+			checkList := [][]string{
+				{"cattle-system", "app=rancher"},
+				{"cattle-fleet-local-system", "app=fleet-agent"},
+				{"cattle-system", "app=rancher-webhook"},
+			}
+			return rancher.CheckPod(k, checkList)
+		}, tools.SetTimeout(3*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
 		// Check that all pods are using the same version
 		Eventually(func() int {
 			out, _ := kubectl.Run(getImageVersion...)
 			return len(strings.Fields(out))
-		}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(1))
+		}, tools.SetTimeout(3*time.Minute), 10*time.Second).Should(Equal(1))
 
 		// Get after-upgrade Rancher Manager version
 		// and check that it's different to the before-upgrade version
