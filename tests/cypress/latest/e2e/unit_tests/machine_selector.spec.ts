@@ -15,6 +15,7 @@ import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
+import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -38,39 +39,45 @@ filterTests(['main'], () => {
       elemental.accessClusterMenu(); 
     });
   
-    it('Testing selector without any rule', () => {
-      cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
-        .should('exist');
-    });
+    qase(25,
+      it('Testing selector without any rule', () => {
+        cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
+          .should('exist');
+      })
+    );
   
-    it('Testing selector with unmatching rule', () => {
-      //cy.clickButton('Add Rule');
-      // TODO: Cannot use the clickButton here, I do not know why yet 
-      cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
-        .contains('Add Rule')
-        .click();
-      cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
-      cy.get('@match-value').click()
-      cy.get('@match-value').type('wrong');
-      cy.contains('.banner', 'Matches no existing Inventory of Machines')
-        .should('exist');
-    });
+    qase(26,
+      it('Testing selector with unmatching rule', () => {
+        //cy.clickButton('Add Rule');
+        // TODO: Cannot use the clickButton here, I do not know why yet 
+        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
+          .contains('Add Rule')
+          .click();
+        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
+        cy.get('@match-value').click()
+        cy.get('@match-value').type('wrong');
+        cy.contains('.banner', 'Matches no existing Inventory of Machines')
+          .should('exist');
+      })
+    );
   
-    it('Testing selector with matching rule', () => {
-      //cy.clickButton('Add Rule');
-      // TODO: Cannot use the clickButton here, I do not know why yet 
-      cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
-        .contains('Add Rule')
-        .click();
-      cy.get('[data-testid="input-match-expression-key-0"]')
-        .click()
-      cy.contains('myInvLabel1')
-        .click();
-      cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
-      cy.get('@match-value').click()
-      cy.get('@match-value').type('myInvLabelValue1');
-      cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
-        .should('exist');
-    });
+    qase(27,
+      it('Testing selector with matching rule', () => {
+        //cy.clickButton('Add Rule');
+        // TODO: Cannot use the clickButton here, I do not know why yet 
+        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
+          .contains('Add Rule')
+          .click();
+        cy.get('[data-testid="input-match-expression-key-0"]')
+          .click()
+        cy.contains('myInvLabel1')
+          .click();
+        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
+        cy.get('@match-value').click()
+        cy.get('@match-value').type('myInvLabelValue1');
+        cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
+          .should('exist');
+      })
+    );
   });
 }); 

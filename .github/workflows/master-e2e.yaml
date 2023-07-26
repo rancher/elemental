@@ -17,12 +17,19 @@ on:
         # - if the person still has access to the repo
         description: PAT token used to add runner
         required: true
+      qase_api_token:
+        description: Qase API token to use for Cypress tests
+        required: false
       slack_webhook_url:
         description: WebHook URL to use for Slack
         required: true
     inputs:
       backup_restore_version:
         description: Version of backup-restore-operator to use
+        type: string
+      qase_run_id:
+        description: Case run ID where the results will be reported
+        required: false
         type: string
       ca_type:
         description: CA type to use (selfsigned or private)
@@ -132,7 +139,7 @@ on:
         default: v1.25.7+k3s1
         type: string
       workflow_download:
-        description: build-ci workflow to use for artifacts
+        description: build-ci workfluw to use for artifacts
         default: build-ci.yaml
         type: string
       zone:
@@ -216,6 +223,9 @@ jobs:
       K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_RUN_ID: ${{ inputs.qase_run_id }}
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}
       TIMEOUT_SCALE: 3
