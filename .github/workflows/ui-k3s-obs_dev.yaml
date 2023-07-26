@@ -4,6 +4,10 @@ name: UI-K3s-OBS_Dev
 on:
   workflow_dispatch:
     inputs:
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        required: false
+        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -23,9 +27,11 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard K3s"
+      qase_run_id: ${{ inputs.qase_run_id }}
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}

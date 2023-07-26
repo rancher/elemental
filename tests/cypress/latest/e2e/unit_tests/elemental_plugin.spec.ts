@@ -16,6 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import { isUIVersion, isRancherManagerVersion } from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
+import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
@@ -26,32 +27,38 @@ filterTests(['main', 'upgrade'], () => {
       cy.visit('/');
     });
   
-    it('Add elemental-ui repo', () => {
-      !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
-    });
+    qase(11,
+      it('Add elemental-ui repo', () => {
+        !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
+      })
+    );
     
-    it('Enable extension support', () => {
-      cypressLib.burgerMenuOpenIfClosed();
-      isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
-    });
+    qase(12,
+      it('Enable extension support', () => {
+        cypressLib.burgerMenuOpenIfClosed();
+        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
+      })
+    );
   
-    it('Install Elemental plugin', () => {
-      cypressLib.burgerMenuOpenIfClosed();
-      // TODO: create a function to install any plugin and not elemental only
-      cy.contains('Extensions')
-        .click();
-      cy.contains('elemental');
-      cy.get('.plugin')
-        .contains('Install')
-        .click();
-      cy.clickButton('Install');
-      cy.contains('Installing');
-      cy.contains('Extensions changed - reload required', {timeout: 40000});
-      cy.clickButton('Reload');
-      cy.get('.plugins')
-        .children()
-        .should('contain', 'elemental')
-        .and('contain', 'Uninstall');
-    });
+    qase(13,
+      it('Install Elemental plugin', () => {
+        cypressLib.burgerMenuOpenIfClosed();
+        // TODO: create a function to install any plugin and not elemental only
+        cy.contains('Extensions')
+          .click();
+        cy.contains('elemental');
+        cy.get('.plugin')
+          .contains('Install')
+          .click();
+        cy.clickButton('Install');
+        cy.contains('Installing');
+        cy.contains('Extensions changed - reload required', {timeout: 40000});
+        cy.clickButton('Reload');
+        cy.get('.plugins')
+          .children()
+          .should('contain', 'elemental')
+          .and('contain', 'Uninstall');
+      })
+    );
   });
-}); 
+});

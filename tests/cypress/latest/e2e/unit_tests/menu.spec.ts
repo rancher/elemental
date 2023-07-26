@@ -15,6 +15,7 @@ import { Elemental } from '~/support/elemental';
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
+import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -29,25 +30,29 @@ filterTests(['main'], () => {
       cy.visit('/');
     });
   
-    it('Check Elemental logo', () => {
-      // Elemental's icon should appear in the side menu
-      cypressLib.burgerMenuOpenIfClosed();
-      cypressLib.checkNavIcon('elemental')
-        .should('exist');
-    });
+    qase(2,
+      it('Check Elemental logo', () => {
+        // Elemental's icon should appear in the side menu
+        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.checkNavIcon('elemental')
+          .should('exist');
+      })
+    );
     
-    it('Check Elemental menu', () => {
-      cypressLib.burgerMenuOpenIfClosed();
+    qase(3,
+      it('Check Elemental menu', () => {
+        cypressLib.burgerMenuOpenIfClosed();
   
-      // Elemental's icon should appear in the side menu
-      cypressLib.checkNavIcon('elemental')
-        .should('exist');
+        // Elemental's icon should appear in the side menu
+        cypressLib.checkNavIcon('elemental')
+          .should('exist');
   
-      // Click on the Elemental's icon
-      cypressLib.accesMenu('OS Management');
+        // Click on the Elemental's icon
+        cypressLib.accesMenu('OS Management');
   
-      // Check Elemental's side menu
-      elemental.checkElementalNav();
-    });
+        // Check Elemental's side menu
+        elemental.checkElementalNav();
+      })
+    );
   });
 }); 

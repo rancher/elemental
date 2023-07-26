@@ -23,6 +23,9 @@ docker run -v $PWD:/workdir -w /workdir                     \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
     -e OPERATOR_REPO=$OPERATOR_REPO                         \
     -e PROXY=$PROXY                                         \
+    -e QASE_API_TOKEN=$QASE_API_TOKEN                       \
+    -e QASE_REPORT=1                                        \
+    -e QASE_RUN_ID=$QASE_RUN_ID                             \
     -e RANCHER_VERSION=$RANCHER_VERSION                     \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD                   \
     -e RANCHER_URL=$RANCHER_URL                             \

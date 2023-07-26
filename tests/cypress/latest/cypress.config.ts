@@ -1,7 +1,15 @@
 import { defineConfig } from 'cypress'
 
+const qaseAPIToken = process.env.QASE_API_TOKEN
+
 export default defineConfig({
   defaultCommandTimeout: 10000,
+  reporter: 'cypress-qase-reporter',
+  reporterOptions: {
+    'apiToken': qaseAPIToken,
+    'projectCode': 'ELEMENTAL',
+    'logging': true,
+  },
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
