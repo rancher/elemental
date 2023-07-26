@@ -296,7 +296,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				By("Checking that node "+h+" is available in Rancher", func() {
 					Eventually(func() string {
-						id, _ := elemental.GetServerId(c, i)
+						id, _ := elemental.GetServerID(c, i)
 						return id
 					}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
 				})
