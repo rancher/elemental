@@ -1,13 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
-#!BuildTag: rancher/elemental-teal-iso:%VERSION%
-#!BuildTag: rancher/elemental-teal-iso:%VERSION%-%RELEASE%
+#!BuildTag: rancher/elemental-teal-iso/%%SLEMICRO_VERSION%%:latest
+#!BuildTag: rancher/elemental-teal-iso/%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: rancher/elemental-teal-iso/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 10
 #!BuildConstraint: hardware:memory:size unit=G 16
 
 ARG SLE_VERSION
+ARG SLEMICRO_VERSION
 
-FROM rancher/elemental-teal:latest AS os
-FROM rancher/elemental-builder-image:latest AS builder
+FROM rancher/elemental-teal/$SLEMICRO_VERSION:latest AS os
+FROM rancher/elemental-builder-image/$SLEMICRO_VERSION:latest AS builder
 
 WORKDIR /iso
 
@@ -22,8 +24,9 @@ RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-teal.$(u
 FROM bci/bci-busybox:$SLE_VERSION
 COPY --from=builder /output /elemental-iso
 
-ARG BUILD_REPO=registry.suse.com
-ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal
+ARG SLEMICRO_VERSION
+ARG BUILD_REPO=%%IMG_REPO%%
+ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal-iso/$SLEMICRO_VERSION
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.rancher.elemental

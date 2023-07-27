@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: rancher/elemental-teal:%VERSION%
-#!BuildTag: rancher/elemental-teal:%VERSION%-%RELEASE%
+#!BuildTag: rancher/elemental-teal/%%SLEMICRO_VERSION%%:latest
+#!BuildTag: rancher/elemental-teal/%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: rancher/elemental-teal/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 
 ARG SLEMICRO_VERSION
@@ -21,8 +22,9 @@ RUN zypper in -y -- \
 # Install extra useful utilities
 RUN zypper in -y k9s
 
-ARG BUILD_REPO=registry.suse.com
-ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal
+ARG SLEMICRO_VERSION
+ARG BUILD_REPO=%%IMG_REPO%%
+ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal/$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
