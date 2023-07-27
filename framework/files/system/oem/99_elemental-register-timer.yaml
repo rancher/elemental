@@ -1,0 +1,6 @@
+name: "Elemental Register start"
+stages:
+  network.after:
+    - if: '[ ! -f /run/cos/live_mode ] && [ ! -f /run/cos/recovery_mode ]'
+      commands:
+        - systemctl start elemental-register.timer
