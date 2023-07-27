@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-#!BuildTag: rancher/elemental-teal-iso:latest
 #!BuildTag: rancher/elemental-teal-iso:%VERSION%
 #!BuildTag: rancher/elemental-teal-iso:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 10

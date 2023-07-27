@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: rancher/elemental-teal:latest
 #!BuildTag: rancher/elemental-teal:%VERSION%
 #!BuildTag: rancher/elemental-teal:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
