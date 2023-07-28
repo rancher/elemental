@@ -15,8 +15,6 @@ limitations under the License.
 package network
 
 import (
-	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 
@@ -30,7 +28,7 @@ import (
  * @returns The number of .ipxe files found or an error
  */
 func ConfigureiPXE(httpSrv string) (int, error) {
-	ipxeScript, err := tools.GetFiles("../..", "*.ipxe")
+	ipxeScript, err := tools.GetFilesList("../..", "*.ipxe")
 	if err != nil {
 		return 0, err
 	}
@@ -64,20 +62,4 @@ func ConfigureiPXE(httpSrv string) (int, error) {
 
 	// Returns the number of ipxe files found
 	return len(ipxeScript), nil
-}
-
-/**
- * Share files through HTTP (simple way, no security at all!)
- * @remarks A HTTP server is up and running
- * @param directory The directory where is files are
- * @param listenAddr Port where to listen to
- */
-func HttpShare(directory, listenAddr string) {
-	fs := http.FileServer(http.Dir(directory))
-
-	go func() {
-		if err := http.ListenAndServe(listenAddr, fs); err != nil {
-			fmt.Printf("Server failed: %s\n", err)
-		}
-	}()
 }

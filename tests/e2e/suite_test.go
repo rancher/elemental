@@ -24,9 +24,9 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
+	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
-	"github.com/rancher/elemental/tests/e2e/helpers/network"
 )
 
 const (
@@ -116,7 +116,7 @@ func CheckClusterState(ns, cluster string) {
 
 func GetNodeInfo(hostName string) (*tools.Client, string) {
 	// Get network data
-	hostData, err := tools.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
+	hostData, err := rancher.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
 	Expect(err).To(Not(HaveOccurred()))
 
 	// Set 'client' to be able to access the node through SSH
@@ -227,5 +227,5 @@ var _ = BeforeSuite(func() {
 	}
 
 	// Start HTTP server
-	network.HttpShare("../..", ":8000")
+	tools.HTTPShare("../..", ":8000")
 })
