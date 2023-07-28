@@ -40,8 +40,8 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.proxy                = process.env.PROXY;
   config.env.rancher_version      = process.env.RANCHER_VERSION;
   config.env.ui_account           = process.env.UI_ACCOUNT;
-  config.env.upgrade_channel_list = process.env.UPGRADE_CHANNEL_LIST;
   config.env.upgrade_image        = process.env.UPGRADE_IMAGE;
+  config.env.upgrade_os_channel   = process.env.UPGRADE_OS_CHANNEL;
   config.env.username             = process.env.RANCHER_USER;
 
   return config;

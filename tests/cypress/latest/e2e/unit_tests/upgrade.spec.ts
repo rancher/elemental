@@ -21,12 +21,13 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 Cypress.config();
 describe('Upgrade tests', () => {
-  const channelName   = "mychannel"
-  const clusterName   = "mycluster"
-  const elementalUser = "elemental-user"
-  const uiAccount     = Cypress.env('ui_account');
-  const uiPassword    = "rancherpassword"
-  const upgradeImage  = Cypress.env('upgrade_image')
+  const channelName      = "mychannel"
+  const clusterName      = "mycluster"
+  const elementalUser    = "elemental-user"
+  const uiAccount        = Cypress.env('ui_account');
+  const uiPassword       = "rancherpassword"
+  const upgradeImage     = Cypress.env('upgrade_image')
+  const upgradeOsChannel = Cypress.env('upgrade_os_channel')
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -83,10 +84,18 @@ describe('Upgrade tests', () => {
             .click();
           cy.getBySel('os-version-box')
             .click()
-          cy.getBySel('os-version-box')
-            .parents()
-            .contains('dev')
-            .click();
+          // TODO: remove hardcoded staging version
+          if (upgradeOsChannel == "staging") {
+            cy.getBySel('os-version-box')
+              .parents()
+              .contains('v1.2.1')
+              .click();
+          } else {
+            cy.getBySel('os-version-box')
+              .parents()
+              .contains('latest-'+upgradeOsChannel)
+              .click();
+          }
         }
 
         cy.getBySel('form-save')

@@ -28,9 +28,9 @@ on:
         description: Rancher Manager channel/version to use for installation
         default: stable/latest
         type: string
-      upgrade_os_channel:
-        description: Channel to use for the Elemental OS upgrade
-        default: dev
+      upgrade_image:
+        description: Upgrade image to use
+        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
         type: string
 
 jobs:
@@ -53,6 +53,4 @@ jobs:
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-dev-channel/5.4:latest
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
-      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
+      upgrade_image: ${{ inputs.upgrade_image }}
