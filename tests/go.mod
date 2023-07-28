@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/onsi/ginkgo/v2 v2.9.7
 	github.com/onsi/gomega v1.27.8
-	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20230720103427-720776eab808
+	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20230728095137-0c2cb1c78cc8
 	gopkg.in/yaml.v3 v3.0.1
 )
 
