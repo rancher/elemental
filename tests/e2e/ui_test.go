@@ -72,7 +72,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
-			hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
+			hostData, err := rancher.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 			Expect(err).To(Not(HaveOccurred()))
 
 			client = &tools.Client{
