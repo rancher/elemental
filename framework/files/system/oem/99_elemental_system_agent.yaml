@@ -1,6 +1,6 @@
 name: "Elemental system agent bootstrap"
 stages:
   network.after:
-    - if: '[ ! -f /run/cos/live_mode ]'
+    - if: '[ ! -f /run/cos/live_mode ] && [ ! -f /run/cos/recovery_mode ]'
       commands:
         - systemctl start elemental-system-agent.service
