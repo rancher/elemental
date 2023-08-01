@@ -40,5 +40,5 @@ jobs:
       k8s_version_to_provision: v1.25.7+rke2r1
       rancher_version: ${{ inputs.rancher_version || 'latest/devel' }}
       test_type: ui
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upstream_cluster_version: v1.25.7+rke2r1

@@ -37,4 +37,4 @@ jobs:
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
       test_type: ui
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/teal53/15.4/rancher/elemental-teal/5.3:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
