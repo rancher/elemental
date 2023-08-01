@@ -388,7 +388,7 @@ Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
 
 // Add an OS version channel
 Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
-    const channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/teal53/15.4/rancher/elemental-teal-channel/5.3:latest`;
+    const channelRepo = `registry.opensuse.org/isv/rancher/elemental/${channelVersion}/containers/rancher/elemental-teal-channel/5.4:latest`;
     cy.clickNavMenu(["Advanced", "OS Version Channels"]);
     cy.getBySel('masthead-create')
       .contains('Create')
