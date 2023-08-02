@@ -78,8 +78,15 @@ iso_repack() {
 : ${ARCH:=$(uname -m)}
 # Docker repos only in lowercase
 REPOINLOWER=$(echo $REPO | tr '[:upper:]' '[:lower:]')
+
+
 # This image needs to have xorriso >= 5
-: ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/containers/rancher/elemental-builder-image/5.4:latest}
+if [ ${REPO} == "Stable" ]; then
+  : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
+else
+  : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/containers/rancher/elemental-builder-image/5.4:latest}
+fi
+
 REG_CONFIG_FILE=${1:-}
 
 # Some systems may report aarch64 as arm64 (darwin for example), so lets consolidate here
