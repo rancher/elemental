@@ -9,7 +9,7 @@ ARG SLE_VERSION
 ARG SLEMICRO_VERSION
 
 FROM rancher/elemental-teal/$SLEMICRO_VERSION:latest AS os
-FROM rancher/elemental-builder-image/$SLEMICRO_VERSION:latest AS builder
+FROM rancher/elemental-teal/$SLEMICRO_VERSION:latest AS builder
 
 WORKDIR /iso
 
