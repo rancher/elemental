@@ -3,4 +3,4 @@ stages:
   network.after:
     - if: '[ -f /run/cos/live_mode ]'
       commands:
-        - elemental-register --debug --install
+        - systemd-cat -t elemental-register elemental-register --debug --install 
