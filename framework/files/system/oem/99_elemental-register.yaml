@@ -1,5 +1,0 @@
-name: "Elemental operator bootstrap"
-stages:
-  network.after:
-    - commands:
-        - systemctl start elemental-register.timer

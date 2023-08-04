@@ -1,0 +1,6 @@
+name: "Elemental Register install"
+stages:
+  network.after:
+    - if: '[ -f /run/cos/live_mode ]'
+      commands:
+        - systemctl start elemental-register-install

@@ -1,0 +1,13 @@
+[Unit]
+Description=Elemental Register Install
+Documentation=https://elemental.docs.rancher.com
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+EnvironmentFile=-/etc/default/elemental
+EnvironmentFile=-/etc/sysconfig/proxy
+Type=oneshot
+ExecStart=/usr/sbin/elemental-register --debug --install
+Restart=on-failure
+RestartSec=5
