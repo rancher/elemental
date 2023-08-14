@@ -22,7 +22,7 @@ RUN elemental --debug --config-dir . build-iso -o /output -n "sle-micro-rancher.
 
 # Only keep the ISO as a result
 FROM bci/bci-busybox:$SLE_VERSION
-COPY --from=builder /output /iso
+COPY --from=builder /output /elemental-iso
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
