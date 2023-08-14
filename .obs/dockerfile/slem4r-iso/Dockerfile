@@ -8,8 +8,8 @@
 ARG SLE_VERSION
 ARG SLEMICRO_VERSION
 
-FROM rancher/sle-micro-rancher/$SLEMICRO_VERSION:latest AS os
-FROM rancher/sle-micro-rancher/$SLEMICRO_VERSION:latest AS builder
+FROM suse/sle-micro-rancher/$SLEMICRO_VERSION:latest AS os
+FROM suse/sle-micro-rancher/$SLEMICRO_VERSION:latest AS builder
 
 WORKDIR /iso
 
@@ -29,7 +29,7 @@ ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-rancher-iso/$SLEMICRO_VERSION
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.rancher.elemental
+# labelprefix=com.rancher.slem4r
 LABEL org.opencontainers.image.title="SLE Micro for Rancher ISO"
 LABEL org.opencontainers.image.description="Includes the SLE Micro for Rancher ISO"
 LABEL org.opencontainers.image.version="%VERSION%"
