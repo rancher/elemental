@@ -8,14 +8,13 @@ StartLimitIntervalSec=5min
 StartLimitBurst=5
 # No need to manually reset failed state
 CollectMode=inactive-or-failed
-# Use active state for Type=oneshot (used for Timer trigger)
-RemainAfterExit=true
 
 [Service]
 EnvironmentFile=-/etc/default/elemental
 EnvironmentFile=-/etc/sysconfig/proxy
 Type=oneshot
+# Use active state for Type=oneshot (used for Timer trigger)
+RemainAfterExit=true
 ExecStart=/usr/sbin/elemental-register --debug
 Restart=on-failure
 RestartSec=5
-
