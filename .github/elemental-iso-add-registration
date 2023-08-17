@@ -79,12 +79,11 @@ iso_repack() {
 # Docker repos only in lowercase
 REPOINLOWER=$(echo $REPO | tr '[:upper:]' '[:lower:]')
 
-
 # This image needs to have xorriso >= 5
 if [ ${REPO} == "Stable" ]; then
   : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
 else
-  : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/containers/rancher/elemental-builder-image/5.4:latest}
+  : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/containers/rancher/elemental-teal/5.4:latest}
 fi
 
 REG_CONFIG_FILE=${1:-}
@@ -99,7 +98,11 @@ if [ "$ARCH" == "amd64" ]; then
   ARCH="x86_64"
 fi
 
-ISO_URL=${2:-https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/${REPO}:/Teal53/media/iso/elemental-teal.${ARCH}.iso}
+if [ ${REPO} == "Stable" ]; then
+  ISO_URL=${2:-https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/${REPO}:/Teal53/media/iso/elemental-teal.${ARCH}.iso}
+else
+  ISO_URL=${2:-https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/${REPO}/containers/iso/elemental-teal.${ARCH}.iso}
+fi
 
 [ "${REPO}" == "Dev" ] || [ "${REPO}" == "Staging" ] || [ "${REPO}" == "Stable" ] || abort "REPO=${REPO} variable has to match Dev|Staging|Stable, aborting"
 [ -n "${REG_CONFIG_FILE}" ] || abort "No registration configuration file provided, aborting"
