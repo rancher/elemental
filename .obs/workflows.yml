@@ -9,6 +9,9 @@ push_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: build-iso
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: build-iso-next
   filters:
     branches:
       only:
