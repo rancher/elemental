@@ -48,7 +48,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_to_test: ${{ inputs.iso_to_test }}
-      k8s_version_to_provision: v1.25.7+k3s1
+      k8s_version_to_provision: v1.26.7+k3s1
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
