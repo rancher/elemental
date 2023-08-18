@@ -45,7 +45,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
-      k8s_version_to_provision: v1.25.7+rke2r1
+      k8s_version_to_provision: v1.26.7+rke2r1
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
@@ -53,4 +53,4 @@ jobs:
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-dev-channel/5.4:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
-      upstream_cluster_version: v1.25.7+rke2r1
+      upstream_cluster_version: v1.26.7+rke2r1
