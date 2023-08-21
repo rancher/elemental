@@ -1,12 +1,8 @@
-GIT_COMMIT ?= $(shell git rev-parse HEAD)
-GIT_COMMIT_SHORT ?= $(shell git rev-parse --short HEAD)
-GIT_TAG ?= $(shell git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0" )
-TAG ?= ${GIT_TAG}-${GIT_COMMIT_SHORT}
+GIT_COMMIT?=$(shell git rev-parse HEAD)
+GIT_COMMIT_SHORT?=$(shell git rev-parse --short HEAD)
+GIT_TAG?=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0" )
+TAG?=${GIT_TAG}-${GIT_COMMIT_SHORT}
 REPO?=ttl.sh/elemental-ci
-IMAGE=${REPO}:${GIT_TAG}
-ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-SUDO?=sudo
-FRAMEWORK_PACKAGES?=meta/cos-light
 CLOUD_CONFIG_FILE?="iso/config"
 MANIFEST_FILE?="iso/manifest.yaml"
 # This are the default images already in the dockerfile but we want to be able to override them
@@ -19,10 +15,13 @@ RELEASE_TAG?=false
 
 # Set tag based on release status for ease of use
 ifeq ($(RELEASE_TAG), "true")
-FINAL_TAG=$(GIT_TAG)
+FINAL_TAG:=$(GIT_TAG)
 else
-FINAL_TAG=$(TAG)
+FINAL_TAG:=$(TAG)
 endif
+
+# Set ISO variable
+ISO?=build/elemental-${FINAL_TAG}.iso
 
 .PHONY: clean
 clean:
@@ -78,7 +77,7 @@ endif
 		-o /mnt \
 		-n elemental-${FINAL_TAG} \
 		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
+	@echo "INFO: ISO available at ${ISO}"
 
 # Build an iso with the OBS base containers
 .PHONY: remote_iso
@@ -104,37 +103,40 @@ endif
 		-o /mnt \
 		-n elemental-${FINAL_TAG} \
 		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at build/elemental-${FINAL_TAG}.iso"
+	@echo "INFO: ISO available at ${ISO}"
 
 .PHONY: extract_kernel_init_squash
 extract_kernel_init_squash:
-	isoinfo -x /rootfs.squashfs -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}.squashfs
-	isoinfo -x /boot/kernel -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-kernel
-	isoinfo -x /boot/initrd -R -i build/elemental-${FINAL_TAG}.iso > build/elemental-${FINAL_TAG}-initrd
+	@VAR='$(ISO)'; \
+	INITRD_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name initrd -print 2>/dev/null); \
+	KERNEL_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name kernel -print 2>/dev/null); \
+	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name linux -print 2>/dev/null); \
+	isoinfo -x /rootfs.squashfs -R -i ${ISO} > $${VAR/\.iso/.squashfs} 2>/dev/null; \
+	isoinfo -x $${INITRD_FILE} -R -i ${ISO} > $${VAR/\.iso/-initrd} 2>/dev/null; \
+	isoinfo -x $${KERNEL_FILE} -R -i ${ISO} > $${VAR/\.iso/-kernel} 2>/dev/null
 
 .PHONY: ipxe
 ipxe:
 	@mkdir -p build
-	echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
-	echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
+	@echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
 ifeq ($(RELEASE_TAG), "true")
-	echo "set url https://github.com/rancher/elemental/releases/download/${FINAL_TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "set url https://github.com/rancher/elemental/releases/download/${FINAL_TAG}" >> build/elemental-${FINAL_TAG}.ipxe
 else
-	echo "set url tftp://10.0.2.2/${TAG}" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "set url tftp://10.0.2.2/${TAG}" >> build/elemental-${FINAL_TAG}.ipxe
 endif
-	echo "set kernel elemental-${FINAL_TAG}-kernel" >> build/elemental-${FINAL_TAG}.ipxe
-	echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
-	echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
-	echo "set iso    elemental-${FINAL_TAG}.iso" >> build/elemental-${FINAL_TAG}.ipxe  #not used anymore, check if we can boot from iso directly with sanboot?
-	echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
-	echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
-	echo "initrd \$${url}/\$${initrd}"  >> build/elemental-${FINAL_TAG}.ipxe
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "set kernel elemental-${FINAL_TAG}-kernel" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "initrd \$${url}/\$${initrd}" >> build/elemental-${FINAL_TAG}.ipxe
+	@echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
 
 .PHONY: build_all
 build_all: build iso extract_kernel_init_squash ipxe
 
 .PHONY: docs
 docs:
-	yarn install --frozen-lockfile
-	yarn build
+	@yarn install --frozen-lockfile
+	@yarn build
