@@ -30,7 +30,8 @@ jobs:
       test_description: "CI/Manual - UI - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
       cypress_tags: main
-      destroy_runner: ${{ inputs.destroy_runner || true }}
+      #destroy_runner: ${{ inputs.destroy_runner || true }}
+      destroy_runner: false
       elemental_ui_version: dev
       k8s_version_to_provision: v1.25.7+k3s1
       proxy: ${{ inputs.proxy || 'elemental' }}

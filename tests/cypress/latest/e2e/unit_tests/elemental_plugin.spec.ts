@@ -36,7 +36,7 @@ filterTests(['main', 'upgrade'], () => {
     qase(12,
       it('Enable extension support', () => {
         cypressLib.burgerMenuOpenIfClosed();
-        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
+        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, true);
       })
     );
   
