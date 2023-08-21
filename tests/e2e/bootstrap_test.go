@@ -268,7 +268,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 						// Check that the installation is completed before halting the VM
 						Eventually(func() error {
-							_, err := cl.RunSSH("journalctl -u elemental-register.service --no-pager | grep -i 'elemental installation completed'")
+							_, err := cl.RunSSH("journalctl -u elemental-register-install.service --no-pager | grep -iq 'elemental install completed''")
 							return err
 						}, tools.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
