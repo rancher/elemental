@@ -44,7 +44,7 @@ RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager 
 
 # make ARM happy
 #!ArchExclusiveLine: aarch64
-RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y raspberrypi-firmware raspberrypi-firmware-config raspberrypi-firmware-dt u-boot-rpiarm64 grub2-arm64-efi; fi
+RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y raspberrypi-firmware-uefi grub2-arm64-efi; fi
                 
 # make SUSE happy
 RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-Rancher-release systemd-presets-branding-SLE-Micro-for-Rancher
