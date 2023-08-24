@@ -16,17 +16,24 @@ on:
         description: ISO to test
         default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
         type: string
+      operator_repo:
+        description: Operator version to use for initial deployment
+        default: stable
+        type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
-        default: latest/devel
         type: string
       rancher_version:
         description: Rancher Manager channel/version to use for installation
         default: stable/latest
         type: string
+      teal_version:
+        description: Elemental Teal base OS version
+        default: 5.4
+        type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
-        default: latest-dev
+        default: dev
         type: string
 
 concurrency:
@@ -49,10 +56,10 @@ jobs:
       iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: v1.26.7+k3s1
       node_number: 5
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
-      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.operator_repo }}/charts/rancher
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-channel:latest
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
-      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
+      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal-channel:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal/${{ inputs.teal_version }}:latest
+      upgrade_os_channel: latest-${{ inputs.upgrade_os_channel }}
