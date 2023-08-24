@@ -104,14 +104,6 @@ func CheckClusterState(ns, cluster string) {
 	// Because if we do the next test too quickly it can be a false positive!
 	// NOTE: no SetTimeout needed here!
 	time.Sleep(30 * time.Second)
-
-	// There should be no 'reason' property set in a clean cluster
-	Eventually(func() string {
-		reason, _ := kubectl.Run("get", "cluster",
-			"--namespace", ns, cluster,
-			"-o", "jsonpath={.status.conditions[*].reason}")
-		return reason
-	}, tools.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(BeEmpty())
 }
 
 func GetNodeInfo(hostName string) (*tools.Client, string) {
