@@ -34,8 +34,18 @@ describe('Machine registration testing', () => {
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
 
-    // In upgrade scenario, we want to build ISO from stable channel
-    utils.isCypressTag('upgrade') ? cy.addOsVersionChannel('stable'): null;
+    // In upgrade scenario, we need to add extra channels
+    if (utils.isCypressTag('upgrade')) {
+      if (utils.isOperatorVersion('stable')) {
+        cy.addOsVersionChannel('dev');
+        cy.addOsVersionChannel('staging');
+      } else if (utils.isOperatorVersion('staging')) {
+        cy.addOsVersionChannel('dev');
+        cy.addOsVersionChannel('stable'); // Not sure it is needed
+      } else {
+        cy.addOsVersionChannel('stable');
+      }
+    }
   });
 
   beforeEach(() => {
