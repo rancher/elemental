@@ -514,8 +514,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					randomSleep(i)
 
 					// Execute 'reboot' in background, to avoid SSH locking
-					_, err := cl.RunSSH("setsid -f reboot")
-					Expect(err).To(Not(HaveOccurred()))
+					Eventually(func() error {
+						_, err := cl.RunSSH("setsid -f reboot")
+						return err
+					}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 				})
 
 				if p != "worker" {
