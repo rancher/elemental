@@ -29,7 +29,7 @@ filterTests(['main', 'upgrade'], () => {
   
     qase(11,
       it('Add elemental-ui repo', () => {
-        !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git') : null;
+        !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages') : null;
       })
     );
     
