@@ -80,6 +80,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_pre shutdown-containerd.service
 %service_add_pre elemental-register.service
 %service_add_pre elemental-register-install.service
+%service_add_pre elemental-register-reset.service
 %service_add_pre elemental-register.timer
 %endif
 
@@ -89,12 +90,14 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_post shutdown-containerd.service
 %service_add_post elemental-register.service
 %service_add_post elemental-register-install.service
+%service_add_post elemental-register-reset.service
 %service_add_post elemental-register.timer
 %else
 %systemd_post elemental-populate-node-labels.service
 %systemd_post shutdown-containerd.service
 %systemd_post elemental-register.service
 %systemd_post elemental-register-install.service
+%systemd_post elemental-register-reset.service
 %systemd_post elemental-register.timer
 %endif
 
@@ -104,12 +107,14 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_del_preun shutdown-containerd.service
 %service_del_preun elemental-register.service
 %service_del_preun elemental-register-install.service
+%service_del_preun elemental-register-reset.service
 %service_del_preun elemental-register.timer
 %else
 %systemd_preun elemental-populate-node-labels.service
 %systemd_preun shutdown-containerd.service
 %systemd_preun elemental-register.service
 %systemd_preun elemental-register-install.service
+%systemd_preun elemental-register-reset.service
 %systemd_preun elemental-register.timer
 %endif
 
@@ -119,12 +124,14 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_del_postun shutdown-containerd.service
 %service_del_postun elemental-register.service
 %service_del_postun elemental-register-install.service
+%service_del_postun elemental-register-reset.service
 %service_del_postun elemental-register.timer
 %else
 %systemd_postun elemental-populate-node-labels.service
 %systemd_postun shutdown-containerd.service
 %systemd_postun elemental-register.service
 %systemd_postun elemental-register-install.service
+%systemd_postun elemental-register-reset.service
 %systemd_postun elemental-register.timer
 %endif
 
@@ -144,6 +151,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %{_unitdir}/shutdown-containerd.service
 %{_unitdir}/elemental-register.service
 %{_unitdir}/elemental-register-install.service
+%{_unitdir}/elemental-register-reset.service
 %{_unitdir}/elemental-register.timer
 %{_unitdir}/elemental-populate-node-labels.service
 %{_sbindir}/elemental-populate-node-labels
