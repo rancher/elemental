@@ -29,7 +29,7 @@ Source:         %{name}-%{version}.tar
 Source1:        LICENSE
 Source2:        README.md
 
-Requires:       elemental-toolkit
+Requires:       elemental-cli
 Requires:       elemental-register
 Requires:       elemental-system-agent
 Requires:       elemental-support
@@ -64,9 +64,6 @@ cp %{S:2} .
 cp -a framework/files/* %{buildroot}
 
 rm -rf %{buildroot}/var/log/journal
-
-# remove luet config in Elemental Teal
-rm -rf %{buildroot}/etc/luet 
 
 # belongs to elemental-system-agent package
 rm %{buildroot}%{_unitdir}/elemental-system-agent.service

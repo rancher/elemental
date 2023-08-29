@@ -3,13 +3,16 @@ GIT_COMMIT_SHORT?=$(shell git rev-parse --short HEAD)
 GIT_TAG?=$(shell git describe --abbrev=0 --tags 2>/dev/null || echo "v0.0.0" )
 TAG?=${GIT_TAG}-${GIT_COMMIT_SHORT}
 REPO?=ttl.sh/elemental-ci
+IMAGE=${REPO}:${GIT_TAG}
+ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+SUDO?=sudo
 CLOUD_CONFIG_FILE?="iso/config"
 MANIFEST_FILE?="iso/manifest.yaml"
 # This are the default images already in the dockerfile but we want to be able to override them
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator-ci:latest
 REGISTER_IMAGE?=quay.io/costoolkit/elemental-register-ci:latest
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
-TOOL_IMAGE?=quay.io/costoolkit/elemental-cli-ci:latest
+TOOL_IMAGE?=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
 # Used to know if this is a release or just a normal dev build
 RELEASE_TAG?=false
 
