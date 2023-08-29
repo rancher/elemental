@@ -5,6 +5,7 @@ name: CLI-RKE2-OS-Upgrade-Rancher_Stable
 # not the ones built in the CI (build-ci workflow).
 # The scheduling is also to avoid running the workflow on each push on main.
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 2 * * *'
 
