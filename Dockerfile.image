@@ -46,6 +46,11 @@ RUN echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
 RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release
 RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
 
+# Ensure /tmp is mounted as tmpfs by default
+RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
+      cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    fi
+
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
     # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
