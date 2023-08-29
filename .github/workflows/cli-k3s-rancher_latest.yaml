@@ -5,6 +5,7 @@ name: CLI-K3s-Rancher_Latest
 # the lastest version built. The scheduling is also to avoid running
 # the workflow on each push on main.
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
 

@@ -2,6 +2,7 @@
 name: CLI-K3s-Hardened-Rancher_Latest
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
 
