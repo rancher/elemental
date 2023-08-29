@@ -57,6 +57,8 @@ RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-conf
     kernel=$(ls /boot/Image-* | head -n1) && \
     if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
 
+COPY framework/files/etc/cos/bootargs.cfg /etc/cos/bootargs.cfg
+
 # Save some space
 RUN rm -rf /var/log/update* && \
     >/var/log/lastlog && \
