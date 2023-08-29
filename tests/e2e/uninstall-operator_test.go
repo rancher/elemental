@@ -86,9 +86,11 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		})
 
 		By("Deleting cluster resource", func() {
-			_, err := kubectl.Run("delete", "cluster",
-				"--namespace", clusterNS, clusterName)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				_, err := kubectl.Run("delete", "cluster",
+					"--namespace", clusterNS, clusterName)
+				return err
+			}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 		})
 
 		By("Testing cluster resource unavailability", func() {
