@@ -29,7 +29,7 @@ Source:         %{name}-%{version}.tar
 Source1:        LICENSE
 Source2:        README.md
 
-Requires:       elemental-cli
+Requires:       elemental-toolkit
 Requires:       elemental-register
 Requires:       elemental-system-agent
 Requires:       elemental-support
