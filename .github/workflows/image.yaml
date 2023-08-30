@@ -52,7 +52,6 @@ jobs:
           # cache into GitHub actions cache, nice
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          target: default
           file: Dockerfile.image
           build-args: |
             IMAGE_TAG=${{ steps.meta.outputs.version }}
