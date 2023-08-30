@@ -24,7 +24,8 @@ FINAL_TAG:=$(TAG)
 endif
 
 # Set ISO variable
-ISO?=elemental-teal.$(shell uname -m)-${FINAL_TAG}.iso
+ARCH:=$(shell uname -m)
+ISO?=elemental-teal.${ARCH}-${FINAL_TAG}.iso
 
 .PHONY: clean
 clean:
