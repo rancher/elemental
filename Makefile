@@ -12,7 +12,7 @@ MANIFEST_FILE?="iso/manifest.yaml"
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator-ci:latest
 REGISTER_IMAGE?=quay.io/costoolkit/elemental-register-ci:latest
 SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
-TOOL_IMAGE?=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
+BUILDER_IMAGE?=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
 # Used to know if this is a release or just a normal dev build
 RELEASE_TAG?=false
 
@@ -24,7 +24,7 @@ FINAL_TAG:=$(TAG)
 endif
 
 # Set ISO variable
-ISO?=build/elemental-${FINAL_TAG}.iso
+ISO?=elemental-teal.$(shell uname -m)-${FINAL_TAG}.iso
 
 .PHONY: clean
 clean:
@@ -34,16 +34,14 @@ clean:
 .PHONY: build
 build:
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.image \
-		--target default \
 		--build-arg IMAGE_TAG=${FINAL_TAG} \
 		--build-arg IMAGE_COMMIT=${GIT_COMMIT} \
 		--build-arg IMAGE_REPO=${REPO} \
 		--build-arg OPERATOR_IMAGE=${OPERATOR_IMAGE} \
 		--build-arg REGISTER_IMAGE=${REGISTER_IMAGE} \
 		--build-arg SYSTEM_AGENT_IMAGE=${SYSTEM_AGENT_IMAGE} \
-		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
-		-t ${REPO}:${FINAL_TAG} \
-		.
+		--build-arg BUILDER_IMAGE=${BUILDER_IMAGE} \
+		-t ${REPO}:${FINAL_TAG} .
 	@DOCKER_BUILDKIT=1 docker push ${REPO}:${FINAL_TAG}
 
 .PHONY: dump_image
@@ -66,21 +64,16 @@ else
 endif
 	@mkdir -p build
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
-		--target default \
 		--build-arg OS_IMAGE=${REPO}:${FINAL_TAG} \
-		--build-arg TOOL_IMAGE=${TOOL_IMAGE} \
-		--build-arg ELEMENTAL_VERSION=${FINAL_TAG} \
+		--build-arg BUILDER_IMAGE=${BUILDER_IMAGE} \
+		--build-arg VERSION=${FINAL_TAG} \
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg MANIFEST_FILE=${MANIFEST_FILE} \
 		-t iso:${FINAL_TAG} .
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
 		iso:${FINAL_TAG} \
-		--config-dir . \
-		--debug build-iso \
-		-o /mnt \
-		-n elemental-${FINAL_TAG} \
-		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at ${ISO}"
+		cp elemental-iso/${ISO} /mnt
+	@echo "INFO: ISO available at build/${ISO}"
 
 # Build an iso with the OBS base containers
 .PHONY: remote_iso
@@ -95,28 +88,23 @@ else
 endif
 	@mkdir -p build
 	@DOCKER_BUILDKIT=1 docker build -f Dockerfile.iso \
-		--target default \
 		--build-arg CLOUD_CONFIG_FILE=${CLOUD_CONFIG_FILE} \
 		--build-arg MANIFEST_FILE=${MANIFEST_FILE} \
 		-t iso:latest .
 	@DOCKER_BUILDKIT=1 docker run --rm -v $(PWD)/build:/mnt \
 		iso:latest \
-		--config-dir . \
-		--debug build-iso \
-		-o /mnt \
-		-n elemental-${FINAL_TAG} \
-		--overlay-iso overlay dir:rootfs
-	@echo "INFO: ISO available at ${ISO}"
+		cp elemental-iso/${ISO} /mnt
+	@echo "INFO: ISO available at build/${ISO}"
 
 .PHONY: extract_kernel_init_squash
 extract_kernel_init_squash:
-	@VAR='$(ISO)'; \
-	INITRD_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name initrd -print 2>/dev/null); \
-	KERNEL_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name kernel -print 2>/dev/null); \
-	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i ${ISO} -find -type f -name linux -print 2>/dev/null); \
-	isoinfo -x /rootfs.squashfs -R -i ${ISO} > $${VAR/\.iso/.squashfs} 2>/dev/null; \
-	isoinfo -x $${INITRD_FILE} -R -i ${ISO} > $${VAR/\.iso/-initrd} 2>/dev/null; \
-	isoinfo -x $${KERNEL_FILE} -R -i ${ISO} > $${VAR/\.iso/-kernel} 2>/dev/null
+	@VAR='build/$(ISO)'; \
+	INITRD_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name initrd -print 2>/dev/null); \
+	KERNEL_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name kernel -print 2>/dev/null); \
+	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name linux -print 2>/dev/null); \
+	isoinfo -x /rootfs.squashfs -R -i build/${ISO} > $${VAR/\.iso/.squashfs} 2>/dev/null; \
+	isoinfo -x $${INITRD_FILE} -R -i build/${ISO} > $${VAR/\.iso/-initrd} 2>/dev/null; \
+	isoinfo -x $${KERNEL_FILE} -R -i build/${ISO} > $${VAR/\.iso/-kernel} 2>/dev/null
 
 .PHONY: ipxe
 ipxe:

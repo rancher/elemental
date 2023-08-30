@@ -1,16 +1,24 @@
-ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-teal/5.3:latest
-ARG TOOL_IMAGE=registry.opensuse.org/isv/rancher/elemental/stable/teal53/15.4/rancher/elemental-builder-image/5.3:latest
+ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
+ARG BUILDER_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
 
 FROM $OS_IMAGE AS os
-FROM $TOOL_IMAGE as tools
+FROM $BUILDER_IMAGE as builder
 
-FROM tools AS default
 WORKDIR /iso
-COPY --from=os / rootfs
-ARG CLOUD_CONFIG_FILE=iso/config
+
 ARG MANIFEST_FILE=iso/manifest.yaml
+ARG CLOUD_CONFIG_FILE=iso/config
+COPY $MANIFEST_FILE manifest.yaml
 COPY $CLOUD_CONFIG_FILE overlay/livecd-cloud-config.yaml
-COPY $MANIFEST_FILE /iso/manifest.yaml
-ARG ELEMENTAL_VERSION=""
-RUN echo $ELEMENTAL_VERSION
-ENTRYPOINT ["/usr/bin/elemental"]
+COPY --from=os / rootfs
+
+ARG VERSION=latest
+RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-teal.$(uname -m)-${VERSION}" --overlay-iso overlay dir:rootfs
+
+# Only keep the ISO as a result
+FROM registry.opensuse.org/bci/bci-busybox:latest
+COPY --from=builder /output /elemental-iso
+
+# By default run a shell
+ENTRYPOINT ["busybox"]
+CMD ["sh"]
