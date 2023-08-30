@@ -254,17 +254,19 @@ jobs:
           ISO_TO_TEST: ${{ inputs.iso_to_test }}
           TAG: from-obs
         run: |
+          ARCH=$(uname -m)
           mkdir -p build
-          wget -v -L -c ${ISO_TO_TEST} -O build/elemental-${TAG}.iso
+          wget -v -L -c ${ISO_TO_TEST} -O build/elemental-teal.${ARCH}-${TAG}.iso
       - name: Create symbolic link to ISO for SeedImage
         run: |
-          ISO=$(ls build/elemental-*.iso 2> /dev/null)
+          ISO=$(ls build/*.iso 2> /dev/null)
           ln -sf ${ISO} base-image.iso
       - name: Extract iPXE artifacts from ISO
         run: |
           # Extract TAG
-          ISO=$(ls build/elemental-*.iso 2> /dev/null)
-          TAG=${ISO#*-}
+          ARCH=$(uname -m)
+          ISO=$(ls build/*.iso 2> /dev/null)
+          TAG=${ISO#*.${ARCH}-}
           export TAG=${TAG%.iso}
           # Extract iPXE artifacts
           make extract_kernel_init_squash

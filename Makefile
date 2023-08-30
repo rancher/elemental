@@ -99,13 +99,13 @@ endif
 
 .PHONY: extract_kernel_init_squash
 extract_kernel_init_squash:
-	@VAR='$(ISO)'; \
-	INITRD_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name initrd -print 2>/dev/null); \
-	KERNEL_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name kernel -print 2>/dev/null); \
-	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i build/${ISO} -find -type f -name linux -print 2>/dev/null); \
-	isoinfo -x /rootfs.squashfs -R -i build/${ISO} > build/$${VAR/\.iso/.squashfs} 2>/dev/null; \
-	isoinfo -x $${INITRD_FILE} -R -i build/${ISO} > build/$${VAR/\.iso/-initrd} 2>/dev/null; \
-	isoinfo -x $${KERNEL_FILE} -R -i build/${ISO} > build/$${VAR/\.iso/-kernel} 2>/dev/null
+	@VAR='build/$(ISO)'; \
+	INITRD_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name initrd -print 2>/dev/null); \
+	KERNEL_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name kernel -print 2>/dev/null); \
+	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name linux -print 2>/dev/null); \
+	isoinfo -x /rootfs.squashfs -R -i $${VAR} > $${VAR/\.iso/.squashfs} 2>/dev/null; \
+	isoinfo -x $${INITRD_FILE} -R -i $${VAR} > $${VAR/\.iso/-initrd} 2>/dev/null; \
+	isoinfo -x $${KERNEL_FILE} -R -i $${VAR} > $${VAR/\.iso/-kernel} 2>/dev/null
 
 .PHONY: ipxe
 ipxe:
