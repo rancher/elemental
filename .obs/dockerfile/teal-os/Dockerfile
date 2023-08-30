@@ -33,8 +33,8 @@ ARG IMAGE_TAG=%VERSION%-%RELEASE%
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"         >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"           >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
-    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release
-RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
+    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"   >> /etc/os-release && \
+    echo GRUB_ENTRY_NAME=\"Elemental\"        >> /etc/os-release
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.rancher.elemental
@@ -63,6 +63,5 @@ RUN zypper clean --all && \
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
     # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
-    kernel=$(ls /boot/Image-* | head -n1) && \
+    kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
     if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
-

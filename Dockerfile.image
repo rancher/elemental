@@ -2,7 +2,7 @@
 ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator-ci:latest
 ARG REGISTER_IMAGE=quay.io/costoolkit/elemental-register-ci:latest
 ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
-ARG TOOL_IMAGE=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
+ARG BUILDER_IMAGE=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
 
 # elemental-operator
 FROM $OPERATOR_IMAGE as elemental-operator
@@ -13,11 +13,11 @@ FROM $REGISTER_IMAGE as elemental-register
 # rancher-system-agent
 FROM $SYSTEM_AGENT_IMAGE as system-agent
 
-FROM $TOOL_IMAGE as elemental-cli
-
+# elemental-cli
+FROM $BUILDER_IMAGE as elemental-cli
 
 # Base os
-FROM registry.suse.com/suse/sle-micro-rancher/5.3:latest as default
+FROM registry.suse.com/suse/sle-micro-rancher/5.4:latest
 
 # Copy elemental-operator
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
@@ -34,32 +34,35 @@ COPY --from=elemental-cli /usr/bin/elemental /usr/bin/elemental
 COPY framework/files/ /
 
 # Enable services
-RUN systemctl enable NetworkManager sshd elemental-populate-node-labels systemd-timesyncd shutdown-containerd
+RUN systemctl enable elemental-populate-node-labels shutdown-containerd
 
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
 ARG IMAGE_REPO=norepo
-RUN echo COMMIT=\"${IMAGE_COMMIT}\" >> /etc/os-release
-RUN echo IMAGE_REPO=\"${IMAGE_REPO}\" >> /etc/os-release
-RUN echo IMAGE_TAG=\"${IMAGE_TAG}\" >> /etc/os-release
-RUN echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release
-RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release
-RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
+
+# IMPORTANT: Setup elemental-release used for versioning/upgrade. The
+# values here should reflect the tag of the image being built
+RUN echo COMMIT=\"${IMAGE_COMMIT}\"           >> /etc/os-release && \
+    echo IMAGE_REPO=\"${IMAGE_REPO}\"         >> /etc/os-release && \
+    echo IMAGE_TAG=\"${IMAGE_TAG}\"           >> /etc/os-release && \
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
+    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"   >> /etc/os-release && \
+    echo GRUB_ENTRY_NAME=\"Elemental\"        >> /etc/os-release
 
 # Ensure /tmp is mounted as tmpfs by default
 RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
       cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
     fi
 
-# Rebuild initrd to setup dracut with the boot configurations
-RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
-    # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
-    kernel=$(ls /boot/Image-* | head -n1) && \
-    if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
-
-COPY framework/files/etc/cos/bootargs.cfg /etc/cos/bootargs.cfg
-
 # Save some space
 RUN rm -rf /var/log/update* && \
     >/var/log/lastlog && \
     rm -rf /boot/vmlinux*
+
+# Rebuild initrd to setup dracut with the boot configurations
+RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
+    # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
+    kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
+    if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
+
+COPY framework/files/etc/cos/bootargs.cfg /etc/cos/bootargs.cfg
