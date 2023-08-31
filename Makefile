@@ -110,20 +110,20 @@ extract_kernel_init_squash:
 .PHONY: ipxe
 ipxe:
 	@mkdir -p build
-	@echo "#!ipxe" > build/elemental-${FINAL_TAG}.ipxe
-	@echo "set arch amd64" >> build/elemental-${FINAL_TAG}.ipxe
-ifeq ($(RELEASE_TAG), "true")
-	@echo "set url https://github.com/rancher/elemental/releases/download/${FINAL_TAG}" >> build/elemental-${FINAL_TAG}.ipxe
-else
-	@echo "set url tftp://10.0.2.2/${TAG}" >> build/elemental-${FINAL_TAG}.ipxe
-endif
-	@echo "set kernel elemental-${FINAL_TAG}-kernel" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "set initrd elemental-${FINAL_TAG}-initrd" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "set rootfs elemental-${FINAL_TAG}.squashfs" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "# set config http://example.com/machine-config" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "# set cmdline extra.values=1" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "initrd \$${url}/\$${initrd}" >> build/elemental-${FINAL_TAG}.ipxe
-	@echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}"  >> build/elemental-${FINAL_TAG}.ipxe
+	@VAR='build/$(ISO)'; \
+	ISO='$(ISO)'; \
+	echo "#!ipxe" > $${VAR/\.iso/.ipxe}; \
+	echo "set arch amd64" >> $${VAR/\.iso/.ipxe}; \
+	URL="tftp://10.0.2.2/${TAG}"; \
+	[[ "${RELEASE_TAG}" == "true" ]] && URL="https://github.com/rancher/elemental/releases/download/${FINAL_TAG}"; \
+	echo "set url $${URL}" >> $${VAR/\.iso/.ipxe}; \
+	echo "set kernel $${ISO/\.iso/-kernel}" >> $${VAR/\.iso/.ipxe}; \
+	echo "set initrd $${ISO/\.iso/-initrd}" >> $${VAR/\.iso/.ipxe}; \
+	echo "set rootfs $${ISO/\.iso/.squashfs}" >> $${VAR/\.iso/.ipxe}; \
+	echo "# set config http://example.com/machine-config" >> $${VAR/\.iso/.ipxe}; \
+	echo "# set cmdline extra.values=1" >> $${VAR/\.iso/.ipxe}; \
+	echo "initrd \$${url}/\$${initrd}" >> $${VAR/\.iso/.ipxe}; \
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $${VAR/\.iso/.ipxe}
 
 .PHONY: build_all
 build_all: build iso extract_kernel_init_squash ipxe
