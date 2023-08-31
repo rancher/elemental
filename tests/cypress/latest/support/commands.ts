@@ -110,12 +110,18 @@ Cypress.Commands.add('createMachReg', (
       if (utils.isCypressTag('upgrade')) {
         // Stable operator version is hardcoded for now
         // Will try to improve it in next version
-        utils.isOperatorVersion('staging') ? cy.contains('Elemental Teal ISO x86_64 latest-staging').click() : cy.contains('Elemental Teal ISO x86_64 v1.1.5').click();
+        if (utils.isOperatorVersion('staging')) {
+          // In rare case, we might want to test upgrading from staging to dev
+          utils.isUpgradeOsChannel('dev') ? cy.contains('Elemental Teal ISO x86_64 (latest)').click(): null;
+        } else {
+            cy.contains('Elemental Teal ISO x86_64 v1.1.5')
+            .click();
+        }
       } else if (utils.isOperatorVersion('stable')) {
         cy.contains('Elemental Teal ISO x86_64 v1.1.5')
           .click();
       } else if (utils.isOperatorVersion('staging')) {
-        cy.contains('Elemental Teal ISO x86_64 latest-staging')
+        cy.contains('Elemental Teal ISO x86_64 (latest)')
             .click();
       } else {
         cy.contains('Elemental Teal ISO x86_64 latest-dev')
