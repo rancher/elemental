@@ -1,5 +1,6 @@
-ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
-ARG BUILDER_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
+ARG SLEMICRO_VERSION=5.4
+ARG OS_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/$SLEMICRO_VERSION:latest
+ARG BUILDER_IMAGE=registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/$SLEMICRO_VERSION:latest
 
 FROM $OS_IMAGE AS os
 FROM $BUILDER_IMAGE as builder
@@ -16,7 +17,7 @@ ARG VERSION=latest
 RUN elemental --debug --config-dir . build-iso -o /output -n "elemental-teal.$(uname -m)-${VERSION}" --overlay-iso overlay dir:rootfs
 
 # Only keep the ISO as a result
-FROM registry.opensuse.org/bci/bci-busybox:latest
+FROM registry.opensuse.org/opensuse/bci/bci-busybox:latest
 COPY --from=builder /output /elemental-iso
 
 # By default run a shell

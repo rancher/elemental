@@ -1,8 +1,9 @@
 # ARGS go first if used on FROM
 ARG OPERATOR_IMAGE=quay.io/costoolkit/elemental-operator-ci:latest
 ARG REGISTER_IMAGE=quay.io/costoolkit/elemental-register-ci:latest
-ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.2.9
-ARG BUILDER_IMAGE=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
+ARG SYSTEM_AGENT_IMAGE=rancher/system-agent:v0.3.3
+ARG BUILDER_IMAGE=ghcr.io/rancher/elemental-toolkit/elemental-cli:latest
+ARG SLEMICRO_VERSION=5.4
 
 # elemental-operator
 FROM $OPERATOR_IMAGE as elemental-operator
@@ -17,7 +18,7 @@ FROM $SYSTEM_AGENT_IMAGE as system-agent
 FROM $BUILDER_IMAGE as elemental-cli
 
 # Base os
-FROM registry.suse.com/suse/sle-micro-rancher/5.4:latest
+FROM registry.suse.com/suse/sle-micro-rancher/$SLEMICRO_VERSION:latest
 
 # Copy elemental-operator
 COPY --from=elemental-operator /usr/sbin/elemental-operator /usr/sbin/elemental-operator
@@ -33,8 +34,51 @@ COPY --from=elemental-cli /usr/bin/elemental /usr/bin/elemental
 # Copy local framework files
 COPY framework/files/ /
 
-# Enable services
-RUN systemctl enable elemental-populate-node-labels shutdown-containerd
+# Add missing packages (weird!?)
+# NOTE: cannot be added for now in GH build, but keep the code here for now
+#RUN ARCH=$(uname -m); \
+#  [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+#  zypper ref -s; \
+#  zypper -n in --no-recommends \
+#    parted \
+#    util-linux-systemd \
+#    e2fsprogs \
+#    udev \
+#    grub2 \
+#    dosfstools \
+#    grub2-${ARCH}-efi \
+#    rsync \
+#    squashfs \
+#    lvm2 \
+#    kernel-default \
+#    open-iscsi \
+#    device-mapper \
+#    tar \
+#    dmidecode \
+#    shim
+
+# Elemental Teal essentials
+#RUN zypper -n in \
+#  openssh-server \
+#  kernel-firmware-all \
+#  NetworkManager \
+#  cryptsetup \
+#  podman
+
+# Install extra useful utilities
+#RUN zypper -n in k9s
+
+# Enable services (configured in package systemd-presets-branding-Elemental in OBS)
+RUN systemctl enable \
+  sshd.service \
+  systemd-timesyncd.service \
+  NetworkManager.service \
+  shutdown-containerd.service \
+  elemental-populate-node-labels.service \
+  elemental-register.service \
+  elemental-register-install.service \
+  elemental-register-reset.service \
+  elemental-register.timer
 
 ARG IMAGE_TAG=latest
 ARG IMAGE_COMMIT=""
@@ -55,7 +99,8 @@ RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
     fi
 
 # Save some space
-RUN rm -rf /var/log/update* && \
+RUN zypper clean --all && \
+    rm -rf /var/log/update* && \
     >/var/log/lastlog && \
     rm -rf /boot/vmlinux*
 
@@ -65,4 +110,5 @@ RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-conf
     kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
     if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
 
+# Copy bootargs
 COPY framework/files/etc/cos/bootargs.cfg /etc/cos/bootargs.cfg

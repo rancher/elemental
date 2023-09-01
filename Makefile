@@ -11,8 +11,8 @@ MANIFEST_FILE?="iso/manifest.yaml"
 # This are the default images already in the dockerfile but we want to be able to override them
 OPERATOR_IMAGE?=quay.io/costoolkit/elemental-operator-ci:latest
 REGISTER_IMAGE?=quay.io/costoolkit/elemental-register-ci:latest
-SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.2.9
-BUILDER_IMAGE?=ghcr.io/rancher/elemental-toolkit/elemental-cli:v0.11.0
+SYSTEM_AGENT_IMAGE?=rancher/system-agent:v0.3.3
+BUILDER_IMAGE?=ghcr.io/rancher/elemental-toolkit/elemental-cli:latest
 # Used to know if this is a release or just a normal dev build
 RELEASE_TAG?=false
 
