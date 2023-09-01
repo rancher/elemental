@@ -356,6 +356,7 @@ jobs:
             /workdir/e2e/unit_tests/machine_registration.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
+          UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
         if: failure() && inputs.test_type == 'ui'

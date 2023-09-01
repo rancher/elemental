@@ -37,11 +37,9 @@ describe('Machine registration testing', () => {
     // In upgrade scenario, we need to add extra channels
     if (utils.isCypressTag('upgrade')) {
       if (utils.isOperatorVersion('stable')) {
-        cy.addOsVersionChannel('dev');
-        cy.addOsVersionChannel('staging');
+        utils.isUpgradeOsChannel('dev') ? cy.addOsVersionChannel('dev') : cy.addOsVersionChannel('staging');
       } else if (utils.isOperatorVersion('staging')) {
         cy.addOsVersionChannel('dev');
-        cy.addOsVersionChannel('stable'); // Not sure it is needed
       } else {
         cy.addOsVersionChannel('stable');
       }

@@ -27,7 +27,6 @@ describe('Upgrade tests', () => {
   const uiAccount        = Cypress.env('ui_account');
   const uiPassword       = "rancherpassword"
   const upgradeImage     = Cypress.env('upgrade_image')
-  const upgradeOsChannel = Cypress.env('upgrade_os_channel')
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -84,19 +83,11 @@ describe('Upgrade tests', () => {
             .click();
           cy.getBySel('os-version-box')
             .click()
-          // TODO: remove hardcoded staging version
-          if (upgradeOsChannel == "staging") {
-            cy.getBySel('os-version-box')
-              .parents()
-              .contains('v1.2.1')
-              .click();
-          } else {
-            cy.getBySel('os-version-box')
-              .parents()
-              .contains('latest-'+upgradeOsChannel)
-              .click();
-          }
-        }
+          cy.getBySel('os-version-box')
+            .parents()
+            .contains('latest')
+            .click();
+        } 
 
         cy.getBySel('form-save')
         .contains('Create')
