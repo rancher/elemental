@@ -187,8 +187,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					"-o", "jsonpath={.status.downloadURL}")
 				Expect(err).To(Not(HaveOccurred()))
 
-				err = tools.GetFileFromURL(seedImageURL, "../../elemental-"+poolType+".iso", false)
-				Expect(err).To(Not(HaveOccurred()))
+				// ISO file size should be greater than 500MB
+				Eventually(func() int64 {
+					// No need to check download status, file size at the end is enough
+					filename := "../../elemental-" + poolType + ".iso"
+					_ = tools.GetFileFromURL(seedImageURL, filename, false)
+					file, _ := os.Stat(filename)
+					return file.Size()
+				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", 500*1024*1024))
 			})
 		}
 
