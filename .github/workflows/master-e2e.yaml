@@ -405,6 +405,7 @@ jobs:
           SPEC: |
             /workdir/e2e/unit_tests/machine_selector.spec.ts
             /workdir/e2e/unit_tests/machine_inventory.spec.ts
+            /workdir/e2e/unit_tests/reset.spec.ts
             /workdir/e2e/unit_tests/deploy_app.spec.ts
             /workdir/e2e/unit_tests/upgrade.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}

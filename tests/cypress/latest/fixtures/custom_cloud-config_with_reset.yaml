@@ -1,0 +1,18 @@
+config:
+  cloud-config:
+    users:
+    - name: root
+      passwd: root
+  elemental:
+    install:
+      poweroff: true
+      device: /dev/sda
+      debug: true
+    reset:
+      debug: true
+      enabled: true
+      reset-persistent: true
+      reset-oem: true
+      power-off: false
+      reboot: true
+machineName: my-machine
