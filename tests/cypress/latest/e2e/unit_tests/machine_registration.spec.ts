@@ -186,7 +186,7 @@ describe('Machine registration testing', () => {
           true,
           //checkIsoBuilding
           true,
-          'custom_cloud-config_with_reset.yaml',
+          utils.isK8sVersion('k3s') ? 'custom_cloud-config_with_reset.yaml' : 'custom_cloud-config.yaml',
           //checkDefaultCloudConfig
           false);
         cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);
