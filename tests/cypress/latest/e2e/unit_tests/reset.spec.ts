@@ -33,7 +33,21 @@ filterTests(['main'], () => {
       cypressLib.burgerMenuOpenIfClosed();
       cypressLib.accesMenu('OS Management');
     });
-  
+    
+    if (utils.isK8sVersion('rke')) {
+      it('Enable reset in machine inventory', () => {
+        cy.clickNavMenu(["Inventory of Machines"]);
+        cy.getBySel('sortable-table-0-action-button').click();
+        cy.contains('Edit YAML').click();
+        cy.contains('annotations').as('anno')
+        cy.get('@anno').click(0,0)
+        cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
+        cy.getBySel('action-button-async-button')
+        .contains('Save')
+        .click();
+      });
+    }
+
     qase(2,
       it('Reset node by deleting the cluster', () => {
         cy.viewport(1920, 1080);
