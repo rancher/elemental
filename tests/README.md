@@ -95,6 +95,13 @@
     - **It:** Check Elemental logo
     - **It:** Check Elemental menu
 
+## `reset.spec.ts`
+
+- **Describe:** Reset testing
+    - **It:** Enable reset in machine inventory
+    - **It:** Reset node by deleting the cluster
+    - **It:** Create Elemental cluster
+
 ## `upgrade.spec.ts`
 
 - **Describe:** Upgrade tests
