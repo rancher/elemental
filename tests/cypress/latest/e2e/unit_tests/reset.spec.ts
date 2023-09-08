@@ -35,24 +35,23 @@ filterTests(['main'], () => {
     });
     
     if (utils.isK8sVersion('rke')) {
-      it('Enable reset in machine inventory', () => {
-        cy.clickNavMenu(["Inventory of Machines"]);
-        cy.getBySel('sortable-table-0-action-button').click();
-        cy.contains('Edit YAML').click();
-        cy.contains('annotations').as('anno')
-        cy.get('@anno').click(0,0)
-        cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
-        cy.getBySel('action-button-async-button')
-        .contains('Save')
-        .click();
-      });
-    }
+      qase(54,
+        it('Enable reset in machine inventory', () => {
+          cy.clickNavMenu(["Inventory of Machines"]);
+          cy.getBySel('sortable-table-0-action-button').click();
+          cy.contains('Edit YAML').click();
+          cy.contains('annotations').as('anno')
+          cy.get('@anno').click(0,0)
+          cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
+          cy.getBySel('action-button-async-button')
+          .contains('Save')
+          .click();
+      }));
+    };
 
-    qase(2,
+    qase(['54', '55'],
       it('Reset node by deleting the cluster', () => {
         cy.viewport(1920, 1080);
-        //cypressLib.burgerMenuOpenIfClosed();
-        //cypressLib.accesMenu('OS Management');
         cy.getBySel('button-manage-elemental-clusters').click();
         cy.getBySel('sortable-cell-0-0').click();
         cy.clickButton('Delete');
@@ -67,8 +66,9 @@ filterTests(['main'], () => {
           .contains('Active', { timeout: 180000 });
     }));
 
-    it('Create Elemental cluster', () => {
-      utils.createCluster(clusterName, k8sVersion, proxy);
-    });
+    qase(30,
+      it('Create Elemental cluster', () => {
+        utils.createCluster(clusterName, k8sVersion, proxy);
+      }));
   });
 });
