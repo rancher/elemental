@@ -1,0 +1,3 @@
+metadata:
+  annotations:
+    elemental.cattle.io/resettable: "true"

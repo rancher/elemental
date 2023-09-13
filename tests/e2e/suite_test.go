@@ -46,6 +46,7 @@ const (
 	netDefaultFileName    = "../assets/net-default.xml"
 	numberOfNodesMax      = 30
 	registrationYaml      = "../assets/machineRegistration.yaml"
+	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"
 	seedimageYaml         = "../assets/seedImage.yaml"
 	selectorYaml          = "../assets/selector.yaml"
