@@ -73,6 +73,8 @@ e2e-check-app: deps
 	ginkgo --label-filter check-app -r -v ./e2e
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
+e2e-reset: deps
+	ginkgo --label-filter reset -r -v ./e2e
 e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
 e2e-install-rancher: deps
