@@ -51,7 +51,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				count := 1
 				Eventually(func() error {
 					// Execute RKE2 installation
-					out, err := exec.Command("sudo", "sh", fileName).CombinedOutput()
+					out, err := exec.Command("sudo", "--preserve-env=INSTALL_RKE2_VERSION", "sh", fileName).CombinedOutput()
 					GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
 					count++
 					return err
