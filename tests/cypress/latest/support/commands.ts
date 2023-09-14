@@ -100,7 +100,7 @@ Cypress.Commands.add('createMachReg', (
       .contains(/https:\/\/.*elemental\/registration/);
 
     // Test ISO building feature
-    if (checkIsoBuilding && utils.isK8sVersion('rke2')) {
+    if (checkIsoBuilding) {
       // Build the ISO according to the elemental operator version
       // Most of the time, it uses the latest dev version but sometimes
       // before releasing, we want to test staging/stable artifacts 

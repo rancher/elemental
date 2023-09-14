@@ -40,9 +40,7 @@ docker run -v $PWD:/workdir -w /workdir                     \
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
-# RKE2 as upstream cluster
-# We cannot use PXE boot so we have to boot from ISO
-if [[ ! -f ${ELEMENTAL_ISO} ]] && grep rke <<< ${K8S_UPSTREAM_VERSION}; then
+if [[ ! -f ${ELEMENTAL_ISO} ]]; then
   # Move elemental.iso into the expected folder
   mv downloads/*.iso ${ELEMENTAL_ISO}
 fi
