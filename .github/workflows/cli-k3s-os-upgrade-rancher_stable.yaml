@@ -19,11 +19,11 @@ jobs:
     with:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+      iso_to_test: https://updates.suse.com/SUSE/Products/ElementalTeal/5.4/x86_64/iso/elemental-teal.x86_64-1.2.2-GM.iso
       k8s_version_to_provision: v1.26.7+k3s1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
-      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+      operator_repo: oci://registry.suse.com/rancher
       rancher_upgrade: latest/devel
       rancher_version: stable/latest
       upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-channel:latest
