@@ -14,7 +14,7 @@ on:
         type: boolean
       operator_repo:
         description: Elemental operator repository to use
-        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+        default: oci://registry.suse.com/rancher
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)

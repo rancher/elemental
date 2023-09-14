@@ -14,11 +14,11 @@ on:
         type: boolean
       iso_to_test:
         description: ISO to test
-        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Stable:/Teal53/media/iso/elemental-teal.x86_64.iso
+        default: https://updates.suse.com/SUSE/Products/ElementalTeal/5.4/x86_64/iso/elemental-teal.x86_64-1.2.2-GM.iso
         type: string
       operator_repo:
         description: Elemental operator repository to use
-        default: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+        default: oci://registry.suse.com/rancher
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
