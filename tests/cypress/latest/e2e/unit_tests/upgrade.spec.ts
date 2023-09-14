@@ -43,8 +43,9 @@ describe('Upgrade tests', () => {
     qase(33,
       it('Check OS Versions', () => {
         cy.clickNavMenu(["Advanced", "OS Versions"]);
-        utils.isOperatorVersion('dev') ? cy.contains('Active latest-dev', {timeout: 120000}): null;
-        utils.isOperatorVersion('staging') ? cy.contains('Active latest-staging', {timeout: 120000}): null;
+        if (utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
+          cy.contains('Active latest', {timeout: 120000});
+        }
       })
     );
 

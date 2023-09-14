@@ -102,7 +102,7 @@ Cypress.Commands.add('createMachReg', (
     // Test ISO building feature
     if (checkIsoBuilding && utils.isK8sVersion('rke2')) {
       // Build the ISO according to the elemental operator version
-      // Most of the time, it uses the latest-dev version but sometimes
+      // Most of the time, it uses the latest dev version but sometimes
       // before releasing, we want to test staging/stable artifacts 
       cy.getBySel('select-os-version-build-iso')
       .click();
@@ -114,17 +114,14 @@ Cypress.Commands.add('createMachReg', (
           // In rare case, we might want to test upgrading from staging to dev
           utils.isUpgradeOsChannel('dev') ? cy.contains('Elemental Teal ISO x86_64 (latest)').click(): null;
         } else {
-            cy.contains('Elemental Teal ISO x86_64 v1.1.5')
+            cy.contains('Elemental Teal ISO x86_64 v1.2.2')
             .click();
         }
-      } else if (utils.isOperatorVersion('stable')) {
-        cy.contains('Elemental Teal ISO x86_64 v1.1.5')
+      } else if (utils.isOperatorVersion('registry.suse.com')) {
+        cy.contains('Elemental Teal ISO x86_64 v1.2.2')
           .click();
-      } else if (utils.isOperatorVersion('staging')) {
-        cy.contains('Elemental Teal ISO x86_64 (latest)')
-            .click();
       } else {
-        cy.contains('Elemental Teal ISO x86_64 latest-dev')
+        cy.contains('Elemental Teal ISO x86_64 (latest)')
           .click();
       }
       cy.getBySel('build-iso-btn')

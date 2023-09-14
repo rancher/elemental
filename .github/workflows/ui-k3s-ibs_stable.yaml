@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-RKE2-OBS_Stable
+name: UI-K3s-IBS_Stable
 
 on:
   workflow_dispatch:
@@ -16,9 +16,13 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: stable
         type: string
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
       rancher_version:
         description: Rancher Manager channel/version to use for installation
-        default: latest/devel
+        default: stable/latest
         type: string
 
 jobs:
@@ -30,17 +34,15 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
-      ui_account: user
+      test_description: "Manual - Fully customizable - UI - IBS Deployment test with Standard K3s"
       qase_run_id: ${{ inputs.qase_run_id }}
-      ca_type: private
-      cluster_name: cluster-rke2
+      cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
-      iso_boot: true
-      k8s_version_to_provision: v1.26.7+rke2r1
-      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/stable/charts/rancher
+      iso_to_test: https://updates.suse.com/SUSE/Products/ElementalTeal/5.4/x86_64/iso/elemental-teal.x86_64-1.2.2-GM.iso
+      k8s_version_to_provision: v1.26.7+k3s1
+      operator_repo: oci://registry.suse.com/rancher
+      proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
-      upstream_cluster_version: v1.26.7+rke2r1
