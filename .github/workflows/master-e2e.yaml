@@ -453,9 +453,8 @@ jobs:
           [[ "${OPERATOR_VERSION}" == "1.0" ]] && unset EMULATE_TPM
           # Disable EMULATE_TPM in case of upgrade test
           # This is because we don't know the version in advance, so easier to not use it
-          if ${{ inputs.upgrade_image != '' }}      || \
-             ${{ inputs.upgrade_os_channel != '' }} || \
-             ${{ contains(inputs.iso_to_test, '/Stable:/') }}; then
+          if ${{ inputs.upgrade_image != '' }} || \
+             ${{ inputs.upgrade_os_channel != '' }}; then
             unset EMULATE_TPM
           fi
           # Execute bootstrapping test
