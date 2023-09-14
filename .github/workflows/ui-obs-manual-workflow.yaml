@@ -15,10 +15,6 @@ on:
         description: Elemental UI version to use
         default: dev
         type: string
-      iso_to_test:
-        description: Defines the ISO to test
-        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
-        type: string
       k8s_version_to_provision:
         description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
         default: v1.26.7+k3s1
@@ -53,7 +49,7 @@ jobs:
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
-      iso_to_test: ${{ inputs.iso_to_test }}
+      iso_boot: true
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}

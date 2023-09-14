@@ -36,7 +36,7 @@ jobs:
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
-      iso_to_test: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Staging/containers/iso/elemental-teal.x86_64.iso
+      iso_boot: true
       k8s_version_to_provision: v1.26.7+k3s1
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
       proxy: ${{ inputs.proxy }}
