@@ -155,3 +155,23 @@ func SetHostname(baseName string, index int) string {
 
 	return baseName + "-" + fmt.Sprintf("%03d", index)
 }
+
+/**
+ * Set a label on MachineInventory
+ * @remarks Define a custom label on a MachineInventory
+ * @param clusterNS Name of the repository
+ * @param node Name of the node
+ * @param key Label to set
+ * @param value Value to set on Label
+ * @returns Nothing or an error
+ */
+func SetMachineInventoryLabel(clusterNS, node, key, value string) error {
+	_, err := kubectl.Run("label", "machineinventory",
+		"--namespace", clusterNS, node,
+		"--overwrite", key+"="+value)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
