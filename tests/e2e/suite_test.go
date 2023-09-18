@@ -16,6 +16,7 @@ package e2e_test
 
 import (
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -32,7 +33,6 @@ import (
 const (
 	appYaml               = "../assets/hello-world_app.yaml"
 	backupYaml            = "../assets/backup.yaml"
-	clusterYaml           = "../assets/cluster.yaml"
 	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript = "../scripts/config-private-ca"
 	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
@@ -45,11 +45,8 @@ const (
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	netDefaultFileName    = "../assets/net-default.xml"
 	numberOfNodesMax      = 30
-	registrationYaml      = "../assets/machineRegistration.yaml"
 	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"
-	seedImageYaml         = "../assets/seedImage.yaml"
-	selectorYaml          = "../assets/selector.yaml"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
 	userPassword          = "r0s@pwd1"
@@ -64,12 +61,14 @@ var (
 	clusterName           string
 	clusterNS             string
 	clusterType           string
+	clusterYaml           string
 	elementalSupport      string
 	emulateTPM            bool
 	rancherHostname       string
 	isoBoot               bool
 	k8sUpstreamVersion    string
 	k8sVersion            string
+	numberOfClusters      int
 	numberOfVMs           int
 	operatorUpgrade       string
 	operatorRepo          string
@@ -83,6 +82,9 @@ var (
 	rancherUpgrade        string
 	rancherUpgradeChannel string
 	rancherUpgradeVersion string
+	registrationYaml      string
+	seedImageYaml         string
+	selectorYaml          string
 	sequential            bool
 	testType              string
 	upgradeImage          string
@@ -93,7 +95,13 @@ var (
 	vmName                string
 )
 
-func CheckClusterState(ns, cluster string) {
+/**
+ * Wait for cluster to be in a stable state
+ * @param ns Namespace where the cluster is deployed
+ * @param cn Cluster resource name
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func WaitCluster(ns, cn string) {
 	type state struct {
 		conditionStatus string
 		conditionType   string
@@ -142,22 +150,66 @@ func CheckClusterState(ns, cluster string) {
 	// Check that the cluster is in Ready state (this means that it has been created)
 	Eventually(func() string {
 		status, _ := kubectl.Run("get", "cluster",
-			"--namespace", ns, cluster,
+			"--namespace", ns, cn,
 			"-o", "jsonpath={.status.ready}")
 		return status
 	}, tools.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("true"))
 
 	// Check that all needed conditions are in the good state
 	for _, s := range states {
+		counter := 0
+
 		Eventually(func() string {
 			status, _ := kubectl.Run("get", "cluster",
-				"--namespace", ns, cluster,
+				"--namespace", ns, cn,
 				"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].status}")
 
-			// Show the status in case of issue, easier to debug
 			if status != s.conditionStatus {
-				GinkgoWriter.Printf("!! Cluster status issue !!  %s is %s instead of %s\n",
-					s.conditionType, status, s.conditionStatus)
+				// Show the status in case of issue, easier to debug (but log after 10 different issues)
+				// NOTE: it's not perfect but it's mainly a way to inform that the cluster took time to came up
+				counter++
+				if counter > 10 {
+					GinkgoWriter.Printf("!! Cluster status issue !! %s is %s instead of %s\n",
+						s.conditionType, status, s.conditionStatus)
+
+					// Reset counter
+					counter = 0
+				}
+
+				// Check if rancher-system-agent.service has some issue
+				if s.conditionType == "Provisioned" || s.conditionType == "Ready" || s.conditionStatus == "Updated" {
+					msg, err := kubectl.Run("get", "cluster",
+						"--namespace", ns, cn,
+						"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].message}")
+					Expect(err).To(Not(HaveOccurred()))
+
+					// We can try to restart the rancher-system-agent service on the failing node
+					// because sometimes it can fail just because of a sporadic/timeout issue and a restart can fix it!
+					if strings.Contains(msg, "check rancher-system-agent.service logs on node") {
+						// Get the Elemental hostname and then the *real* hostname
+						substr := regexp.MustCompile(`(` + cn + `-.*): error`).FindStringSubmatch(msg)
+						for _, node := range strings.Split(substr[1], ",") {
+							// Get node IP
+							ip, err := elemental.GetExternalMachineIP(ns, node)
+							Expect(err).To(Not(HaveOccurred()))
+
+							// Set 'client' to be able to access the node through SSH
+							cl := &tools.Client{
+								Host:     ip + ":22",
+								Username: userName,
+								Password: userPassword,
+							}
+
+							// Log the workaround, could be useful
+							GinkgoWriter.Printf("!! rancher-system-agent issue !! Service has been restarted on %s\n", node)
+
+							// Restart rancher-system-agent service on the node
+							// NOTE: wait a little to be sure that all is restarted before continuing
+							cl.RunSSH("systemctl restart rancher-system-agent.service")
+							time.Sleep(tools.SetTimeout(15 * time.Second))
+						}
+					}
+				}
 			}
 
 			return status
@@ -165,21 +217,152 @@ func CheckClusterState(ns, cluster string) {
 	}
 }
 
-func GetNodeInfo(hostName string) (*tools.Client, string) {
+/**
+ * Check that Cluster resource has been correctly created
+ * @param ns Namespace where the cluster is deployed
+ * @param cn Cluster resource name
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func CheckCreatedCluster(ns, cn string) {
+	// Check that the cluster is correctly created
+	Eventually(func() string {
+		out, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns,
+			cn, "-o", "jsonpath={.metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(cn))
+}
+
+/**
+ * Check that Cluster resource has been correctly created
+ * @param ns Namespace where the cluster is deployed
+ * @param rn MachineRegistration resource name
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func CheckCreatedRegistration(ns, rn string) {
+	Eventually(func() string {
+		out, _ := kubectl.Run("get", "MachineRegistration",
+			"--namespace", clusterNS,
+			"-o", "jsonpath={.items[*].metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(rn))
+}
+
+/**
+ * Check that a SelectorTemplate resource has been correctly created
+ * @param ns Namespace where the cluster is deployed
+ * @param sn Selector name
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func CheckCreatedSelectorTemplate(ns, sn string) {
+	Eventually(func() string {
+		out, _ := kubectl.Run("get", "MachineInventorySelectorTemplate",
+			"--namespace", ns,
+			"-o", "jsonpath={.items[*].metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(sn))
+}
+
+/**
+ * Wait for OSVersion to be populated
+ * @param ns Namespace where the cluster is deployed
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func WaitForOSVersion(ns string) {
+	Eventually(func() string {
+		out, _ := kubectl.Run("get", "ManagedOSVersion",
+			"--namespace", ns,
+			"-o", "jsonpath={.items[*].metadata.name}")
+		return out
+	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
+}
+
+/**
+ * Check SSH connection
+ * @param cl Client (node) informations
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func CheckSSH(cl *tools.Client) {
+	Eventually(func() string {
+		out, _ := cl.RunSSH("echo SSH_OK")
+		return strings.Trim(out, "\n")
+	}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+}
+
+/**
+ * Download ISO built with SeedImage
+ * @param ns Namespace where the cluster is deployed
+ * @param seedName Name of the used SeedImage resource
+ * @param filename Path and name of the file where to store the ISO
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
+func DownloadBuiltISO(ns, seedName, filename string) {
+	// Set minimal ISO file to 500MB
+	const minimalISOSize = 500 * 1024 * 1024
+
+	// Check that the seed image is correctly created
+	Eventually(func() string {
+		out, _ := kubectl.Run("get", "SeedImage",
+			"--namespace", ns,
+			seedName,
+			"-o", "jsonpath={.status}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+
+	// Get URL
+	seedImageURL, err := kubectl.Run("get", "SeedImage",
+		"--namespace", ns,
+		seedName,
+		"-o", "jsonpath={.status.downloadURL}")
+	Expect(err).To(Not(HaveOccurred()))
+
+	// ISO file size should be greater than 500MB
+	Eventually(func() int64 {
+		// No need to check download status, file size at the end is enough
+		_ = tools.GetFileFromURL(seedImageURL, filename, false)
+		file, _ := os.Stat(filename)
+		return file.Size()
+	}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
+}
+
+/**
+ * Get Elemental node information
+ * @param hn Node hostname
+ * @returns Client structure and MAC address
+ */
+func GetNodeInfo(hn string) (*tools.Client, string) {
 	// Get network data
-	hostData, err := rancher.GetHostNetConfig(".*name=\""+hostName+"\".*", netDefaultFileName)
+	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
 	Expect(err).To(Not(HaveOccurred()))
 
 	// Set 'client' to be able to access the node through SSH
 	c := &tools.Client{
-		Host:     string(hostData.IP) + ":22",
+		Host:     string(data.IP) + ":22",
 		Username: userName,
 		Password: userPassword,
 	}
 
-	return c, hostData.Mac
+	return c, data.Mac
 }
 
+/**
+ * Get Elemental node IP address
+ * @param hn Node hostname
+ * @returns IP address
+ */
+func GetNodeIP(hn string) string {
+	// Get network data
+	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	return data.IP
+}
+
+/**
+ * Execute RunHelmBinaryWithCustomErr within a loop with timeout
+ * @param s options to pass to RunHelmBinaryWithCustomErr command
+ * @returns Nothing, the function will fail through Ginkgo in case of issue
+ */
 func RunHelmCmdWithRetry(s ...string) {
 	Eventually(func() error {
 		return kubectl.RunHelmBinaryWithCustomErr(s...)
@@ -212,6 +395,7 @@ var _ = BeforeSuite(func() {
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
+	clusterNumber := os.Getenv("CLUSTER_NUMBER")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
 	operatorRepo = os.Getenv("OPERATOR_REPO")
 	os2Test = os.Getenv("OS_TO_TEST")
@@ -290,6 +474,25 @@ var _ = BeforeSuite(func() {
 		s := strings.Split(rancherUpgrade, "/")
 		rancherUpgradeChannel = s[0]
 		rancherUpgradeVersion = s[1]
+	}
+
+	// Enable multi-cluster support if needed
+	if testType == "multi" {
+		if clusterNumber != "" {
+			var err error
+			numberOfClusters, err = strconv.Atoi(clusterNumber)
+			Expect(err).To(Not(HaveOccurred()))
+		}
+
+		clusterYaml = "../assets/cluster-multi.yaml"
+		registrationYaml = "../assets/machineRegistration-multi.yaml"
+		seedImageYaml = "../assets/seedImage-multi.yaml"
+		selectorYaml = "../assets/selector-multi.yaml"
+	} else {
+		clusterYaml = "../assets/cluster.yaml"
+		registrationYaml = "../assets/machineRegistration.yaml"
+		seedImageYaml = "../assets/seedImage.yaml"
+		selectorYaml = "../assets/selector.yaml"
 	}
 
 	// Start HTTP server

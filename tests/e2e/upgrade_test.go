@@ -280,7 +280,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 		wg.Wait()
 
 		By("Checking cluster state after upgrade", func() {
-			CheckClusterState(clusterNS, clusterName)
+			WaitCluster(clusterNS, clusterName)
 		})
 	})
 })

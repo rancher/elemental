@@ -42,6 +42,9 @@ on:
         description: Name of the provisioned cluster
         required: true
         type: string
+      cluster_number:
+        description: Number of clusters to deploy in multi-cluster test
+        type: string
       cluster_type:
         description: Cluster type (empty if normal or hardened)
         type: string
@@ -222,6 +225,7 @@ jobs:
       QASE_RUN_ID: ${{ inputs.qase_run_id }}
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}
+      TEST_TYPE: ${{ inputs.test_type }}
       TIMEOUT_SCALE: 3
     steps:
       - name: Checkout
@@ -240,7 +244,6 @@ jobs:
           PROXY: ${{ inputs.proxy }}
           PUBLIC_DNS: ${{ needs.create-runner.outputs.public_dns }}
           PUBLIC_DOMAIN: bc.googleusercontent.com
-          TEST_TYPE: ${{ inputs.test_type }}
         run: cd tests && make e2e-install-rancher
       - name: Workaround for DynamicSchemas (if needed)
         run: |
@@ -251,7 +254,7 @@ jobs:
             kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
           fi
       - name: Install backup-restore components (K3s only for now)
-        if: ${{ contains(inputs.upstream_cluster_version, 'k3s') }}
+        if: ${{ inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-backup-restore
       - name: Extract component versions/informations
         id: component
@@ -395,18 +398,6 @@ jobs:
       - name: Extract iPXE artifacts from ISO
         if: ${{ inputs.test_type == 'cli' && inputs.iso_boot == false }}
         run: cd tests && make extract_kernel_init_squash && make ipxe
-      - name: Extract ISO version
-        id: iso_version
-        run: |
-          # Extract OS version from ISO
-          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
-          INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
-          isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
-            | xz -dc \
-            | cpio -i --to-stdout usr/lib/initrd-release > os-release
-          eval $(grep IMAGE_TAG os-release)
-          # Export value
-          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         if: ${{ inputs.test_type == 'cli' }}
         env:
@@ -433,6 +424,12 @@ jobs:
           else
             cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
           fi
+      - name: Deploy multiple clusters (with 3 nodes by cluster)
+        if: inputs.test_type == 'multi'
+        env:
+          CLUSTER_NUMBER: ${{ inputs.cluster_number }}
+          ISO_BOOT: ${{ inputs.iso_boot }}
+        run: cd tests && make e2e-multi-cluster
       - name: Install a simple application
         if: ${{ inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
@@ -513,6 +510,21 @@ jobs:
           if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
             make e2e-check-app
           fi
+      - name: Extract ISO version
+        if: ${{ always() }}
+        id: iso_version
+        run: |
+          # Extract OS version from ISO
+          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
+          if [[ -n "${ISO}" ]]; then
+            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+            isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+              | xz -dc \
+              | cpio -i --to-stdout usr/lib/initrd-release > os-release
+            eval $(grep IMAGE_TAG os-release 2>/dev/null)
+          fi
+          # Export value (even if empty!)
+          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
       - name: Remove old built ISO image
         # Only one at a time is allowed, the new one will be created after if needed
         if: ${{ inputs.test_type == 'cli' }}

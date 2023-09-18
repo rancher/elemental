@@ -56,12 +56,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Check that the cluster is correctly created
-			Eventually(func() string {
-				out, _ := kubectl.Run("get", "cluster",
-					"--namespace", clusterNS,
-					clusterName, "-o", "jsonpath={.metadata.name}")
-				return out
-			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(clusterName))
+			CheckCreatedCluster(clusterNS, clusterName)
 		})
 
 		By("Creating cluster selectors", func() {
@@ -95,12 +90,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Check that the selector template is correctly created
-				Eventually(func() string {
-					out, _ := kubectl.Run("get", "MachineInventorySelectorTemplate",
-						"--namespace", clusterNS,
-						"-o", "jsonpath={.items[*].metadata.name}")
-					return out
-				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("selector-" + pool + "-" + clusterName))
+				CheckCreatedSelectorTemplate(clusterNS, "selector-"+pool+"-"+clusterName)
 			}
 		})
 
@@ -147,12 +137,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Check that the machine registration is correctly created
-				Eventually(func() string {
-					out, _ := kubectl.Run("get", "MachineRegistration",
-						"--namespace", clusterNS,
-						"-o", "jsonpath={.items[*].metadata.name}")
-					return out
-				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("machine-registration-" + pool + "-" + clusterName))
+				CheckCreatedRegistration(clusterNS, "machine-registration-"+pool+"-"+clusterName)
 			}
 		})
 

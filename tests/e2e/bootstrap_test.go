@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"math/rand"
 	"os/exec"
 	"strings"
 	"sync"
@@ -27,6 +26,7 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"github.com/rancher/elemental/tests/e2e/helpers/misc"
 	"github.com/rancher/elemental/tests/e2e/helpers/network"
 )
 
@@ -38,41 +38,6 @@ func checkClusterAgent(client *tools.Client) {
 	}, tools.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
-func getClusterState(ns, cluster, condition string) string {
-	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
-	Expect(err).To(Not(HaveOccurred()))
-	return out
-}
-
-func randomSleep(index int) {
-	// Only useful in parallel mode
-	if sequential == true {
-		return
-	}
-
-	// Initialize the seed
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-	// Get a pseudo-random value
-	timeMax := 240000
-	value := r.Intn(timeMax + (timeMax % index))
-
-	// Wait until value is reached
-	time.Sleep(time.Duration(value) * time.Millisecond)
-}
-
-func waitNodesBoot(i, v, b int) int {
-	if (i - v - b) == numberOfNodesMax {
-		// Save the number of nodes already bootstrapped for the next round
-		b = (i - v)
-
-		// Wait a little
-		time.Sleep(4 * time.Minute)
-	}
-
-	return b
-}
-
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
 		bootstrappedNodes int
@@ -81,7 +46,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 	It("Provision the node", func() {
 		if !isoBoot {
-			By("Downloading installation config file", func() {
+			By("Downloading MachineRegistration file", func() {
 				// Download the new YAML installation config file
 				machineRegName := "machine-registration-" + poolType + "-" + clusterName
 				tokenURL, err := kubectl.Run("get", "MachineRegistration",
@@ -123,7 +88,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				By("Installing node "+h, func() {
 					// Wait a little bit to avoid starting all VMs at the same time
-					randomSleep(i)
+					misc.RandomSleep(sequential, i)
 
 					// Execute node deployment in parallel
 					err := exec.Command(s, h, m).Run()
@@ -132,7 +97,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}(installVMScript, hostName, macAdrs, index)
 
 			// Wait a bit before starting more nodes to reduce CPU and I/O load
-			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
+			bootstrappedNodes = misc.WaitNodesBoot(index, vmIndex, bootstrappedNodes, numberOfNodesMax)
 		}
 
 		// Wait for all parallel jobs
@@ -156,11 +121,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					By("Checking SeedImage cloud-config on "+h, func() {
 						// Wait for SSH to be available
 						// NOTE: this also checks that the root password was correctly set by cloud-config
-						Eventually(func() string {
-							out, _ := cl.RunSSH("echo SSH_OK")
-							out = strings.Trim(out, "\n")
-							return out
-						}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+						CheckSSH(cl)
 
 						// Check that the cloud-config is correctly applied by checking the presence of a file
 						_, err := cl.RunSSH("ls /etc/elemental-test")
@@ -209,7 +170,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		if vmIndex > 1 {
 			By("Checking cluster state", func() {
-				CheckClusterState(clusterNS, clusterName)
+				WaitCluster(clusterNS, clusterName)
 			})
 		}
 
@@ -233,12 +194,15 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Waiting for known cluster state before adding the node(s)", func() {
 			msg := `(configuring .* node\(s\)|waiting for viable init node)`
 			Eventually(func() string {
-				clusterMsg := getClusterState(clusterNS, clusterName,
+				clusterMsg, _ := elemental.GetClusterState(clusterNS, clusterName,
 					"{.status.conditions[?(@.type==\"Updated\")].message}")
 
+				// Sometimes we can have a different status/condition
 				if clusterMsg == "" {
-					clusterMsg = getClusterState(clusterNS, clusterName,
+					out, _ := elemental.GetClusterState(clusterNS, clusterName,
 						"{.status.conditions[?(@.type==\"Provisioned\")].message}")
+
+					return out
 				}
 
 				return clusterMsg
@@ -264,19 +228,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 				// Restart the node(s)
 				By("Restarting "+h+" to add it in the cluster", func() {
 					// Wait a little bit to avoid starting all VMs at the same time
-					randomSleep(i)
+					misc.RandomSleep(sequential, i)
 
 					err := exec.Command("sudo", "virsh", "start", h).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				})
 
 				By("Checking "+h+" SSH connection", func() {
-					// Retry the SSH connection, as it can takes time for the user to be created
-					Eventually(func() string {
-						out, _ := cl.RunSSH("echo SSH_OK")
-						out = strings.Trim(out, "\n")
-						return out
-					}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+					CheckSSH(cl)
 				})
 
 				By("Checking that TPM is correctly configured on "+h, func() {
@@ -298,7 +257,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}(clusterNS, hostName, index, emulateTPM, client)
 
 			// Wait a bit before starting more nodes to reduce CPU and I/O load
-			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
+			bootstrappedNodes = misc.WaitNodesBoot(index, vmIndex, bootstrappedNodes, numberOfNodesMax)
 		}
 
 		// Wait for all parallel jobs
@@ -357,7 +316,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		}
 
 		By("Checking cluster state", func() {
-			CheckClusterState(clusterNS, clusterName)
+			WaitCluster(clusterNS, clusterName)
 		})
 
 		if poolType != "worker" {
@@ -411,7 +370,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				By("Rebooting "+h, func() {
 					// Wait a little bit to avoid starting all VMs at the same time
-					randomSleep(i)
+					misc.RandomSleep(sequential, i)
 
 					// Execute 'reboot' in background, to avoid SSH locking
 					Eventually(func() error {
@@ -428,14 +387,14 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			}(hostName, poolType, index, client)
 
 			// Wait a bit before starting more nodes to reduce CPU and I/O load
-			bootstrappedNodes = waitNodesBoot(index, vmIndex, bootstrappedNodes)
+			bootstrappedNodes = misc.WaitNodesBoot(index, vmIndex, bootstrappedNodes, numberOfNodesMax)
 		}
 
 		// Wait for all parallel jobs
 		wg.Wait()
 
 		By("Checking cluster state after reboot", func() {
-			CheckClusterState(clusterNS, clusterName)
+			WaitCluster(clusterNS, clusterName)
 		})
 	})
 })

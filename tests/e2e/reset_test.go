@@ -69,7 +69,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 		})
 
 		By("Checking cluster state", func() {
-			CheckClusterState(clusterNS, clusterName)
+			WaitCluster(clusterNS, clusterName)
 		})
 	})
 })

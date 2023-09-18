@@ -52,14 +52,65 @@ func AddSelector(key, value string) ([]byte, error) {
 }
 
 /**
+ * Get state of the cluster
+ * @param ns Namespace where the cluster is deployed
+ * @param cluster Name of the cluster to check
+ * @param condition Status to search for
+ * @returns The YAML structure or an error
+ */
+func GetClusterState(ns, cluster, condition string) (string, error) {
+	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
+	if err != nil {
+		return "", err
+	}
+	return out, nil
+}
+
+/**
+ * Get nodeName from MachineInventory
+ * @remarks This is useful to link machine name from Rancher Manager to the Elemental one
+ * @param ns Namespace
+ * @param machine Machine name as seen by Rancher Manager
+ * @returns Corresponding external machine name
+ */
+func GetExternalMachine(ns, machine string) (string, error) {
+	node, err := kubectl.Run("get", "Machine",
+		"--namespace", ns, machine,
+		"-o", "jsonpath={.status.addresses[?(@.type==\"Hostname\")].address}")
+	if err != nil {
+		return "", err
+	}
+
+	return node, nil
+}
+
+/**
+ * Get IP from MachineInventory
+ * @remarks This is useful to link machine name from Rancher Manager to the Elemental one
+ * @param ns Namespace
+ * @param machine Machine name as seen by Rancher Manager
+ * @returns Corresponding machine IP
+ */
+func GetExternalMachineIP(ns, machine string) (string, error) {
+	node, err := kubectl.Run("get", "Machine",
+		"--namespace", ns, machine,
+		"-o", "jsonpath={.status.addresses[?(@.type==\"InternalIP\")].address}")
+	if err != nil {
+		return "", err
+	}
+
+	return node, nil
+}
+
+/**
  * Get container URI from ManagedOSVersion
- * @param clusterNS Namespace
+ * @param ns Namespace
  * @param os OS version to get URI from
  * @returns URI of container image
  */
-func GetImageURI(clusterNS, os string) (string, error) {
+func GetImageURI(ns, os string) (string, error) {
 	uri, err := kubectl.Run("get", "ManagedOSVersion",
-		"--namespace", clusterNS, os,
+		"--namespace", ns, os,
 		"-o", "jsonpath={.spec.metadata.uri}")
 
 	if err != nil {
@@ -72,13 +123,13 @@ func GetImageURI(clusterNS, os string) (string, error) {
 /**
  * Get Machine from MachineInventory
  * @remarks This is useful to link machine name from Elemental to the Rancher Manager one
- * @param clusterNS Namespace
+ * @param ns Namespace
  * @param machineInventory Machine name as seen by Elemental
  * @returns Corresponding internal machine name
  */
-func GetInternalMachine(clusterNS, machineInventory string) (string, error) {
+func GetInternalMachine(ns, machineInventory string) (string, error) {
 	machine, err := kubectl.Run("get", "Machine",
-		"--namespace", clusterNS,
+		"--namespace", ns,
 		"-o", "jsonpath={.items[?(@.status.nodeRef.name==\""+machineInventory+"\")].metadata.name}")
 	if err != nil {
 		return "", err
@@ -122,13 +173,13 @@ func GetOperatorVersion() (string, error) {
 
 /**
  * Get MachineInventory name (aka. server id)
- * @param clusterNS Namespace
+ * @param ns Namespace
  * @param index URL of the repository
  * @returns The name/id of the server or an error
  */
-func GetServerID(clusterNS string, index int) (string, error) {
+func GetServerID(ns string, index int) (string, error) {
 	serverID, err := kubectl.Run("get", "MachineInventories",
-		"--namespace", clusterNS,
+		"--namespace", ns,
 		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
 	if err != nil {
 		return "", err
@@ -159,15 +210,15 @@ func SetHostname(baseName string, index int) string {
 /**
  * Set a label on MachineInventory
  * @remarks Define a custom label on a MachineInventory
- * @param clusterNS Name of the repository
+ * @param ns Name of the repository
  * @param node Name of the node
  * @param key Label to set
  * @param value Value to set on Label
  * @returns Nothing or an error
  */
-func SetMachineInventoryLabel(clusterNS, node, key, value string) error {
+func SetMachineInventoryLabel(ns, node, key, value string) error {
 	_, err := kubectl.Run("label", "machineinventory",
-		"--namespace", clusterNS, node,
+		"--namespace", ns, node,
 		"--overwrite", key+"="+value)
 	if err != nil {
 		return err
