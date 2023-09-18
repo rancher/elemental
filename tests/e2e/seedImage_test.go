@@ -18,7 +18,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -40,12 +39,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			}
 
 			// Wait for list of OS versions to be populated
-			Eventually(func() string {
-				out, _ := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS,
-					"-o", "jsonpath={.items[*].metadata.name}")
-				return out
-			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
+			WaitForOSVersion(clusterNS)
 
 			// Get OSVersion name
 			OSVersion, err := exec.Command(getOSScript, os2Test, "true").Output()
@@ -122,32 +116,10 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			// Apply to k8s
 			err = kubectl.Apply(clusterNS, seedImageTmp)
 			Expect(err).To(Not(HaveOccurred()))
-
-			// Check that the seed image is correctly created
-			Eventually(func() string {
-				out, _ := kubectl.Run("get", "SeedImage",
-					"--namespace", clusterNS,
-					seedImageName,
-					"-o", "jsonpath={.status}")
-				return out
-			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
 		})
 
 		By("Downloading ISO built by SeedImage", func() {
-			seedImageURL, err := kubectl.Run("get", "SeedImage",
-				"--namespace", clusterNS,
-				seedImageName,
-				"-o", "jsonpath={.status.downloadURL}")
-			Expect(err).To(Not(HaveOccurred()))
-
-			// ISO file size should be greater than 500MB
-			Eventually(func() int64 {
-				// No need to check download status, file size at the end is enough
-				filename := "../../elemental-" + poolType + ".iso"
-				_ = tools.GetFileFromURL(seedImageURL, filename, false)
-				file, _ := os.Stat(filename)
-				return file.Size()
-			}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", 500*1024*1024))
+			DownloadBuiltISO(clusterNS, seedImageName, "../../elemental-"+poolType+".iso")
 		})
 	})
 })

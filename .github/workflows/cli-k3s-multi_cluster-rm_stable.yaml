@@ -1,0 +1,31 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-Multi_Cluster-RM_Stable
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+  schedule:
+    # Every Sunday at 3am
+    - cron: '0 3 * * 0'
+
+jobs:
+  cli:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI/Manual - CLI - MultiCluster - Deployment test with Standard K3s"
+      cluster_name: cluster-k3s
+      cluster_number: 40
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      iso_boot: true
+      k8s_version_to_provision: v1.26.8+k3s1
+      runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
+      test_type: multi
+      zone: us-central1-b

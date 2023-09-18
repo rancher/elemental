@@ -2,12 +2,15 @@ ROOT_DIR:=$(realpath $(PWD)/..)
 IPXE:=$(ROOT_DIR)/install.ipxe
 ISO:=$(shell file -Ls $(ROOT_DIR)/*.iso 2>/dev/null | awk -F':' '/boot sector/ { print $$1 }')
 
-# Define Ginkgo timeout for the bootstrapping test
+# Define Ginkgo timeout for the tests
 GINKGO_TIMEOUT?=3600
 ifdef VM_NUMBERS
 	ifeq ($(shell expr $(VM_NUMBERS) \> 80), 1)
-		GINKGO_TIMEOUT=6000
+		GINKGO_TIMEOUT=7200
 	endif
+endif
+ifeq ($(TEST_TYPE),multi)
+	GINKGO_TIMEOUT=10800
 endif
 
 extract_kernel_init_squash:
@@ -71,6 +74,9 @@ e2e-install-backup-restore: deps
 
 e2e-iso-image: deps
 	ginkgo --label-filter iso-image -r -v ./e2e
+
+e2e-multi-cluster: deps
+	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter multi-cluster -r -v ./e2e
 
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e

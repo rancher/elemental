@@ -164,7 +164,7 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 		})
 
 		By("Checking cluster state after restore", func() {
-			CheckClusterState(clusterNS, clusterName)
+			WaitCluster(clusterNS, clusterName)
 		})
 	})
 })

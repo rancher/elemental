@@ -1,0 +1,11 @@
+kind: MachineInventorySelectorTemplate
+apiVersion: elemental.cattle.io/v1beta1
+metadata:
+  name: selector-%CLUSTER_NAME%
+  # namespace: fleet-default
+spec:
+  template:
+    spec:
+      selector:
+        matchLabels:
+          clusterName: %CLUSTER_NAME%
