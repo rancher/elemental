@@ -65,9 +65,6 @@ cp -a framework/files/* %{buildroot}
 
 rm -rf %{buildroot}/var/log/journal
 
-# belongs to elemental-system-agent package
-rm %{buildroot}%{_unitdir}/elemental-system-agent.service
-
 # remove placeholders
 rm -rf %{buildroot}/usr/libexec/.placeholder
 
@@ -79,6 +76,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_pre elemental-register-install.service
 %service_add_pre elemental-register-reset.service
 %service_add_pre elemental-register.timer
+%service_add_pre elemental-system-agent.service
 %endif
 
 %post
@@ -89,6 +87,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_add_post elemental-register-install.service
 %service_add_post elemental-register-reset.service
 %service_add_post elemental-register.timer
+%service_add_post elemental-system-agent.service
 %else
 %systemd_post elemental-populate-node-labels.service
 %systemd_post shutdown-containerd.service
@@ -96,6 +95,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %systemd_post elemental-register-install.service
 %systemd_post elemental-register-reset.service
 %systemd_post elemental-register.timer
+%systemd_post elemental-system-agent.service
 %endif
 
 %preun
@@ -106,6 +106,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_del_preun elemental-register-install.service
 %service_del_preun elemental-register-reset.service
 %service_del_preun elemental-register.timer
+%service_del_preun elemental-system-agent.service
 %else
 %systemd_preun elemental-populate-node-labels.service
 %systemd_preun shutdown-containerd.service
@@ -113,6 +114,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %systemd_preun elemental-register-install.service
 %systemd_preun elemental-register-reset.service
 %systemd_preun elemental-register.timer
+%systemd_preun elemental-system-agent.service
 %endif
 
 %postun
@@ -123,6 +125,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %service_del_postun elemental-register-install.service
 %service_del_postun elemental-register-reset.service
 %service_del_postun elemental-register.timer
+%service_del_postun elemental-system-agent.service
 %else
 %systemd_postun elemental-populate-node-labels.service
 %systemd_postun shutdown-containerd.service
@@ -130,6 +133,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %systemd_postun elemental-register-install.service
 %systemd_postun elemental-register-reset.service
 %systemd_postun elemental-register.timer
+%systemd_postun elemental-system-agent.service
 %endif
 
 %files
@@ -151,6 +155,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %{_unitdir}/elemental-register-reset.service
 %{_unitdir}/elemental-register.timer
 %{_unitdir}/elemental-populate-node-labels.service
+%{_unitdir}/elemental-system-agent.service
 %{_sbindir}/elemental-populate-node-labels
 %dir /usr/libexec
 %dir %{systemdir}
