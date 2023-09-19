@@ -17,14 +17,12 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
 var _ = Describe("E2E - Configure test", Label("configure"), func() {
@@ -72,11 +70,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			defer os.Remove(selectorTmp)
 
-			// Get elemental-operator version
-			operatorVersion, err := elemental.GetOperatorVersion()
-			Expect(err).To(Not(HaveOccurred()))
-			operatorVersionShort := strings.Split(operatorVersion, ".")
-
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
 				addPatterns := []pattern{
@@ -94,12 +87,6 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				// Create Yaml file
 				for _, p := range patterns {
 					err := tools.Sed(p.key, p.value, selectorTmp)
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
-				// Remove 'just-a-dumb-value' if needed (multiple values only supported in operator v1.1+)
-				if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-					err := tools.Sed(".*just-a-dumb-value.*", "", selectorTmp)
 					Expect(err).To(Not(HaveOccurred()))
 				}
 

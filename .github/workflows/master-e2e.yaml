@@ -576,15 +576,7 @@ jobs:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
         if: inputs.destroy_runner == true && inputs.test_type == 'cli'
-        run: |
-          OPERATOR_VERSION=$(echo ${{ steps.component.outputs.operator_version }} \
-                             | awk -F ':' '{print substr($2,0,3)}')
-          # Uninstallation of elemental-operator isn't supported on version v1.0.x
-          if [[ "${OPERATOR_VERSION}" != "1.0" ]]; then
-            cd tests && make e2e-uninstall-operator
-          else
-            echo "Uninstallation of elemental-operator isn't supported on version v1.0.x!"
-          fi
+        run: cd tests && make e2e-uninstall-operator
       - name: Store logs
         if: always()
         env:

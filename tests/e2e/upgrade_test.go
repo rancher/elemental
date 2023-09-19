@@ -175,17 +175,6 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
-				// Get elemental-operator version
-				operatorVersion, err := elemental.GetOperatorVersion()
-				Expect(err).To(Not(HaveOccurred()))
-				operatorVersionShort := strings.Split(operatorVersion, ".")
-
-				// Remove 'syncInterval' option if needed (only supported in operator v1.1+)
-				if (operatorVersionShort[0] + "." + operatorVersionShort[1]) == "1.0" {
-					err := tools.Sed("syncInterval:.*", "", osListYaml)
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
 				// Add OS channel list
 				err = tools.Sed("%UPGRADE_CHANNEL_LIST%", upgradeChannelList, osListYaml)
 				Expect(err).To(Not(HaveOccurred()))
