@@ -48,7 +48,7 @@ const (
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"
-	seedimageYaml         = "../assets/seedImage.yaml"
+	seedImageYaml         = "../assets/seedImage.yaml"
 	selectorYaml          = "../assets/selector.yaml"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
@@ -73,6 +73,7 @@ var (
 	numberOfVMs           int
 	operatorUpgrade       string
 	operatorRepo          string
+	os2Test               string
 	poolType              string
 	proxy                 string
 	rancherChannel        string
@@ -212,6 +213,7 @@ var _ = BeforeSuite(func() {
 	number := os.Getenv("VM_NUMBERS")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
 	operatorRepo = os.Getenv("OPERATOR_REPO")
+	os2Test = os.Getenv("OS_TO_TEST")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")

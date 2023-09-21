@@ -3,13 +3,8 @@ name: CLI-K3s-Rancher_Stable
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - build-ci
-    branches:
-      - main
-    types:
-      - completed
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
   cli:
@@ -22,5 +17,3 @@ jobs:
       test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.26.8+k3s1
-      start_condition: ${{ github.event.workflow_run.conclusion }}
-      workflow_download: ${{ github.event.workflow_run.workflow_id }}

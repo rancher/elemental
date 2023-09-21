@@ -16,9 +16,7 @@ package e2e_test
 
 import (
 	"math/rand"
-	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -82,124 +80,19 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	)
 
 	It("Provision the node", func() {
-		type pattern struct {
-			key   string
-			value string
-		}
-
-		// Set MachineRegistration name based on hostname
-		machineRegName := "machine-registration-" + poolType + "-" + clusterName
-		seedImageName := "seed-image-" + poolType + "-" + clusterName
-		baseImageURL := "http://192.168.122.1:8000/base-image.iso"
-
-		// Patterns to replace
-		patterns := []pattern{
-			{
-				key:   "%CLUSTER_NAME%",
-				value: clusterName,
-			},
-			{
-				key:   "%BASE_IMAGE%",
-				value: baseImageURL,
-			},
-			{
-				key:   "%POOL_TYPE%",
-				value: poolType,
-			},
-		}
-
-		By("Setting emulated TPM to "+strconv.FormatBool(emulateTPM), func() {
-			// Set temporary file
-			emulatedTmp, err := tools.CreateTemp("emulatedTPM")
-			Expect(err).To(Not(HaveOccurred()))
-			defer os.Remove(emulatedTmp)
-
-			// Save original file as it can be modified multiple time
-			err = tools.CopyFile(emulateTPMYaml, emulatedTmp)
-			Expect(err).To(Not(HaveOccurred()))
-
-			// Patch the yaml file
-			err = tools.Sed("%EMULATE_TPM%", strconv.FormatBool(emulateTPM), emulatedTmp)
-			Expect(err).To(Not(HaveOccurred()))
-
-			// And apply it
-			_, err = kubectl.Run("patch", "MachineRegistration",
-				"--namespace", clusterNS, machineRegName,
-				"--type", "merge", "--patch-file", emulatedTmp,
-			)
-			Expect(err).To(Not(HaveOccurred()))
-		})
-
-		By("Downloading installation config file", func() {
-			// Download the new YAML installation config file
-			tokenURL, err := kubectl.Run("get", "MachineRegistration",
-				"--namespace", clusterNS, machineRegName,
-				"-o", "jsonpath={.status.registrationURL}")
-			Expect(err).To(Not(HaveOccurred()))
-
-			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
-			Expect(err).To(Not(HaveOccurred()))
-		})
-
-		if isoBoot == "true" {
-			By("Adding SeedImage", func() {
-				// Set temporary file
-				seedimageTmp, err := tools.CreateTemp("seedimage")
-				Expect(err).To(Not(HaveOccurred()))
-				defer os.Remove(seedimageTmp)
-
-				// Set poweroff to false for master pool to have time to check SeedImage cloud-config
-				if poolType == "master" {
-					_, err := kubectl.Run("patch", "MachineRegistration",
-						"--namespace", clusterNS, machineRegName,
-						"--type", "merge", "--patch",
-						"{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
-				// Save original file as it will have to be modified twice
-				err = tools.CopyFile(seedimageYaml, seedimageTmp)
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Create Yaml file
-				for _, p := range patterns {
-					err := tools.Sed(p.key, p.value, seedimageTmp)
-					Expect(err).To(Not(HaveOccurred()))
-				}
-
-				// Apply to k8s
-				err = kubectl.Apply(clusterNS, seedimageTmp)
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Check that the seed image is correctly created
-				Eventually(func() string {
-					out, _ := kubectl.Run("get", "SeedImage",
-						"--namespace", clusterNS,
-						seedImageName,
-						"-o", "jsonpath={.status}")
-					return out
-				}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
-			})
-
-			By("Downloading ISO built by SeedImage", func() {
-				seedImageURL, err := kubectl.Run("get", "SeedImage",
-					"--namespace", clusterNS,
-					seedImageName,
-					"-o", "jsonpath={.status.downloadURL}")
-				Expect(err).To(Not(HaveOccurred()))
-
-				// ISO file size should be greater than 500MB
-				Eventually(func() int64 {
-					// No need to check download status, file size at the end is enough
-					filename := "../../elemental-" + poolType + ".iso"
-					_ = tools.GetFileFromURL(seedImageURL, filename, false)
-					file, _ := os.Stat(filename)
-					return file.Size()
-				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", 500*1024*1024))
-			})
-		}
-
 		if isoBoot != "true" {
+			By("Downloading installation config file", func() {
+				// Download the new YAML installation config file
+				machineRegName := "machine-registration-" + poolType + "-" + clusterName
+				tokenURL, err := kubectl.Run("get", "MachineRegistration",
+					"--namespace", clusterNS, machineRegName,
+					"-o", "jsonpath={.status.registrationURL}")
+				Expect(err).To(Not(HaveOccurred()))
+
+				err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
+				Expect(err).To(Not(HaveOccurred()))
+			})
+
 			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := network.ConfigureiPXE(httpSrv)
 				Expect(err).To(Not(HaveOccurred()))

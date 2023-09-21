@@ -52,9 +52,27 @@ func AddSelector(key, value string) ([]byte, error) {
 }
 
 /**
+ * Get container URI from ManagedOSVersion
+ * @param clusterNS Namespace
+ * @param os OS version to get URI from
+ * @returns URI of container image
+ */
+func GetImageURI(clusterNS, os string) (string, error) {
+	uri, err := kubectl.Run("get", "ManagedOSVersion",
+		"--namespace", clusterNS, os,
+		"-o", "jsonpath={.spec.metadata.uri}")
+
+	if err != nil {
+		return "", err
+	}
+
+	return uri, nil
+}
+
+/**
  * Get Machine from MachineInventory
  * @remarks This is useful to link machine name from Elemental to the Rancher Manager one
- * @param clusterNS Name of the repository
+ * @param clusterNS Namespace
  * @param machineInventory Machine name as seen by Elemental
  * @returns Corresponding internal machine name
  */
@@ -104,7 +122,7 @@ func GetOperatorVersion() (string, error) {
 
 /**
  * Get MachineInventory name (aka. server id)
- * @param clusterNS Name of the repository
+ * @param clusterNS Namespace
  * @param index URL of the repository
  * @returns The name/id of the server or an error
  */

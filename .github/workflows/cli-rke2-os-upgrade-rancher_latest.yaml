@@ -1,9 +1,6 @@
 # This workflow calls the master E2E workflow with custom variables
 name: CLI-RKE2-OS-Upgrade-Rancher_Latest
 
-# This worflow is scheduled because it uses Dev artifacts from OBS and
-# not the ones built in the CI (build-ci workflow).
-# The scheduling is also to avoid running the workflow on each push on main.
 on:
   workflow_dispatch:
   schedule:
@@ -20,11 +17,11 @@ jobs:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
-      iso_to_test: https://updates.suse.com/SUSE/Products/ElementalTeal/5.4/x86_64/iso/elemental-teal.x86_64-1.2.2-GM.iso
       k8s_version_to_provision: v1.26.8+rke2r1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
+      os_to_test: stable
       rancher_version: latest/devel
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev

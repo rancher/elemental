@@ -99,31 +99,28 @@ endif
 
 .PHONY: extract_kernel_init_squash
 extract_kernel_init_squash:
-	@VAR='build/$(ISO)'; \
-	INITRD_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name initrd -print 2>/dev/null); \
-	KERNEL_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name kernel -print 2>/dev/null); \
-	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i $${VAR} -find -type f -name linux -print 2>/dev/null); \
-	isoinfo -x /rootfs.squashfs -R -i $${VAR} > $${VAR/\.iso/.squashfs} 2>/dev/null; \
-	isoinfo -x $${INITRD_FILE} -R -i $${VAR} > $${VAR/\.iso/-initrd} 2>/dev/null; \
-	isoinfo -x $${KERNEL_FILE} -R -i $${VAR} > $${VAR/\.iso/-kernel} 2>/dev/null
+	@ISO=$$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $$1 }'); \
+	INITRD_FILE=$$(isoinfo -R -i $${ISO} -find -type f -name initrd -print 2>/dev/null); \
+	KERNEL_FILE=$$(isoinfo -R -i $${ISO} -find -type f -name kernel -print 2>/dev/null); \
+	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i $${ISO} -find -type f -name linux -print 2>/dev/null); \
+	isoinfo -x /rootfs.squashfs -R -i $${ISO} > $${ISO/\.iso/.squashfs} 2>/dev/null; \
+	isoinfo -x $${INITRD_FILE} -R -i $${ISO} > $${ISO/\.iso/-initrd} 2>/dev/null; \
+	isoinfo -x $${KERNEL_FILE} -R -i $${ISO} > $${ISO/\.iso/-kernel} 2>/dev/null
 
 .PHONY: ipxe
 ipxe:
-	@mkdir -p build
-	@VAR='build/$(ISO)'; \
-	ISO='$(ISO)'; \
-	echo "#!ipxe" > $${VAR/\.iso/.ipxe}; \
-	echo "set arch amd64" >> $${VAR/\.iso/.ipxe}; \
-	URL="tftp://10.0.2.2/${TAG}"; \
-	[[ "${RELEASE_TAG}" == "true" ]] && URL="https://github.com/rancher/elemental/releases/download/${FINAL_TAG}"; \
-	echo "set url $${URL}" >> $${VAR/\.iso/.ipxe}; \
-	echo "set kernel $${ISO/\.iso/-kernel}" >> $${VAR/\.iso/.ipxe}; \
-	echo "set initrd $${ISO/\.iso/-initrd}" >> $${VAR/\.iso/.ipxe}; \
-	echo "set rootfs $${ISO/\.iso/.squashfs}" >> $${VAR/\.iso/.ipxe}; \
-	echo "# set config http://example.com/machine-config" >> $${VAR/\.iso/.ipxe}; \
-	echo "# set cmdline extra.values=1" >> $${VAR/\.iso/.ipxe}; \
-	echo "initrd \$${url}/\$${initrd}" >> $${VAR/\.iso/.ipxe}; \
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $${VAR/\.iso/.ipxe}
+	@ISO=$$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $$1 }'); \
+	echo "#!ipxe" > $${ISO/\.iso/.ipxe}; \
+	echo "set arch amd64" >> $${ISO/\.iso/.ipxe}; \
+	URL="tftp://10.0.2.2/$${ISO}"; \
+	echo "set url $${URL}" >> $${ISO/\.iso/.ipxe}; \
+	echo "set kernel $${ISO/\.iso/-kernel}" >> $${ISO/\.iso/.ipxe}; \
+	echo "set initrd $${ISO/\.iso/-initrd}" >> $${ISO/\.iso/.ipxe}; \
+	echo "set rootfs $${ISO/\.iso/.squashfs}" >> $${ISO/\.iso/.ipxe}; \
+	echo "# set config http://example.com/machine-config" >> $${ISO/\.iso/.ipxe}; \
+	echo "# set cmdline cos.setup=/run/initramfs/live/cloudd-config extra.values=1" >> $${ISO/\.iso/.ipxe}; \
+	echo "initrd \$${url}/\$${initrd}" >> $${ISO/\.iso/.ipxe}; \
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $${ISO/\.iso/.ipxe}
 
 .PHONY: build_all
 build_all: build iso extract_kernel_init_squash ipxe

@@ -1,9 +1,6 @@
 # This workflow calls the master E2E workflow with custom variables
 name: CLI-RKE2-Scalability-Rancher_Stable
 
-# This worflow is scheduled *after* build-ci to be sure that we have
-# the lastest version built. The scheduling is also to avoid running
-# the workflow on each push on main.
 on:
   workflow_dispatch:
   schedule:

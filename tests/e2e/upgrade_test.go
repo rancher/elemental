@@ -176,23 +176,8 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
-				// Extract OSVersion informations
-				out, err := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS, "-o", "json")
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Set temporary file
-				outTmp, err := tools.CreateTemp("out")
-				Expect(err).To(Not(HaveOccurred()))
-				defer os.Remove(outTmp)
-
-				// Add "out" to temporary file
-				// NOTE: just add data to the same file
-				tools.AddDataToFile(outTmp, outTmp, []byte(out))
-				Expect(err).To(Not(HaveOccurred()))
-
 				// Get OSVersion name
-				OSVersion, err := exec.Command(getOSScript, outTmp, upgradeOSChannel).Output()
+				OSVersion, err := exec.Command(getOSScript, upgradeOSChannel).Output()
 				Expect(err).To(Not(HaveOccurred()))
 				Expect(OSVersion).To(Not(BeEmpty()))
 
@@ -200,7 +185,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				value = string(OSVersion)
 
 				// Extract the value to check after the upgrade
-				out, err = kubectl.Run("get", "ManagedOSVersion",
+				out, err := kubectl.Run("get", "ManagedOSVersion",
 					"--namespace", clusterNS, string(OSVersion),
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))

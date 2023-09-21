@@ -15,10 +15,6 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
-      iso_to_test:
-        description: Defines the ISO to test
-        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev/containers/iso/elemental-teal.x86_64.iso
-        type: string
       k8s_version:
         description: Version of K3s/RKE2 to use (for both upstream and downstream clusters)
         default: v1.26.8+k3s1
@@ -31,6 +27,10 @@ on:
         description: Elemental operator repository to use
         default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
         type: string
+      os_to_test:
+        description: OS repository to test (dev/staging/stable)
+        type: string
+        default: dev
       rancher_version:
         description: Rancher Manager channel/version to use for installation
         default: stable/latest
@@ -61,10 +61,10 @@ jobs:
       cluster_name: my-own-cluster
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
-      iso_to_test: ${{ inputs.iso_to_test }}
       k8s_version_to_provision: ${{ inputs.k8s_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
+      os_to_test: ${{ inputs.os_to_test }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_template: ${{ inputs.runner_template }}
       sequential: ${{ inputs.sequential }}

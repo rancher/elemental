@@ -5,9 +5,10 @@
 set -e -x
 
 # Variables
-FILE_TO_CHECK=$1
-KIND_OF_OS=$2
+KIND_OF_OS=$1
+CHECK_FOR_ISO=$2
 INVERTED="| not"
+GREP_OPTS="-v"
 
 # Define if we check for stable or unstable OS
 case ${KIND_OF_OS} in
@@ -16,10 +17,13 @@ case ${KIND_OF_OS} in
     ;;
 esac
 
+# Define if we have to check for ISO image or not
+[[ -n "${CHECK_FOR_ISO}" ]] && unset GREP_OPTS
+
 # Get the value
-# NOTE: don't check for ISO, only container images are used for upgrade
-VALUE=$(jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null ${FILE_TO_CHECK} \
-        | grep -v '\-iso$' \
+VALUE=$(kubectl get ManagedOSVersion --namespace ${CLUSTER_NS} -o json 2>/dev/null \
+        | jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null \
+        | grep ${GREP_OPTS} '\-iso' \
         | sort \
         | tail -1)
 
