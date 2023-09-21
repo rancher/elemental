@@ -123,11 +123,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// And apply it
-			out, err := kubectl.Run("patch", "MachineRegistration",
+			_, err = kubectl.Run("patch", "MachineRegistration",
 				"--namespace", clusterNS, machineRegName,
 				"--type", "merge", "--patch-file", emulatedTmp,
 			)
-			Expect(err).To(Not(HaveOccurred()), out)
+			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Downloading installation config file", func() {
@@ -150,10 +150,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 				// Set poweroff to false for master pool to have time to check SeedImage cloud-config
 				if poolType == "master" {
-					out, err := kubectl.Run("patch", "MachineRegistration",
+					_, err := kubectl.Run("patch", "MachineRegistration",
 						"--namespace", clusterNS, machineRegName,
-						"--type", "merge", "-p", "{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
-					Expect(err).To(Not(HaveOccurred()), out)
+						"--type", "merge", "--patch",
+						"{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
+					Expect(err).To(Not(HaveOccurred()))
 				}
 
 				// Save original file as it will have to be modified twice

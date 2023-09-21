@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# This script returns the OS version/channel name from ManagedOSVersion
+
+set -e -x
+
+# Variables
+FILE_TO_CHECK=$1
+KIND_OF_OS=$2
+INVERTED="| not"
+
+# Define if we check for stable or unstable OS
+case ${KIND_OF_OS} in
+  dev|unstable)
+    unset INVERTED
+    ;;
+esac
+
+# Get the value
+# NOTE: check for ISO only, as we can only build an image with ISO and SeedImage
+VALUE=$(cat ${FILE_TO_CHECK} \
+        | jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null \
+        | grep -v '\-iso$' \
+        | sort \
+        | tail -1)
+
+# Return VALUE without \n
+echo -n ${VALUE}

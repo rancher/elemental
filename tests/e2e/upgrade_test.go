@@ -68,6 +68,15 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		// Wait for all pods to be started
 		err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 		Expect(err).To(Not(HaveOccurred()))
+
+		// Workaround: force re-sync of ManagedOSVersionChannels
+		// NOTE: this should be done directly when upgrading the operator,
+		// see https://github.com/rancher/elemental-operator/issues/519
+		_, err = kubectl.Run("patch", "ManagedOSVersionChannel",
+			"--namespace", clusterNS, "elemental-teal-channel",
+			"--type", "merge", "--patch", "{\"spec\":{\"syncInterval\":\"1m\"}}",
+		)
+		Expect(err).To(Not(HaveOccurred()))
 	})
 })
 
@@ -175,27 +184,32 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			defer os.Remove(upgradeTmp)
 
 			if upgradeType == "managedOSVersionName" {
-				// Add OS channel list
-				err = tools.Sed("%UPGRADE_CHANNEL_LIST%", upgradeChannelList, osListYaml)
+				// Extract OSVersion informations
+				out, err := kubectl.Run("get", "ManagedOSVersion",
+					"--namespace", clusterNS, "-o", "json")
 				Expect(err).To(Not(HaveOccurred()))
 
-				// Apply the generated file
-				err = kubectl.Apply(clusterNS, osListYaml)
+				// Set temporary file
+				outTmp, err := tools.CreateTemp("out")
+				Expect(err).To(Not(HaveOccurred()))
+				defer os.Remove(outTmp)
+
+				// Add "out" to temporary file
+				// NOTE: just add data to the same file
+				tools.AddDataToFile(outTmp, outTmp, []byte(out))
 				Expect(err).To(Not(HaveOccurred()))
 
-				// Wait for ManagedOSVersion to be populated from ManagedOSVersionChannel
-				Eventually(func() string {
-					out, _ := kubectl.Run("get", "ManagedOSVersion",
-						"--namespace", clusterNS, upgradeOsChannel)
-					return out
-				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(ContainSubstring("Error")))
+				// Get OSVersion name
+				OSVersion, err := exec.Command(getOSScript, outTmp, upgradeOSChannel).Output()
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(OSVersion).To(Not(BeNil()))
 
 				// Set OS image to use for upgrade
-				value = upgradeOsChannel
+				value = string(OSVersion)
 
 				// Extract the value to check after the upgrade
-				out, err := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS, upgradeOsChannel,
+				out, err = kubectl.Run("get", "ManagedOSVersion",
+					"--namespace", clusterNS, string(OSVersion),
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))
 				valueToCheck = tools.TrimStringFromChar(out, ":")

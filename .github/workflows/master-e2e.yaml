@@ -122,9 +122,6 @@ on:
         description: Account used to test RBAC role in UI
         required: false
         type: string
-      upgrade_channel_list:
-        description: URL to version channel list for Elemental OS upgrade
-        type: string
       upgrade_image:
         description: Image to use for the Elemental OS upgrade
         type: string
@@ -523,7 +520,6 @@ jobs:
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
         if: inputs.test_type == 'cli' && inputs.upgrade_os_channel != ''
         env:
-          UPGRADE_CHANNEL_LIST: ${{ inputs.upgrade_channel_list }}
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 2
@@ -653,7 +649,6 @@ jobs:
             echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Rancher Manager Image: ${{ steps.rancher_upgrade.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
-            echo "Channel list: ${{ inputs.upgrade_channel_list }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
