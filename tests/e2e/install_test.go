@@ -240,6 +240,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				"-o", "jsonpath={.items[?(@.username==\"admin\")].metadata.name}",
 			)
 			Expect(err).To(Not(HaveOccurred()))
+			Expect(internalUsername).To(Not(BeEmpty()))
 
 			// Add token in Rancher Manager
 			err = tools.Sed("%ADMIN_USER%", internalUsername, ciTokenYaml)

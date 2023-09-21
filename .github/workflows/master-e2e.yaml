@@ -61,9 +61,6 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: dev
         type: string
-      iso_to_test:
-        description: ISO to test (default built one is empty)
-        type: string
       iso_boot:
         description: Choose booting from ISO
         type: boolean
@@ -85,6 +82,10 @@ on:
       operator_upgrade:
         description: Elemental operator version to upgrade to
         type: string
+      os_to_test:
+        description: OS repository to test (dev/staging/stable)
+        type: string
+        default: dev
       proxy:
         description: Deploy a proxy
         type: string
@@ -106,10 +107,6 @@ on:
       sequential:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
-        type: string
-      start_condition:
-        description: Start condition of the runner
-        default: success
         type: string
       test_description:
         description: Short description of the test
@@ -135,10 +132,6 @@ on:
         description: Cluster upstream version where to install Rancher (K3s or RKE2)
         default: v1.26.8+k3s1
         type: string
-      workflow_download:
-        description: build-ci workfluw to use for artifacts
-        default: build-ci.yaml
-        type: string
       zone:
         description: GCP zone to host the runner
         default: us-central1-a
@@ -146,7 +139,6 @@ on:
 
 jobs:
   create-runner:
-    if: inputs.start_condition == 'success'
     runs-on: ubuntu-latest
     outputs:
       uuid: ${{ steps.generator.outputs.uuid }}
@@ -233,45 +225,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: tests/go.mod
-      - name: Cache ISO
-        # NOTE: download the *default* ISO, not the one passed as a parameter
-        if: inputs.iso_to_test == ''
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-artifacts
-        with:
-          path: build/*
-          key: build-ci-${{ github.event.pull_request.head.sha || github.sha }}
-          # Alternate key, mainly useful for UI test
-          restore-keys: |
-            build-ci-
-      - name: Download specified ISO
-        if: inputs.iso_to_test != ''
-        env:
-          ISO_TO_TEST: ${{ inputs.iso_to_test }}
-          TAG: from-obs
-        run: |
-          ARCH=$(uname -m)
-          mkdir -p build
-          wget -v -L -c ${ISO_TO_TEST} -O build/elemental-teal.${ARCH}-${TAG}.iso
-      - name: Create symbolic link to ISO for SeedImage
-        run: |
-          ISO=$(ls build/*.iso 2> /dev/null)
-          ln -sf ${ISO} base-image.iso
-      - name: Extract iPXE artifacts from ISO
-        run: |
-          # Extract TAG
-          ARCH=$(uname -m)
-          ISO=$(ls build/*.iso 2> /dev/null)
-          TAG=${ISO#*.${ARCH}-}
-          export TAG=${TAG%.iso}
-          # Extract iPXE artifacts
-          make extract_kernel_init_squash
-          make ipxe
-          # Extend regexes (needed for the next 'mv' command)
-          shopt -s extglob
-          # Looks a little bit weird but we have to keep the ISO in build!
-          mv -f build/!(*.iso) .
       - name: Deploy Proxy
         if: inputs.proxy == 'elemental' || inputs.proxy == 'rancher'
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
@@ -289,46 +242,12 @@ jobs:
           # Check if DynamicSchemas for MachineInventorySelectorTemplate exists
           if ! kubectl get dynamicschema machineinventoryselectortemplate >/dev/null 2>&1; then
             # If not we have to add it to avoid weird issues!
+            echo "WORKAROUND: DynamicSchemas for MachineInventorySelectorTemplate is missing!"
             kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
           fi
       - name: Install backup-restore components (K3s only for now)
         if: contains(inputs.upstream_cluster_version, 'k3s')
         run: cd tests && make e2e-install-backup-restore
-      - name: Extracts component versions/informations
-        id: component
-        run: |
-          # Extract rancher-backup-operator version
-          BACKUP_RESTORE_VERSION=$(kubectl get pod \
-                                     --namespace cattle-resources-system \
-                                     -l app.kubernetes.io/name=rancher-backup \
-                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract CertManager version
-          CERT_MANAGER_VERSION=$(kubectl get pod \
-                                   --namespace cert-manager \
-                                   -l app=cert-manager \
-                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract elemental-operator version
-          OPERATOR_VERSION=$(kubectl get pod \
-                             --namespace cattle-elemental-system \
-                             -l app=elemental-operator \
-                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract Rancher Manager version
-          RM_VERSION=$(kubectl get pod \
-                         --namespace cattle-system \
-                         -l app=rancher \
-                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract OS version from ISO
-          INITRD_FILE=$(isoinfo -i build/*.iso -R -find -type f -name initrd -print 2>/dev/null)
-          isoinfo -i build/*.iso -R -x ${INITRD_FILE} 2>/dev/null \
-            | xz -dc \
-            | cpio -i --to-stdout usr/lib/initrd-release > os-release
-          eval $(grep IMAGE_TAG os-release)
-          # Export values
-          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
-          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: inputs.test_type == 'ui'
@@ -338,7 +257,6 @@ jobs:
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           ISO_BOOT: ${{ inputs.iso_boot }}
-          ISO_TO_TEST: ${{ inputs.iso_to_test }}
           K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           RANCHER_VERSION: ${{ steps.component.outputs.rm_version }}
@@ -428,6 +346,58 @@ jobs:
       - name: Configure Rancher & Libvirt
         if: inputs.test_type == 'cli'
         run: cd tests && make e2e-configure-rancher
+      - name: Create ISO image for master pool
+        if: inputs.test_type == 'cli'
+        env:
+          EMULATE_TPM: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: master
+        run: |
+          # Only use ISO boot if the upstream cluster is RKE2
+          # due to issue with pxe, dhcp traffic
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export ISO_BOOT=true
+          fi
+          cd tests && make e2e-iso-image
+      - name: Extract iPXE artifacts from ISO
+        if: inputs.test_type == 'cli' && inputs.iso_boot == false
+        run: make extract_kernel_init_squash && make ipxe
+      - name: Extracts component versions/informations
+        id: component
+        run: |
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract OS version from ISO
+          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
+          INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+          isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+            | xz -dc \
+            | cpio -i --to-stdout usr/lib/initrd-release > os-release
+          eval $(grep IMAGE_TAG os-release)
+          # Export values
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
@@ -534,6 +504,17 @@ jobs:
           if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
             make e2e-check-app
           fi
+      - name: Remove old built ISO image
+        # Only one at a time is allowed, the new one will be created after if needed
+        if: inputs.test_type == 'cli'
+        run: rm -f *.iso
+      - name: Create ISO image for worker pool
+        if: inputs.test_type == 'cli'
+        env:
+          ISO_BOOT: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: worker
+        run: cd tests && make e2e-iso-image
       - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
         if: inputs.test_type == 'cli' && inputs.node_number > 3
         env:
@@ -597,10 +578,6 @@ jobs:
           if ${{ inputs.sequential == 'true' }}; then
             BOOTSTRAP_METHOD="Sequential"
           fi
-          ISO_USED=$(ls build/elemental-*.iso 2> /dev/null)
-          if ${{ inputs.iso_to_test != '' }}; then
-            ISO_USED=${{ inputs.iso_to_test }}
-          fi
           # Get nodes configuration (use the first one, they are all identical)
           NODE=$(sudo virsh list --name | head -1)
           if [[ -n "${NODE}" ]]; then
@@ -622,7 +599,7 @@ jobs:
           echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental ISO used: ${ISO_USED}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental OS version: ${{ steps.component.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
@@ -645,7 +622,7 @@ jobs:
             echo "Elemental Operator Image: ${{ steps.operator_upgrade.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Rancher Manager Image: ${{ steps.rancher_upgrade.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
-            echo "Channel used: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
+            echo "Channel: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
       - name: Send failed status to slack
@@ -659,7 +636,7 @@ jobs:
                   "type": "section",
                     "text": {
                       "type": "mrkdwn",
-                      "text": "Workflow build-ci ${{ github.job }}"
+                      "text": "Workflow E2E ${{ github.job }}"
                     },
                     "accessory": {
                       "type": "button",
