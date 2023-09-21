@@ -37,6 +37,7 @@ const (
 	configPrivateCAScript = "../scripts/config-private-ca"
 	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
 	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	getOSScript           = "../scripts/get-name-from-managedosversion"
 	httpSrv               = "http://192.168.122.1:8000"
 	installConfigYaml     = "../../install-config.yaml"
 	installHardenedScript = "../scripts/config-hardened"
@@ -44,7 +45,6 @@ const (
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	netDefaultFileName    = "../assets/net-default.xml"
 	numberOfNodesMax      = 30
-	osListYaml            = "../assets/managedOSVersionChannel.yaml"
 	registrationYaml      = "../assets/machineRegistration.yaml"
 	restoreYaml           = "../assets/restore.yaml"
 	seedimageYaml         = "../assets/seedImage.yaml"
@@ -82,9 +82,8 @@ var (
 	rancherUpgradeVersion string
 	sequential            bool
 	testType              string
-	upgradeChannelList    string
 	upgradeImage          string
-	upgradeOsChannel      string
+	upgradeOSChannel      string
 	upgradeType           string
 	usedNodes             int
 	vmIndex               int
@@ -156,9 +155,8 @@ var _ = BeforeSuite(func() {
 	rancherUpgrade = os.Getenv("RANCHER_UPGRADE")
 	seqString := os.Getenv("SEQUENTIAL")
 	testType = os.Getenv("TEST_TYPE")
-	upgradeChannelList = os.Getenv("UPGRADE_CHANNEL_LIST")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
-	upgradeOsChannel = os.Getenv("UPGRADE_OS_CHANNEL")
+	upgradeOSChannel = os.Getenv("UPGRADE_OS_CHANNEL")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
 
 	// Only if VM_INDEX is set

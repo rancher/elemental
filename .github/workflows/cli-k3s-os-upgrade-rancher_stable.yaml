@@ -26,6 +26,5 @@ jobs:
       operator_repo: oci://registry.suse.com/rancher
       rancher_upgrade: latest/devel
       rancher_version: stable/latest
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal-channel:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
-      upgrade_os_channel: latest-dev
+      upgrade_os_channel: dev

@@ -60,6 +60,4 @@ jobs:
       operator_repo: ${{ inputs.operator_repo }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
-      upgrade_channel_list: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal-channel:latest
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal/${{ inputs.teal_version }}:latest
-      upgrade_os_channel: latest
