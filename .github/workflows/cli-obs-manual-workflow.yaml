@@ -17,7 +17,7 @@ on:
         type: boolean
       iso_to_test:
         description: Defines the ISO to test
-        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev:/Teal53/media/iso/elemental-teal.x86_64.iso
+        default: https://download.opensuse.org/repositories/isv:/Rancher:/Elemental:/Dev/containers/iso/elemental-teal.x86_64.iso
         type: string
       k8s_version:
         description: Version of K3s/RKE2 to use (for both upstream and downstream clusters)
