@@ -91,18 +91,74 @@ var (
 )
 
 func CheckClusterState(ns, cluster string) {
-	// Check that a 'type' property named 'Ready' is set to true
-	Eventually(func() string {
-		clusterStatus, _ := kubectl.Run("get", "cluster",
-			"--namespace", ns, cluster,
-			"-o", "jsonpath={.status.conditions[?(@.type==\"Ready\")].status}")
-		return clusterStatus
-	}, tools.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("True"))
+	type state struct {
+		conditionStatus string
+		conditionType   string
+	}
 
-	// Wait a little bit for the cluster to be in a stable state
-	// Because if we do the next test too quickly it can be a false positive!
-	// NOTE: no SetTimeout needed here!
-	time.Sleep(30 * time.Second)
+	// List of conditions to check
+	states := []state{
+		{
+			conditionStatus: "True",
+			conditionType:   "AgentDeployed",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "NoDiskPressure",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "NoMemoryPressure",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "Provisioned",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "Ready",
+		},
+		{
+			conditionStatus: "False",
+			conditionType:   "Reconciling",
+		},
+		{
+			conditionStatus: "False",
+			conditionType:   "Stalled",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "Updated",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "Waiting",
+		},
+	}
+
+	// Check that the cluster is in Ready state (this means that it has been created)
+	clusterStatus, err := kubectl.Run("get", "cluster",
+		"--namespace", ns, cluster,
+		"-o", "jsonpath={.status.ready}")
+	Expect(err).To(Not(HaveOccurred()))
+	Expect(clusterStatus).To(Equal("true"))
+
+	// Check that all needed conditions are in the good state
+	for _, s := range states {
+		Eventually(func() string {
+			status, _ := kubectl.Run("get", "cluster",
+				"--namespace", ns, cluster,
+				"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].status}")
+
+			// Show the status in case of issue, easier to debug
+			if status != s.conditionStatus {
+				GinkgoWriter.Printf("!! Cluster status issue !!  %s is %s instead of %s\n",
+					s.conditionType, status, s.conditionStatus)
+			}
+
+			return status
+		}, tools.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal(s.conditionStatus))
+	}
 }
 
 func GetNodeInfo(hostName string) (*tools.Client, string) {
