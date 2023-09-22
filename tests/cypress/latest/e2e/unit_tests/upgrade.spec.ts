@@ -86,7 +86,7 @@ describe('Upgrade tests', () => {
             .click()
           cy.getBySel('os-version-box')
             .parents()
-            .contains('latest')
+            .contains('unstable')
             .click();
         } 
 
