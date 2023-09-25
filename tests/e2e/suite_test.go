@@ -137,11 +137,12 @@ func CheckClusterState(ns, cluster string) {
 	}
 
 	// Check that the cluster is in Ready state (this means that it has been created)
-	clusterStatus, err := kubectl.Run("get", "cluster",
-		"--namespace", ns, cluster,
-		"-o", "jsonpath={.status.ready}")
-	Expect(err).To(Not(HaveOccurred()))
-	Expect(clusterStatus).To(Equal("true"))
+	Eventually(func() string {
+		status, _ := kubectl.Run("get", "cluster",
+			"--namespace", ns, cluster,
+			"-o", "jsonpath={.status.ready}")
+		return status
+	}, tools.SetTimeout(2*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(Equal("true"))
 
 	// Check that all needed conditions are in the good state
 	for _, s := range states {
