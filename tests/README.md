@@ -182,6 +182,16 @@
       -  **By:** Collecting additionals logs with kubectl commands
       -  **By:** Collecting proxy log and make sure traffic went through it
 
+## `reset_test.go`
+
+- **Describe:** E2E - Test the reset feature
+    - **It:** Reset one node in the cluster
+      -  **By:** Configuring reset at machine inventory level
+      -  **By:** Deleting and removing the node from the cluster
+      -  **By:** Checking that machine inventory is deleted
+      -  **By:** Checking that machine inventory is back after the reset
+      -  **By:** Checking cluster state
+
 ## `suite_test.go`
 
 *No test defined!*
