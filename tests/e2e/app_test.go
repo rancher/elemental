@@ -59,10 +59,20 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		})
 
 		By("Checking application", func() {
+			cmd := []string{
+				"get", "svc",
+				appName + "-loadbalancer",
+				"-o", "jsonpath={.status.loadBalancer.ingress[*].ip}",
+			}
+
+			// Wait until at least an IP address is returned
+			Eventually(func() bool {
+				ip, _ := kubectl.Run(cmd...)
+				return tools.IsIPv4(strings.Fields(ip)[0])
+			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeTrue())
+
 			// Get load balancer IPs
-			appIPs, err := kubectl.Run("get", "svc",
-				appName+"-loadbalancer",
-				"-o", "jsonpath={.status.loadBalancer.ingress[*].ip}")
+			appIPs, err := kubectl.Run(cmd...)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(appIPs).To(Not(BeEmpty()))
 
