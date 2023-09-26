@@ -44,7 +44,7 @@ describe('Upgrade tests', () => {
       it('Check OS Versions', () => {
         cy.clickNavMenu(["Advanced", "OS Versions"]);
         if (utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
-          cy.contains('Active latest', {timeout: 120000});
+          cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
         }
       })
     );
