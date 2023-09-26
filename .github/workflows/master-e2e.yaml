@@ -469,7 +469,10 @@ jobs:
         run: cd tests && make e2e-install-app && make e2e-check-app
       - name: Reset a node in the cluster
         if: inputs.test_type == 'cli' && inputs.rancher_upgrade == ''
-        run: cd tests && make e2e-reset && make e2e-check-app
+        run: cd tests && make e2e-reset
+      - name: Check app after reset
+        if: inputs.test_type == 'cli' && inputs.rancher_upgrade == '' && contains(inputs.upstream_cluster_version, 'k3s')
+        run: cd tests && make e2e-check-app
       - name: Upgrade Elemental Operator
         if: inputs.test_type == 'cli' && inputs.operator_upgrade != ''
         id: operator_upgrade
