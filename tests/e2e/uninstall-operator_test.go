@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os/exec"
 	"strings"
+	"sync"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -24,7 +25,16 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
+
+func deleteFinalizers(ns, object, value string) {
+	_, err := kubectl.Run("patch", object,
+		"--namespace", ns, value, "--type", "merge",
+		"--patch", "{\"metadata\":{\"finalizers\":null}}")
+	Expect(err).To(Not(HaveOccurred()))
+
+}
 
 func testClusterAvailability(ns, cluster string) {
 	Eventually(func() string {
@@ -84,13 +94,45 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("NotFound"))
 		})
 
-		By("Deleting cluster resource", func() {
-			Eventually(func() error {
-				_, err := kubectl.Run("delete", "cluster",
-					"--namespace", clusterNS, clusterName)
-				return err
-			}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+		// NOTE: we have to run this in background to be able to apply the workaround!
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func(ns, name string) {
+			defer wg.Done()
+			defer GinkgoRecover()
+
+			By("Deleting cluster resource", func() {
+				Eventually(func() error {
+					_, err := kubectl.Run("delete", "cluster",
+						"--namespace", ns, name)
+					return err
+				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+			})
+		}(clusterNS, clusterName)
+
+		// Removing finalizers from MachineInventory and Machine
+		By("WORKAROUND: Removing finalizers from MachineInventory/Machine", func() {
+			// NOTE: wait a bit for the cluster deletion to be started (it's running in background)
+			time.Sleep(1 * time.Minute)
+
+			machineList, err := kubectl.Run("get", "MachineInventory",
+				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
+			Expect(err).To(Not(HaveOccurred()))
+
+			for _, machine := range strings.Fields(machineList) {
+				internalMachine, err := elemental.GetInternalMachine(clusterNS, machine)
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Delete blocking Finalizers
+				GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for MachineInventory '%s'...\n", machine)
+				deleteFinalizers(clusterNS, "MachineInventory", machine)
+				GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for Machine '%s'...\n", internalMachine)
+				deleteFinalizers(clusterNS, "Machine", internalMachine)
+			}
 		})
+
+		// Wait for cluster deletion to be completed
+		wg.Wait()
 
 		By("Testing cluster resource unavailability", func() {
 			out, err := kubectl.Run("get", "cluster",
