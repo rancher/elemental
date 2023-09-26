@@ -109,6 +109,3 @@ RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-conf
     # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
     kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
     if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
-
-# Copy bootargs
-COPY framework/files/etc/cos/bootargs.cfg /etc/cos/bootargs.cfg
