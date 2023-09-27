@@ -43,11 +43,8 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 			if backupRestoreVersion != "" {
 				chartRepo = "https://github.com/rancher/backup-restore-operator/releases/download/" + backupRestoreVersion
 			} else {
-				err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", chartRepo, "https://charts.rancher.io")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
-				Expect(err).To(Not(HaveOccurred()))
+				RunHelmCmdWithRetry("repo", "add", chartRepo, "https://charts.rancher.io")
+				RunHelmCmdWithRetry("repo", "update")
 			}
 		})
 
@@ -64,6 +61,7 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 					"upgrade", "--install", chart, chartRepo + "/" + chartName,
 					"--namespace", "cattle-resources-system",
 					"--create-namespace",
+					"--wait", "--wait-for-jobs",
 				}
 
 				// Add specific options for the rancher-backup chart
@@ -75,8 +73,7 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 				}
 
 				// Install through Helm
-				err := kubectl.RunHelmBinaryWithCustomErr(flags...)
-				Expect(err).To(Not(HaveOccurred()))
+				RunHelmCmdWithRetry(flags...)
 			}
 		})
 
