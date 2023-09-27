@@ -23,21 +23,50 @@ import (
 )
 
 /**
- * Get MachineInventory name (aka. server id)
- * @remarks The repository is added to the local cluster
- * @param clusterNS Name of the repository
- * @param index URL of the repository
- * @returns The name/id of the server or an error
+ * Add node selector
+ * @remarks A nodeSelector field is added
+ * @param key key to add in YAML
+ * @param value value to set the key to
+ * @returns The YAML structure or an error
  */
-func GetServerID(clusterNS string, index int) (string, error) {
-	serverID, err := kubectl.Run("get", "MachineInventories",
+func AddSelector(key, value string) ([]byte, error) {
+	type selectorYaml struct {
+		MatchLabels map[string]string `yaml:"matchLabels,omitempty"`
+	}
+
+	type selector struct {
+		SelectorYaml selectorYaml `yaml:"nodeSelector,omitempty"`
+	}
+
+	v := selectorYaml{map[string]string{key: value}}
+	s := selector{v}
+	out, err := yaml.Marshal(s)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add indent at the beginning
+	out = append([]byte("  "), out...)
+
+	return out, nil
+}
+
+/**
+ * Get Machine from MachineInventory
+ * @remarks This is useful to link machine name from Elemental to the Rancher Manager one
+ * @param clusterNS Name of the repository
+ * @param machineInventory Machine name as seen by Elemental
+ * @returns Corresponding internal machine name
+ */
+func GetInternalMachine(clusterNS, machineInventory string) (string, error) {
+	machine, err := kubectl.Run("get", "Machine",
 		"--namespace", clusterNS,
-		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
+		"-o", "jsonpath={.items[?(@.status.nodeRef.name==\""+machineInventory+"\")].metadata.name}")
 	if err != nil {
 		return "", err
 	}
 
-	return serverID, nil
+	return machine, nil
 }
 
 /**
@@ -74,32 +103,20 @@ func GetOperatorVersion() (string, error) {
 }
 
 /**
- * Add node selector
- * @remarks A nodeSelector field is added
- * @param key key to add in YAML
- * @param value value to set the key to
- * @returns The YAML structure or an error
+ * Get MachineInventory name (aka. server id)
+ * @param clusterNS Name of the repository
+ * @param index URL of the repository
+ * @returns The name/id of the server or an error
  */
-func AddSelector(key, value string) ([]byte, error) {
-	type selectorYaml struct {
-		MatchLabels map[string]string `yaml:"matchLabels,omitempty"`
-	}
-
-	type selector struct {
-		SelectorYaml selectorYaml `yaml:"nodeSelector,omitempty"`
-	}
-
-	v := selectorYaml{map[string]string{key: value}}
-	s := selector{v}
-	out, err := yaml.Marshal(s)
+func GetServerID(clusterNS string, index int) (string, error) {
+	serverID, err := kubectl.Run("get", "MachineInventories",
+		"--namespace", clusterNS,
+		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	// Add indent at the beginning
-	out = append([]byte("  "), out...)
-
-	return out, nil
+	return serverID, nil
 }
 
 /**
