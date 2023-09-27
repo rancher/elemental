@@ -54,12 +54,13 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		}
 
 		for _, chart := range upgradeOrder {
-			err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+			RunHelmCmdWithRetry(
+				"upgrade", "--install", chart,
 				operatorUpgrade+"/"+chart+"-chart",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
+				"--wait", "--wait-for-jobs",
 			)
-			Expect(err).To(Not(HaveOccurred()))
 		}
 
 		// Delay few seconds before checking, needed because we may have 2 pods at the same time

@@ -162,11 +162,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			})
 		} else {
 			By("Installing CertManager", func() {
-				err := kubectl.RunHelmBinaryWithCustomErr("repo", "add", "jetstack", "https://charts.jetstack.io")
-				Expect(err).To(Not(HaveOccurred()))
-
-				err = kubectl.RunHelmBinaryWithCustomErr("repo", "update")
-				Expect(err).To(Not(HaveOccurred()))
+				RunHelmCmdWithRetry("repo", "add", "jetstack", "https://charts.jetstack.io")
+				RunHelmCmdWithRetry("repo", "update")
 
 				// Set flags for cert-manager installation
 				flags := []string{
@@ -174,21 +171,21 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					"--namespace", "cert-manager",
 					"--create-namespace",
 					"--set", "installCRDs=true",
+					"--wait", "--wait-for-jobs",
 				}
 
 				if clusterType == "hardened" {
 					flags = append(flags, "--version", CertManagerVersion)
 				}
 
-				err = kubectl.RunHelmBinaryWithCustomErr(flags...)
-				Expect(err).To(Not(HaveOccurred()))
+				RunHelmCmdWithRetry(flags...)
 
 				checkList := [][]string{
 					{"cert-manager", "app.kubernetes.io/component=controller"},
 					{"cert-manager", "app.kubernetes.io/component=webhook"},
 					{"cert-manager", "app.kubernetes.io/component=cainjector"},
 				}
-				err = rancher.CheckPod(k, checkList)
+				err := rancher.CheckPod(k, checkList)
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		}
@@ -306,13 +303,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 						continue
 					}
 				}
-				Eventually(func() error {
-					return kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
-						operatorRepo+"/"+chart+"-chart",
-						"--namespace", "cattle-elemental-system",
-						"--create-namespace",
-					)
-				}, tools.SetTimeout(1*time.Minute), 10*time.Second).Should(BeNil())
+
+				RunHelmCmdWithRetry("upgrade", "--install", chart,
+					operatorRepo+"/"+chart+"-chart",
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+					"--wait", "--wait-for-jobs",
+				)
 			}
 
 			// Wait for pod to be started

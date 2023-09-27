@@ -178,6 +178,12 @@ func GetNodeInfo(hostName string) (*tools.Client, string) {
 	return c, hostData.Mac
 }
 
+func RunHelmCmdWithRetry(s ...string) {
+	Eventually(func() error {
+		return kubectl.RunHelmBinaryWithCustomErr(s...)
+	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
+}
+
 func FailWithReport(message string, callerSkip ...int) {
 	// Ensures the correct line numbers are reported
 	Fail(message, callerSkip[0]+1)

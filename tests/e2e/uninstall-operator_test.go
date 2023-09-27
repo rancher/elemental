@@ -64,11 +64,10 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 						continue
 					}
 				}
-				err := kubectl.RunHelmBinaryWithCustomErr(
+				RunHelmCmdWithRetry(
 					"uninstall", chart,
 					"--namespace", "cattle-elemental-system",
 				)
-				Expect(err).To(Not(HaveOccurred()))
 			}
 		})
 
@@ -113,12 +112,12 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 						continue
 					}
 				}
-				err := kubectl.RunHelmBinaryWithCustomErr("upgrade", "--install", chart,
+				RunHelmCmdWithRetry("upgrade", "--install", chart,
 					operatorRepo+"/"+chart+"-chart",
 					"--namespace", "cattle-elemental-system",
 					"--create-namespace",
+					"--wait", "--wait-for-jobs",
 				)
-				Expect(err).To(Not(HaveOccurred()))
 			}
 
 			// Wait for pod to be started
