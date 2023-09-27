@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"os/exec"
 	"strings"
 	"time"
 
@@ -23,30 +22,35 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
 var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 	It("Reset one node in the cluster", func() {
 		// Get the machine inventory name list
-		machineInventory, err := kubectl.Run("get", "machineinventory", "-A", "-o", "jsonpath='{.items[*].metadata.name}'")
+		machineInventory, err := kubectl.Run("get", "MachineInventory",
+			"--namespace", clusterNS,
+			"-o", "jsonpath='{.items[*].metadata.name}'")
 		Expect(err).To(Not(HaveOccurred()))
 		firstMachineInventory := strings.Split(machineInventory, " ")[1]
 
-		By("Configuring reset at machine inventory level", func() {
+		By("Configuring reset at MachineInventory level", func() {
 			// Patch the first machine inventory to enable reset
-			_, err = kubectl.Run("patch", "machineinventory", firstMachineInventory, "--namespace", clusterNS, "--type", "merge", "--patch-file", resetMachineInv)
+			_, err = kubectl.Run("patch", "MachineInventory", firstMachineInventory,
+				"--namespace", clusterNS, "--type", "merge",
+				"--patch-file", resetMachineInv)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Deleting and removing the node from the cluster", func() {
-			out, err := exec.Command("bash", "-c", "kubectl get machines -A | awk '/"+firstMachineInventory+"/ {print $2}'").CombinedOutput()
+			machineToRemove, err := elemental.GetInternalMachine(clusterNS, firstMachineInventory)
 			Expect(err).To(Not(HaveOccurred()))
-			machineToRemove := strings.Trim(string(out), "\n")
-			_, err = kubectl.Run("delete", "machines", machineToRemove, "-n", "fleet-default")
+			_, err = kubectl.Run("delete", "machines", machineToRemove,
+				"--namespace", clusterNS)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Checking that machine inventory is deleted", func() {
+		By("Checking that MachineInventory is deleted", func() {
 			Eventually(func() string {
 				out, _ := kubectl.Run("get", "MachineInventory",
 					"--namespace", clusterNS,
@@ -55,7 +59,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 			}, tools.SetTimeout(5*time.Minute), 5*time.Second).ShouldNot(ContainSubstring(firstMachineInventory))
 		})
 
-		By("Checking that machine inventory is back after the reset", func() {
+		By("Checking that MachineInventory is back after the reset", func() {
 			Eventually(func() string {
 				out, _ := kubectl.Run("get", "MachineInventory",
 					"--namespace", clusterNS,
