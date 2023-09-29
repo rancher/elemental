@@ -201,10 +201,10 @@
 
 - **Describe:** E2E - Test the reset feature
     - **It:** Reset one node in the cluster
-      -  **By:** Configuring reset at machine inventory level
+      -  **By:** Configuring reset at MachineInventory level
       -  **By:** Deleting and removing the node from the cluster
-      -  **By:** Checking that machine inventory is deleted
-      -  **By:** Checking that machine inventory is back after the reset
+      -  **By:** Checking that MachineInventory is deleted
+      -  **By:** Checking that MachineInventory is back after the reset
       -  **By:** Checking cluster state
 
 ## `suite_test.go`
@@ -233,6 +233,7 @@
       -  **By:** Testing cluster resource availability AFTER operator uninstallation
       -  **By:** Checking that Elemental resources are gone
       -  **By:** Deleting cluster resource
+      -  **By:** WORKAROUND: Removing finalizers from MachineInventory/Machine
       -  **By:** Testing cluster resource unavailability
     - **It:** Re-install Elemental Operator
       -  **By:** Installing Operator via Helm
