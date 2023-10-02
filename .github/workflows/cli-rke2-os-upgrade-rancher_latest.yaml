@@ -21,11 +21,11 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       iso_to_test: https://updates.suse.com/SUSE/Products/ElementalTeal/5.4/x86_64/iso/elemental-teal.x86_64-1.2.2-GM.iso
-      k8s_version_to_provision: v1.26.7+rke2r1
+      k8s_version_to_provision: v1.26.8+rke2r1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       rancher_version: latest/devel
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev
-      upstream_cluster_version: v1.26.7+rke2r1
+      upstream_cluster_version: v1.26.8+rke2r1

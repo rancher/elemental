@@ -133,7 +133,7 @@ on:
         type: string
       upstream_cluster_version:
         description: Cluster upstream version where to install Rancher (K3s or RKE2)
-        default: v1.26.7+k3s1
+        default: v1.26.8+k3s1
         type: string
       workflow_download:
         description: build-ci workfluw to use for artifacts

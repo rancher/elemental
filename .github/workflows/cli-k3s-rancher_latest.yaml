@@ -19,5 +19,5 @@ jobs:
     with:
       test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
-      k8s_version_to_provision: v1.26.7+k3s1
+      k8s_version_to_provision: v1.26.8+k3s1
       rancher_version: latest/devel

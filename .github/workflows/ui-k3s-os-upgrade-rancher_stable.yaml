@@ -32,7 +32,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner || true }}
       elemental_ui_version: dev
       iso_boot: true
-      k8s_version_to_provision: v1.26.7+k3s1
+      k8s_version_to_provision: v1.26.8+k3s1
       operator_repo: oci://registry.suse.com/rancher
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
