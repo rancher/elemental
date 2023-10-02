@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"os/exec"
 	"strings"
 	"sync"
 	"time"
@@ -61,19 +60,6 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 		By("Uninstalling Operator via Helm", func() {
 			for _, chart := range []string{"elemental-operator", "elemental-operator-crds"} {
-				if strings.Contains(chart, "-crds") {
-					// Check if CRDs chart is available (not always the case in older versions)
-					chartList, err := exec.Command("helm",
-						"list",
-						"--no-headers",
-						"--namespace", "cattle-elemental-system",
-					).CombinedOutput()
-					Expect(err).To(Not(HaveOccurred()))
-
-					if !strings.Contains(string(chartList), chart) {
-						continue
-					}
-				}
 				RunHelmCmdWithRetry(
 					"uninstall", chart,
 					"--namespace", "cattle-elemental-system",
@@ -150,14 +136,6 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 	It("Re-install Elemental Operator", func() {
 		By("Installing Operator via Helm", func() {
 			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-				// Check if CRDs chart is available (not always the case in older versions)
-				// Anyway, if it is needed and missing the next chart installation will fail too
-				if strings.Contains(chart, "-crds") {
-					noChart := kubectl.RunHelmBinaryWithCustomErr("show", "readme", operatorRepo+"/"+chart+"-chart")
-					if noChart != nil {
-						continue
-					}
-				}
 				RunHelmCmdWithRetry("upgrade", "--install", chart,
 					operatorRepo+"/"+chart+"-chart",
 					"--namespace", "cattle-elemental-system",
