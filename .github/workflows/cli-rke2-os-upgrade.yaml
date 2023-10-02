@@ -55,11 +55,11 @@ jobs:
       cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_to_test: ${{ inputs.iso_to_test }}
-      k8s_version_to_provision: v1.26.7+rke2r1
+      k8s_version_to_provision: v1.26.8+rke2r1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
       operator_repo: ${{ inputs.operator_repo }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal/${{ inputs.teal_version }}:latest
-      upstream_cluster_version: v1.26.7+rke2r1
+      upstream_cluster_version: v1.26.8+rke2r1
