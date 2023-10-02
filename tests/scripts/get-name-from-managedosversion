@@ -17,9 +17,8 @@ case ${KIND_OF_OS} in
 esac
 
 # Get the value
-# NOTE: check for ISO only, as we can only build an image with ISO and SeedImage
-VALUE=$(cat ${FILE_TO_CHECK} \
-        | jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null \
+# NOTE: don't check for ISO, only container images are used for upgrade
+VALUE=$(jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null ${FILE_TO_CHECK} \
         | grep -v '\-iso$' \
         | sort \
         | tail -1)
