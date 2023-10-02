@@ -126,8 +126,12 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				// Delete blocking Finalizers
 				GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for MachineInventory '%s'...\n", machine)
 				deleteFinalizers(clusterNS, "MachineInventory", machine)
-				GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for Machine '%s'...\n", internalMachine)
-				deleteFinalizers(clusterNS, "Machine", internalMachine)
+
+				// Only if Machine is still present
+				if internalMachine != "" {
+					GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for Machine '%s'...\n", internalMachine)
+					deleteFinalizers(clusterNS, "Machine", internalMachine)
+				}
 			}
 		})
 
