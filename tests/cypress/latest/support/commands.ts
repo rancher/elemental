@@ -213,7 +213,14 @@ Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabel
       cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
         .click();
       cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
-      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) > .no-resize`).type(hwLabels[key], {parseSpecialCharSequences: false});
+      // Following condition could be removed when we will release next Elemental UI (> 1.2.0)
+      if (utils.isUIVersion('dev')) {
+        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
+          > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], {parseSpecialCharSequences: false});
+      } else {
+        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1})
+          > .no-resize`).type(hwLabels[key], {parseSpecialCharSequences: false});
+      };
       nthChildIndex += 3;
     };
   };
@@ -379,7 +386,8 @@ Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
     sizeToCheck == "name" ? cy.addMachInvLabel('labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', 'mylabelvalue', false) : null;
     sizeToCheck == "value" ? cy.addMachInvLabel('mylabelname', 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', false) : null;
     // A banner should appear alerting you about the size exceeded
-    cy.get('.banner > span');
+    // Following condition could be removed when we will release next Elemental UI (> 1.2.0)
+    utils.isUIVersion('dev') ? cy.get('[data-testid="banner-content"]') : cy.get('.banner > span');
     // Create button should be disabled
     cy.getBySel('form-save').should(($input) => {
       expect($input).to.have.attr('disabled')
