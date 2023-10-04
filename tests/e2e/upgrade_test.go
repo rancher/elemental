@@ -155,7 +155,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Get node information
 			client, _ := GetNodeInfo(hostName)
@@ -203,7 +203,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				// Get OSVersion name
 				OSVersion, err := exec.Command(getOSScript, outTmp, upgradeOSChannel).Output()
 				Expect(err).To(Not(HaveOccurred()))
-				Expect(OSVersion).To(Not(BeNil()))
+				Expect(OSVersion).To(Not(BeEmpty()))
 
 				// Set OS image to use for upgrade
 				value = string(OSVersion)
@@ -226,7 +226,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			if usedNodes == 1 {
 				// Set node hostname
 				hostName := elemental.SetHostname(vmNameRoot, vmIndex)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				// Get node information
 				client, _ := GetNodeInfo(hostName)
@@ -266,7 +266,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Get node information
 			client, _ := GetNodeInfo(hostName)
