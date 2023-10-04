@@ -213,7 +213,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Add node in network configuration
 			err := rancher.AddNode(netDefaultFileName, hostName, index)
@@ -221,7 +221,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Get generated MAC address
 			_, macAdrs := GetNodeInfo(hostName)
-			Expect(macAdrs).To(Not(BeNil()))
+			Expect(macAdrs).To(Not(BeEmpty()))
 
 			wg.Add(1)
 			go func(s, h, m string, i int) {
@@ -250,7 +250,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		if poolType == "master" && isoBoot == "true" {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				hostName := elemental.SetHostname(vmNameRoot, index)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				client, _ := GetNodeInfo(hostName)
 				Expect(client).To(Not(BeNil()))
@@ -294,7 +294,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Execute node deployment in parallel
 			wg.Add(1)
@@ -356,7 +356,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Get node information
 			client, _ := GetNodeInfo(hostName)
@@ -415,7 +415,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				// Set node hostname
 				hostName := elemental.SetHostname(vmNameRoot, index)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				// Get node information
 				client, _ := GetNodeInfo(hostName)
@@ -471,7 +471,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				// Set node hostname
 				hostName := elemental.SetHostname(vmNameRoot, index)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				// Get node information
 				client, _ := GetNodeInfo(hostName)
@@ -504,7 +504,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)
-			Expect(hostName).To(Not(BeNil()))
+			Expect(hostName).To(Not(BeEmpty()))
 
 			// Get node information
 			client, _ := GetNodeInfo(hostName)
