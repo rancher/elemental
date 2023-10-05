@@ -203,7 +203,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}
 
 				if clusterType == "hardened" {
-					flags = append(flags, "--version", CertManagerVersion)
+					flags = append(flags, "--version", certManagerVersion)
 				}
 
 				RunHelmCmdWithRetry(flags...)

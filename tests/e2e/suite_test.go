@@ -31,34 +31,36 @@ import (
 )
 
 const (
-	appYaml               = "../assets/hello-world_app.yaml"
-	backupYaml            = "../assets/backup.yaml"
-	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
-	configPrivateCAScript = "../scripts/config-private-ca"
-	configRKE2Yaml        = "../assets/config_rke2.yaml"
-	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
-	emulateTPMYaml        = "../assets/emulateTPM.yaml"
-	getOSScript           = "../scripts/get-name-from-managedosversion"
-	httpSrv               = "http://192.168.122.1:8000"
-	installConfigYaml     = "../../install-config.yaml"
-	installHardenedScript = "../scripts/config-hardened"
-	installVMScript       = "../scripts/install-vm"
-	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
-	netDefaultFileName    = "../assets/net-default.xml"
-	numberOfNodesMax      = 30
-	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
-	restoreYaml           = "../assets/restore.yaml"
-	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
-	userName              = "root"
-	userPassword          = "r0s@pwd1"
-	vmNameRoot            = "node"
+	airgapBuildScript        = "../scripts/build-airgap"
+	appYaml                  = "../assets/hello-world_app.yaml"
+	backupYaml               = "../assets/backup.yaml"
+	ciTokenYaml              = "../assets/local-kubeconfig-token-skel.yaml"
+	configPrivateCAScript    = "../scripts/config-private-ca"
+	configRKE2Yaml           = "../assets/config_rke2.yaml"
+	dumbRegistrationYaml     = "../assets/dumb_machineRegistration.yaml"
+	emulateTPMYaml           = "../assets/emulateTPM.yaml"
+	getOSScript              = "../scripts/get-name-from-managedosversion"
+	httpSrv                  = "http://192.168.122.1:8000"
+	installConfigYaml        = "../../install-config.yaml"
+	installHardenedScript    = "../scripts/config-hardened"
+	installVMScript          = "../scripts/install-vm"
+	localKubeconfigYaml      = "../assets/local-kubeconfig-skel.yaml"
+	netDefaultFileName       = "../assets/net-default.xml"
+	netDefaultAirgapFileName = "../assets/net-default-airgap.xml"
+	numberOfNodesMax         = 30
+	resetMachineInv          = "../assets/reset_machine_inventory.yaml"
+	restoreYaml              = "../assets/restore.yaml"
+	upgradeSkelYaml          = "../assets/upgrade_skel.yaml"
+	userName                 = "root"
+	userPassword             = "r0s@pwd1"
+	vmNameRoot               = "node"
 )
 
 var (
 	arch                      string
 	backupRestoreVersion      string
 	caType                    string
-	CertManagerVersion        string
+	certManagerVersion        string
 	clusterName               string
 	clusterNS                 string
 	clusterType               string
@@ -403,7 +405,7 @@ var _ = BeforeSuite(func() {
 	arch = os.Getenv("ARCH")
 	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
 	caType = os.Getenv("CA_TYPE")
-	CertManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
+	certManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
 	clusterNS = os.Getenv("CLUSTER_NS")
 	clusterType = os.Getenv("CLUSTER_TYPE")
@@ -514,6 +516,11 @@ var _ = BeforeSuite(func() {
 		registrationYaml = "../assets/machineRegistration.yaml"
 		seedImageYaml = "../assets/seedImage.yaml"
 		selectorYaml = "../assets/selector.yaml"
+	}
+
+	// Enable airgap support if needed
+	if testType == "airgap" {
+		clusterYaml = "../assets/cluster-airgap.yaml"
 	}
 
 	// Start HTTP server

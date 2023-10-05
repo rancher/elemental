@@ -1,0 +1,124 @@
+#!/bin/bash
+
+# Build Airgap
+
+set -e -x
+
+K3S_UPSTREAM_VERSION=$1
+CERT_MANAGER_VERSION=$2
+RANCHER_CHANNEL=$3
+K3S_DOWNSTREAM_VERSION=$4
+
+# Create directories
+mkdir -p /opt/rancher/{k3s_$K3S_UPSTREAM_VERSION,helm} /opt/rancher/images/{cert,rancher,registry,elemental}
+cd /opt/rancher/k3s_$K3S_UPSTREAM_VERSION/
+
+# Install packages
+zypper --no-refresh -n in zstd skopeo yq
+
+# Add rancher manager in /etc/hosts
+sudo echo "192.168.122.102 rancher-manager.test" >> /etc/hosts
+
+# Download k3s and rancher
+curl -#OL https://github.com/k3s-io/k3s/releases/download/v$K3S_UPSTREAM_VERSION%2Bk3s1/k3s-airgap-images-amd64.tar.zst
+curl -#OL https://github.com/k3s-io/k3s/releases/download/v$K3S_UPSTREAM_VERSION%2Bk3s1/k3s
+
+# Get the install script
+curl -sfL https://get.k3s.io/ -o install.sh
+
+# Get the airgap deploy script
+cp /home/gh-runner/actions-runner/_work/elemental/elemental/tests/scripts/deploy-airgap . 
+
+# Get Helm Charts
+cd /opt/rancher/helm/
+
+# Add repos
+helm repo add jetstack https://charts.jetstack.io > /dev/null 2>&1
+helm repo add rancher-$RANCHER_CHANNEL https://releases.rancher.com/server-charts/$RANCHER_CHANNEL > /dev/null 2>&1
+helm repo update > /dev/null 2>&1
+
+# Get charts
+helm pull jetstack/cert-manager --version $CERT_MANAGER_VERSION > /dev/null 2>&1
+if [[ "$RANCHER_CHANNEL" == "latest" ]]; then
+  helm pull rancher-$RANCHER_CHANNEL/rancher --devel > /dev/null 2>&1
+else
+  helm pull rancher-$RANCHER_CHANNEL/rancher > /dev/null 2>&1
+fi
+
+# Get rancher manager version
+RANCHER_MANAGER_VERSION=$(ls rancher*| cut -d '-' -f '2-3')
+helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart > /dev/null 2>&1
+helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-crds-chart > /dev/null 2>&1
+
+# Temporary thing to get latest version of elemental-teal-iso (very ugly...)
+wget https://raw.githubusercontent.com/fgiudici/elemental-operator/airgap-allow-only-channel-creation/scripts/elemental-airgap.sh
+chmod +x elemental-airgap.sh
+./elemental-airgap.sh -r localhost:5000 -sa dev
+
+# Get Images - Rancher/Elemental
+cd /opt/rancher/images/
+
+# Rancher image list
+curl -#L https://github.com/rancher/rancher/releases/download/v${RANCHER_MANAGER_VERSION%.*}/rancher-images.txt -o rancher/orig_rancher-images.txt
+
+# Shorten rancher list with a sort
+# Fix library tags
+sed -i -e '0,/busybox/s/busybox/library\/busybox/' -e 's/registry/library\/registry/g' rancher/orig_rancher-images.txt
+
+# We need to keep the following images
+IMAGES_LIST="mirrored-cluster-api-controller mirrored-pause mirrored-coredns-coredns mirrored-library-traefik"
+for i in $IMAGES_LIST; do
+  IMAGES+="$(grep $i rancher/orig_rancher-images.txt)\n"
+done
+
+# Remove things that are not needed and overlapped
+sed -i -E '/neuvector|minio|gke|aks|eks|sriov|harvester|mirrored|longhorn|thanos|tekton|istio|multus|hyper|jenkins|windows/d' rancher/orig_rancher-images.txt
+echo -e $IMAGES >> rancher/orig_rancher-images.txt
+
+# Get latest version
+for i in $(cat rancher/orig_rancher-images.txt|awk -F: '{print $1}'); do
+  grep -w $i rancher/orig_rancher-images.txt | sort -Vr| head -1 >> rancher/version_unsorted.txt
+done
+# Except for rancher/kubectl
+grep 'rancher/kubectl' rancher/orig_rancher-images.txt >> rancher/version_unsorted.txt
+grep "rancher/system-agent-installer-k3s:${K3S_DOWNSTREAM_VERSION%+*}" rancher/orig_rancher-images.txt >> rancher/version_unsorted.txt
+
+# Final sort
+cat rancher/version_unsorted.txt | sort -u > rancher/rancher-images.txt
+
+# Cert-manager image list
+helm template --kube-version=1.22 /opt/rancher/helm/cert-manager-$CERT_MANAGER_VERSION.tgz | awk '$1 ~ /image:/ {print $2}' | sed s/\"//g > cert/cert-manager-images.txt
+
+# Elemental image list
+helm template --kube-version=1.22 /opt/rancher/helm/elemental-operator-chart-*.tgz | awk '$1 ~ /image:/ {print $2}' | sed s/\"//g > elemental/elemental-images.txt
+helm template --kube-version=1.22 /opt/rancher/helm/elemental-operator-chart-*.tgz|grep 'seedimage-builder' | awk '{print $2}' >> elemental/elemental-images.txt
+
+# Temporary thing to get latest version of elemental-teal-iso (very ugly...)
+grep 'registry.opensuse.*sle-micro-iso' /opt/rancher/helm/elemental-images.txt >> elemental/elemental-images.txt
+
+# Get images
+# Skopeo - cert-manager
+for i in $(cat cert/cert-manager-images.txt); do
+  skopeo copy docker://$i docker-archive:cert/$(echo $i| awk -F/ '{print $3}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $3}') > /dev/null 2>&1
+done
+
+# Skopeo - Elemental
+for i in $(cat elemental/elemental-images.txt); do
+  if grep 'sle-micro-iso' <<< $i; then
+    skopeo copy docker://$i docker-archive:elemental/$(echo $i| awk -F/ '{print $8"-"$9}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $8"-"$9}') > /dev/null 2>&1
+  else
+    skopeo copy docker://$i docker-archive:elemental/$(echo $i| awk -F/ '{print $8}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $8}') > /dev/null 2>&1
+  fi
+done
+
+# Skopeo - Rancher
+for i in $(cat rancher/rancher-images.txt); do
+  skopeo copy docker://$i docker-archive:rancher/$(echo $i| awk -F/ '{print $2}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $2}') > /dev/null 2>&1
+done
+
+# TODO: improve how to fetch the registry image
+curl -#L https://github.com/clemenko/rke_airgap_install/raw/main/registry.tar -o registry/registry.tar > /dev/null 2>&1
+
+# Compress all the things
+cd /opt/rancher/
+tar -I zstd -vcf /opt/airgap_rancher.zst $(ls) > /dev/null 2>&1

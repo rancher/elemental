@@ -45,6 +45,8 @@ generate-readme:
 	@./scripts/generate-readme > README.md
 
 # E2E tests
+e2e-airgap-rancher: deps
+	ginkgo --label-filter airgap-rancher -r -v ./e2e
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
 
@@ -81,6 +83,9 @@ e2e-multi-cluster: deps
 e2e-reset: deps
 	ginkgo --label-filter reset -r -v ./e2e
 
+e2e-prepare-archive: deps
+	ginkgo --label-filter prepare-archive -r -v ./e2e
+	
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e
 

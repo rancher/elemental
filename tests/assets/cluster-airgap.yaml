@@ -1,0 +1,39 @@
+kind: Cluster
+apiVersion: provisioning.cattle.io/v1
+metadata:
+  name: %CLUSTER_NAME%
+  # namespace: fleet-default
+spec:
+  rkeConfig:
+    etcd:
+      disableSnapshots: true
+    machineGlobalConfig:
+      cni: canal
+      disable:
+        - rke2-metrics-server
+        - metrics-server
+      etcd-expose-metrics: false
+      profile: null
+    machinePools:
+      - controlPlaneRole: true
+        etcdRole: true
+        machineConfigRef:
+          apiVersion: elemental.cattle.io/v1beta1
+          kind: MachineInventorySelectorTemplate
+          name: selector-master-%CLUSTER_NAME%
+        name: pool-master-%CLUSTER_NAME%
+        quantity: 0
+        unhealthyNodeTimeout: 0s
+        workerRole: true
+    machineSelectorConfig:
+      - config:
+          protect-kernel-defaults: false
+    registries:
+      configs:
+        rancher-manager.test:5000:
+          insecureSkipVerify: true
+      mirrors:
+        rancher-manager.test:5000:
+          endpoint:
+            - http://rancher-manager.test:5000
+  kubernetesVersion: %K8S_VERSION%

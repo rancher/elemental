@@ -1,0 +1,263 @@
+name: (template) Elemental Airgap E2E tests with Rancher Manager
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    secrets:
+      credentials:
+        description: Credentials to use to connect
+        required: true
+      pat_token:
+        # A token is needed to be able to add runner on the repo, maybe this can be changed later
+        # This token is linked to a personal account
+        # So in case of token issue you have to check (no specific order and for example):
+        # - the expiration date
+        # - if the account associated still exists
+        # - if the person still has access to the repo
+        description: PAT token used to add runner
+        required: true
+      qase_api_token:
+        description: Qase API token to use for Cypress tests
+        required: false
+      slack_webhook_url:
+        description: WebHook URL to use for Slack
+        required: true
+    inputs:
+      cert-manager_version:
+        description: Version of cert-manager to use
+        type: string
+      cluster_name:
+        description: Name of the provisioned cluster
+        required: true
+        type: string
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_version_to_provision:
+        description: Name and version of installed K8s distribution
+        required: true
+        type: string
+      operator_repo:
+        description: Elemental operator repository to use
+        type: string
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+      os_to_test:
+        description: OS repository to test (dev/staging/stable)
+        type: string
+        default: dev
+      qase_run_id:
+        description: Case run ID where the results will be reported
+        required: false
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest/2.7
+        type: string
+      test_description:
+        description: Short description of the test
+        type: string
+      test_type:
+        description: Type of test to run (cli or ui)
+        default: airgap
+        type: string
+      upstream_cluster_version:
+        description: Cluster upstream version where to install Rancher (K3s or RKE2)
+        default: v1.26.8
+        type: string
+      zone:
+        description: GCP zone to host the runner
+        default: us-central1-a
+        type: string
+
+jobs:
+  create-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      uuid: ${{ steps.generator.outputs.uuid }}
+      runner: ${{ steps.generator.outputs.runner }}
+      public_dns: ${{ steps.dns.outputs.public_dns }}
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Generate UUID and Runner hostname
+        id: generator
+        run: |
+          UUID=$(uuidgen)
+          echo "uuid=${UUID}" >> ${GITHUB_OUTPUT}
+          echo "runner=elemental-ci-${UUID}" >> ${GITHUB_OUTPUT}
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.credentials }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Create runner
+        run: |
+          gcloud compute instances create ${{ steps.generator.outputs.runner }} \
+            --source-instance-template elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v4 \
+            --zone us-central1-a
+      - name: Create PAT token secret
+        run: |
+          echo -n ${{ secrets.pat_token }} \
+            | gcloud secrets create PAT_TOKEN_${{ steps.generator.outputs.uuid }} --data-file=-
+      - name: Get public dns name in GCP
+        id: dns
+        run: |
+          # Do a timed out loop here, as gcloud can sometimes fail
+          typeset -i i=0
+          while true; do
+            # Get public IP
+            PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
+                        | awk '/${{ steps.generator.outputs.runner }}/ {print $6}')
+            # Exit if we reach the timeout or if IP is set
+            if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
+              break
+            fi
+            # Wait a little before retrying
+            sleep 2
+          done
+          # Get the public DNS
+          PUBLIC_DNS=$(host -l ${PUBLIC_IP} 2> /dev/null \
+                       | awk '{sub(/\.$/, ""); print $5}')
+          echo "public_dns=${PUBLIC_DNS}" >> ${GITHUB_OUTPUT}
+          # Raise an error if either IP and/or DNS are empty
+          if [[ -z "${PUBLIC_IP}" || -z "${PUBLIC_DNS}" ]]; then
+            echo "PUBLIC_IP and/or PUBLIC_DNS are empty!" >&2
+            false
+          fi
+  e2e:
+    needs: create-runner
+    runs-on: ${{ needs.create-runner.outputs.uuid }}
+    env:
+      ARCH: amd64
+      CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NS: fleet-default
+      CLUSTER_TYPE: ${{ inputs.cluster_type }}
+      # Distribution to use to host Rancher Manager (K3s)
+      K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision}}
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_RUN_ID: ${{ inputs.qase_run_id }}
+      # For Rancher Manager
+      RANCHER_VERSION: ${{ inputs.rancher_version }}
+      TEST_TYPE: ${{ inputs.test_type }}
+      TIMEOUT_SCALE: 3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: tests/go.mod
+      - name: Prepare the archive file to send to air-gapped nodes
+        run: cd tests && make e2e-prepare-archive 
+      - name: Deploy airgap infrastructure
+        run: cd tests && make e2e-airgap-rancher
+      - name: Configure Rancher & Libvirt
+        run: cd tests && make e2e-configure-rancher
+      - name: Extract component versions/informations
+        id: component
+        run: |
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export values
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
+      - name: Create ISO image for master pool
+        env:
+          EMULATE_TPM: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: master
+        run: cd tests && ISO_BOOT=true make e2e-iso-image
+      - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
+        env:
+          EMULATE_TPM: true
+          POOL: master
+          VM_START: 1
+          VM_END: 3
+        run: cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} ISO_BOOT=true make e2e-bootstrap-node
+      - name: Add summary
+        if: ${{ always() }}
+        run: |
+          # Define some variable(s)
+          # Add summary
+          echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
+          echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
+          echo "Type of cluster deployed: ${CLUSTER_TYPE:-normal}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Image: ${{ steps.component.outputs.rm_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental OS version: ${{ steps.iso_version.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
+          echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+  clean-runner:
+      if: ${{ always() }}
+      needs: e2e
+      runs-on: ubuntu-latest
+      steps:
+        # actions/checkout MUST come before auth
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Authenticate to GCP
+          uses: google-github-actions/auth@v1
+          with:
+            credentials_json: ${{ secrets.credentials }}
+        - name: Setup gcloud
+          uses: google-github-actions/setup-gcloud@v1
+        - name: Delete GCP secrets
+          run: |
+            gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }} || true
+            gcloud --quiet secrets delete GH_REPO_${{ needs.create-runner.outputs.uuid }} || true
+  delete-runner:
+    if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
+    needs: [create-runner, clean-runner]
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.credentials }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
+      - name: Delete runner
+        run: |
+          gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
+            --delete-disks all \
+            --zone ${{ inputs.zone }}
