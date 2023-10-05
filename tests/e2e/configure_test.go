@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -140,17 +141,18 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				CheckCreatedRegistration(clusterNS, "machine-registration-"+pool+"-"+clusterName)
 			}
 		})
+		if !strings.Contains(clusterType, "airgap") {
+			By("Starting default network", func() {
+				// Don't check return code, as the default network could be already removed
+				for _, c := range []string{"net-destroy", "net-undefine"} {
+					_ = exec.Command("sudo", "virsh", c, "default").Run()
+				}
 
-		By("Starting default network", func() {
-			// Don't check return code, as the default network could be already removed
-			for _, c := range []string{"net-destroy", "net-undefine"} {
-				_ = exec.Command("sudo", "virsh", c, "default").Run()
-			}
-
-			// Wait a bit between virsh commands
-			time.Sleep(1 * time.Minute)
-			err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
+				// Wait a bit between virsh commands
+				time.Sleep(1 * time.Minute)
+				err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
+				Expect(err).To(Not(HaveOccurred()))
+			})
+		}
 	})
 })

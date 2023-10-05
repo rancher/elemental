@@ -1,0 +1,95 @@
+#!/bin/bash
+
+set -e -x
+
+K3S_UPSTREAM_VERSION=$1
+CERT_MANAGER_VERSION=$2
+
+# Install k3s
+cd /opt/rancher/k3s_$K3S_UPSTREAM_VERSION
+sudo mkdir -p /var/lib/rancher/k3s/agent/images/ /etc/rancher/k3s
+sudo cp k3s-airgap-images-amd64.tar.zst /var/lib/rancher/k3s/agent/images/
+sudo chmod +x k3s install.sh
+sudo cp k3s /usr/local/bin/
+
+# Add registry configuration
+cat <<EOF | sudo tee /etc/rancher/k3s/registries.yaml
+mirrors:
+  "rancher-manager.test:5000":
+    endpoint:
+      - "http://rancher-manager.test:5000"
+configs:
+  "rancher-manager.test:5000":
+    tls:
+      insecure_skip_verify: true
+EOF
+
+# Pre-load registry image
+rsync -avP /opt/rancher/images/registry/registry.tar /var/lib/rancher/k3s/agent/images/
+
+# Install k3s
+INSTALL_K3S_SKIP_DOWNLOAD=true INSTALL_K3S_VERSION=v$K3S_UPSTREAM_VERSION+k3s1 ./install.sh
+systemctl enable --now k3s
+
+sleep 30
+
+# wait and add link
+echo "export KUBECONFIG=/etc/rancher/k3s/k3s.yaml" >> ~/.bashrc
+source ~/.bashrc
+
+# Run local registry
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: registry
+  labels:
+    app: registry
+spec:
+  selector:
+    matchLabels:
+      app: registry
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      containers:
+      - name: registry
+        image: registry
+        imagePullPolicy: Never
+        ports:
+        - name: registry
+          containerPort: 5000
+        securityContext:
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+        volumeMounts:
+        - name: registry
+          mountPath: /var/lib/registry
+      volumes:
+      - name: registry
+        hostPath:
+          path: /opt/rancher/registry
+      hostNetwork: true
+EOF
+
+# Wait for registry to be ready
+sleep 45
+
+# Load images inside the local registry
+# Elemental
+for file in $(ls /opt/rancher/images/elemental/ | grep -v txt ); do
+  skopeo copy docker-archive:/opt/rancher/images/elemental/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "rancher-manager.test:5000/elemental/"$1":"$2}') --dest-tls-verify=false
+done
+
+# Cert-manager
+for file in $(ls /opt/rancher/images/cert/ | grep -v txt ); do
+  skopeo copy docker-archive:/opt/rancher/images/cert/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "rancher-manager.test:5000/cert/"$1":"$2}') --dest-tls-verify=false
+done
+
+# Rancher
+for file in $(ls /opt/rancher/images/rancher/ | grep -v txt ); do
+  skopeo copy docker-archive:/opt/rancher/images/rancher/$file docker://$(echo $file | sed 's/.tar//g' | awk -F_ '{print "rancher-manager.test:5000/rancher/"$1":"$2}') --dest-tls-verify=false
+done

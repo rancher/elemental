@@ -1,0 +1,18 @@
+<network xmlns:dnsmasq='http://libvirt.org/schemas/network/dnsmasq/1.0'>
+  <name>default</name>
+  <forward dev="eth0" mode="route">
+    <interface dev="eth0"/>
+  </forward>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <dns>
+    <host ip='192.168.122.102'>
+      <hostname>rancher-manager.test</hostname>
+    </host>
+  </dns>
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.122.2' end='192.168.122.254'/>
+      <host mac='52:54:00:00:00:10' name='rancher-manager' ip='192.168.122.102'/>
+    </dhcp>
+  </ip>
+</network>
