@@ -69,15 +69,6 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		// Wait for all pods to be started
 		err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 		Expect(err).To(Not(HaveOccurred()))
-
-		// Workaround: force re-sync of ManagedOSVersionChannels
-		// NOTE: this should be done directly when upgrading the operator,
-		// see https://github.com/rancher/elemental-operator/issues/519
-		_, err = kubectl.Run("patch", "ManagedOSVersionChannel",
-			"--namespace", clusterNS, "elemental-teal-channel",
-			"--type", "merge", "--patch", "{\"spec\":{\"syncInterval\":\"1m\"}}",
-		)
-		Expect(err).To(Not(HaveOccurred()))
 	})
 })
 
