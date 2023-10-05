@@ -134,10 +134,7 @@
 
 - **Describe:** E2E - Bootstrapping node
     - **It:** Provision the node
-      -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM
       -  **By:** Downloading installation config file
-      -  **By:** Adding SeedImage
-      -  **By:** Downloading ISO built by SeedImage
       -  **By:** Configuring iPXE boot script for network installation
       -  **By:** Installing node +h
       -  **By:** Checking SeedImage cloud-config on +h
@@ -206,6 +203,14 @@
       -  **By:** Checking that MachineInventory is deleted
       -  **By:** Checking that MachineInventory is back after the reset
       -  **By:** Checking cluster state
+
+## `seedImage_test.go`
+
+- **Describe:** E2E - Creating ISO image
+    - **It:** Configure and create ISO image
+      -  **By:** Adding SeedImage
+      -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM
+      -  **By:** Downloading ISO built by SeedImage
 
 ## `suite_test.go`
 
