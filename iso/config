@@ -1,4 +1,0 @@
-#cloud-config
-elemental:
-  install:
-    automatic: false

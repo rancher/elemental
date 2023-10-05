@@ -1,16 +1,10 @@
-/.dapper
 /.env
 /.cache
 /bin
-/dist
-/build
 *.swp
 .idea
-/tests/build
-/tests/build-box
 /tests/cypress/*/videos/*
 /tests/cypress/*/screenshots/*
 /tests/cypress/*/downloads/*
 /tests/cypress/*/node_modules
 *package-lock.json
-*yarn.lock
