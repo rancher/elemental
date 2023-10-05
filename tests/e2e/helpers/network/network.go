@@ -15,9 +15,6 @@ limitations under the License.
 package network
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
@@ -28,7 +25,7 @@ import (
  * @returns The number of .ipxe files found or an error
  */
 func ConfigureiPXE(httpSrv string) (int, error) {
-	ipxeScript, err := tools.GetFilesList("../..", "*.ipxe")
+	ipxeScript, err := tools.GetFilesList("../..", "install.ipxe")
 	if err != nil {
 		return 0, err
 	}
@@ -41,20 +38,6 @@ func ConfigureiPXE(httpSrv string) (int, error) {
 		}
 
 		err = tools.Sed(".*set config.*", "set config $${url}/install-config.yaml", ipxeScript[0])
-		if err != nil {
-			return 0, err
-		}
-
-		// Delete the previous symlink, use RemoveAll to avoid error if the file doesn't exist
-		symLink := "../../install-elemental.ipxe"
-		err = os.RemoveAll(symLink)
-		if err != nil {
-			return 0, err
-		}
-
-		// Create a symlink to the needed ipxe file
-		scriptName := filepath.Base(ipxeScript[0])
-		err = os.Symlink(scriptName, symLink)
 		if err != nil {
 			return 0, err
 		}

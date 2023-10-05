@@ -248,7 +248,7 @@ jobs:
       - name: Install backup-restore components (K3s only for now)
         if: contains(inputs.upstream_cluster_version, 'k3s')
         run: cd tests && make e2e-install-backup-restore
-      - name: Extracts component versions/informations
+      - name: Extract component versions/informations
         id: component
         run: |
           # Extract rancher-backup-operator version
@@ -389,8 +389,8 @@ jobs:
           cd tests && make e2e-iso-image
       - name: Extract iPXE artifacts from ISO
         if: inputs.test_type == 'cli' && inputs.iso_boot == false
-        run: make extract_kernel_init_squash && make ipxe
-      - name: Extracts iso version
+        run: cd tests && make extract_kernel_init_squash && make ipxe
+      - name: Extract ISO version
         id: iso_version
         run: |
           # Extract OS version from ISO
