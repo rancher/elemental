@@ -248,6 +248,34 @@ jobs:
       - name: Install backup-restore components (K3s only for now)
         if: contains(inputs.upstream_cluster_version, 'k3s')
         run: cd tests && make e2e-install-backup-restore
+      - name: Extracts component versions/informations
+        id: component
+        run: |
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Extract Rancher Manager version
+          RM_VERSION=$(kubectl get pod \
+                         --namespace cattle-system \
+                         -l app=rancher \
+                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export values
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: inputs.test_type == 'ui'
@@ -362,29 +390,9 @@ jobs:
       - name: Extract iPXE artifacts from ISO
         if: inputs.test_type == 'cli' && inputs.iso_boot == false
         run: make extract_kernel_init_squash && make ipxe
-      - name: Extracts component versions/informations
-        id: component
+      - name: Extracts iso version
+        id: iso_version
         run: |
-          # Extract rancher-backup-operator version
-          BACKUP_RESTORE_VERSION=$(kubectl get pod \
-                                     --namespace cattle-resources-system \
-                                     -l app.kubernetes.io/name=rancher-backup \
-                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract CertManager version
-          CERT_MANAGER_VERSION=$(kubectl get pod \
-                                   --namespace cert-manager \
-                                   -l app=cert-manager \
-                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract elemental-operator version
-          OPERATOR_VERSION=$(kubectl get pod \
-                             --namespace cattle-elemental-system \
-                             -l app=elemental-operator \
-                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-          # Extract Rancher Manager version
-          RM_VERSION=$(kubectl get pod \
-                         --namespace cattle-system \
-                         -l app=rancher \
-                         -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
           # Extract OS version from ISO
           ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
           INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
@@ -392,12 +400,8 @@ jobs:
             | xz -dc \
             | cpio -i --to-stdout usr/lib/initrd-release > os-release
           eval $(grep IMAGE_TAG os-release)
-          # Export values
-          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          # Export value
           echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
-          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         if: inputs.test_type == 'cli'
         env:
@@ -600,7 +604,7 @@ jobs:
           echo "CertManager Image: ${{ steps.component.outputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Elemental OS version: ${{ steps.component.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental OS version: ${{ steps.iso_version.outputs.image_tag }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ steps.component.outputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Backup/Restore Operator Image: ${{ steps.component.outputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
           if ${{ inputs.elemental_ui_version != '' }}; then
