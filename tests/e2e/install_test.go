@@ -27,6 +27,22 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
+func rolloutDeployment(ns, d string) {
+	// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
+	Eventually(func() string {
+		status, _ := kubectl.Run("rollout", "restart", "deployment/"+d,
+			"--namespace", ns)
+		return status
+	}, tools.SetTimeout(1*time.Minute), 20*time.Second).Should(ContainSubstring("restarted"))
+
+	// Wait for deployment to be restarted
+	Eventually(func() string {
+		status, _ := kubectl.Run("rollout", "status", "deployment/"+d,
+			"--namespace", ns)
+		return status
+	}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
+}
+
 var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Create kubectl context
 	// Default timeout is too small, so New() cannot be used
@@ -190,7 +206,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			})
 		}
 
-		By("Installing Rancher", func() {
+		By("Installing Rancher Manager", func() {
 			err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, caType, proxy)
 			Expect(err).To(Not(HaveOccurred()))
 
@@ -220,6 +236,11 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			}
 			err = rancher.CheckPod(k, checkList)
 			Expect(err).To(Not(HaveOccurred()))
+
+			// We have to restart Rancher Manager to be sure that Private CA is used
+			if caType == "private" {
+				rolloutDeployment("cattle-system", "rancher")
+			}
 
 			// Check issuer for Private CA
 			if caType == "private" {
