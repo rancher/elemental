@@ -1,18 +1,3 @@
-# Tests description for smoke
-
-## `smoke_suite_test.go`
-
-*No test defined!*
-
-## `smoke_test.go`
-
-- **Describe:** Elemental Smoke tests
-  - **Context:** First boot
-    - **It:** fmt.Sprintfstarts successfully %s on boot, unit
-    - **It:** has default mounts
-    - **It:** has default cmdline
-    - **It:** has the user added via cloud-init
-
 # Tests description for cypress/latest/e2e/unit_tests
 
 ## `advanced_filtering.spec.ts`
@@ -260,21 +245,4 @@
       -  **By:** Checking VM upgrade on +h
       -  **By:** Checking OS version on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
-
-# Tests description for install
-
-## `install_suite_test.go`
-
-*No test defined!*
-
-## `install_test.go`
-
-- **Describe:** Elemental Installation tests
-  - **Context:** From ISO
-    - **It:** can install
-  - **Context:** From container
-    - **It:** can install
-    - **It:** has customization applied
-      -  **By:** Checking we booted from the installed OS
-      -  **By:** Checking config file was run
 
