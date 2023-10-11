@@ -302,16 +302,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 		if testType == "ui" {
 			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
-				// https://github.com/rancher/elemental/issues/410
-				time.Sleep(tools.SetTimeout(120 * time.Second))
-				_, err := kubectl.Run("scale", "deployment/fleet-agent", "-n", "cattle-fleet-local-system", "--replicas=0")
-				Expect(err).To(Not(HaveOccurred()))
-				_, err = kubectl.Run("scale", "deployment/fleet-controller", "-n", "cattle-fleet-system", "--replicas=0")
-				Expect(err).To(Not(HaveOccurred()))
-				_, err = kubectl.Run("scale", "deployment/fleet-controller", "-n", "cattle-fleet-system", "--replicas=1")
-				Expect(err).To(Not(HaveOccurred()))
-				_, err = kubectl.Run("scale", "deployment/fleet-agent", "-n", "cattle-fleet-local-system", "--replicas=1")
-				Expect(err).To(Not(HaveOccurred()))
+				for _, d := range [][]string{
+					{"cattle-fleet-local-system", "fleet-agent"},
+					{"cattle-fleet-system", "fleet-controller"},
+				} {
+					rolloutDeployment(d[0], d[1])
+				}
 			})
 		}
 
