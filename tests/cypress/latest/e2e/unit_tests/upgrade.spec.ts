@@ -115,10 +115,11 @@ describe('Upgrade tests', () => {
           .click();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20000);
+        // NOTE: in the downstream cluster the Namespace is cattle-fleet-system!
         cy.get('.shell-body')
-          .type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=0{enter}');
+          .type('kubectl rollout restart deployment/fleet-agent -n cattle-fleet-system{enter}');
         cy.get('.shell-body')
-          .type('kubectl scale deployment/fleet-agent -n cattle-fleet-system --replicas=1{enter}');
+          .type('kubectl rollout status deployment/fleet-agent -n cattle-fleet-system{enter}');
 
         // Check if the node reboots to apply the upgrade
         cypressLib.burgerMenuOpenIfClosed();    
