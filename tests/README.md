@@ -166,7 +166,7 @@
       -  **By:** Configuring Kubeconfig file
       -  **By:** Configuring Private CA
       -  **By:** Installing CertManager
-      -  **By:** Installing Rancher
+      -  **By:** Installing Rancher Manager
       -  **By:** Configuring kubectl to use Rancher admin user
       -  **By:** Workaround for upgrade test, restart Fleet controller and agent
       -  **By:** Installing Elemental Operator
