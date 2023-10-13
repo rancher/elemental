@@ -437,12 +437,5 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Checking cluster state after reboot", func() {
 			CheckClusterState(clusterNS, clusterName)
 		})
-
-		if isoBoot == "true" {
-			By("Removing the ISO", func() {
-				err := exec.Command("bash", "-c", "rm -f ../../elemental-*.iso").Run()
-				Expect(err).To(Not(HaveOccurred()))
-			})
-		}
 	})
 })
