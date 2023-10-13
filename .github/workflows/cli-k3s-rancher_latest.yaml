@@ -3,6 +3,11 @@ name: CLI-K3s-Rancher_Latest
 
 on:
   workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
   schedule:
     - cron: '0 1 * * *'
 
@@ -16,5 +21,6 @@ jobs:
     with:
       test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
+      destroy_runner: ${{ inputs.destroy_runner }}
       k8s_version_to_provision: v1.26.8+k3s1
       rancher_version: latest/devel

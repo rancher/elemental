@@ -3,6 +3,11 @@ name: CLI-K3s-OS-Upgrade-Rancher_Latest
 
 on:
   workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
   schedule:
     - cron: '0 2 * * *'
 
@@ -16,6 +21,7 @@ jobs:
     with:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
+      destroy_runner: ${{ inputs.destroy_runner }}
       k8s_version_to_provision: v1.26.8+k3s1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher

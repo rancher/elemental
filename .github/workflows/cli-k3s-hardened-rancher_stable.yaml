@@ -3,6 +3,11 @@ name: CLI-K3s-Hardened-Rancher_Stable
 
 on:
   workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
   schedule:
     - cron: '0 1 * * *'
 
@@ -18,5 +23,6 @@ jobs:
       cert-manager_version: v1.11.1
       cluster_name: cluster-k3s
       cluster_type: hardened
+      destroy_runner: ${{ inputs.destroy_runner }}
       k8s_version_to_provision: v1.26.8+k3s1
       node_number: 3
