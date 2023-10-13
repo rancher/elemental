@@ -140,7 +140,6 @@
       -  **By:** Rebooting +h
       -  **By:** Checking cluster agent on +h
       -  **By:** Checking cluster state after reboot
-      -  **By:** Removing the ISO
 
 ## `configure_test.go`
 
