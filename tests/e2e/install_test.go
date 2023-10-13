@@ -242,6 +242,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				rolloutDeployment("cattle-system", "rancher")
 			}
 
+			// A bit dirty be better to wait a little here for all to be correctly started
+			time.Sleep(2 * time.Minute)
+
 			// Check issuer for Private CA
 			if caType == "private" {
 				Eventually(func() error {
