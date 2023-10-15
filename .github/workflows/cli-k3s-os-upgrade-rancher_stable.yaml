@@ -21,7 +21,7 @@ jobs:
     with:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
-      destroy_runner: ${{ inputs.destroy_runner }}
+      destroy_runner: ${{ inputs.destroy_runner || true }}
       k8s_version_to_provision: v1.26.8+k3s1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
