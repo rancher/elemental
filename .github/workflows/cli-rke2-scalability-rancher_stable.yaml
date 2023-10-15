@@ -23,7 +23,7 @@ jobs:
       test_description: "CI/Manual - CLI - Scalability - Deployment test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
-      destroy_runner: ${{ inputs.destroy_runner }}
+      destroy_runner: ${{ inputs.destroy_runner || true }}
       k8s_version_to_provision: v1.26.8+rke2r1
       node_number: 60
       rancher_version: stable/latest
