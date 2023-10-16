@@ -61,10 +61,10 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 				"--create-namespace",
 				"--wait", "--wait-for-jobs",
 			)
-		}
 
-		// Delay few seconds before checking, needed because we may have 2 pods at the same time
-		time.Sleep(tools.SetTimeout(30 * time.Second))
+			// Delay few seconds for all to be installed
+			time.Sleep(tools.SetTimeout(20 * time.Second))
+		}
 
 		// Wait for all pods to be started
 		err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})

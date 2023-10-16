@@ -28,7 +28,7 @@ ipxe:
 	echo "set initrd $${VAR/\.iso/-initrd}" >> $(IPXE); \
 	echo "set rootfs $${VAR/\.iso/.squashfs}" >> $(IPXE); \
 	echo "# set config http://example.com/machine-config" >> $(IPXE); \
-	echo "# set cmdline cos.setup=/run/initramfs/live/cloudd-config extra.values=1" >> $(IPXE); \
+	echo "# set cmdline cos.setup=/run/initramfs/live/cloud-config extra.values=1" >> $(IPXE); \
 	echo "initrd \$${url}/\$${initrd}" >> $(IPXE); \
 	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $(IPXE)
 
