@@ -28,7 +28,7 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
-      destroy_runner: ${{ inputs.destroy_runner || true }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
