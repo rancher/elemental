@@ -322,6 +322,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					"--create-namespace",
 					"--wait", "--wait-for-jobs",
 				)
+
+				// Delay few seconds for all to be installed
+				time.Sleep(tools.SetTimeout(20 * time.Second))
 			}
 
 			// Wait for pod to be started

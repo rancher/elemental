@@ -74,6 +74,9 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 
 				// Install through Helm
 				RunHelmCmdWithRetry(flags...)
+
+				// Delay few seconds for all to be installed
+				time.Sleep(tools.SetTimeout(20 * time.Second))
 			}
 		})
 
