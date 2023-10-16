@@ -1,4 +1,4 @@
-<network xmlns:dnsmasq='http://libvirt.org/schemas/network/dnsmasq/1.0'>
+<network ipv6='no' xmlns:dnsmasq='http://libvirt.org/schemas/network/dnsmasq/1.0'>
   <name>default</name>
   <forward mode='nat'>
     <nat>
