@@ -43,7 +43,7 @@ RUN zypper --installroot /osimage in --no-recommends -y apparmor-parser
 RUN zypper --installroot /osimage in --no-recommends -y elemental
 
 # make users happy
-RUN zypper --installroot /osimage in --no-recommends -y procps openssl openssh vim-small less iputils kernel-firmware-all NetworkManager-wwan cryptsetup podman zypper
+RUN zypper --installroot /osimage in --no-recommends -y procps openssl openssh vim-small less iputils NetworkManager-wwan cryptsetup podman zypper
 
 FROM scratch as osimage
 
