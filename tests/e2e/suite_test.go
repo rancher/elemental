@@ -67,7 +67,7 @@ var (
 	elementalSupport      string
 	emulateTPM            bool
 	rancherHostname       string
-	isoBoot               string
+	isoBoot               bool
 	k8sUpstreamVersion    string
 	k8sVersion            string
 	numberOfVMs           int
@@ -207,7 +207,7 @@ var _ = BeforeSuite(func() {
 	eTPM := os.Getenv("EMULATE_TPM")
 	rancherHostname = os.Getenv("PUBLIC_DNS")
 	index := os.Getenv("VM_INDEX")
-	isoBoot = os.Getenv("ISO_BOOT")
+	isoBootString := os.Getenv("ISO_BOOT")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
@@ -266,6 +266,14 @@ var _ = BeforeSuite(func() {
 		sequential = true
 	default:
 		sequential = false
+	}
+
+	// Same for isoBoot
+	switch isoBootString {
+	case "true":
+		isoBoot = true
+	default:
+		isoBoot = false
 	}
 
 	// Extract Rancher Manager channel/version to install

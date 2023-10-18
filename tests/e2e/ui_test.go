@@ -57,7 +57,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		if isoBoot != "true" {
+		if !isoBoot {
 			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := network.ConfigureiPXE(httpSrv)
 				Expect(err).To(Not(HaveOccurred()))

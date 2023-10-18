@@ -80,7 +80,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	)
 
 	It("Provision the node", func() {
-		if isoBoot != "true" {
+		if !isoBoot {
 			By("Downloading installation config file", func() {
 				// Download the new YAML installation config file
 				machineRegName := "machine-registration-" + poolType + "-" + clusterName
@@ -140,7 +140,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		// Loop on nodes to check that SeedImage cloud-config is correctly applied
 		// Only for master pool
-		if poolType == "master" && isoBoot == "true" {
+		if poolType == "master" && isoBoot {
 			for index := vmIndex; index <= numberOfVMs; index++ {
 				hostName := elemental.SetHostname(vmNameRoot, index)
 				Expect(hostName).To(Not(BeEmpty()))
