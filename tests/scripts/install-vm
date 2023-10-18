@@ -101,4 +101,8 @@ CMD="sudo virt-install \
        ${INSTALL_FLAG}"
 
 # Create VM
-script -E never -e -f -q -O ${LOG_FILE} -c "${CMD}" >/dev/null 2>&1
+# But before, sync all and wait a little bit before executing virt-install
+# To try to avoid sporadic issue where sometimes the media is not found by virt-install
+sync \
+  && sleep 20s \
+  && script -E never -e -f -q -O ${LOG_FILE} -c "${CMD}" >/dev/null 2>&1
