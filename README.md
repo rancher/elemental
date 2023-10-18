@@ -16,6 +16,9 @@ CI with latest stable Rancher Manager:
 [![CLI-K3s-Hardened-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_stable.yaml)
 [![CLI-RKE2-Hardened-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-rancher_stable.yaml)
 
+[![CLI-K3s-Hardened-Upgrade-Reset-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-upgrade-reset-test-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-upgrade-reset-test-rancher_stable.yaml)
+[![CLI-RKE2-Hardened-Upgrade-Reset-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-upgrade-reset-test-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-upgrade-reset-test-rancher_stable.yaml)
+
 [![CLI-RKE2-Scalability-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-scalability-rancher_stable.yaml)
 
 [![UI-K3s-Rancher_Stable](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_stable.yaml)
@@ -37,6 +40,9 @@ CI with latest devel Rancher Manager:
 
 [![CLI-K3s-Hardened-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-rancher_latest.yaml)
 [![CLI-RKE2-Hardened-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-rancher_latest.yaml)
+
+[![CLI-K3s-Hardened-Upgrade-Reset-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-upgrade-reset-test-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-hardened-upgrade-reset-test-rancher_latest.yaml)
+[![CLI-RKE2-Hardened-Upgrade-Reset-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-upgrade-reset-test-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-hardened-upgrade-reset-test-rancher_latest.yaml)
 
 [![UI-K3s-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-rancher_latest.yaml)
 [![UI-RKE2-Rancher_Latest](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_latest.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-rancher_latest.yaml)
