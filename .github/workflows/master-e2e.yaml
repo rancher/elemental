@@ -63,6 +63,7 @@ on:
         type: string
       iso_boot:
         description: Choose booting from ISO
+        default: false
         type: boolean
       k3s_flags:
         description: Argument to configure INSTALL_K3S_EXEC env variable 
@@ -107,7 +108,7 @@ on:
       sequential:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
-        type: string
+        type: boolean
       test_description:
         description: Short description of the test
         type: string
@@ -419,7 +420,7 @@ jobs:
             export VM_CPU=4
           fi
           # Execute bootstrapping test
-          if ${{ inputs.sequential == 'true' }}; then
+          if ${{ inputs.sequential == true }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
             for ((i = VM_START ; i <= VM_END ; i++)); do
@@ -532,7 +533,7 @@ jobs:
             export VM_MEM=8192
             export VM_CPU=4
           fi
-          if ${{ inputs.sequential == 'true' }}; then
+          if ${{ inputs.sequential == true }}; then
             # Force node bootstrapping in sequential instead of parallel
             cd tests
             for ((i = VM_START ; i <= VM_END ; i++)); do
@@ -579,7 +580,7 @@ jobs:
         run: |
           # Define some variable(s)
           BOOTSTRAP_METHOD="Parallel"
-          if ${{ inputs.sequential == 'true' }}; then
+          if ${{ inputs.sequential == true }}; then
             BOOTSTRAP_METHOD="Sequential"
           fi
           # Get nodes configuration (use the first one, they are all identical)
