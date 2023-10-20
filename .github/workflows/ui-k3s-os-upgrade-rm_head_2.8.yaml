@@ -1,33 +1,30 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-K3s-OS-Upgrade
+name: UI-K3s-OS-Upgrade-RM_head_2.8
+# We test upgrade with: 
+# - Iso stable to dev
+# - Elemental-operator dev
+#
+# Main reason of dev operator is to test ISO building.
+# Later it will be moved to main scenario when we will be able to choose the ISO
+# because for now, we can only build ISO with stable ISO
 
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        required: false
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
-      operator_repo:
-        description: Elemental operator repository to use
-        default: oci://registry.suse.com/rancher
-        type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: latest/devel/2.8
         type: string
-      upgrade_image:
-        description: Upgrade image to use
-        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
-        type: string
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
   ui:
@@ -35,18 +32,15 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      qase_run_id: ${{ inputs.qase_run_id }}
       cluster_name: cluster-k3s
       cypress_tags: upgrade
-      destroy_runner: ${{ inputs.destroy_runner }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+k3s1
-      operator_repo: ${{ inputs.operator_repo }}
-      proxy: ${{ inputs.proxy }}
-      rancher_version: ${{ inputs.rancher_version }}
+      proxy: ${{ inputs.proxy || 'elemental' }}
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.8' }}
       test_type: ui
-      upgrade_image: ${{ inputs.upgrade_image }}
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest

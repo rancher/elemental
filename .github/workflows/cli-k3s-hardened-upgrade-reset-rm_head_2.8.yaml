@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-Hardened-Upgrade-Reset-Rancher_Stable
+name: CLI-K3s-Hardened-Upgrade-Reset-RM_head_2.8
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 1 * * *'
 
 jobs:
   cli:
@@ -19,19 +19,17 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "CI - CLI - Parallel - Deployment with OS Upgrade test + reset on Hardened RKE2"
-      ca_type: private
-      cluster_name: cluster-rke2
+      test_description: "CI - CLI - Parallel - Deployment with OS Upgrade test + reset on Hardened K3s"
+      cert-manager_version: v1.11.1
+      cluster_name: cluster-k3s
       cluster_type: hardened
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_version_to_provision: v1.26.8+rke2r1
+      k8s_version_to_provision: v1.26.8+k3s1
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
-      rancher_upgrade: latest/devel
-      rancher_version: stable/latest/none
+      rancher_version: latest/devel/2.8
       reset: true
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev
-      upstream_cluster_version: v1.26.8+rke2r1
