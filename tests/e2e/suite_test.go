@@ -77,6 +77,7 @@ var (
 	poolType              string
 	proxy                 string
 	rancherChannel        string
+	rancherHeadVersion    string
 	rancherLogCollector   string
 	rancherVersion        string
 	rancherUpgrade        string
@@ -281,6 +282,7 @@ var _ = BeforeSuite(func() {
 		s := strings.Split(rancherVersion, "/")
 		rancherChannel = s[0]
 		rancherVersion = s[1]
+		rancherHeadVersion = s[2]
 	}
 
 	// Extract Rancher Manager channel/version to upgrade

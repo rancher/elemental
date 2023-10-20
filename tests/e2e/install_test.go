@@ -207,7 +207,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 
 		By("Installing Rancher Manager", func() {
-			err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, caType, proxy)
+			err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Inject secret for Private CA
