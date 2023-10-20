@@ -14,7 +14,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: latest/devel/2.7
+        default: latest/devel/2.8
         type: string
   schedule:
     - cron: '0 4 * * *'

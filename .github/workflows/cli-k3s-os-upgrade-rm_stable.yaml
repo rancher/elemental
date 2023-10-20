@@ -28,6 +28,6 @@ jobs:
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
       rancher_upgrade: latest/devel
-      rancher_version: stable/latest
+      rancher_version: stable/latest/none
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev

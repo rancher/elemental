@@ -17,8 +17,8 @@ on:
         default: true
         type: boolean
       rancher_version:
-        description: Rancher Manager channel/version to use for installation
-        default: stable/latest
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
         type: string
   schedule:
     - cron: '0 1 * * *'
@@ -43,7 +43,7 @@ jobs:
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
       operator_repo: oci://registry.suse.com/rancher
-      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev
