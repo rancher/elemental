@@ -22,6 +22,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rancher-sandbox/ele-testhelpers v0.0.0-20231017080613-10744f51a9ea h1:RXelAMEvk2gzyTyU0Az8uWtGYeE9EoZDK2fn7CmXcA0=
 github.com/rancher-sandbox/ele-testhelpers v0.0.0-20231017080613-10744f51a9ea/go.mod h1:Ex+a/ng4u2BvcGQdQjTHI48h88bQ6k2a7q8rnvU0XbQ=
+github.com/rancher-sandbox/ele-testhelpers v0.0.0-20231019143409-a8e92d67d1e4 h1:NIoMaiQgvl0aKNbJVoHshacD3OO30HEO9rpQ8T2ilpc=
+github.com/rancher-sandbox/ele-testhelpers v0.0.0-20231019143409-a8e92d67d1e4/go.mod h1:Ex+a/ng4u2BvcGQdQjTHI48h88bQ6k2a7q8rnvU0XbQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
