@@ -9,8 +9,8 @@ on:
         default: true
         type: boolean
       rancher_version:
-        description: Rancher Manager channel/version to use for installation
-        default: stable/latest
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
         type: string
   schedule:
     - cron: '0 4 * * *'
@@ -35,6 +35,6 @@ jobs:
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
-      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
       upstream_cluster_version: v1.26.8+rke2r1
