@@ -1,21 +1,26 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-RKE2-OBS_Staging
-
+name: UI-RKE2-OS-Upgrade-RM_head_2.7
+# We test upgrade with: 
+# - Iso stable to dev
+# - Elemental-operator dev
+# - RKE2 as management node
+# - Rancher latest devel
+#
+# Later it will be moved to main scenario when we will be able to choose the ISO
+# because for now, we can only build ISO with stable ISO
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        required: false
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: latest/devel/2.7
         type: string
+  schedule:
+    - cron: '0 1 * * *'
 
 jobs:
   ui:
@@ -23,20 +28,18 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
       ui_account: user
-      qase_run_id: ${{ inputs.qase_run_id }}
       ca_type: private
       cluster_name: cluster-rke2
-      cypress_tags: main
-      destroy_runner: ${{ inputs.destroy_runner }}
+      cypress_tags: upgrade
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
-      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
-      rancher_version: ${{ inputs.rancher_version }}
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.7' }}
       test_type: ui
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
+      upgrade_os_channel: dev
       upstream_cluster_version: v1.26.8+rke2r1

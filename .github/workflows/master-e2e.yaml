@@ -95,8 +95,8 @@ on:
         default: https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh
         type: string
       rancher_version:
-        description: Rancher Manager channel/version to use for installation
-        default: stable/latest
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to

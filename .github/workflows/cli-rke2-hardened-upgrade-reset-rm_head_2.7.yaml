@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-Hardened-Upgrade-Reset-Rancher_Stable
+name: CLI-RKE2-Hardened-Upgrade-Reset-RM_head_2.7
 
 on:
   workflow_dispatch:
@@ -29,8 +29,7 @@ jobs:
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
-      rancher_upgrade: latest/devel
-      rancher_version: stable/latest/none
+      rancher_version: latest/devel/2.7
       reset: true
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
       upgrade_os_channel: dev

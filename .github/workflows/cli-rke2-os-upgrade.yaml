@@ -20,8 +20,8 @@ on:
         description: Rancher Manager channel/version to upgrade to
         type: string
       rancher_version:
-        description: Rancher Manager channel/version to use for installation
-        default: stable/latest
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
         type: string
       teal_version:
         description: Elemental Teal base OS version

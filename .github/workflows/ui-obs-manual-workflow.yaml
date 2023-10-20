@@ -28,8 +28,8 @@ on:
         default: elemental
         type: string
       rancher_version:
-        description: Rancher Manager channel/version to use for installation
-        default: stable/latest
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
         type: string
       runner_template:
         description: Runner template to use

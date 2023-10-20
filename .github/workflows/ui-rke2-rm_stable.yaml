@@ -1,21 +1,19 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-RKE2-OBS_Staging
+name: UI-RKE2-RM_Stable
 
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        required: false
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
       rancher_version:
-        description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        description: Rancher Manager channel/version to use for installation
+        default: stable/latest
         type: string
+  schedule:
+    - cron: '0 4 * * *'
 
 jobs:
   ui:
@@ -23,20 +21,20 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
-      ui_account: user
-      qase_run_id: ${{ inputs.qase_run_id }}
+      # Using user account has to be disable due to this bug
+      # https://github.com/rancher/elemental-ui/issues/64
+      # Fixed in elemental-ui 1.1.0
+      #ui_account: user
+      test_description: "CI/Manual - UI - Deployment test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
-      destroy_runner: ${{ inputs.destroy_runner }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
-      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
-      rancher_version: ${{ inputs.rancher_version }}
+      rancher_version: ${{ inputs.rancher_version || 'stable/latest' }}
       test_type: ui
       upstream_cluster_version: v1.26.8+rke2r1
