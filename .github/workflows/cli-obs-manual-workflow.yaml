@@ -42,7 +42,7 @@ on:
       sequential:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
-        type: string
+        type: boolean
 
 concurrency:
   group: cli-obs-manual-workflow-${{ github.head_ref || github.ref }}-${{ github.repository }}
