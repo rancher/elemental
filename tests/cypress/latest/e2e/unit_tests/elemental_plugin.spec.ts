@@ -25,6 +25,7 @@ filterTests(['main', 'upgrade'], () => {
     beforeEach(() => {
       cy.login();
       cy.visit('/');
+      cypressLib.burgerMenuToggle();
     });
   
     qase(11,
@@ -35,14 +36,12 @@ filterTests(['main', 'upgrade'], () => {
     
     qase(12,
       it('Enable extension support', () => {
-        cypressLib.burgerMenuOpenIfClosed();
         isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
       })
     );
   
     qase(13,
       it('Install Elemental plugin', () => {
-        cypressLib.burgerMenuOpenIfClosed();
         // TODO: create a function to install any plugin and not elemental only
         cy.contains('Extensions')
           .click();

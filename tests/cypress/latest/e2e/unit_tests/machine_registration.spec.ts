@@ -29,7 +29,7 @@ describe('Machine registration testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    cypressLib.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuToggle();
 
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
@@ -47,11 +47,12 @@ describe('Machine registration testing', () => {
   });
 
   beforeEach(() => {
+    cy.viewport(1920, 1080);
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
     cy.visit('/');
 
     // Open the navigation menu
-    cypressLib.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuToggle();
 
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');

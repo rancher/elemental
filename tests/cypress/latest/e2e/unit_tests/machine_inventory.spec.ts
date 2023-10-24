@@ -35,7 +35,7 @@ describe('Machine inventory testing', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    cypressLib.burgerMenuOpenIfClosed();
+    cypressLib.burgerMenuToggle();
 
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
@@ -88,8 +88,9 @@ describe('Machine inventory testing', () => {
   
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
+      cypressLib.burgerMenuToggle();
       cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.burgerMenuToggle();
       cy.contains(clusterName)
         .click();
     })

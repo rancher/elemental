@@ -34,7 +34,7 @@ describe('User role testing', () => {
       it('Create standard user', () => {
         // User without the elemental-administrator role
         cy.login();
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cypressLib.createUser(stdUser, uiPassword);
       })
     );
@@ -43,7 +43,7 @@ describe('User role testing', () => {
       it('Create elemental user', () => {
         // User with the elemental-administrator role
         cy.login();
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cypressLib.createUser(elementalUser, uiPassword, 'Elemental Administrator');
       })
     );
@@ -55,7 +55,7 @@ describe('User role testing', () => {
         cy.login(elementalUser, uiPassword);
         cy.getBySel('banner-title')
           .contains('Welcome to Rancher');
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');
         cypressLib.accesMenu('OS Management');
         elemental.checkElementalNav();
@@ -67,7 +67,7 @@ describe('User role testing', () => {
         cy.login(stdUser, uiPassword);
         cy.getBySel('banner-title')
           .contains('Welcome to Rancher');
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');
         cypressLib.accesMenu('OS Management');
         // User without appropriate role will get a specific page
