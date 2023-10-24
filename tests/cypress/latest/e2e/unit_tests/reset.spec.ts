@@ -31,7 +31,7 @@ filterTests(['main'], () => {
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
-      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.burgerMenuToggle();
       cypressLib.accesMenu('OS Management');
     });
     
@@ -59,7 +59,7 @@ filterTests(['main'], () => {
         cy.getBySel('prompt-remove-input')
           .type('mycluster');
         cy.getBySel('prompt-remove-confirm-button').click();
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.contains('There are no rows to show.');

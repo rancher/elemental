@@ -84,7 +84,9 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
   // This wait can be replaced by something cleaner
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(3000);
+  cypressLib.burgerMenuToggle();
   cypressLib.checkClusterStatus(clusterName, 'Updating', 300000);
+  cypressLib.burgerMenuToggle();
   cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
   // Ugly but needed unfortunately to make sure the cluster stops switching status
   // eslint-disable-next-line cypress/no-unnecessary-waiting

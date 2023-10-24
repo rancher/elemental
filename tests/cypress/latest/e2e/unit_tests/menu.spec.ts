@@ -29,12 +29,12 @@ filterTests(['main'], () => {
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
+      cypressLib.burgerMenuToggle();
     });
   
     qase(2,
       it('Check Elemental logo', () => {
         // Elemental's icon should appear in the side menu
-        cypressLib.burgerMenuOpenIfClosed();
         cypressLib.checkNavIcon('elemental')
           .should('exist');
       })
@@ -42,8 +42,6 @@ filterTests(['main'], () => {
     
     qase(3,
       it('Check Elemental menu', () => {
-        cypressLib.burgerMenuOpenIfClosed();
-  
         // Elemental's icon should appear in the side menu
         cypressLib.checkNavIcon('elemental')
           .should('exist');

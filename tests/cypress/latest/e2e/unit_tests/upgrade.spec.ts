@@ -33,7 +33,7 @@ describe('Upgrade tests', () => {
     cy.visit('/');
 
     // Open the navigation menu
-    cypressLib.burgerMenuOpenIfClosed();    
+    cypressLib.burgerMenuToggle();
 
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
@@ -51,8 +51,8 @@ describe('Upgrade tests', () => {
 
     qase(34,
       it('Upgrade one node (different methods if rke2 or k3s)', () => {
+        cypressLib.burgerMenuToggle();
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        cypressLib.burgerMenuOpenIfClosed();
         cypressLib.accesMenu('OS Management');
         /////////////////////////////////////////
         // K3s cluster upgraded with OS Image
@@ -103,7 +103,7 @@ describe('Upgrade tests', () => {
         // Workaround to avoid sporadic issue with Upgrade
         // https://github.com/rancher/elemental/issues/410
         // Restart fleet agent inside downstream cluster
-        cypressLib.burgerMenuOpenIfClosed();
+        cypressLib.burgerMenuToggle();
         cy.getBySel('side-menu')
           .contains(clusterName)
           .click();
@@ -122,7 +122,7 @@ describe('Upgrade tests', () => {
           .type('kubectl rollout status deployment/fleet-agent -n cattle-fleet-system{enter}');
 
         // Check if the node reboots to apply the upgrade
-        cypressLib.burgerMenuOpenIfClosed();    
+        cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
         cy.clickNavMenu(["Dashboard"]);
         cy.getBySel('card-clusters')

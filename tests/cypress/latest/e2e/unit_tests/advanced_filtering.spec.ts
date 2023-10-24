@@ -29,7 +29,7 @@ filterTests(['main'], () => {
       cy.visit('/');
   
       // Open the navigation menu
-      cypressLib.burgerMenuOpenIfClosed();
+      cypressLib.burgerMenuToggle();
   
       // Click on the Elemental's icon
       cypressLib.accesMenu('OS Management');
