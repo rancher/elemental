@@ -112,16 +112,16 @@ Cypress.Commands.add('createMachReg', (
         // Will try to improve it in next version
         if (utils.isOperatorVersion('staging')) {
           // In rare case, we might want to test upgrading from staging to dev
-          utils.isUpgradeOsChannel('dev') ? cy.contains('Elemental Teal ISO x86_64 (unstable)').click(): null;
+          utils.isUpgradeOsChannel('dev') ? cy.contains('ISO x86_64 (unstable)').click(): null;
         } else {
-            cy.contains('Elemental Teal ISO x86_64 v1.2.2')
+            cy.contains('ISO x86_64 v1.2.2')
             .click();
         }
       } else if (utils.isOperatorVersion('registry.suse.com')) {
-        cy.contains('Elemental Teal ISO x86_64 v1.2.2')
+        cy.contains('ISO x86_64 v1.2.2')
           .click();
       } else {
-        cy.contains('Elemental Teal ISO x86_64 (unstable)')
+        cy.contains('ISO x86_64 (unstable)')
           .click();
       }
       cy.getBySel('build-iso-btn')
