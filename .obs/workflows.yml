@@ -5,16 +5,16 @@ push_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: node-image
-    - trigger_services:
-        project: isv:Rancher:Elemental:Dev
-        package: build-iso
-    - trigger_services:
-        project: isv:Rancher:Elemental:Dev
         package: build-iso-next
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
+        package: build-iso-base
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
         package: SLE-Micro-Rancher
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-Rancher-base
   filters:
     branches:
       only:
@@ -28,10 +28,16 @@ tag_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: node-image
+        package: build-iso-next
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso
+        package: build-iso-base
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-Rancher
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-Rancher-base
   filters:
     event: tag_push
 
@@ -43,11 +49,19 @@ pr_workflow:
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: node-image
+        source_package: build-iso-base
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: build-iso
+        source_package: build-iso-next
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: SLE-Micro-Rancher
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: SLE-Micro-Rancher-base
         target_project: isv:Rancher:Elemental:PR
   filters:
     event: pull_request
