@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
 #!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%
 #!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
