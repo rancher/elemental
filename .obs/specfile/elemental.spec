@@ -144,7 +144,7 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %config %{_sysconfdir}/cos/bootargs.cfg
 %dir %{_sysconfdir}/dracut.conf.d
 %config %{_sysconfdir}/dracut.conf.d/51-certificates-initrd.conf
-%config %{_sysconfdir}/dracut.conf.d/99-teal-systemd.conf
+%config %{_sysconfdir}/dracut.conf.d/99-elemental-systemd.conf
 %dir %{_sysconfdir}/NetworkManager
 %dir %{_sysconfdir}/NetworkManager/conf.d
 %config %{_sysconfdir}/NetworkManager/conf.d/rke2-canal.conf
