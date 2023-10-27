@@ -24,9 +24,10 @@ on:
         description: Rancher Manager channel/version/head_version to use for installation
         default: stable/latest/none
         type: string
+      # Test OS upgrade with OS image in this test ("Use image from registry")
       upgrade_image:
         description: Upgrade image to use
-        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-teal/5.4:latest
+        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro-rancher/5.5:latest
         type: string
 
 jobs:
