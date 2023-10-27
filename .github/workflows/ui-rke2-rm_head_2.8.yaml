@@ -32,6 +32,6 @@ jobs:
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.8+rke2r1
-      rancher_version: ${{ inputs.rancher_version || 'latest/deve/2.8' }}
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.8' }}
       test_type: ui
       upstream_cluster_version: v1.26.8+rke2r1
