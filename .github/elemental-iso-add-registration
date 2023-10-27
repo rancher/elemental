@@ -81,7 +81,7 @@ REPOINLOWER=$(echo $REPO | tr '[:upper:]' '[:lower:]')
 
 # This image needs to have xorriso >= 5
 if [ ${REPO} == "Stable" ]; then
-  : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/teal53/15.4/rancher/elemental-builder-image/5.3:latest}
+  : ${BUILD_IMG:=registry.suse.com/rancher/seedimage-builder:latest}
 else
   : ${BUILD_IMG:=registry.opensuse.org/isv/rancher/elemental/${REPOINLOWER}/containers/rancher/elemental-teal/5.4:latest}
 fi
