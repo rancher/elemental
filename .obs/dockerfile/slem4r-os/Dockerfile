@@ -51,7 +51,7 @@ COPY --from=host /osimage /
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/rancher/elemental-teal/$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-rancher/$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
