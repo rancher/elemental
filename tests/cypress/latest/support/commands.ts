@@ -114,11 +114,11 @@ Cypress.Commands.add('createMachReg', (
         // In rare case, we might want to test upgrading from staging to dev
         utils.isUpgradeOsChannel('dev') ? cy.contains('ISO x86_64 (unstable)').click(): null;
       } else {
-          cy.contains('ISO x86_64 v1.2.2')
+          cy.contains('ISO x86_64 v1.2.3')
           .click();
       }
     } else if (utils.isOperatorVersion('registry.suse.com')) {
-      cy.contains('ISO x86_64 v1.2.2')
+      cy.contains('ISO x86_64 v1.2.3')
         .click();
     } else {
       cy.contains('ISO x86_64 (unstable)')
