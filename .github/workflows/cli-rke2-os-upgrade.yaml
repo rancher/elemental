@@ -23,9 +23,9 @@ on:
         description: Rancher Manager channel/version/head_version to use for installation
         default: stable/latest/none
         type: string
-      teal_version:
-        description: Elemental Teal base OS version
-        default: 5.4
+      slem_version:
+        description: SLE Micro version
+        default: 5.5
         type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
@@ -57,5 +57,5 @@ jobs:
       os_to_test: stable
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/rancher/elemental-teal/${{ inputs.teal_version }}:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sle-micro-rancher/${{ inputs.slem_version }}:latest
       upstream_cluster_version: v1.26.8+rke2r1
