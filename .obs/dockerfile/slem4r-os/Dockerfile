@@ -57,11 +57,11 @@ ARG IMAGE_TAG=%VERSION%-%RELEASE%
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
 # Also used by elemental-populate-labels
-RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"         >> /etc/os-release && \
-    echo IMAGE_TAG=\"${IMAGE_TAG}\"           >> /etc/os-release && \
-    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
-    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"   >> /etc/os-release && \
-    echo GRUB_ENTRY_NAME=\"Elemental\"        >> /etc/os-release
+RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
+    echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
+    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
+    echo GRUB_ENTRY_NAME=\"SLE Micro for Rancher\" >> /etc/os-release
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro.rancher
