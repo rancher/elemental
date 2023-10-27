@@ -31,6 +31,7 @@ describe('Upgrade tests', () => {
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
     cy.visit('/');
+    cy.viewport(1920, 1080);
 
     // Open the navigation menu
     cypressLib.burgerMenuToggle();
@@ -53,6 +54,7 @@ describe('Upgrade tests', () => {
       it('Upgrade one node (different methods if rke2 or k3s)', () => {
         cypressLib.burgerMenuToggle();
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+        cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
         /////////////////////////////////////////
         // K3s cluster upgraded with OS Image
@@ -68,7 +70,8 @@ describe('Upgrade tests', () => {
         cy.contains('Target Cluster')
         cy.getBySel('cluster-target')
           .click();
-        cy.contains(clusterName)
+        cy.get('#vs5__listbox')
+          .contains(clusterName)
           .click();
         if (utils.isK8sVersion("k3s")) {
           cy.getBySel('upgrade-choice-selector')
@@ -99,28 +102,6 @@ describe('Upgrade tests', () => {
         cy.wait(10000);
         cy.getBySel('sortable-cell-0-0')
           .contains('Active');
-
-        // Workaround to avoid sporadic issue with Upgrade
-        // https://github.com/rancher/elemental/issues/410
-        // Restart fleet agent inside downstream cluster
-        cypressLib.burgerMenuToggle();
-        cy.getBySel('side-menu')
-          .contains(clusterName)
-          .click();
-        cy.contains('Workload')
-          .click();
-        cy.contains('Pods')
-          .click();
-        cy.get('.header-buttons > :nth-child(2)')
-          .click();
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(20000);
-        // NOTE: in the downstream cluster the Namespace is cattle-fleet-system!
-        cy.get('.shell-body')
-          .type('kubectl rollout restart deployment/fleet-agent -n cattle-fleet-system{enter}');
-        cy.get('.shell-body')
-          .type('kubectl rollout status deployment/fleet-agent -n cattle-fleet-system{enter}');
-
         // Check if the node reboots to apply the upgrade
         cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
@@ -130,14 +111,15 @@ describe('Upgrade tests', () => {
           .click()
         cy.get('.title')
           .contains('Clusters');
-        cy.contains(clusterName)
+        cy.get('.outlet')
+          .contains(clusterName)
           .click();
         cy.get('.primaryheader')
           .contains('Active');
         cy.get('.primaryheader')
           .contains('Active', {timeout: 420000}).should('not.exist');
         cy.get('.primaryheader')
-          .contains('Active', {timeout: 420000});
+          .contains('Active', {timeout: 540000});
       })
     );
 

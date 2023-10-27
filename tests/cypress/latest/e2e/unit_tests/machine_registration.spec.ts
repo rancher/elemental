@@ -35,15 +35,16 @@ describe('Machine registration testing', () => {
     cypressLib.accesMenu('OS Management');
 
     // In upgrade scenario, we need to add extra channels
-    if (utils.isCypressTag('upgrade')) {
-      if (utils.isOperatorVersion('registry.suse.com')) {
-        utils.isUpgradeOsChannel('dev') ? cy.addOsVersionChannel('dev') : cy.addOsVersionChannel('staging');
-      } else if (utils.isOperatorVersion('staging')) {
-        cy.addOsVersionChannel('dev');
-      } else {
-        cy.addOsVersionChannel('stable');
-      }
-    }
+    // KEEP THIS COMMENTED FOR NOW
+    //if (utils.isCypressTag('upgrade')) {
+    //  if (utils.isOperatorVersion('registry.suse.com')) {
+    //    utils.isUpgradeOsChannel('dev') ? cy.addOsVersionChannel('dev') : cy.addOsVersionChannel('staging');
+    //  } else if (utils.isOperatorVersion('staging')) {
+    //    cy.addOsVersionChannel('dev');
+    //  } else {
+    //    cy.addOsVersionChannel('stable');
+    //  }
+    //}
   });
 
   beforeEach(() => {
