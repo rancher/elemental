@@ -66,8 +66,8 @@ iso_repack() {
   echo -e "\nInfo: Using $CONT_ENGINE to run the ISO builder..."
 
   $CONT_ENGINE pull "${BUILD_IMG}"
-  $CONT_ENGINE run --rm -v ${TEMPDIR}:/mnt -v $(pwd):/output ${BUILD_IMG} \
-      xorriso -indev "/mnt/iso/${ISO_FILE}" -outdev "/output/${ISO_FILE}" -map "/mnt/config/${REG_FILE}" "/${REG_FILE}" -boot_image any replay
+  $CONT_ENGINE run --rm -v ${TEMPDIR}:/mnt -v $(pwd):/output --entrypoint=xorriso ${BUILD_IMG} \
+      -indev "/mnt/iso/${ISO_FILE}" -outdev "/output/${ISO_FILE}" -map "/mnt/config/${REG_FILE}" "/${REG_FILE}" -boot_image any replay
 
   cleanup
 
