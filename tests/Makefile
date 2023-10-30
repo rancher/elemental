@@ -9,7 +9,7 @@ ifdef VM_NUMBERS
 		GINKGO_TIMEOUT=7200
 	endif
 endif
-ifeq ($(TEST_TYPE),multi)
+ifeq ($(TEST_TYPE),multi_cli)
 	GINKGO_TIMEOUT=10800
 endif
 

@@ -477,7 +477,7 @@ var _ = BeforeSuite(func() {
 	}
 
 	// Enable multi-cluster support if needed
-	if testType == "multi" {
+	if testType == "multi_cli" {
 		if clusterNumber != "" {
 			var err error
 			numberOfClusters, err = strconv.Atoi(clusterNumber)

@@ -27,5 +27,5 @@ jobs:
       iso_boot: true
       k8s_version_to_provision: v1.26.8+k3s1
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
-      test_type: multi
+      test_type: multi_cli
       zone: us-central1-b

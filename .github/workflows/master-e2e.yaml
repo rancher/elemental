@@ -121,7 +121,7 @@ on:
         type: string
       test_type:
         description: Type of test to run (cli or ui)
-        default: cli
+        default: single_cli
         type: string
       ui_account:
         description: Account used to test RBAC role in UI
@@ -254,7 +254,7 @@ jobs:
             kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
           fi
       - name: Install backup-restore components (K3s only for now)
-        if: ${{ inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
+        if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-backup-restore
       - name: Extract component versions/informations
         id: component
@@ -380,10 +380,10 @@ jobs:
           path: tests/cypress/latest/videos
           retention-days: 7
       - name: Configure Rancher & Libvirt
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         run: cd tests && make e2e-configure-rancher
       - name: Create ISO image for master pool
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         env:
           EMULATE_TPM: true
           OS_TO_TEST: ${{ inputs.os_to_test }}
@@ -396,10 +396,10 @@ jobs:
           fi
           cd tests && make e2e-iso-image
       - name: Extract iPXE artifacts from ISO
-        if: ${{ inputs.test_type == 'cli' && inputs.iso_boot == false }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.iso_boot == false }}
         run: cd tests && make extract_kernel_init_squash && make ipxe
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         env:
           EMULATE_TPM: true
           POOL: master
@@ -425,22 +425,22 @@ jobs:
             cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
           fi
       - name: Deploy multiple clusters (with 3 nodes by cluster)
-        if: inputs.test_type == 'multi'
+        if: inputs.test_type == 'multi_cli'
         env:
           CLUSTER_NUMBER: ${{ inputs.cluster_number }}
           ISO_BOOT: ${{ inputs.iso_boot }}
         run: cd tests && make e2e-multi-cluster
       - name: Install a simple application
-        if: ${{ inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
+        if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
       - name: Reset a node in the cluster
-        if: ${{ inputs.test_type == 'cli' && inputs.reset == true }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.reset == true }}
         run: cd tests && make e2e-reset
       - name: Check app after reset
-        if: ${{ inputs.test_type == 'cli' && inputs.reset == true && contains(inputs.upstream_cluster_version, 'k3s') }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.reset == true && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-check-app
       - name: Upgrade Elemental Operator
-        if: ${{ inputs.test_type == 'cli' && inputs.operator_upgrade != '' }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.operator_upgrade != '' }}
         id: operator_upgrade
         env:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
@@ -458,7 +458,7 @@ jobs:
           echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade Rancher Manager
-        if: ${{ inputs.test_type == 'cli' && inputs.rancher_upgrade != '' }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.rancher_upgrade != '' }}
         id: rancher_upgrade
         env:
           CA_TYPE: ${{ inputs.ca_type }}
@@ -479,7 +479,7 @@ jobs:
           # Export values
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade node 1 to specified OS version with osImage
-        if: ${{ inputs.test_type == 'cli' && inputs.upgrade_image != '' }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.upgrade_image != '' }}
         env:
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           UPGRADE_TYPE: osImage
@@ -490,7 +490,7 @@ jobs:
             make e2e-check-app
           fi
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
-        if: ${{ inputs.test_type == 'cli' && inputs.upgrade_os_channel != '' }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.upgrade_os_channel != '' }}
         env:
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
           UPGRADE_TYPE: managedOSVersionName
@@ -502,7 +502,7 @@ jobs:
             make e2e-check-app
           fi
       - name: Test Backup/Restore Elemental resources with Rancher Manager
-        if: ${{ inputs.test_type == 'cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
+        if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         env:
           BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
         run: |
@@ -527,17 +527,17 @@ jobs:
           echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
       - name: Remove old built ISO image
         # Only one at a time is allowed, the new one will be created after if needed
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         run: rm -f *.iso
       - name: Create ISO image for worker pool
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         env:
           ISO_BOOT: true
           OS_TO_TEST: ${{ inputs.os_to_test }}
           POOL: worker
         run: cd tests && make e2e-iso-image
       - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
-        if: ${{ inputs.test_type == 'cli' && inputs.node_number > 3 }}
+        if: ${{ inputs.test_type == 'single_cli' && inputs.node_number > 3 }}
         env:
           ISO_BOOT: true
           POOL: worker
@@ -563,13 +563,13 @@ jobs:
             make e2e-check-app
           fi
       - name: List installed nodes
-        if: ${{ inputs.test_type == 'cli' }}
+        if: ${{ inputs.test_type == 'single_cli' }}
         run: sudo virsh list
       - name: Uninstall Elemental Operator
         env:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
-        if: ${{ inputs.destroy_runner == true && inputs.test_type == 'cli'  }}
+        if: ${{ inputs.destroy_runner == true && inputs.test_type == 'single_cli'  }}
         run: cd tests && make e2e-uninstall-operator
       - name: Store logs
         if: ${{ always() }}
@@ -609,7 +609,7 @@ jobs:
           # Add summary
           echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
           echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
-          if ${{ inputs.test_type == 'cli' }}; then
+          if ${{ inputs.test_type == 'single_cli' }}; then
             echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
           fi
           echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
