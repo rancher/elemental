@@ -8,6 +8,7 @@ spec:
     etcd:
       disableSnapshots: true
     machineGlobalConfig:
+      cni: canal
       etcd-expose-metrics: false
       profile: null
     machinePools:
