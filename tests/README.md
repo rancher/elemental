@@ -31,7 +31,7 @@
 
 - **Describe:** E2E - Bootstrapping node
     - **It:** Provision the node
-      -  **By:** Downloading installation config file
+      -  **By:** Downloading MachineRegistration file
       -  **By:** Configuring iPXE boot script for network installation
       -  **By:** Installing node +h
       -  **By:** Checking SeedImage cloud-config on +h
@@ -89,6 +89,22 @@
       -  **By:** Downloading and executing tools to generate logs
       -  **By:** Collecting additionals logs with kubectl commands
       -  **By:** Collecting proxy log and make sure traffic went through it
+
+## `multi-cluster_test.go`
+
+- **Describe:** E2E - Bootstrapping node
+    - **It:** Provision the node
+      -  **By:** Starting default network
+      -  **By:** Adding MachineRegistration
+      -  **By:** Downloading MachineRegistration file
+      -  **By:** Creating ISO from SeedImage
+      -  **By:** Downloading ISO built by SeedImage
+      -  **By:** Creating cluster +createdClusterName
+      -  **By:** Creating cluster selector for cluster +createdClusterName
+      -  **By:** Installing node +h+ on cluster +createdClusterName
+      -  **By:** Restarting +h+ to add it in cluster +createdClusterName
+      -  **By:** Checking +h+ SSH connection
+      -  **By:** Waiting for cluster +createdClusterName+ to be Active
 
 ## `reset_test.go`
 
