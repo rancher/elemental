@@ -182,14 +182,55 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				// Get OSVersion name
 				OSVersion, err := exec.Command(getOSScript, upgradeOSChannel).Output()
 				Expect(err).To(Not(HaveOccurred()))
-				Expect(OSVersion).To(Not(BeEmpty()))
+
+				// In case of sync failure OSVersion can be empty,
+				// so try to force the sync before aborting
+				if string(OSVersion) == "" {
+					const channel = "elemental-channel"
+
+					// Log the workaround, could be useful
+					GinkgoWriter.Printf("!! ManagedOSVersionChannel not synced !! Triggering a re-sync!`\n")
+
+					// Get current syncInterval
+					syncValue, err := kubectl.Run("get", "managedOSVersionChannel",
+						"--namespace", clusterNS, channel,
+						"-o", "jsonpath={.spec.syncInterval}")
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(syncValue).To(Not(BeEmpty()))
+
+					// Reduce syncInterval to force an update
+					_, err = kubectl.Run("patch", "managedOSVersionChannel",
+						"--namespace", clusterNS, channel,
+						"--type", "merge",
+						"--patch", "{\"spec\":{\"syncInterval\":\"1m\"}}")
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Loop until sync is done
+					Eventually(func() string {
+						value, _ := exec.Command(getOSScript, upgradeOSChannel).Output()
+
+						return string(value)
+					}, tools.SetTimeout(1*time.Minute), 15*time.Second).Should(Not(BeEmpty()))
+
+					// We should now have an OS version!
+					OSVersion, err = exec.Command(getOSScript, upgradeOSChannel).Output()
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(OSVersion).To(Not(BeEmpty()))
+
+					// Re-patch syncInterval to the initial value
+					_, err = kubectl.Run("patch", "managedOSVersionChannel",
+						"--namespace", clusterNS, channel,
+						"--type", "merge",
+						"--patch", "{\"spec\":{\"syncInterval\":\""+syncValue+"\"}}")
+					Expect(err).To(Not(HaveOccurred()))
+				}
 
 				// Set OS image to use for upgrade
 				value = string(OSVersion)
 
 				// Extract the value to check after the upgrade
 				out, err := kubectl.Run("get", "ManagedOSVersion",
-					"--namespace", clusterNS, string(OSVersion),
+					"--namespace", clusterNS, value,
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))
 				valueToCheck = tools.TrimStringFromChar(out, ":")
