@@ -298,5 +298,24 @@ var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
 				WaitCluster(clusterNS, createdClusterName)
 			})
 		}
+
+		// Loop on all clusters to check
+		for clusterIndex := 1; clusterIndex <= numberOfClusters; clusterIndex++ {
+			createdClusterName := clusterName + "-" + strconv.Itoa(clusterIndex)
+
+			// Do a final check on all created clusters to validate them
+			// NOTE: do it in parallel to speed-up the checking process
+			wg.Add(1)
+			go func(ns, c string) {
+				defer wg.Done()
+				defer GinkgoRecover()
+				By("Waiting for cluster "+c+" to be Active", func() {
+					WaitCluster(ns, c)
+				})
+			}(clusterNS, createdClusterName)
+
+			// Wait for all parallel jobs
+			wg.Wait()
+		}
 	})
 })
