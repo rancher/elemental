@@ -9,8 +9,8 @@ on:
         default: true
         type: boolean
   schedule:
-    # Every Sunday at 3am
-    - cron: '0 3 * * 0'
+    # Every Sunday at 2am
+    - cron: '0 2 * * 0'
 
 jobs:
   cli:
