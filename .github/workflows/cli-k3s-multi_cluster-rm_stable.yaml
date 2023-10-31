@@ -22,7 +22,7 @@ jobs:
     with:
       test_description: "CI/Manual - CLI - MultiCluster - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
-      cluster_number: 40
+      cluster_number: 20
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       iso_boot: true
       k8s_version_to_provision: v1.26.8+k3s1
