@@ -41,12 +41,18 @@ describe('Upgrade tests', () => {
   });
 
   filterTests(['upgrade'], () => {
+    // Add dev OS Version Channel if stable operator is installed
+    // because we do not update the operator in UI test so far
+    if (utils.isOperatorVersion('registry.suse.com')) {
+      it('Add dev channel for RKE2 upgrade', () => {
+        cy.addOsVersionChannel('dev');
+      })
+    }
+
     qase(33,
       it('Check OS Versions', () => {
         cy.clickNavMenu(["Advanced", "OS Versions"]);
-        if (utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
-          cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
-        }
+        cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
       })
     );
 
