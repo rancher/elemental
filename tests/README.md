@@ -105,6 +105,7 @@
       -  **By:** Restarting +h+ to add it in cluster +createdClusterName
       -  **By:** Checking +h+ SSH connection
       -  **By:** Waiting for cluster +createdClusterName+ to be Active
+      -  **By:** Waiting for cluster +c+ to be Active
 
 ## `reset_test.go`
 
@@ -248,6 +249,7 @@
 ## `upgrade.spec.ts`
 
 - **Describe:** Upgrade tests
+    - **It:** Add dev channel for RKE2 upgrade
     - **It:** Check OS Versions
     - **It:** Upgrade one node different methods if rke2 or k3s
     - **It:** Cannot create two upgrade groups targeting the same cluster
