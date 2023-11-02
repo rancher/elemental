@@ -178,10 +178,9 @@ func WaitCluster(ns, cn string) {
 
 				// Check if rancher-system-agent.service has some issue
 				if s.conditionType == "Provisioned" || s.conditionType == "Ready" || s.conditionStatus == "Updated" {
-					msg, err := kubectl.Run("get", "cluster",
+					msg, _ := kubectl.Run("get", "cluster",
 						"--namespace", ns, cn,
 						"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].message}")
-					Expect(err).To(Not(HaveOccurred()))
 
 					// We can try to restart the rancher-system-agent service on the failing node
 					// because sometimes it can fail just because of a sporadic/timeout issue and a restart can fix it!
@@ -190,23 +189,24 @@ func WaitCluster(ns, cn string) {
 						substr := regexp.MustCompile(`(` + cn + `-.*): error`).FindStringSubmatch(msg)
 						for _, node := range strings.Split(substr[1], ",") {
 							// Get node IP
-							ip, err := elemental.GetExternalMachineIP(ns, node)
-							Expect(err).To(Not(HaveOccurred()))
+							ip, _ := elemental.GetExternalMachineIP(ns, node)
 
-							// Set 'client' to be able to access the node through SSH
-							cl := &tools.Client{
-								Host:     ip + ":22",
-								Username: userName,
-								Password: userPassword,
+							if ip != "" {
+								// Set 'client' to be able to access the node through SSH
+								cl := &tools.Client{
+									Host:     ip + ":22",
+									Username: userName,
+									Password: userPassword,
+								}
+
+								// Log the workaround, could be useful
+								GinkgoWriter.Printf("!! rancher-system-agent issue !! Service has been restarted on %s\n", node)
+
+								// Restart rancher-system-agent service on the node
+								// NOTE: wait a little to be sure that all is restarted before continuing
+								cl.RunSSH("systemctl restart rancher-system-agent.service")
+								time.Sleep(tools.SetTimeout(15 * time.Second))
 							}
-
-							// Log the workaround, could be useful
-							GinkgoWriter.Printf("!! rancher-system-agent issue !! Service has been restarted on %s\n", node)
-
-							// Restart rancher-system-agent service on the node
-							// NOTE: wait a little to be sure that all is restarted before continuing
-							cl.RunSSH("systemctl restart rancher-system-agent.service")
-							time.Sleep(tools.SetTimeout(15 * time.Second))
 						}
 					}
 				}

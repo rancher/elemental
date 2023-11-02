@@ -189,7 +189,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					const channel = "elemental-channel"
 
 					// Log the workaround, could be useful
-					GinkgoWriter.Printf("!! ManagedOSVersionChannel not synced !! Triggering a re-sync!`\n")
+					GinkgoWriter.Printf("!! ManagedOSVersionChannel not synced !! Triggering a re-sync!\n")
 
 					// Get current syncInterval
 					syncValue, err := kubectl.Run("get", "managedOSVersionChannel",
