@@ -14,7 +14,7 @@ limitations under the License.
 
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
-import { isUIVersion, isRancherManagerVersion } from '../../support/utils';
+import { isUIVersion } from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
@@ -36,7 +36,7 @@ filterTests(['main', 'upgrade'], () => {
     
     qase(12,
       it('Enable extension support', () => {
-        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion("head"));
+        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
       })
     );
   
