@@ -45,7 +45,6 @@ stages:
           /var/lib/rancher
           /var/lib/kubelet
           /var/lib/NetworkManager
-          /var/lib/longhorn
           /var/lib/cni
           /var/lib/calico
         PERSISTENT_STATE_BIND: "true"
