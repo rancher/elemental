@@ -30,6 +30,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
 
   config.baseUrl                  = url.replace(/\/$/, );
   config.env.cache_session        = process.env.CACHE_SESSION || false;
+  config.env.chartmuseum_repo     = process.env.CHARTMUSEUM_REPO;
   config.env.cluster              = process.env.CLUSTER_NAME;
   config.env.cypress_tags         = process.env.CYPRESS_TAGS;
   config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
