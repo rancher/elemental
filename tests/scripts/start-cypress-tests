@@ -19,6 +19,7 @@ npm install
 docker run -v $PWD:/workdir -w /workdir                     \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
+    -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO                   \
     -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION           \
     -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
     -e OPERATOR_REPO=$OPERATOR_REPO                         \

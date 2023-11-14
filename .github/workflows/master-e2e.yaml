@@ -284,11 +284,15 @@ jobs:
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
+      - name: Install Chartmuseum
+        if: ${{ inputs.test_type == 'ui' }}
+        run: cd tests && make e2e-install-chartmuseum
       - name: Cypress tests - Basics
         # Basics means tests without an extra elemental node needed
         if: ${{ inputs.test_type == 'ui' }}
         env:
           BROWSER: chrome
+          CHARTMUSEUM_REPO: http://${{ needs.create-runner.outputs.public_dns }}
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
@@ -301,6 +305,7 @@ jobs:
           RANCHER_USER: admin
           SPEC: |
             /workdir/e2e/unit_tests/first_connection.spec.ts
+            /workdir/e2e/unit_tests/elemental_operator.spec.ts
             /workdir/e2e/unit_tests/elemental_plugin.spec.ts
             /workdir/e2e/unit_tests/user.spec.ts
             /workdir/e2e/unit_tests/menu.spec.ts

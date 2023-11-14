@@ -57,14 +57,8 @@ e2e-check-app: deps
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
 
-e2e-reset: deps
-	ginkgo --label-filter reset -r -v ./e2e
-
 e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
-
-e2e-install-rancher: deps
-	ginkgo --label-filter install -r -v ./e2e
 
 e2e-install-app: deps
 	ginkgo --label-filter install-app -r -v ./e2e
@@ -72,11 +66,20 @@ e2e-install-app: deps
 e2e-install-backup-restore: deps
 	ginkgo --label-filter install-backup-restore -r -v ./e2e
 
+e2e-install-chartmuseum:
+	sudo ./scripts/deploy-chartmuseum
+
+e2e-install-rancher: deps
+	ginkgo --label-filter install -r -v ./e2e
+
 e2e-iso-image: deps
 	ginkgo --label-filter iso-image -r -v ./e2e
 
 e2e-multi-cluster: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter multi-cluster -r -v ./e2e
+
+e2e-reset: deps
+	ginkgo --label-filter reset -r -v ./e2e
 
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e

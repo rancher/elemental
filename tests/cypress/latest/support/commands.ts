@@ -105,7 +105,7 @@ Cypress.Commands.add('createMachReg', (
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
     cy.getBySel('select-os-version-build-iso')
-    .click();
+      .click();
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
