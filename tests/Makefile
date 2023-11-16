@@ -5,7 +5,7 @@ ISO:=$(shell file -Ls $(ROOT_DIR)/*.iso 2>/dev/null | awk -F':' '/boot sector/ {
 # Define Ginkgo timeout for the tests
 GINKGO_TIMEOUT?=3600
 ifdef VM_NUMBERS
-	ifeq ($(shell expr $(VM_NUMBERS) \> 80), 1)
+	ifeq ($(shell expr $(VM_NUMBERS) \> 50), 1)
 		GINKGO_TIMEOUT=7200
 	endif
 endif
