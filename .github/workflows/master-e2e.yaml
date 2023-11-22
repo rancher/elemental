@@ -68,9 +68,6 @@ on:
         description: Choose booting from ISO
         default: false
         type: boolean
-      k3s_flags:
-        description: Argument to configure INSTALL_K3S_EXEC env variable 
-        type: string
       k8s_version_to_provision:
         description: Name and version of installed K8s distribution
         required: true

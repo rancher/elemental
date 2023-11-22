@@ -83,14 +83,19 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			}
 
 			By("Starting RKE2", func() {
-				err := exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
+				// Copy config file, this allows custom configuration for RKE2 installation
+				// NOTE: CopyFile cannot be used, as we need root permissions for this file
+				err := exec.Command("sudo", "mkdir", "-p", "/etc/rancher/rke2").Run()
+				Expect(err).To(Not(HaveOccurred()))
+				err = exec.Command("sudo", "cp", configRKE2Yaml, "/etc/rancher/rke2/config.yaml").Run()
+				Expect(err).To(Not(HaveOccurred()))
+
+				// Activate and start RKE2
+				err = exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delay few seconds before checking
 				time.Sleep(tools.SetTimeout(20 * time.Second))
-
-				err = exec.Command("sudo", "chown", "gh-runner", "/etc/rancher/rke2/rke2.yaml").Run()
-				Expect(err).To(Not(HaveOccurred()))
 
 				err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
 				Expect(err).To(Not(HaveOccurred()))
@@ -103,7 +108,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 				checkList := [][]string{
 					{"kube-system", "k8s-app=kube-dns"},
-					{"kube-system", "app=rke2-metrics-server"},
 					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
 				}
 				Eventually(func() error {
@@ -120,11 +124,15 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
 				Expect(err).To(Not(HaveOccurred()))
 
+				// Set command and arguments
+				installCmd := exec.Command("sh", fileName)
+				installCmd.Env = append(os.Environ(), "INSTALL_K3S_EXEC=--disable metrics-server")
+
 				// Retry in case of (sporadic) failure...
 				count := 1
 				Eventually(func() error {
 					// Execute K3s installation
-					out, err := exec.Command("sh", fileName).CombinedOutput()
+					out, err := installCmd.CombinedOutput()
 					GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
 					count++
 					return err
@@ -151,7 +159,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				checkList := [][]string{
 					{"kube-system", "app=local-path-provisioner"},
 					{"kube-system", "k8s-app=kube-dns"},
-					{"kube-system", "k8s-app=metrics-server"},
 					{"kube-system", "app.kubernetes.io/name=traefik"},
 					{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
 				}
