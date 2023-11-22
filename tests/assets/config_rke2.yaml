@@ -1,0 +1,3 @@
+write-kubeconfig-mode: "0644"
+disable:
+  - rke2-metrics-server

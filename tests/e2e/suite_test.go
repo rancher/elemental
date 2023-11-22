@@ -35,6 +35,7 @@ const (
 	backupYaml            = "../assets/backup.yaml"
 	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
 	configPrivateCAScript = "../scripts/config-private-ca"
+	configRKE2Yaml        = "../assets/config_rke2.yaml"
 	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
 	emulateTPMYaml        = "../assets/emulateTPM.yaml"
 	getOSScript           = "../scripts/get-name-from-managedosversion"
