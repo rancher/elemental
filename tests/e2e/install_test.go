@@ -106,8 +106,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"kube-system", "app=rke2-metrics-server"},
 					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
 				}
-				err = rancher.CheckPod(k, checkList)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 
 				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
@@ -154,8 +155,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"kube-system", "app.kubernetes.io/name=traefik"},
 					{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
 				}
-				err := rancher.CheckPod(k, checkList)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 			})
 		}
 
@@ -202,8 +204,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					{"cert-manager", "app.kubernetes.io/component=webhook"},
 					{"cert-manager", "app.kubernetes.io/component=cainjector"},
 				}
-				err := rancher.CheckPod(k, checkList)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 			})
 		}
 
@@ -235,8 +238,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				{"cattle-fleet-local-system", "app=fleet-agent"},
 				{"cattle-system", "app=rancher-webhook"},
 			}
-			err = rancher.CheckPod(k, checkList)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return rancher.CheckPod(k, checkList)
+			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 
 			// We have to restart Rancher Manager to be sure that Private CA is used
 			if caType == "private" {
@@ -332,8 +336,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}
 
 				// Wait for pod to be started
-				err := rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 			})
 		}
 	})

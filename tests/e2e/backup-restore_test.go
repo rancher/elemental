@@ -82,8 +82,9 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 
 		By("Waiting for rancher-backup-operator pod", func() {
 			// Wait for pod to be started
-			err := rancher.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return rancher.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
+			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 		})
 	})
 })
