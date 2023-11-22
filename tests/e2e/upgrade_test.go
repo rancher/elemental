@@ -67,8 +67,9 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		}
 
 		// Wait for all pods to be started
-		err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-		Expect(err).To(Not(HaveOccurred()))
+		Eventually(func() error {
+			return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 	})
 })
 
