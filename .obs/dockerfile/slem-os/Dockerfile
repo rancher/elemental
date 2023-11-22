@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: suse/sle-micro-rancher/%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro-rancher/%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro-rancher/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
@@ -51,7 +51,7 @@ COPY --from=host /osimage /
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-rancher/$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -61,18 +61,18 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
-    echo GRUB_ENTRY_NAME=\"SLE Micro for Rancher\" >> /etc/os-release
+    echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.suse.sle.micro.rancher
-LABEL org.opencontainers.image.title="SLE Micro for Rancher"
-LABEL org.opencontainers.image.description="Image containing SLE Micro for Rancher - a containerized OS layer for Kubernetes."
+# labelprefix=com.suse.sle.micro
+LABEL org.opencontainers.image.title="SLE Micro"
+LABEL org.opencontainers.image.description="Image containing SLE Micro - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="%%SLEMICRO_VERSION%%.%RELEASE%"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
-LABEL org.opensuse.reference="registry.suse.com/suse/sle-micro-rancher/%%SLEMICRO_VERSION%%:%RELEASE%"
+LABEL org.opensuse.reference="registry.suse.com/suse/sle-micro/%%SLEMICRO_VERSION%%:%RELEASE%"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 LABEL com.suse.supportlevel="alpha"
 LABEL com.suse.eula="sle-eula"

@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLEMICRO_VERSION
 
-FROM suse/sle-micro-rancher/base-${SLEMICRO_VERSION}:latest
+FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.suse.sle.micro.rancher
+# labelprefix=com.suse.sle.micro
 LABEL org.opencontainers.image.version="%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%.%VERSION%.%RELEASE%"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
@@ -31,7 +31,7 @@ fi
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-rancher/$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -43,7 +43,7 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
-    echo GRUB_ENTRY_NAME=\"SLE Micro for Rancher\" >> /etc/os-release
+    echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
 
 # Ensure /tmp is mounted as tmpfs by default
 RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
