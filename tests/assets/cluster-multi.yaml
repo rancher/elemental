@@ -9,6 +9,9 @@ spec:
       disableSnapshots: true
     machineGlobalConfig:
       cni: canal
+      disable:
+        - rke2-metrics-server
+        - metrics-server
       etcd-expose-metrics: false
       profile: null
     machinePools:
