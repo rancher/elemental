@@ -1,21 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro-rancher/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLEMICRO_VERSION
 
-FROM suse/sle-micro-rancher/base-${SLEMICRO_VERSION}:latest
+FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro.rancher
-LABEL org.opencontainers.image.version="%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%.%VERSION%.%RELEASE%"
+LABEL org.opencontainers.image.version="%VERSION%-%RELEASE%"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
 # endlabelprefix

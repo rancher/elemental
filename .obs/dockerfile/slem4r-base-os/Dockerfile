@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: suse/sle-micro-rancher/base-%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro-rancher/base-%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro-rancher/base-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/base-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/base-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/base-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
@@ -53,7 +53,7 @@ COPY --from=host /osimage /
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-rancher/base-$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/base-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -69,18 +69,18 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 # labelprefix=com.suse.sle.micro.rancher
 LABEL org.opencontainers.image.title="SLE Micro for Rancher"
 LABEL org.opencontainers.image.description="Image containing SLE Micro for Rancher - a containerized OS layer for Kubernetes."
-LABEL org.opencontainers.image.version="base-%%SLEMICRO_VERSION%%.%RELEASE%"
+LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
-LABEL org.opensuse.reference="registry.suse.com/suse/sle-micro-rancher/%%SLEMICRO_VERSION%%:%RELEASE%"
+LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
-LABEL com.suse.supportlevel="alpha"
+LABEL com.suse.supportlevel="l3"
 LABEL com.suse.eula="sle-eula"
 LABEL com.suse.lifecycle-url="https://www.suse.com/lifecycle#suse-linux-enterprise-micro"
 LABEL com.suse.image-type="sle-micro"
-LABEL com.suse.release-stage="unreleased"
+LABEL com.suse.release-stage="released"
 # endlabelprefix
 
 # Make sure trusted certificates are properly generated
