@@ -24,8 +24,8 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_version_to_provision: v1.26.8+rke2r1
+      k8s_version_to_provision: v1.26.10+rke2r2
       node_number: 60
       rancher_version: stable/latest/none
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
-      upstream_cluster_version: v1.26.8+rke2r1
+      upstream_cluster_version: v1.26.10+rke2r2

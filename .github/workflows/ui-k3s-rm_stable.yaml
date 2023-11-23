@@ -33,7 +33,7 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
-      k8s_version_to_provision: v1.26.8+k3s1
+      k8s_version_to_provision: v1.26.10+k3s2
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
