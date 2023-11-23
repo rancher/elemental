@@ -38,7 +38,7 @@ jobs:
       cluster_name: cluster-k3s
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
-      k8s_version_to_provision: v1.26.8+k3s1
+      k8s_version_to_provision: v1.26.10+k3s2
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
       rancher_version: ${{ inputs.rancher_version }}

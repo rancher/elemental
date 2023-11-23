@@ -25,7 +25,7 @@ jobs:
       cluster_number: 20
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       iso_boot: true
-      k8s_version_to_provision: v1.26.8+k3s1
+      k8s_version_to_provision: v1.26.10+k3s2
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
       test_type: multi_cli
       zone: us-central1-b

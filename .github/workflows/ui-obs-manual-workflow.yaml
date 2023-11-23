@@ -17,7 +17,7 @@ on:
         type: string
       k8s_version_to_provision:
         description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
-        default: v1.26.8+k3s1
+        default: v1.26.10+k3s2
         type: string
       operator_repo:
         description: Elemental operator repository to use

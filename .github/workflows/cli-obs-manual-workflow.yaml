@@ -17,7 +17,7 @@ on:
         type: boolean
       k8s_version:
         description: Version of K3s/RKE2 to use (for both upstream and downstream clusters)
-        default: v1.26.8+k3s1
+        default: v1.26.10+k3s2
         type: string
       node_number:
         description: Number of nodes (>3) to deploy on the provisioned cluster
