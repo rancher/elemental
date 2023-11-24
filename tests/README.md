@@ -191,6 +191,12 @@
     - **It:** Deploy Alerting Drivers application
     - **It:** Remove Alerting Drivers application
 
+## `elemental_operator.spec.ts`
+
+- **Describe:** Install Elemental Operator
+    - **It:** Add local chartmuseum repo
+    - **It:** Install Elemental operator
+
 ## `elemental_plugin.spec.ts`
 
 - **Describe:** Install Elemental plugin
