@@ -17,7 +17,8 @@ RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher 
 RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   # replace default kernel with smaller one, sufficient to run kvm guests \
   zypper in --no-recommends -y kernel-default-base -kernel-default; \
-elif [[ "%%BUILD_FLAVOR%%" == "rt-" ]]; then \
+elif [[ "%%BUILD_FLAVOR%%" == "rt-" ]] && [ $(uname -m) = "x86_64" ]; then \
+  #!ArchExclusiveLine x86_64
   zypper in --no-recommends -y kernel-rt -kernel-default; \ 
 else \
   # extend -base with baremetal and usability packages \
