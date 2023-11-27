@@ -17,6 +17,8 @@ RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher 
 RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   # replace default kernel with smaller one, sufficient to run kvm guests \
   zypper in --no-recommends -y kernel-default-base -kernel-default; \
+elif [[ "%%BUILD_FLAVOR%%" == "rt-" ]]; then \
+  zypper in --no-recommends -y kernel-rt -kernel-default; \ 
 else \
   # extend -base with baremetal and usability packages \
   zypper in --no-recommends -y procps openssl openssh vim-small less iputils kernel-firmware-all NetworkManager-wwan cryptsetup; \
