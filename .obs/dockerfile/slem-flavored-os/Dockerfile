@@ -13,13 +13,6 @@ FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
-# Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.suse.sle.micro
-LABEL org.opencontainers.image.version="%%BUILD_FLAVOR%%%%SLEMICRO_VERSION%%.%VERSION%.%RELEASE%"
-LABEL org.opencontainers.image.created="%BUILDTIME%"
-LABEL org.opencontainers.image.source="%SOURCEURL%"
-# endlabelprefix
-
 
 RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   # replace default kernel with smaller one, sufficient to run kvm guests \
@@ -44,6 +37,15 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
+
+# Define labels according to https://en.opensuse.org/Building_derived_containers
+# labelprefix=com.suse.sle.micro
+LABEL org.opencontainers.image.version="${IMAGE_TAG}"
+LABEL org.opencontainers.image.created="%BUILDTIME%"
+LABEL org.opencontainers.image.source="%SOURCEURL%"
+LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
+LABEL org.openbuildservice.disturl="%DISTURL%"
+# endlabelprefix
 
 # Ensure /tmp is mounted as tmpfs by default
 RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
