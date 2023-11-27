@@ -69,18 +69,18 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 # labelprefix=com.suse.sle.micro
 LABEL org.opencontainers.image.title="SLE Micro"
 LABEL org.opencontainers.image.description="Image containing SLE Micro - a containerized OS layer for Kubernetes."
-LABEL org.opencontainers.image.version="base-%%SLEMICRO_VERSION%%.%RELEASE%"
+LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
-LABEL org.opensuse.reference="registry.suse.com/suse/sle-micro/%%SLEMICRO_VERSION%%:%RELEASE%"
+LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
-LABEL com.suse.supportlevel="alpha"
+LABEL com.suse.supportlevel="l3"
 LABEL com.suse.eula="sle-eula"
 LABEL com.suse.lifecycle-url="https://www.suse.com/lifecycle#suse-linux-enterprise-micro"
 LABEL com.suse.image-type="sle-micro"
-LABEL com.suse.release-stage="unreleased"
+LABEL com.suse.release-stage="released"
 # endlabelprefix
 
 # Make sure trusted certificates are properly generated

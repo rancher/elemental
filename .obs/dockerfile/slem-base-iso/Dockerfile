@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #!BuildTag: suse/sle-micro-iso/base-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro-iso/base-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro-iso/base-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 10
 #!BuildConstraint: hardware:memory:size unit=G 16
 
@@ -25,16 +27,18 @@ COPY --from=builder /output /elemental-iso
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro-iso/base-$SLEMICRO_VERSION
+ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.rancher.slem
 LABEL org.opencontainers.image.title="SLE Micro base-ISO"
-LABEL org.opencontainers.image.description="Includes the SLE Micro ISO"
-LABEL org.opencontainers.image.version="%VERSION%"
+LABEL org.opencontainers.image.description="Includes the SLE Micro base-ISO"
+LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://github.com/rancher/elemental"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
-LABEL org.opensuse.reference=$IMAGE_REPO
+LABEL org.opencontainers.image.source="%SOURCEURL%"
+LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 LABEL com.suse.supportlevel="l3"
 # endlabelprefix
