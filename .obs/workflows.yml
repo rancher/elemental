@@ -5,7 +5,7 @@ push_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso-next
+        package: build-iso
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: build-iso-base
@@ -28,7 +28,7 @@ tag_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso-next
+        package: build-iso
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: build-iso-base
@@ -53,7 +53,7 @@ pr_workflow:
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: build-iso-next
+        source_package: build-iso
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
