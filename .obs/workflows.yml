@@ -11,10 +11,10 @@ push_workflow:
         package: build-iso-base
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-Rancher
+        package: SLE-Micro
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-Rancher-base
+        package: SLE-Micro-base
   filters:
     branches:
       only:
@@ -34,10 +34,10 @@ tag_workflow:
         package: build-iso-base
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-Rancher
+        package: SLE-Micro
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-Rancher-base
+        package: SLE-Micro-base
   filters:
     event: tag_push
 
@@ -57,11 +57,11 @@ pr_workflow:
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro-Rancher
+        source_package: SLE-Micro
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro-Rancher-base
+        source_package: SLE-Micro-base
         target_project: isv:Rancher:Elemental:PR
   filters:
     event: pull_request
