@@ -12,10 +12,6 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
-      operator_repo:
-        description: Elemental operator repository to use
-        default: oci://registry.suse.com/rancher
-        type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
@@ -27,7 +23,7 @@ on:
       # Test OS upgrade with OS image in this test ("Use image from registry")
       upgrade_image:
         description: Upgrade image to use
-        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro-rancher/5.5:latest
+        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest
         type: string
 
 jobs:
@@ -46,7 +42,6 @@ jobs:
       elemental_ui_version: dev
       iso_boot: true
       k8s_version_to_provision: v1.26.10+k3s2
-      operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
