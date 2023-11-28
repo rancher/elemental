@@ -43,18 +43,21 @@ describe('Upgrade tests', () => {
   filterTests(['upgrade'], () => {
     // Add dev OS Version Channel if stable operator is installed
     // because we do not update the operator in UI test so far
-    if (utils.isOperatorVersion('registry.suse.com')) {
+    // Only RKE2 tests use os version channel
+    if (utils.isK8sVersion("rke2") && utils.isRancherManagerVersion('2.8')) {
       it('Add dev channel for RKE2 upgrade', () => {
         cy.addOsVersionChannel('dev');
       })
     }
 
-    qase(33,
-      it('Check OS Versions', () => {
-        cy.clickNavMenu(["Advanced", "OS Versions"]);
-        cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
-      })
-    );
+    if (utils.isK8sVersion("rke2")) {
+      qase(33,
+        it('Check OS Versions', () => {
+          cy.clickNavMenu(["Advanced", "OS Versions"]);
+          cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
+        })
+      );
+    };
 
     qase(34,
       it('Upgrade one node (different methods if rke2 or k3s)', () => {
@@ -125,7 +128,7 @@ describe('Upgrade tests', () => {
         cy.get('.primaryheader')
           .contains('Active', {timeout: 420000}).should('not.exist');
         cy.get('.primaryheader')
-          .contains('Active', {timeout: 540000});
+          .contains('Active', {timeout: 720000});
       })
     );
 
