@@ -26,10 +26,10 @@ if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
     && sudo bash -c "echo ${VALUE} > /proc/sys/vm/nr_hugepages"
 
   # Set memory config on command line
-  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM:-2048},hugepages=yes"
+  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM:-4096},hugepages=yes"
 else
   # Set memory config on command line
-  INSTALL_FLAG+=" --memory ${VM_MEM:-2048}"
+  INSTALL_FLAG+=" --memory ${VM_MEM:-4096}"
 fi
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
@@ -87,7 +87,7 @@ CMD="sudo virt-install \
        --machine q35 \
        --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
        --features smm.state=yes \
-       --vcpus ${VM_CPU:-2} \
+       --vcpus ${VM_CPU:-4} \
        --cpu host \
        --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
        --check disk_size=off \

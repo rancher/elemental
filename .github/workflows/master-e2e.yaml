@@ -410,11 +410,11 @@ jobs:
         run: |
           # Only use ISO boot if the upstream cluster is RKE2
           # due to issue with pxe, dhcp traffic
-          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
+          # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
           if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
             export ISO_BOOT=true
-            export VM_MEM=8192
-            export VM_CPU=4
+            export VM_MEM=10240
+            export VM_CPU=6
           fi
           # Execute bootstrapping test
           if ${{ inputs.sequential == true }}; then
@@ -431,7 +431,13 @@ jobs:
         env:
           CLUSTER_NUMBER: ${{ inputs.cluster_number }}
           ISO_BOOT: ${{ inputs.iso_boot }}
-        run: cd tests && make e2e-multi-cluster
+        run: |
+          # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export VM_MEM=10240
+            export VM_CPU=6
+          fi
+          cd tests && make e2e-multi-cluster
       - name: Install a simple application
         if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
@@ -546,10 +552,10 @@ jobs:
           VM_START: 4
           VM_END: ${{ inputs.node_number }}
         run: |
-          # Set RAM to 8GB for RKE2 and vCPU to 4, it's the recommended values
+          # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
           if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
-            export VM_MEM=8192
-            export VM_CPU=4
+            export VM_MEM=10240
+            export VM_CPU=6
           fi
           if ${{ inputs.sequential == true }}; then
             # Force node bootstrapping in sequential instead of parallel
