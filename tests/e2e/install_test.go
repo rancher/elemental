@@ -61,8 +61,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			By("Installing RKE2", func() {
 				// Get RKE2 installation script
 				fileName := "rke2-install.sh"
-				err := tools.GetFileFromURL("https://get.rke2.io", fileName, true)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return tools.GetFileFromURL("https://get.rke2.io", fileName, true)
+				}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 
 				// Retry in case of (sporadic) failure...
 				count := 1
@@ -121,8 +122,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			By("Installing K3s", func() {
 				// Get K3s installation script
 				fileName := "k3s-install.sh"
-				err := tools.GetFileFromURL("https://get.k3s.io", fileName, true)
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					return tools.GetFileFromURL("https://get.k3s.io", fileName, true)
+				}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 
 				// Set command and arguments
 				installCmd := exec.Command("sh", fileName)

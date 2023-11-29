@@ -109,8 +109,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
 				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
 
-			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return tools.GetFileFromURL(tokenURL, installConfigYaml, false)
+			}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 		})
 
 		By("Creating ISO from SeedImage", func() {
