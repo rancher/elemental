@@ -42,8 +42,9 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Get the YAML config file
-			err = tools.GetFileFromURL(tokenURL, installConfigYaml, false)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return tools.GetFileFromURL(tokenURL, installConfigYaml, false)
+			}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 		})
 
 		By("Starting default network", func() {
