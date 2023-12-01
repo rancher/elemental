@@ -156,9 +156,12 @@ jobs:
       - name: Generate UUID and Runner hostname
         id: generator
         run: |
+          # NOTE: keep the runner name to less than 63 characters!
           UUID=$(uuidgen)
-          echo "uuid=${UUID}" >> ${GITHUB_OUTPUT}
-          echo "runner=elemental-ci-${UUID}" >> ${GITHUB_OUTPUT}
+          GH_REPO_FULL=${{ github.repository }}
+          GH_REPO=${GH_REPO_FULL#*/}
+          echo "uuid=${UUID//-}" >> ${GITHUB_OUTPUT}
+          echo "runner=${GH_REPO//\//-}-ci-${UUID//-}" >> ${GITHUB_OUTPUT}
       - name: Authenticate to GCP
         uses: google-github-actions/auth@v1
         with:
