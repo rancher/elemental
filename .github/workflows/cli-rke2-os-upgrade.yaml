@@ -57,5 +57,5 @@ jobs:
       os_to_test: stable
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sle-micro-rancher/${{ inputs.slem_version }}:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sle-micro/${{ inputs.slem_version }}:latest
       upstream_cluster_version: v1.26.10+rke2r2
