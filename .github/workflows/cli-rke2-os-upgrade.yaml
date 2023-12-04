@@ -18,6 +18,7 @@ on:
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
+        default: latest/devel/2.8
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
