@@ -29,7 +29,7 @@ jobs:
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
-      rancher_upgrade: latest/devel
+      rancher_upgrade: latest/devel/2.8
       rancher_version: stable/latest/none
       reset: true
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest

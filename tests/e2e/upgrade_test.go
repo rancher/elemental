@@ -94,7 +94,13 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Upgrade Rancher Manager
-		err = rancher.DeployRancherManager(rancherHostname, rancherUpgradeChannel, rancherUpgradeVersion, rancherHeadVersion, caType, proxy)
+		err = rancher.DeployRancherManager(
+			rancherHostname,
+			rancherUpgradeChannel,
+			rancherUpgradeVersion,
+			rancherUpgradeHeadVersion,
+			caType, proxy,
+		)
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Wait for Rancher Manager to be restarted

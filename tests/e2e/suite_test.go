@@ -55,45 +55,46 @@ const (
 )
 
 var (
-	arch                  string
-	backupRestoreVersion  string
-	caType                string
-	CertManagerVersion    string
-	clusterName           string
-	clusterNS             string
-	clusterType           string
-	clusterYaml           string
-	elementalSupport      string
-	emulateTPM            bool
-	rancherHostname       string
-	isoBoot               bool
-	k8sUpstreamVersion    string
-	k8sVersion            string
-	numberOfClusters      int
-	numberOfVMs           int
-	operatorUpgrade       string
-	operatorRepo          string
-	os2Test               string
-	poolType              string
-	proxy                 string
-	rancherChannel        string
-	rancherHeadVersion    string
-	rancherLogCollector   string
-	rancherVersion        string
-	rancherUpgrade        string
-	rancherUpgradeChannel string
-	rancherUpgradeVersion string
-	registrationYaml      string
-	seedImageYaml         string
-	selectorYaml          string
-	sequential            bool
-	testType              string
-	upgradeImage          string
-	upgradeOSChannel      string
-	upgradeType           string
-	usedNodes             int
-	vmIndex               int
-	vmName                string
+	arch                      string
+	backupRestoreVersion      string
+	caType                    string
+	CertManagerVersion        string
+	clusterName               string
+	clusterNS                 string
+	clusterType               string
+	clusterYaml               string
+	elementalSupport          string
+	emulateTPM                bool
+	rancherHostname           string
+	isoBoot                   bool
+	k8sUpstreamVersion        string
+	k8sVersion                string
+	numberOfClusters          int
+	numberOfVMs               int
+	operatorUpgrade           string
+	operatorRepo              string
+	os2Test                   string
+	poolType                  string
+	proxy                     string
+	rancherChannel            string
+	rancherHeadVersion        string
+	rancherLogCollector       string
+	rancherVersion            string
+	rancherUpgrade            string
+	rancherUpgradeChannel     string
+	rancherUpgradeHeadVersion string
+	rancherUpgradeVersion     string
+	registrationYaml          string
+	seedImageYaml             string
+	selectorYaml              string
+	sequential                bool
+	testType                  string
+	upgradeImage              string
+	upgradeOSChannel          string
+	upgradeType               string
+	usedNodes                 int
+	vmIndex                   int
+	vmName                    string
 )
 
 /**
@@ -475,6 +476,7 @@ var _ = BeforeSuite(func() {
 		s := strings.Split(rancherUpgrade, "/")
 		rancherUpgradeChannel = s[0]
 		rancherUpgradeVersion = s[1]
+		rancherUpgradeHeadVersion = s[2]
 	}
 
 	// Enable multi-cluster support if needed
