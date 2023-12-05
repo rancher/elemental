@@ -125,8 +125,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						CheckSSH(cl)
 
 						// Check that the cloud-config is correctly applied by checking the presence of a file
-						_, err := cl.RunSSH("ls /etc/elemental-test")
-						Expect(err).To(Not(HaveOccurred()))
+						_ = RunSSHWithRetry(cl, "ls /etc/elemental-test")
 
 						// Check that the installation is completed before halting the VM
 						Eventually(func() error {
@@ -136,8 +135,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						}, tools.SetTimeout(8*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
 						// Halt the VM
-						_, err = cl.RunSSH("setsid -f init 0")
-						Expect(err).To(Not(HaveOccurred()))
+						_ = RunSSHWithRetry(cl, "setsid -f init 0")
 					})
 				}(hostName, client)
 			}
@@ -244,15 +242,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					if t == true {
 						testValue = "! -e"
 					}
-					Eventually(func() error {
-						_, err := cl.RunSSH("[[ " + testValue + " /dev/tpm0 ]]")
-						return err
-					}, tools.SetTimeout(1*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+					_ = RunSSHWithRetry(cl, "[[ "+testValue+" /dev/tpm0 ]]")
 				})
 
 				By("Checking OS version on "+h, func() {
-					out, err := cl.RunSSH("cat /etc/os-release")
-					Expect(err).To(Not(HaveOccurred()))
+					out := RunSSHWithRetry(cl, "cat /etc/os-release")
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
 			}(clusterNS, hostName, index, emulateTPM, client)
@@ -287,14 +281,10 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 							// Wait a little to be sure that RKE2 installation has started
 							// Otherwise the directory is not available!
-							Eventually(func() error {
-								_, err := cl.RunSSH("[[ -d " + dir + " ]]")
-								return err
-							}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+							_ = RunSSHWithRetry(cl, "[[ -d "+dir+" ]]")
 
 							// Configure kubectl
-							_, err := cl.RunSSH("I=" + dir + "/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo " + kubeCfg + " >> .bashrc; fi")
-							Expect(err).To(Not(HaveOccurred()))
+							_ = RunSSHWithRetry(cl, "I="+dir+"/kubectl; if [[ -x ${I} ]]; then ln -s ${I} bin/; echo "+kubeCfg+" >> .bashrc; fi")
 						})
 					}
 
