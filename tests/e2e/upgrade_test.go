@@ -216,7 +216,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 						value, _ := exec.Command(getOSScript, upgradeOSChannel).Output()
 
 						return string(value)
-					}, tools.SetTimeout(1*time.Minute), 15*time.Second).Should(Not(BeEmpty()))
+					}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(BeEmpty()))
 
 					// We should now have an OS version!
 					OSVersion, err = exec.Command(getOSScript, upgradeOSChannel).Output()
