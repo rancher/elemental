@@ -206,7 +206,7 @@ func WaitCluster(ns, cn string) {
 
 								// Restart rancher-system-agent service on the node
 								// NOTE: wait a little to be sure that all is restarted before continuing
-								cl.RunSSH("systemctl restart rancher-system-agent.service")
+								RunSSHWithRetry(cl, "systemctl restart rancher-system-agent.service")
 								time.Sleep(tools.SetTimeout(15 * time.Second))
 							}
 						}
@@ -369,6 +369,24 @@ func RunHelmCmdWithRetry(s ...string) {
 	Eventually(func() error {
 		return kubectl.RunHelmBinaryWithCustomErr(s...)
 	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
+}
+
+/**
+ * Execute SSH command with retry
+ * @param cl Client (node) informations
+ * @param cmd Command to execute
+ * @returns result of the executed command
+ */
+func RunSSHWithRetry(cl *tools.Client, cmd string) string {
+	var err error
+	var out string
+
+	Eventually(func() error {
+		out, err = cl.RunSSH(cmd)
+		return err
+	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
+
+	return out
 }
 
 func FailWithReport(message string, callerSkip ...int) {

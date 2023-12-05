@@ -169,8 +169,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				defer GinkgoRecover()
 
 				By("Checking OS version on "+h+" before upgrade", func() {
-					out, err := client.RunSSH("cat /etc/os-release")
-					Expect(err).To(Not(HaveOccurred()))
+					out := RunSSHWithRetry(cl, "cat /etc/os-release")
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
 			}(hostName, client)
@@ -260,8 +259,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				Expect(client).To(Not(BeNil()))
 
 				// Get *REAL* hostname
-				hostname, err := client.RunSSH("hostname")
-				Expect(err).To(Not(HaveOccurred()))
+				hostname := RunSSHWithRetry(client, "hostname")
 				hostname = strings.Trim(hostname, "\n")
 
 				label := "kubernetes.io/hostname"
@@ -308,7 +306,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				By("Checking VM upgrade on "+h, func() {
 					Eventually(func() string {
 						// Use grep here in case of comment in the file!
-						out, _ := client.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
+						out, _ := cl.RunSSH("eval $(grep -v ^# /etc/os-release) && echo ${IMAGE}")
 
 						// This remove the version and keep only the repo, as in the file
 						// we have the exact version and we don't know it before the upgrade
@@ -317,8 +315,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				})
 
 				By("Checking OS version on "+h+" after upgrade", func() {
-					out, err := client.RunSSH("cat /etc/os-release")
-					Expect(err).To(Not(HaveOccurred()))
+					out := RunSSHWithRetry(cl, "cat /etc/os-release")
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
 			}(hostName, client)
