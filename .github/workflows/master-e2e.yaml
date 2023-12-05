@@ -690,9 +690,9 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-  delete-runner:
-    if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
-    needs: [create-runner, e2e]
+  clean-runner:
+    if: ${{ always() }}
+    needs: e2e
     runs-on: ubuntu-latest
     steps:
       # actions/checkout MUST come before auth
@@ -704,9 +704,24 @@ jobs:
           credentials_json: ${{ secrets.credentials }}
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v1
-      - name: Delete PAT token secret
+      - name: Delete GCP secrets
         run: |
-          gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }}
+          gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }} || true
+          gcloud --quiet secrets delete GH_REPO_${{ needs.create-runner.outputs.uuid }} || true
+  delete-runner:
+    if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
+    needs: [create-runner, clean-runner]
+    runs-on: ubuntu-latest
+    steps:
+      # actions/checkout MUST come before auth
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.credentials }}
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v1
       - name: Delete runner
         run: |
           gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
