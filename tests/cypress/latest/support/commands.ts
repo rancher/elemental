@@ -104,7 +104,11 @@ Cypress.Commands.add('createMachReg', (
     // Build the ISO according to the elemental operator version
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
-    cy.getBySel('select-os-version-build-iso')
+    cy.getBySel('select-media-type-build-media')
+      .click();
+    cy.contains('Iso')
+      .click();
+    cy.getBySel('select-os-version-build-media')
       .click();
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
@@ -124,19 +128,19 @@ Cypress.Commands.add('createMachReg', (
       cy.contains('ISO x86_64 (unstable)')
         .click();
     }
-    cy.getBySel('build-iso-btn')
+    cy.getBySel('build-media-btn')
       .click();
-    cy.getBySel('build-iso-btn')
+    cy.getBySel('build-media-btn')
       .get('.icon-spin');
     // Download button is disabled while ISO is building
-    cy.getBySel('download-iso-btn').should(($input) => {
+    cy.getBySel('download-media-btn').should(($input) => {
       expect($input).to.have.attr('disabled')
     })
     // Download button is enabled once ISO building done
-    cy.getBySel('download-iso-btn', { timeout: 600000 }).should(($input) => {
+    cy.getBySel('download-media-btn', { timeout: 600000 }).should(($input) => {
       expect($input).to.not.have.attr('disabled')
     })
-    cy.getBySel('download-iso-btn')
+    cy.getBySel('download-media-btn')
       .click()
     cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
   }

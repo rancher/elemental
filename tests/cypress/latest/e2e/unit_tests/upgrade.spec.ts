@@ -79,7 +79,7 @@ describe('Upgrade tests', () => {
         cy.contains('Target Cluster')
         cy.getBySel('cluster-target')
           .click();
-        cy.get('#vs5__listbox')
+        cy.get('#vs7__listbox')
           .contains(clusterName)
           .click();
         if (utils.isK8sVersion("k3s")) {
