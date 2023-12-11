@@ -14,7 +14,7 @@ on:
         type: boolean
       operator_repo:
         description: Operator version to use for initial deployment
-        default: oci://registry.opensuse.org/rancher
+        default: oci://registry.suse.com/rancher
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
@@ -58,3 +58,4 @@ jobs:
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sle-micro/${{ inputs.slem_version }}:latest
+      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
