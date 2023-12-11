@@ -41,6 +41,6 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       k8s_version_to_provision: v1.26.10+rke2r2
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
-      os_to_test: staging
+      os_to_test: unstable
       rancher_version: ${{ inputs.rancher_version }}
       upstream_cluster_version: v1.26.10+rke2r2
