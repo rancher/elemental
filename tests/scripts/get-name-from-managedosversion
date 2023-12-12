@@ -12,7 +12,7 @@ GREP_OPTS="-v"
 
 # Define if we check for stable or unstable OS
 case ${KIND_OF_OS} in
-  dev|unstable)
+  dev|staging)
     unset INVERTED
     ;;
 esac
