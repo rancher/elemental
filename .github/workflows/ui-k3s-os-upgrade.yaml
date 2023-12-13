@@ -39,7 +39,7 @@ jobs:
       cluster_name: cluster-k3s
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner }}
-      elemental_ui_version: dev
+      elemental_ui_version: stable
       iso_boot: true
       k8s_version_to_provision: v1.26.10+k3s2
       proxy: ${{ inputs.proxy }}
