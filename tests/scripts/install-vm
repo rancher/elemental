@@ -3,12 +3,13 @@
 set -e -x
 
 # Variable(s) and default values
-VM_NAME=$1
-MAC=$2
 ARCH=$(uname -m)
+EMULATED_TPM="none"
 FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
-EMULATED_TPM="none"
+HDD_SIZE=30
+MAC=$2
+VM_NAME=$1
 
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
@@ -89,7 +90,7 @@ CMD="sudo virt-install \
        --features smm.state=yes \
        --vcpus ${VM_CPU:-4} \
        --cpu host \
-       --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=35 \
+       --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=${HDD_SIZE} \
        --check disk_size=off \
        --graphics none \
        --serial pty \
