@@ -3,7 +3,7 @@ Description=Elemental Register Reset
 Documentation=https://elemental.docs.rancher.com
 Wants=network-online.target
 After=network-online.target
-ConditionPathExists=/run/cos/recovery_mode
+ConditionPathExists=/run/elemental/recovery_mode
 
 [Service]
 EnvironmentFile=-/etc/default/elemental
