@@ -33,6 +33,20 @@ spec:
       install:
         reboot: false
         poweroff: true
-        device: /dev/sda
+        device-selector:
+        - key: Name
+          operator: In
+          values:
+          - /dev/sda
+          - /dev/vda
+          - /dev/nvme0
+        - key: Size
+          operator: Lt
+          values:
+          - 35Gi
+        - key: Size
+          operator: Gt
+          values:
+          - 25Gi
         debug: true
   machineName: %VM_NAME%-${System Information/UUID}
