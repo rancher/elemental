@@ -4,8 +4,8 @@ HOST_DIR="${HOST_DIR:-/host}"
 RELEASE_FILE="${RELEASE_FILE:-/etc/os-release}"
 CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
 LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
-LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/cos/upgrade.lock}"
-ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/cos/active_mode}"
+LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/elemental/upgrade.lock}"
+ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/elemental/active_mode}"
 
 function config()
 {

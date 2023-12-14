@@ -1,30 +1,30 @@
 name: "Elemental Rootfs Layout Settings"
 stages:
   initramfs:
-    - if: '[ ! -f /run/cos/recovery_mode ]'
+    - if: '[ ! -f /run/elemental/recovery_mode ]'
       commands:
       - |
-        if [ ! -e /usr/local/etc/hostname ]; then
-          mkdir -p /usr/local/etc 
-          echo rancher-${RANDOM} > /usr/local/etc/hostname
+        if [ ! -e /run/elemental/persistent/etc/hostname ]; then
+          mkdir -p /run/elemental/persistent/etc
+          echo rancher-${RANDOM} > /run/elemental/persistent/etc/hostname
         fi
-        ln -sf /usr/local/etc/hostname /etc/hostname
-    - if: '[ ! -f "/run/cos/recovery_mode" ]'
+        ln -sf /run/elemental/persistent/etc/hostname /etc/hostname
+    - if: '[ ! -f "/run/elemental/recovery_mode" ]'
       name: "Persist /etc/machine-id"
       commands:
       - |
         # persist machine-id
-        if [ -s /usr/local/etc/machine-id ]; then
-          cat /usr/local/etc/machine-id > /etc/machine-id
+        if [ -s /run/elemental/persistent/etc/machine-id ]; then
+          cat /run/elemental/persistent/etc/machine-id > /etc/machine-id
         else
-          mkdir -p /usr/local/etc
-          cp /etc/machine-id /usr/local/etc
+          mkdir -p /run/elemental/persistent/etc
+          cp /etc/machine-id /run/elemental/persistent/etc
         fi
     - name: "Create essential persistent paths"
       directories:
       - path: /usr/local/bin
   rootfs:
-    - if: '[ ! -f "/run/cos/recovery_mode" ]'
+    - if: '[ ! -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration"
       environment_file: /run/cos/cos-layout.env
       environment:
@@ -48,7 +48,7 @@ stages:
           /var/lib/cni
           /var/lib/calico
         PERSISTENT_STATE_BIND: "true"
-    - if: '[ -f "/run/cos/recovery_mode" ]'
+    - if: '[ -f "/run/elemental/recovery_mode" ]'
       # omit the persistent partition on recovery mode
       name: "Layout configuration for recovery"
       environment_file: /run/cos/cos-layout.env
