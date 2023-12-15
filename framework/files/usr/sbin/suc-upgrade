@@ -7,6 +7,8 @@ LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
 LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/elemental/upgrade.lock}"
 ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/elemental/active_mode}"
 
+mkdir -p $HOST_DIR/run/elemental
+
 function config()
 {
     if [ ! -s $CONF_FILE ]; then
