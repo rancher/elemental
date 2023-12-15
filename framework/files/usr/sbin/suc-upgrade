@@ -5,7 +5,7 @@ RELEASE_FILE="${RELEASE_FILE:-/etc/os-release}"
 CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
 LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
 LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/elemental/upgrade.lock}"
-ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/elemental/active_mode}"
+ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/cos/active_mode}"
 
 mkdir -p $HOST_DIR/run/elemental
 
