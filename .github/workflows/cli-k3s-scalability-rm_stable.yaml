@@ -26,4 +26,4 @@ jobs:
       k8s_version_to_provision: v1.26.10+k3s2
       node_number: 60
       rancher_version: stable/latest/none
-      runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-64-v4
+      runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
