@@ -107,7 +107,7 @@ on:
         type: boolean
       runner_template:
         description: Runner template to use
-        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v4
+        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
         type: string
       sequential:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
@@ -236,6 +236,10 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: tests/go.mod
+      - name: Define needed system variables
+        run: |
+          # Add missing PATH, removed in recent distributions for security reasons...
+          echo "/usr/local/bin" >> ${GITHUB_PATH}
       - name: Deploy Proxy
         if: ${{ inputs.proxy == 'elemental' || inputs.proxy == 'rancher' }}
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid

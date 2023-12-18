@@ -5,6 +5,9 @@
 
 set -e -x
 
+# Add missing PATH, removed in recent distributions for security reasons...
+PATH+=:/usr/local/bin
+
 # Create a systemctl file for chartmuseum
 cat > /etc/systemd/system/chartmuseum.service << EOF
 [Unit]
