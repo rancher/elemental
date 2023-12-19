@@ -252,6 +252,13 @@
     - **It:** Reset node by deleting the cluster
     - **It:** Create Elemental cluster
 
+## `upgrade-ui-extension.spec.ts`
+
+- **Describe:** UI extension upgrade tests
+    - **It:** Add elemental-ui dev repo
+    - **It:** Upgrade Elemental UI extension
+    - **It:** Check Elemental UI after upgrade
+
 ## `upgrade.spec.ts`
 
 - **Describe:** Upgrade tests
