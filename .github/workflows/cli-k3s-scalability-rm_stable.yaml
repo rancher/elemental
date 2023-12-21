@@ -27,3 +27,4 @@ jobs:
       node_number: 60
       rancher_version: stable/latest/none
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
+      zone: us-central1-f
