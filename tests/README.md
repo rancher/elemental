@@ -252,6 +252,13 @@
     - **It:** Reset node by deleting the cluster
     - **It:** Create Elemental cluster
 
+## `upgrade-operator.spec.ts`
+
+- **Describe:** Elemental operator upgrade tests
+    - **It:** Add elemental-operator dev repo
+    - **It:** Upgrade Elemental operator
+    - **It:** Check Elemental UI after upgrade
+
 ## `upgrade-ui-extension.spec.ts`
 
 - **Describe:** UI extension upgrade tests
