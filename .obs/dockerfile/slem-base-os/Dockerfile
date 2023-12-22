@@ -18,7 +18,8 @@ RUN rpm --initdb --root /osimage
 RUN zypper --installroot /osimage in --no-recommends -y filesystem
 
 # make system bootable
-RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut kernel systemd bash
+# iputils: https://github.com/rancher/elemental/issues/1138
+RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut iputils kernel systemd bash
 
 #!ArchExclusiveLine: x86_64
 RUN if [ `uname -m` = "x86-64" ]; then zypper --installroot /osimage in --no-recommends -y syslinux; fi
