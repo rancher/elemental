@@ -3,6 +3,8 @@ Description=Elemental Register Reset
 Documentation=https://elemental.docs.rancher.com
 Wants=network-online.target
 After=network-online.target
+Wants=time-sync.target
+After=time-sync.target
 ConditionPathExists=/run/elemental/recovery_mode
 
 [Service]
