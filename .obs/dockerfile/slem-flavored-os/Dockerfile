@@ -19,7 +19,7 @@ RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   zypper in --no-recommends -y kernel-default-base -kernel-default; \
 else \
   # extend -base with baremetal and usability packages \
-  zypper in --no-recommends -y procps openssl openssh vim-small less iputils kernel-firmware-all NetworkManager-wwan cryptsetup; \
+  zypper in --no-recommends -y procps openssl openssh openssh-server vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup; \
 fi
 
 ARG SLEMICRO_VERSION
