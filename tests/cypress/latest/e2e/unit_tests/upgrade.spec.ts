@@ -79,9 +79,16 @@ describe('Upgrade tests', () => {
         cy.contains('Target Cluster')
         cy.getBySel('cluster-target')
           .click();
-        cy.get('#vs7__listbox')
-          .contains(clusterName)
-          .click();
+        // Next if condition will be removed once ui extension 1.3.0 is released
+        if (utils.isUIVersion('stable') || utils.isK8sVersion("rke2")) { 
+          cy.get('#vs5__listbox')
+            .contains(clusterName)
+            .click();
+        } else {
+          cy.get('#vs7__listbox')
+            .contains(clusterName)
+            .click();
+        }
         if (utils.isK8sVersion("k3s")) {
           cy.getBySel('upgrade-choice-selector')
             .parent()

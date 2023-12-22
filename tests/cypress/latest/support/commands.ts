@@ -118,8 +118,14 @@ Cypress.Commands.add('createMachReg', (
     //  cy.getBySel('select-os-version-build-media')
     //    .click();
     //}
-    cy.getBySel('select-os-version-build-media')
-      .click();
+    // Next if condition will be removed once ui extension 1.3.0 is released
+    if (utils.isUIVersion('stable')) {
+      cy.getBySel('select-os-version-build-iso')
+        .click();
+    } else {
+      cy.getBySel('select-os-version-build-media')
+        .click();
+    }
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
@@ -128,10 +134,14 @@ Cypress.Commands.add('createMachReg', (
         // In rare case, we might want to test upgrading from staging to dev
         utils.isUpgradeOsChannel('dev') ? cy.contains('ISO x86_64 (unstable)').click(): null;
       } else {
+        // We cannot use v2.0.2 because the latest stable operator is not in the marketplace yet
+          //cy.contains('ISO x86_64 v2.0.2')
           cy.contains('ISO x86_64 v1.2.3')
           .click();
       }
     } else if (utils.isOperatorVersion('registry.suse.com')) {
+      // We cannot use v2.0.2 because the latest stable operator is not in the marketplace yet
+      //cy.contains('ISO x86_64 v2.0.2')
       cy.contains('ISO x86_64 v1.2.3')
         .click();
     } else {

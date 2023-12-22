@@ -40,7 +40,7 @@ describe('Elemental operator upgrade tests', () => {
         cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
       });
 
-      qase(888,
+      qase(55,
         it('Upgrade Elemental operator', () => {
           cy.contains('local')
             .click();
@@ -67,7 +67,7 @@ describe('Elemental operator upgrade tests', () => {
         })
       );
 
-      qase(889,
+      qase(58,
         it('Check Elemental UI after upgrade', () => {
           cy.viewport(1920, 1080);
           // Elemental's icon should appear in the side menu

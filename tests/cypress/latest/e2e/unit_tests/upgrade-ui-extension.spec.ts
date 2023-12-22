@@ -40,7 +40,7 @@ describe('UI extension upgrade tests', () => {
         cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages');
       });
 
-      qase(888,
+      qase(56,
         it('Upgrade Elemental UI extension', () => {
           cy.contains('Extensions')
             .click();
@@ -58,7 +58,7 @@ describe('UI extension upgrade tests', () => {
           cy.getBySel('extension-card-uninstall-btn-elemental')
         })
       );
-      qase(888,
+      qase(58,
         it('Check Elemental UI after upgrade', () => {
           cy.viewport(1920, 1080);
           // Elemental's icon should appear in the side menu
