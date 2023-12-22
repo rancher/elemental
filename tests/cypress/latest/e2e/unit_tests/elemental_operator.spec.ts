@@ -17,10 +17,12 @@ import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { isCypressTag, isRancherManagerVersion } from '~/support/utils';
+import { Elemental } from '~/support/elemental';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental Operator', () => {
+    const elemental = new Elemental();
   
     beforeEach(() => {
       cy.login();
@@ -28,47 +30,23 @@ filterTests(['main', 'upgrade'], () => {
       cypressLib.burgerMenuToggle();
     });
 
-    // Install the dev operator in the main scenario for Rancher >= 2.8.x
+    // Install the dev operator in the main scenario except for Rancher 2.7.x
     if (isCypressTag('main') && !isRancherManagerVersion('2.7')){
-      qase(11,
-        it('Add local chartmuseum repo', () => {
-          cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
-        })
-      );
+      it('Add local chartmuseum repo', () => {
+        cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
+      })
     };
   
-    if (!isRancherManagerVersion('2.7')) {
-      qase(13,
-        it('Install Elemental operator', () => {
-          cy.contains('local')
-            .click();
-          cy.get('.nav').contains('Apps')
-            .click();
-          if (isCypressTag('main')) {
-            cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
-              .click();
-          } else {
-            cy.contains('Elemental', {timeout:30000})
-              .click();
-          }
-          cy.contains('Charts: Elemental', {timeout:30000});
-          cy.clickButton('Install');
-          cy.contains('.outer-container > .header', 'Elemental');
-          cy.clickButton('Next');
-          // Workaround for https://github.com/rancher/rancher/issues/43379
-          if (isCypressTag('upgrade')) {
-            cy.get('[data-testid="string-input-channel.repository"]')
-              .type('registry.suse.com/rancher/elemental-teal-channel')
-            cy.get('[data-testid="string-input-channel.tag"]')
-              .type('1.3.5')
-          }
-          cy.clickButton('Install');
-          cy.contains('SUCCESS: helm', {timeout:120000});
-          cy.reload;
-          cy.contains('Only User Namespaces') // eslint-disable-line cypress/unsafe-to-chain-command
-            .click()
-            .type('cattle-elemental-system{enter}{esc}');
-          cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', {timeout: 120000});
+    if (!isRancherManagerVersion('2.7') && isCypressTag('main')) {
+      qase(10,
+        it('Install latest stable Elemental operator', () => {
+          elemental.installElementalOperator();
+        })
+      );
+    } else if (!isRancherManagerVersion('2.7') && isCypressTag('upgrade')) {
+      qase(57,
+        it('Install latest dev Elemental operator', () => {
+          elemental.installElementalOperator();
         })
       );
     };

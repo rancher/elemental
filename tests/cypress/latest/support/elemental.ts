@@ -11,6 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import { isCypressTag } from '~/support/utils';
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
@@ -46,5 +47,37 @@ export class Elemental {
     expect($lis.eq(5)).to.contain('OS Version Channels');
     expect($lis.eq(6)).to.contain('Seed Images');
     })      
+  }
+
+  installElementalOperator() {
+    cy.contains('local')
+    .click();
+    cy.get('.nav').contains('Apps')
+      .click();
+    if (isCypressTag('main')) {
+      cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
+        .click();
+    } else {
+      cy.contains('Elemental', {timeout:30000})
+        .click();
+    }
+    cy.contains('Charts: Elemental', {timeout:30000});
+    cy.clickButton('Install');
+    cy.contains('.outer-container > .header', 'Elemental');
+    cy.clickButton('Next');
+    // Workaround for https://github.com/rancher/rancher/issues/43379
+    if (isCypressTag('upgrade')) {
+      cy.get('[data-testid="string-input-channel.repository"]')
+        .type('registry.suse.com/rancher/elemental-teal-channel')
+      cy.get('[data-testid="string-input-channel.tag"]')
+        .type('1.3.5')
+    }
+    cy.clickButton('Install');
+    cy.contains('SUCCESS: helm', {timeout:120000});
+    cy.reload;
+    cy.contains('Only User Namespaces') // eslint-disable-line cypress/unsafe-to-chain-command
+      .click()
+      .type('cattle-elemental-system{enter}{esc}');
+    cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', {timeout: 120000});
   }
 }
