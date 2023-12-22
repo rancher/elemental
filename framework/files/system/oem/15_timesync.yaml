@@ -1,0 +1,9 @@
+name: "Enable systemd-time-wait-sync"
+stages:
+   initramfs:
+     - name: "Default systemd config"
+       if: '[ -e "/sbin/systemctl" ] || [ -e "/bin/systemctl" ] || [ -e "/usr/sbin/systemctl" ] || [ -e "/usr/bin/systemctl" ]'
+       systemctl:
+        enable:
+        - systemd-time-wait-sync
+
