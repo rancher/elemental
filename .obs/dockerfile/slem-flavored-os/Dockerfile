@@ -16,10 +16,21 @@ RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher 
 
 RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   # replace default kernel with smaller one, sufficient to run kvm guests \
-  zypper in --no-recommends -y kernel-default-base -kernel-default; \
+  zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent; \
 else \
   # extend -base with baremetal and usability packages \
-  zypper in --no-recommends -y procps openssl openssh openssh-server vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup; \
+  zypper in --no-recommends -y procps openssl openssh openssh-server \
+    vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
+    \
+    avahi bash-completion  catatonit cni cni-plugins conmon conntrack-tools \
+    container-selinux ethtool fuse-overlayfs haveged hdparm hostname iptables \
+    issue-generator jq k9s keyutils kpartx lshw lsof lsscsi mdadm multipath-tools \
+    netcat-openbsd net-tools NetworkManager-branding-SLE nfs-client nfsidmap \
+    nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
+    procmail psmisc rpcbind rpm-ndb runc selinux-policy selinux-policy-targeted \
+    selinux-tools sg3_utils slirp4netns strace sudo sysstat system-user-nobody \
+    timezone traceroute xtables-plugins \
+    ; \
 fi
 
 ARG SLEMICRO_VERSION
