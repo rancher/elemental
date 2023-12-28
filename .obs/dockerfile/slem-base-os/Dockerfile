@@ -25,7 +25,7 @@ RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut iputil
 RUN if [ `uname -m` = "x86-64" ]; then zypper --installroot /osimage in --no-recommends -y syslinux; fi
 
 # make dracut happy
-RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager device-mapper iproute2 tar curl ca-certificates ca-certificates-mozilla
+RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager-branding-SLE NetworkManager device-mapper iproute2 tar curl ca-certificates ca-certificates-mozilla
 
 # make ARM happy
 #!ArchExclusiveLine: aarch64
