@@ -27,7 +27,7 @@ else \
     issue-generator jq k9s keyutils kpartx lshw lsof lsscsi mdadm multipath-tools \
     netcat-openbsd net-tools NetworkManager-branding-SLE nfs-client nfsidmap \
     nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
-    procmail psmisc rpcbind rpm-ndb runc selinux-policy selinux-policy-targeted \
+    procmail psmisc rpcbind runc selinux-policy selinux-policy-targeted \
     selinux-tools sg3_utils slirp4netns strace sudo sysstat system-user-nobody \
     timezone traceroute xtables-plugins \
     ; \
