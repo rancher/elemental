@@ -1,6 +1,6 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "SLE Micro for Rancher Install"
+  grub-entry-name: "SLE Micro Install"
 
 squash-no-compression: true
 
