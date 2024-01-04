@@ -13,7 +13,6 @@ FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
-
 RUN if [[ "%%BUILD_FLAVOR%%" == "kvm-" ]]; then \
   # replace default kernel with smaller one, sufficient to run kvm guests \
   zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent; \
@@ -22,13 +21,13 @@ else \
   zypper in --no-recommends -y procps openssl openssh openssh-server \
     vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
     \
-    avahi bash-completion  catatonit cni cni-plugins conmon conntrack-tools \
+    avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \
     container-selinux ethtool fuse-overlayfs haveged hdparm hostname iptables \
-    issue-generator jq k9s keyutils kpartx lshw lsof lsscsi mdadm multipath-tools \
+    issue-generator jq k9s keyutils lshw lsof lsscsi mdadm multipath-tools \
     netcat-openbsd net-tools NetworkManager-branding-SLE nfs-client nfsidmap \
     nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
     procmail psmisc rpcbind runc selinux-policy selinux-policy-targeted \
-    selinux-tools sg3_utils slirp4netns strace sudo sysstat system-user-nobody \
+    selinux-tools slirp4netns strace sudo sysstat system-user-nobody \
     timezone traceroute xtables-plugins \
     ; \
 fi
