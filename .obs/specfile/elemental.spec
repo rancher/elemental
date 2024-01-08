@@ -28,6 +28,7 @@ URL:            https://github.com/rancher-sandbox/%{name}
 Source:         %{name}-%{version}.tar
 Source1:        LICENSE
 Source2:        README.md
+Source3:        %{name}-rpmlintrc
 
 Requires:       elemental-toolkit
 Requires:       elemental-register
