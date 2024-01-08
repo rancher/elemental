@@ -1,0 +1,37 @@
+# This workflow calls the master E2E workflow with custom variables
+name: UI-RKE2-RM_head_2.9
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: latest/devel/2.9
+        type: string
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  ui:
+    uses: ./.github/workflows/master-e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    with:
+      test_description: "CI/Manual - UI - Deployment test with Standard RKE2"
+      ui_account: user
+      ca_type: private
+      cluster_name: cluster-rke2
+      cypress_tags: main
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      elemental_ui_version: dev
+      iso_boot: true
+      k8s_version_to_provision: v1.26.10+rke2r2
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
+      test_type: ui
+      upstream_cluster_version: v1.26.10+rke2r2
