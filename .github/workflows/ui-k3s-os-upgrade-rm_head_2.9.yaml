@@ -24,7 +24,7 @@ on:
         default: latest/devel/2.9
         type: string
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 10 * * *'
 
 jobs:
   ui:
