@@ -1,7 +1,7 @@
 name: "Root autologin"
 stages:
   initramfs:
-  - if: '[ -f /run/cos/live_mode ]'
+  - if: '[ -f /run/elemental/live_mode ]'
     files:
     - path: /etc/motd
       content: |

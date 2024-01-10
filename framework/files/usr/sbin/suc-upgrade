@@ -5,7 +5,7 @@ RELEASE_FILE="${RELEASE_FILE:-/etc/os-release}"
 CONF_FILE="${CONF_FILE:-/run/data/cloud-config}"
 LOCK_TIMEOUT="${LOCK_TIMEOUT:-600}"
 LOCK_FILE="${LOCK_FILE:-$HOST_DIR/run/elemental/upgrade.lock}"
-ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/cos/active_mode}"
+ACTIVE_FILE="${ACTIVE_FILE:-$HOST_DIR/run/elemental/active_mode}"
 
 mkdir -p $HOST_DIR/run/elemental
 
@@ -101,12 +101,15 @@ function isActiveSystem() {
     mount --rbind $HOST_DIR/run /run
     elemental --debug upgrade --system.uri dir:/
 
+    STATE_PATH=/run/initramfs/elemental-state
+    [ ! -d "${STATE_PATH}" ] && STATE_PATH=/run/initramfs/cos-state
+
     # After elemental upgrade we have to also copy
     # /etc/resolv.conf from /host filesystem, otherwise
     # it will be taken from container context
-    mount -o remount,rw /run/initramfs/cos-state
+    mount -o remount,rw $STATE_PATH
     LOOP_DEV=$(losetup -f)
-    losetup $LOOP_DEV /run/initramfs/cos-state/cOS/active.img
+    losetup $LOOP_DEV ${STATE_PATH}/cOS/active.img
     mkdir -p /tmp/cOS
     mount $LOOP_DEV /tmp/cOS
     rsync -av $HOST_DIR/etc/resolv.conf /tmp/cOS/etc/resolv.conf
