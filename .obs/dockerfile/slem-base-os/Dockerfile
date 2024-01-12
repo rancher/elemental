@@ -68,8 +68,8 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro
-LABEL org.opencontainers.image.title="SLE Micro"
-LABEL org.opencontainers.image.description="Image containing SLE Micro - a containerized OS layer for Kubernetes."
+LABEL org.opencontainers.image.title="SLE Micro Base"
+LABEL org.opencontainers.image.description="Image containing SLE Micro Base - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
