@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: Apache-2.0
+# Define the names/tags of the container
+#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildConstraint: hardware:disk:size unit=G 8
+#
+
+ARG SLEMICRO_VERSION
+ARG BUILD_REPO=%%IMG_REPO%%
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/rt-$SLEMICRO_VERSION
+ARG IMAGE_TAG=%VERSION%-%RELEASE%
+
+FROM suse/sle-micro/$SLEMICRO_VERSION:latest AS os
+
+# dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
+RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
+
+MAINTAINER SUSE LLC (https://www.suse.com/)
+
+# Define labels according to https://en.opensuse.org/Building_derived_containers
+# labelprefix=com.suse.sle.micro.rancher
+LABEL org.opencontainers.image.title="SLE Micro for Rancher RT"
+LABEL org.opencontainers.image.description="Image containing SLE Micro for Rancher RT - a containerized OS layer for Kubernetes."
+LABEL org.opencontainers.image.version="${IMAGE_TAG}"
+LABEL org.opencontainers.image.created="%BUILDTIME%"
+LABEL org.opencontainers.image.source="%SOURCEURL%"
+LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
+LABEL org.openbuildservice.disturl="%DISTURL%"
+# endlabelprefix
+
+# turn base image into a rt image
+RUN zypper in --no-recommends -y -- \
+  -kernel-default \
+  kernel-rt
+
+# IMPORTANT: Setup elemental-release used for versioning/upgrade. The
+# values here should reflect the tag of the image being built
+# Also used by elemental-populate-labels
+RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"         >> /etc/os-release && \
+    echo IMAGE_TAG=\"${IMAGE_TAG}\"           >> /etc/os-release && \
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\" >> /etc/os-release && \
+    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release
+RUN echo GRUB_ENTRY_NAME=\"Elemental\" >> /etc/os-release
+
+# Ensure /tmp is mounted as tmpfs by default
+RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
+      cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    fi
+
+# Save some space
+RUN zypper clean --all && \
+    rm -rf /var/log/update* && \
+    >/var/log/lastlog && \
+    rm -rf /boot/vmlinux*
+
+# Rebuild initrd to setup dracut with the boot configurations
+RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
+    # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
+    kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
+    if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
