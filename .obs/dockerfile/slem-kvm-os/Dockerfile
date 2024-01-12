@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
@@ -13,18 +13,8 @@ FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
-# extend -base with baremetal and usability packages
-RUN zypper in --no-recommends -y procps openssl openssh openssh-server \
-    vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
-    \
-    avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \
-    container-selinux ethtool fuse-overlayfs haveged hdparm hostname iptables \
-    issue-generator jq k9s keyutils lshw lsof lsscsi mdadm multipath-tools \
-    netcat-openbsd net-tools nfs-client nfsidmap \
-    nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
-    procmail psmisc rpcbind runc selinux-policy selinux-policy-targeted \
-    selinux-tools slirp4netns strace sudo sysstat system-user-nobody \
-    timezone traceroute xtables-plugins
+# replace default kernel with smaller one, sufficient to run kvm guests
+RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
@@ -44,8 +34,8 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro
-LABEL org.opencontainers.image.title="SLE Micro"
-LABEL org.opencontainers.image.description="Image containing SLE Micro - a containerized OS layer for Kubernetes."
+LABEL org.opencontainers.image.title="SLE Micro KVM"
+LABEL org.opencontainers.image.description="Image containing SLE Micro KVM - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
