@@ -1,6 +1,13 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-Hardened-Upgrade-Reset-RM_head_2.7
-
+name: UI-RKE2-OS-Upgrade-RM_head_2.9
+# We test upgrade with: 
+# - Iso stable to dev
+# - Elemental-operator dev
+# - RKE2 as management node
+# - Rancher latest devel
+#
+# Later it will be moved to main scenario when we will be able to choose the ISO
+# because for now, we can only build ISO with stable ISO
 on:
   workflow_dispatch:
     inputs:
@@ -8,30 +15,31 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: latest/devel/2.9
+        type: string
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 10 * * *'
 
 jobs:
-  cli:
+  ui:
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "CI - CLI - Parallel - Deployment with OS Upgrade test + reset on Hardened RKE2"
+      ui_account: user
       ca_type: private
       cluster_name: cluster-rke2
-      cluster_type: hardened
+      cypress_tags: upgrade
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      elemental_ui_version: dev
+      iso_boot: true
       k8s_version_to_provision: v1.26.10+rke2r2
-      node_number: 5
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
-      operator_repo: oci://registry.suse.com/rancher
-      os_to_test: stable
-      rancher_upgrade: latest/devel/2.8
-      rancher_version: latest/devel/2.7
-      reset: true
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
+      test_type: ui
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest
       upgrade_os_channel: dev
       upstream_cluster_version: v1.26.10+rke2r2

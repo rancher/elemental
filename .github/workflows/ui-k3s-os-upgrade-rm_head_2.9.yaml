@@ -1,5 +1,12 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-K3s-RM_head_2.7
+name: UI-K3s-OS-Upgrade-RM_head_2.9
+# We test upgrade with: 
+# - Iso stable to dev
+# - Elemental-operator dev
+#
+# Main reason of dev operator is to test ISO building.
+# Later it will be moved to main scenario when we will be able to choose the ISO
+# because for now, we can only build ISO with stable ISO
 
 on:
   workflow_dispatch:
@@ -14,10 +21,10 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: latest/devel/2.7
+        default: latest/devel/2.9
         type: string
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 10 * * *'
 
 jobs:
   ui:
@@ -27,13 +34,13 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "CI/Manual - UI - Deployment test with Standard K3s"
       cluster_name: cluster-k3s
-      cypress_tags: main
+      cypress_tags: upgrade
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      elemental_ui_version: dev
+      elemental_ui_version: stable
       iso_boot: true
       k8s_version_to_provision: v1.26.10+k3s2
       proxy: ${{ inputs.proxy || 'elemental' }}
-      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.7' }}
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
       test_type: ui
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest

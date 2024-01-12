@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: UI-K3s-RM_head_2.7
+name: UI-K3s-RM_head_2.9
 
 on:
   workflow_dispatch:
@@ -14,13 +14,16 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: latest/devel/2.7
+        default: latest/devel/2.9
         type: string
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 10 * * *'
 
 jobs:
   ui:
+    strategy:
+      matrix:
+        rancher_version: [latest/devel/2.8, latest/devel/2.9]
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
@@ -35,5 +38,5 @@ jobs:
       iso_boot: true
       k8s_version_to_provision: v1.26.10+k3s2
       proxy: ${{ inputs.proxy || 'elemental' }}
-      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.7' }}
+      rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
       test_type: ui

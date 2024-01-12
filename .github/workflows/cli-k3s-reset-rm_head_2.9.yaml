@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-Sequential-RM_head_2.8
+name: CLI-K3s-Reset-RM_head_2.9
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 10 * * *'
 
 jobs:
   cli:
@@ -19,11 +19,9 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "CI/Manual - CLI - Sequential - Deployment test with Standard RKE2"
-      ca_type: private
-      cluster_name: cluster-rke2
+      test_description: "CI - CLI - Parallel - Deployment test + reset with Standard K3s"
+      cluster_name: cluster-k3s
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_version_to_provision: v1.26.10+rke2r2
-      rancher_version: latest/devel/2.8
-      sequential: true
-      upstream_cluster_version: v1.26.10+rke2r2
+      k8s_version_to_provision: v1.26.10+k3s2
+      rancher_version: latest/devel/2.9
+      reset: true

@@ -21,7 +21,7 @@ on:
         default: stable/latest/none
         type: string
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 4 * * *'
 
 jobs:
   ui:
