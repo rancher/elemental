@@ -224,7 +224,12 @@ jobs:
       K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
       # QASE variables
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ELEMENTAL
+      QASE_REPORT: 1
+      QASE_RUN_COMPLETE: 1
+      QASE_RUN_DESCRIPTION: ${{ inputs.test_description }}
       QASE_RUN_ID: ${{ inputs.qase_run_id }}
+      QASE_RUN_NAME: TO_BE_CHANGED
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}
       TEST_TYPE: ${{ inputs.test_type }}
@@ -243,6 +248,27 @@ jobs:
       - name: Deploy Proxy
         if: ${{ inputs.proxy == 'elemental' || inputs.proxy == 'rancher' }}
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
+      - name: Create Qase Run (if needed)
+        if: ${{ inputs.qase_run_id == 'auto' }}
+        run: |
+          # Export the Qase run name, as it cannot be done in
+          # 'env:' because GITHUB_WORKFLOW is a shell variable
+          echo "QASE_RUN_NAME=${GITHUB_WORKFLOW}" >> ${GITHUB_ENV}
+
+          # Export it also to be used locally
+          export QASE_RUN_NAME="${GITHUB_WORKFLOW}"
+
+          # We need to always unset the faking ID variable
+          unset QASE_RUN_ID
+
+          ID=$(cd tests && make create-qase-run)
+          if [[ -n "${ID}" ]]; then
+            # Export QASE_RUN_ID to be sure that we always have the same value
+            echo "QASE_RUN_ID=${ID}" >> ${GITHUB_ENV}
+          fi
+
+          # Just an info for debugging purposes
+          echo "Export QASE_RUN_ID=${ID} and QASE_RUN_NAME=${GITHUB_WORKFLOW}"
       - name: Install Rancher+Elemental components
         env:
           CA_TYPE: ${{ inputs.ca_type }}

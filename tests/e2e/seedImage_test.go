@@ -27,10 +27,19 @@ import (
 )
 
 var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
+	var (
+		machineRegName string
+		seedImageName  string
+	)
+
+	BeforeEach(func() {
+		machineRegName = "machine-registration-" + poolType + "-" + clusterName
+		seedImageName = "seed-image-" + poolType + "-" + clusterName
+	})
+
 	It("Configure and create ISO image", func() {
-		// Globales variables
-		machineRegName := "machine-registration-" + poolType + "-" + clusterName
-		seedImageName := "seed-image-" + poolType + "-" + clusterName
+		// Report to Qase
+		testCaseID = 38
 
 		By("Adding SeedImage", func() {
 			type pattern struct {
@@ -121,9 +130,12 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			err = kubectl.Apply(clusterNS, seedImageTmp)
 			Expect(err).To(Not(HaveOccurred()))
 		})
+	})
 
-		By("Downloading ISO built by SeedImage", func() {
-			DownloadBuiltISO(clusterNS, seedImageName, "../../elemental-"+poolType+".iso")
-		})
+	It("Download ISO built by SeedImage", func() {
+		// Report to Qase
+		testCaseID = 39
+
+		DownloadBuiltISO(clusterNS, seedImageName, "../../elemental-"+poolType+".iso")
 	})
 })

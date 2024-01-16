@@ -29,25 +29,26 @@ import (
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
-var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
+var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
+	// Define some variables
+	const seedImageName = "seed-image-multi"
+	const machineRegName = "machine-registration-multi"
+
+	type pattern struct {
+		key   string
+		value string
+	}
+
 	var (
-		//bootstrappedNodes int
-		wg           sync.WaitGroup
+		basePatterns []pattern
 		globalNodeID int
+		wg           sync.WaitGroup
 	)
 
-	It("Provision the node", func() {
-		type pattern struct {
-			key   string
-			value string
-		}
-
-		// Define some variables
-		const seedImageName = "seed-image-multi"
-		const machineRegName = "machine-registration-multi"
+	BeforeEach(func() {
 
 		// Patterns to replace
-		basePatterns := []pattern{
+		basePatterns = []pattern{
 			{
 				key:   "%K8S_VERSION%",
 				value: k8sVersion,
@@ -65,6 +66,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
 				value: vmNameRoot,
 			},
 		}
+	})
+
+	It("Configure Libvirt", func() {
+		// Report to Qase
+		testCaseID = 68
 
 		By("Starting default network", func() {
 			// Don't check return code, as the default network could be already removed
@@ -77,6 +83,11 @@ var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
 			err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
 			Expect(err).To(Not(HaveOccurred()))
 		})
+	})
+
+	It("Configure and create ISO image", func() {
+		// Report to Qase
+		testCaseID = 38
 
 		By("Adding MachineRegistration", func() {
 			// Set temporary file
@@ -155,10 +166,18 @@ var _ = Describe("E2E - Bootstrapping node", Label("multi-cluster"), func() {
 			err = kubectl.Apply(clusterNS, seedImageTmp)
 			Expect(err).To(Not(HaveOccurred()))
 		})
+	})
 
-		By("Downloading ISO built by SeedImage", func() {
-			DownloadBuiltISO(clusterNS, seedImageName, "../../elemental-multi.iso")
-		})
+	It("Downloading ISO built by SeedImage", func() {
+		// Report to Qase
+		testCaseID = 38
+
+		DownloadBuiltISO(clusterNS, seedImageName, "../../elemental-multi.iso")
+	})
+
+	It("Create clusters and deploy nodes", func() {
+		// Report to Qase
+		testCaseID = 9
 
 		// Loop on all clusters to create
 		for clusterIndex := 1; clusterIndex <= numberOfClusters; clusterIndex++ {

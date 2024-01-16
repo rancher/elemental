@@ -54,6 +54,9 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 	}
 
 	It("Uninstall Elemental Operator", func() {
+		// Report to Qase
+		testCaseID = 70
+
 		By("Testing cluster resource availability BEFORE operator uninstallation", func() {
 			testClusterAvailability(clusterNS, clusterName)
 		})
@@ -134,6 +137,9 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 	})
 
 	It("Re-install Elemental Operator", func() {
+		// Report to Qase
+		testCaseID = 62
+
 		By("Installing Operator via Helm", func() {
 			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
 				RunHelmCmdWithRetry("upgrade", "--install", chart,

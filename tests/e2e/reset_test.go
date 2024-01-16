@@ -27,6 +27,9 @@ import (
 
 var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 	It("Reset one node in the cluster", func() {
+		// Report to Qase
+		testCaseID = 54
+
 		// Get the machine inventory name list
 		machineInventory, err := kubectl.Run("get", "MachineInventory",
 			"--namespace", clusterNS,

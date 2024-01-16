@@ -56,8 +56,11 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Define local Kubeconfig file
 	localKubeconfig := os.Getenv("HOME") + "/.kube/config"
 
-	It("Install Rancher Manager", func() {
+	It("Install upsteam K8s cluster", func() {
 		if strings.Contains(k8sUpstreamVersion, "rke2") {
+			// Report to Qase
+			testCaseID = 60
+
 			By("Installing RKE2", func() {
 				// Get RKE2 installation script
 				fileName := "rke2-install.sh"
@@ -119,6 +122,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			})
 		} else {
+			// Report to Qase
+			testCaseID = 59
+
 			By("Installing K3s", func() {
 				// Get K3s installation script
 				fileName := "k3s-install.sh"
@@ -218,59 +224,62 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 			})
 		}
+	})
 
-		By("Installing Rancher Manager", func() {
-			err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
+	It("Installing Rancher Manager", func() {
+		// Report to Qase
+		testCaseID = 61
+
+		err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
+		Expect(err).To(Not(HaveOccurred()))
+
+		// Inject secret for Private CA
+		if caType == "private" {
+			_, err := kubectl.Run("create", "secret",
+				"--namespace", "cattle-system",
+				"tls", "tls-rancher-ingress",
+				"--cert=tls.crt",
+				"--key=tls.key",
+			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			// Inject secret for Private CA
-			if caType == "private" {
-				_, err := kubectl.Run("create", "secret",
-					"--namespace", "cattle-system",
-					"tls", "tls-rancher-ingress",
-					"--cert=tls.crt",
-					"--key=tls.key",
-				)
-				Expect(err).To(Not(HaveOccurred()))
+			_, err = kubectl.Run("create", "secret",
+				"--namespace", "cattle-system",
+				"generic", "tls-ca",
+				"--from-file=cacerts.pem=./cacerts.pem",
+			)
+			Expect(err).To(Not(HaveOccurred()))
+		}
 
-				_, err = kubectl.Run("create", "secret",
-					"--namespace", "cattle-system",
-					"generic", "tls-ca",
-					"--from-file=cacerts.pem=./cacerts.pem",
-				)
-				Expect(err).To(Not(HaveOccurred()))
-			}
+		// Wait for all pods to be started
+		checkList := [][]string{
+			{"cattle-system", "app=rancher"},
+			{"cattle-fleet-local-system", "app=fleet-agent"},
+			{"cattle-system", "app=rancher-webhook"},
+		}
+		Eventually(func() error {
+			return rancher.CheckPod(k, checkList)
+		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 
-			// Wait for all pods to be started
-			checkList := [][]string{
-				{"cattle-system", "app=rancher"},
-				{"cattle-fleet-local-system", "app=fleet-agent"},
-				{"cattle-system", "app=rancher-webhook"},
-			}
+		// We have to restart Rancher Manager to be sure that Private CA is used
+		if caType == "private" {
+			rolloutDeployment("cattle-system", "rancher")
+		}
+
+		// A bit dirty be better to wait a little here for all to be correctly started
+		time.Sleep(2 * time.Minute)
+
+		// Check issuer for Private CA
+		if caType == "private" {
 			Eventually(func() error {
-				return rancher.CheckPod(k, checkList)
-			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
-
-			// We have to restart Rancher Manager to be sure that Private CA is used
-			if caType == "private" {
-				rolloutDeployment("cattle-system", "rancher")
-			}
-
-			// A bit dirty be better to wait a little here for all to be correctly started
-			time.Sleep(2 * time.Minute)
-
-			// Check issuer for Private CA
-			if caType == "private" {
-				Eventually(func() error {
-					out, err := exec.Command("curl", "-vk", "https://"+rancherHostname).CombinedOutput()
-					if err != nil {
-						// Show only if there's no error
-						GinkgoWriter.Printf("%s\n", out)
-					}
-					return err
-				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
-			}
-		})
+				out, err := exec.Command("curl", "-vk", "https://"+rancherHostname).CombinedOutput()
+				if err != nil {
+					// Show only if there's no error
+					GinkgoWriter.Printf("%s\n", out)
+				}
+				return err
+			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+		}
 
 		By("Configuring kubectl to use Rancher admin user", func() {
 			// Getting internal username for admin
@@ -327,28 +336,32 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				}
 			})
 		}
-		// Deploy operator in CLI test or if Rancher version is < 2.8
-		// because operator can not be installed trough Marketplace in Rancher 2.7.x
-		matched, _ := regexp.MatchString(`2.8`, rancherHeadVersion)
-		if strings.Contains(testType, "cli") || matched == false {
-			By("Installing Elemental Operator", func() {
-				for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-					RunHelmCmdWithRetry("upgrade", "--install", chart,
-						operatorRepo+"/"+chart+"-chart",
-						"--namespace", "cattle-elemental-system",
-						"--create-namespace",
-						"--wait", "--wait-for-jobs",
-					)
-
-					// Delay few seconds for all to be installed
-					time.Sleep(tools.SetTimeout(20 * time.Second))
-				}
-
-				// Wait for pod to be started
-				Eventually(func() error {
-					return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
-			})
-		}
 	})
+
+	// Deploy operator in CLI test or if Rancher version is < 2.8
+	// because operator can not be installed trough Marketplace in Rancher 2.7.x
+	matched, _ := regexp.MatchString(`2.8`, rancherHeadVersion)
+	if strings.Contains(testType, "cli") || matched == false {
+		It("Installing Elemental Operator", func() {
+			// Report to Qase
+			testCaseID = 62
+
+			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
+				RunHelmCmdWithRetry("upgrade", "--install", chart,
+					operatorRepo+"/"+chart+"-chart",
+					"--namespace", "cattle-elemental-system",
+					"--create-namespace",
+					"--wait", "--wait-for-jobs",
+				)
+
+				// Delay few seconds for all to be installed
+				time.Sleep(tools.SetTimeout(20 * time.Second))
+			}
+
+			// Wait for pod to be started
+			Eventually(func() error {
+				return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+		})
+	}
 })

@@ -27,7 +27,10 @@ import (
 )
 
 var _ = Describe("E2E - Configure test", Label("configure"), func() {
-	It("Configure Rancher and libvirt", func() {
+	It("Deploy a new cluster", func() {
+		// Report to Qase
+		testCaseID = 30
+
 		type pattern struct {
 			key   string
 			value string
@@ -45,7 +48,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			},
 		}
 
-		By("Creating a new cluster", func() {
+		By("Creating a cluster", func() {
 			// Create Yaml file
 			for _, p := range basePatterns {
 				err := tools.Sed(p.key, p.value, clusterYaml)
@@ -141,7 +144,13 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				CheckCreatedRegistration(clusterNS, "machine-registration-"+pool+"-"+clusterName)
 			}
 		})
+	})
+
+	It("Configure Libvirt (if needed)", func() {
 		if !strings.Contains(clusterType, "airgap") {
+			// Report to Qase
+			testCaseID = 68
+
 			By("Starting default network", func() {
 				// Don't check return code, as the default network could be already removed
 				for _, c := range []string{"net-destroy", "net-undefine"} {

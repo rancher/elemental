@@ -39,7 +39,8 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 	}
 
 	It("Upgrade operator", func() {
-		upgradeOrder := []string{"elemental-operator-crds", "elemental-operator"}
+		// Report to Qase
+		testCaseID = 71
 
 		// Check if CRDs chart is already installed (not always the case in older versions)
 		chartList, err := exec.Command("helm",
@@ -49,6 +50,7 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		).CombinedOutput()
 		Expect(err).To(Not(HaveOccurred()))
 
+		upgradeOrder := []string{"elemental-operator-crds", "elemental-operator"}
 		if !strings.Contains(string(chartList), "-crds") {
 			upgradeOrder = []string{"elemental-operator", "elemental-operator-crds"}
 		}
@@ -83,6 +85,9 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 	}
 
 	It("Upgrade Rancher Manager", func() {
+		// Report to Qase
+		testCaseID = 72
+
 		// Get before-upgrade Rancher Manager version
 		getImageVersion := []string{
 			"get", "pod",
@@ -143,12 +148,15 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 	var (
-		wg           sync.WaitGroup
 		value        string
 		valueToCheck string
+		wg           sync.WaitGroup
 	)
 
 	It("Upgrade node", func() {
+		// Report to Qase
+		testCaseID = 73
+
 		By("Checking if upgrade type is set", func() {
 			Expect(upgradeType).To(Not(BeEmpty()))
 		})
