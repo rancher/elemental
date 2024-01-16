@@ -43,6 +43,9 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 	}
 
 	It("Get the upstream cluster logs", func() {
+		// Report to Qase
+		testCaseID = 69
+
 		By("Downloading and executing tools to generate logs", func() {
 			elemental := binary{
 				elementalSupport,

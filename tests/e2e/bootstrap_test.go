@@ -45,6 +45,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	)
 
 	It("Provision the node", func() {
+		// Report to Qase
+		testCaseID = 9
+
 		if !isoBoot {
 			By("Downloading MachineRegistration file", func() {
 				// Download the new YAML installation config file
@@ -144,6 +147,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	})
 
 	It("Add the nodes in Rancher Manager", func() {
+		// Report to Qase
+		testCaseID = 67
+
 		for index := vmIndex; index <= numberOfVMs; index++ {
 			// Set node hostname
 			hostName := elemental.SetHostname(vmNameRoot, index)

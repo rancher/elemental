@@ -29,6 +29,9 @@ import (
 
 var _ = Describe("E2E - Install a simple application", Label("install-app"), func() {
 	It("Install HelloWorld application", func() {
+		// Report to Qase
+		testCaseID = 31
+
 		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
@@ -42,6 +45,9 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 
 var _ = Describe("E2E - Checking a simple application", Label("check-app"), func() {
 	It("Check HelloWorld application", func() {
+		// Report to Qase
+		testCaseID = 63
+
 		appName := "hello-world"
 
 		// File where to host client cluster kubeconfig

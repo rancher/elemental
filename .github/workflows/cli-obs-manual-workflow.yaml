@@ -56,7 +56,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "Manual - Fully customizable - CLI - IBS/OBS Deployment test"
+      test_description: "Manual - Fully customizable + reset - CLI - IBS/OBS Deployment test"
       ca_type: ${{ inputs.ca_type }}
       cluster_name: my-own-cluster
       cluster_type: ${{ inputs.cluster_type }}
@@ -69,3 +69,4 @@ jobs:
       runner_template: ${{ inputs.runner_template }}
       sequential: ${{ inputs.sequential }}
       upstream_cluster_version: ${{ inputs.k8s_version }}
+      reset: true

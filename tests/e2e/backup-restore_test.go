@@ -35,6 +35,9 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 	}
 
 	It("Install Backup/Restore Operator", func() {
+		// Report to Qase
+		testCaseID = 64
+
 		// Default chart
 		chartRepo := "rancher-chart"
 
@@ -90,11 +93,13 @@ var _ = Describe("E2E - Install Backup/Restore Operator", Label("install-backup-
 })
 
 var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func() {
-	// Variable(s)
 	backupResourceName := "elemental-backup"
 	restoreResourceName := "elemental-restore"
 
 	It("Do a backup", func() {
+		// Report to Qase
+		testCaseID = 65
+
 		By("Adding a backup resource", func() {
 			err := kubectl.Apply(clusterNS, backupYaml)
 			Expect(err).To(Not(HaveOccurred()))
@@ -117,6 +122,9 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 	})
 
 	It("Do a restore", func() {
+		// Report to Qase
+		testCaseID = 66
+
 		By("Deleting some Elemental resources", func() {
 			for _, obj := range []string{"MachineRegistration", "MachineInventorySelectorTemplate"} {
 				// List the resources

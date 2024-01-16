@@ -30,11 +30,10 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      test_description: "Manual - CLI - Parallel - Deployment test with Standard RKE2"
-      qase_run_id: ${{ inputs.qase_run_id }}
+      test_description: "Manual - CLI - Parallel - Deployment test + reset with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       cluster_type: ${{ inputs.cluster_type }}
@@ -42,5 +41,7 @@ jobs:
       k8s_version_to_provision: v1.26.10+rke2r2
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       upstream_cluster_version: v1.26.10+rke2r2
+      reset: true

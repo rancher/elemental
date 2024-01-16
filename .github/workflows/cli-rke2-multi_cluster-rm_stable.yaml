@@ -4,6 +4,10 @@ name: CLI-RKE2-Multi_Cluster-RM_Stable
 on:
   workflow_dispatch:
     inputs:
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        required: false
+        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -18,6 +22,7 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI/Manual - CLI - MultiCluster - Deployment test with Standard RKE2"
@@ -27,6 +32,7 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       iso_boot: true
       k8s_version_to_provision: v1.26.10+rke2r2
+      qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
       test_type: multi_cli
       upstream_cluster_version: v1.26.10+rke2r2

@@ -36,13 +36,17 @@ ipxe:
 	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $(IPXE)
 
 deps: 
-	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
-	go install -mod=mod github.com/onsi/gomega
-	go mod tidy
+	@go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
+	@go install -mod=mod github.com/onsi/gomega
+	@go mod tidy
 
 # Generate tests description file
 generate-readme:
 	@./scripts/generate-readme > README.md
+
+# Qase deps
+create-qase-run: deps
+	@go run qase/create_qase_run.go
 
 # E2E tests
 e2e-airgap-rancher: deps

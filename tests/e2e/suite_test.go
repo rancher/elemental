@@ -28,6 +28,7 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	. "github.com/rancher/elemental/tests/e2e/helpers/qase"
 )
 
 const (
@@ -90,6 +91,7 @@ var (
 	seedImageYaml             string
 	selectorYaml              string
 	sequential                bool
+	testCaseID                int64
 	testType                  string
 	upgradeImage              string
 	upgradeOSChannel          string
@@ -525,4 +527,19 @@ var _ = BeforeSuite(func() {
 
 	// Start HTTP server
 	tools.HTTPShare("../..", ":8000")
+})
+
+var _ = ReportAfterSuite("Qase Report", func(report Report) {
+	// Finalize Qase report
+	FinalizeResults()
+})
+
+var _ = ReportBeforeEach(func(report SpecReport) {
+	// Reset case ID
+	testCaseID = -1
+})
+
+var _ = ReportAfterEach(func(report SpecReport) {
+	// Add result in Qase if asked
+	Qase(testCaseID, report)
 })
