@@ -18,12 +18,11 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
-/**
- * Configure iPXE server for OS provisioning
- * @remarks An iPXE server is up and running
- * @param httpSrv IP address:port where the files are shared
- * @returns The number of .ipxe files found or an error
- */
+/*
+Configure iPXE server for OS provisioning
+  - @param httpSrv IP address:port where the files are shared
+  - @returns The number of .ipxe files found or an error
+*/
 func ConfigureiPXE(httpSrv string) (int, error) {
 	ipxeScript, err := tools.GetFilesList("../..", "install.ipxe")
 	if err != nil {

@@ -101,12 +101,12 @@ var (
 	vmName                    string
 )
 
-/**
- * Wait for cluster to be in a stable state
- * @param ns Namespace where the cluster is deployed
- * @param cn Cluster resource name
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Wait for cluster to be in a stable state
+  - @param ns Namespace where the cluster is deployed
+  - @param cn Cluster resource name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func WaitCluster(ns, cn string) {
 	type state struct {
 		conditionStatus string
@@ -223,12 +223,12 @@ func WaitCluster(ns, cn string) {
 	}
 }
 
-/**
- * Check that Cluster resource has been correctly created
- * @param ns Namespace where the cluster is deployed
- * @param cn Cluster resource name
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Check that Cluster resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param cn Cluster resource name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func CheckCreatedCluster(ns, cn string) {
 	// Check that the cluster is correctly created
 	Eventually(func() string {
@@ -239,12 +239,12 @@ func CheckCreatedCluster(ns, cn string) {
 	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(cn))
 }
 
-/**
- * Check that Cluster resource has been correctly created
- * @param ns Namespace where the cluster is deployed
- * @param rn MachineRegistration resource name
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Check that Cluster resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param rn MachineRegistration resource name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func CheckCreatedRegistration(ns, rn string) {
 	Eventually(func() string {
 		out, _ := kubectl.Run("get", "MachineRegistration",
@@ -254,12 +254,12 @@ func CheckCreatedRegistration(ns, rn string) {
 	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(rn))
 }
 
-/**
- * Check that a SelectorTemplate resource has been correctly created
- * @param ns Namespace where the cluster is deployed
- * @param sn Selector name
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Check that a SelectorTemplate resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param sn Selector name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func CheckCreatedSelectorTemplate(ns, sn string) {
 	Eventually(func() string {
 		out, _ := kubectl.Run("get", "MachineInventorySelectorTemplate",
@@ -269,11 +269,11 @@ func CheckCreatedSelectorTemplate(ns, sn string) {
 	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(sn))
 }
 
-/**
- * Wait for OSVersion to be populated
- * @param ns Namespace where the cluster is deployed
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Wait for OSVersion to be populated
+  - @param ns Namespace where the cluster is deployed
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func WaitForOSVersion(ns string) {
 	Eventually(func() string {
 		out, _ := kubectl.Run("get", "ManagedOSVersion",
@@ -283,11 +283,11 @@ func WaitForOSVersion(ns string) {
 	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
 }
 
-/**
- * Check SSH connection
- * @param cl Client (node) informations
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Check SSH connection
+  - @param cl Client (node) informations
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func CheckSSH(cl *tools.Client) {
 	Eventually(func() string {
 		out, _ := cl.RunSSH("echo SSH_OK")
@@ -295,13 +295,13 @@ func CheckSSH(cl *tools.Client) {
 	}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
 }
 
-/**
- * Download ISO built with SeedImage
- * @param ns Namespace where the cluster is deployed
- * @param seedName Name of the used SeedImage resource
- * @param filename Path and name of the file where to store the ISO
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Download ISO built with SeedImage
+  - @param ns Namespace where the cluster is deployed
+  - @param seedName Name of the used SeedImage resource
+  - @param filename Path and name of the file where to store the ISO
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func DownloadBuiltISO(ns, seedName, filename string) {
 	// Set minimal ISO file to 500MB
 	const minimalISOSize = 500 * 1024 * 1024
@@ -331,11 +331,11 @@ func DownloadBuiltISO(ns, seedName, filename string) {
 	}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
 }
 
-/**
- * Get Elemental node information
- * @param hn Node hostname
- * @returns Client structure and MAC address
- */
+/*
+Get Elemental node information
+  - @param hn Node hostname
+  - @returns Client structure and MAC address
+*/
 func GetNodeInfo(hn string) (*tools.Client, string) {
 	// Get network data
 	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
@@ -351,11 +351,11 @@ func GetNodeInfo(hn string) (*tools.Client, string) {
 	return c, data.Mac
 }
 
-/**
- * Get Elemental node IP address
- * @param hn Node hostname
- * @returns IP address
- */
+/*
+Get Elemental node IP address
+  - @param hn Node hostname
+  - @returns IP address
+*/
 func GetNodeIP(hn string) string {
 	// Get network data
 	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
@@ -364,23 +364,23 @@ func GetNodeIP(hn string) string {
 	return data.IP
 }
 
-/**
- * Execute RunHelmBinaryWithCustomErr within a loop with timeout
- * @param s options to pass to RunHelmBinaryWithCustomErr command
- * @returns Nothing, the function will fail through Ginkgo in case of issue
- */
+/*
+Execute RunHelmBinaryWithCustomErr within a loop with timeout
+  - @param s options to pass to RunHelmBinaryWithCustomErr command
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
 func RunHelmCmdWithRetry(s ...string) {
 	Eventually(func() error {
 		return kubectl.RunHelmBinaryWithCustomErr(s...)
 	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
 }
 
-/**
- * Execute SSH command with retry
- * @param cl Client (node) informations
- * @param cmd Command to execute
- * @returns result of the executed command
- */
+/*
+Execute SSH command with retry
+  - @param cl Client (node) informations
+  - @param cmd Command to execute
+  - @returns result of the executed command
+*/
 func RunSSHWithRetry(cl *tools.Client, cmd string) string {
 	var err error
 	var out string
