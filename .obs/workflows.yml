@@ -15,6 +15,12 @@ push_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: SLE-Micro-base
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-kvm
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-rt
   filters:
     branches:
       only:
@@ -38,6 +44,12 @@ tag_workflow:
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
         package: SLE-Micro-base
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-kvm
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: SLE-Micro-rt
   filters:
     event: tag_push
 
@@ -62,6 +74,14 @@ pr_workflow:
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
         source_package: SLE-Micro-base
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: SLE-Micro-kvm
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: SLE-Micro-rt
         target_project: isv:Rancher:Elemental:PR
   filters:
     event: pull_request
