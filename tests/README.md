@@ -1,5 +1,23 @@
 # Tests description for e2e
 
+## `airgap_test.go`
+
+- **Describe:** E2E - Build the airgap archive
+    - **It:** Execute the script to build the archive
+- **Describe:** E2E - Deploy K3S/Rancher in airgap environment
+    - **It:** Create the rancher-manager machine
+      -  **By:** Updating the default network configuration
+      -  **By:** Downloading the qcow2 image from GCP storage
+      -  **By:** Creating the Rancher Manager VM
+    - **It:** Install K3S/Rancher in the rancher-manager machine
+      -  **By:** Sending the archive file into the rancher server
+      -  **By:** Deploying airgap infrastructure by executing the deploy script
+      -  **By:** Getting the kubeconfig file of the airgap cluster
+      -  **By:** Installing kubectl
+      -  **By:** Installing CertManager
+      -  **By:** Installing Rancher
+      -  **By:** Installing Elemental Operator
+
 ## `app_test.go`
 
 - **Describe:** E2E - Install a simple application
