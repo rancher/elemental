@@ -165,6 +165,8 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		By("Installing Rancher", func() {
 			// TODO: Use the DeployRancherManager function from install.go
 			rancherAirgapVersion, err := exec.Command("bash", "-c", "ls /opt/rancher/helm/rancher-*.tgz").Output()
+			Expect(err).To(Not(HaveOccurred()))
+
 			// Set flags for Rancher Manager installation
 			flags := []string{
 				"upgrade", "--install", "rancher", string(rancherAirgapVersion),
