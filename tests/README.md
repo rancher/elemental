@@ -74,16 +74,17 @@
 ## `configure_test.go`
 
 - **Describe:** E2E - Configure test
-    - **It:** Configure Rancher and libvirt
-      -  **By:** Creating a new cluster
+    - **It:** Deploy a new cluster
+      -  **By:** Creating a cluster
       -  **By:** Creating cluster selectors
       -  **By:** Adding MachineRegistration
+    - **It:** Configure Libvirt if needed
       -  **By:** Starting default network
 
 ## `install_test.go`
 
 - **Describe:** E2E - Install Rancher Manager
-    - **It:** Install Rancher Manager
+    - **It:** Install upsteam K8s cluster
       -  **By:** Installing RKE2
       -  **By:** Configuring hardened cluster
       -  **By:** Starting RKE2
@@ -95,10 +96,10 @@
       -  **By:** Configuring Kubeconfig file
       -  **By:** Configuring Private CA
       -  **By:** Installing CertManager
-      -  **By:** Installing Rancher Manager
+    - **It:** Installing Rancher Manager
       -  **By:** Configuring kubectl to use Rancher admin user
       -  **By:** Workaround for upgrade test, restart Fleet controller and agent
-      -  **By:** Installing Elemental Operator
+    - **It:** Installing Elemental Operator
 
 ## `logs_test.go`
 
@@ -110,13 +111,15 @@
 
 ## `multi-cluster_test.go`
 
-- **Describe:** E2E - Bootstrapping node
-    - **It:** Provision the node
+- **Describe:** E2E - Bootstrapping nodes
+    - **It:** Configure Libvirt
       -  **By:** Starting default network
+    - **It:** Configure and create ISO image
       -  **By:** Adding MachineRegistration
       -  **By:** Downloading MachineRegistration file
       -  **By:** Creating ISO from SeedImage
-      -  **By:** Downloading ISO built by SeedImage
+    - **It:** Downloading ISO built by SeedImage
+    - **It:** Create clusters and deploy nodes
       -  **By:** Creating cluster +createdClusterName
       -  **By:** Creating cluster selector for cluster +createdClusterName
       -  **By:** Installing node +h+ on cluster +createdClusterName
@@ -141,7 +144,7 @@
     - **It:** Configure and create ISO image
       -  **By:** Adding SeedImage
       -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM
-      -  **By:** Downloading ISO built by SeedImage
+    - **It:** Download ISO built by SeedImage
 
 ## `suite_test.go`
 
@@ -191,6 +194,22 @@
       -  **By:** Checking VM upgrade on +h
       -  **By:** Checking OS version on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
+
+# Tests description for e2e/helpers/qase
+
+## `qase_example_test.go`
+
+- **Describe:** Qase Ginkgo Integration - Basic tests
+    - **It:** Test a sleep function
+    - **It:** Test the Qase function with ID=30
+      -  **By:** testing that output is not empty will pass
+      -  **By:** testing that output is empty will fail
+    - **It:** Test the Qase function with ID=31
+      -  **By:** testing that output is not empty will pass
+
+## `suite_test.go`
+
+*No test defined!*
 
 # Tests description for cypress/latest/e2e/unit_tests
 
