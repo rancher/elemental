@@ -44,9 +44,11 @@ deps:
 generate-readme:
 	@./scripts/generate-readme > README.md
 
-# Qase deps
+# Qase commands
 create-qase-run: deps
-	@go run qase/create_qase_run.go
+	@go run qase/qase_cmd.go -create
+delete-qase-run: deps
+	@go run qase/qase_cmd.go -delete
 
 # E2E tests
 e2e-airgap-rancher: deps
