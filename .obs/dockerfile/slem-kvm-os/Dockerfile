@@ -11,7 +11,7 @@ ARG SLEMICRO_VERSION
 FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
-RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
+RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 
 # replace default kernel with smaller one, sufficient to run kvm guests
 RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent

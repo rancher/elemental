@@ -14,7 +14,7 @@ ARG IMAGE_TAG=%VERSION%-%RELEASE%
 FROM suse/sle-micro/$SLEMICRO_VERSION:latest AS os
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
-RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
+RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
