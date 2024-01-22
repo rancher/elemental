@@ -692,6 +692,12 @@ jobs:
             echo "Channel: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
+      - name: Delete Qase Run if job has been cancelled
+        if: ${{ always() && job.status == 'cancelled' }}
+        run: |
+          if [[ -n "${QASE_RUN_ID}" ]]; then
+            cd tests && make delete-qase-run
+          fi
       - name: Send failed status to slack
         if: ${{ failure() && github.event_name == 'schedule' }}
         uses: slackapi/slack-github-action@v1.23.0

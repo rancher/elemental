@@ -119,9 +119,7 @@ func createRun(client *qase.APIClient, name, description string, ids []int64) *q
 }
 
 /*
-This function creates a run in a specific project.
-  - @param name Name of the run
-  - @param description Short description of the run
+This function creates a run in a specific project. This is the exported version of the function.
   - @return ID of the created run
 */
 func CreateRun() int32 {
@@ -140,7 +138,9 @@ func CreateRun() int32 {
 		logrus.Debugf("Run named '%s' with description '%s' created with id %d", runName, runDescription, createdID)
 
 		// Check that we can access the run
-		checkRun(client, createdID)
+		if itExists := checkRun(client, createdID); !itExists {
+			logrus.Fatalf("Run %d doesn't exist", createdID)
+		}
 
 		// Export runID for all functions to use it
 		os.Setenv("QASE_RUN_ID", fmt.Sprint(runID))
@@ -155,11 +155,16 @@ This function checks the availability of a specific run.
   - @param id ID of the run to check
   - @return Fatal on error
 */
-func checkRun(client *qase.APIClient, id int32) {
+func checkRun(client *qase.APIClient, id int32) bool {
 	runResponse, _, err := client.RunsApi.GetRun(context.TODO(), projectCode, id)
-	if err != nil || !runResponse.Status {
-		logrus.Fatalf("Error on checking run: %v", err)
+	if err != nil {
+		logrus.Debugf("Error on checking run: %v", err)
+		// Return false in case if error
+		// As we don't care about the reason why, the run is not available anyway
+		return false
 	}
+
+	return runResponse.Status
 }
 
 /*
@@ -185,6 +190,32 @@ func deleteRun(client *qase.APIClient, id int32) {
 	idResponse, _, err := client.RunsApi.DeleteRun(context.TODO(), projectCode, id)
 	if err != nil || !idResponse.Status {
 		logrus.Fatalf("Error on deleting run with id %d: %v", id, err)
+	}
+}
+
+/*
+This function completely deletes a specific run. This is the exported version of the function.
+  - @return Fatal on error
+*/
+func DeleteRun() {
+	cfg := qase.NewConfiguration()
+	cfg.AddDefaultHeader("Token", apiToken)
+	client := qase.NewAPIClient(cfg)
+
+	// Do something only if run id is valid
+	if runID > 0 {
+		if checkProject(client, projectCode) {
+			logrus.Debugf("Project %s is validated", projectCode)
+
+			// Delete test run
+			deleteRun(client, runID)
+			logrus.Debugf("Run id %d has been deleted", runID)
+
+			// Check that we can't access the run
+			if itExists := checkRun(client, runID); itExists {
+				logrus.Fatalf("Run %d still exists", runID)
+			}
+		}
 	}
 }
 
