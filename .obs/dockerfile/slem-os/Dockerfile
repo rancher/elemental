@@ -34,7 +34,7 @@ ARG IMAGE_TAG=%VERSION%-%RELEASE%
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
 # Also used by elemental-populate-labels
-RUN grep -v IMAGE_REPO /etc/os-release | grep -v "IMAGE_TAG|IMAGE=|TIMESTAMP|GRUB_ENTRY_NAME" > /tmp/os-release
+RUN grep -v "IMAGE_REPO\|IMAGE_TAG\|IMAGE=\|TIMESTAMP\|GRUB_ENTRY_NAME" /etc/os-release > /tmp/os-release
 RUN mv /tmp/os-release /etc/os-release
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
