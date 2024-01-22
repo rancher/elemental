@@ -11,7 +11,7 @@ ARG SLEMICRO_VERSION
 FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
-RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
+RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 
 # extend -base with baremetal and usability packages
 RUN zypper in --no-recommends -y procps openssl openssh openssh-server \
