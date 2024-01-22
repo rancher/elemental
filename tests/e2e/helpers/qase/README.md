@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This `qase-ginkgo` integration library is a a basic library that can be used to report results from Ginkgo Go tests to Qase reporting tool.
+This `qase-ginkgo` integration library is a basic library that can be used to report results from Ginkgo Go tests to Qase reporting tool.
 
 ## Quick test
 
