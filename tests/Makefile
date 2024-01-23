@@ -49,6 +49,8 @@ create-qase-run: deps
 	@go run qase/qase_cmd.go -create
 delete-qase-run: deps
 	@go run qase/qase_cmd.go -delete
+publish-qase-run: deps
+	@go run qase/qase_cmd.go -publish
 
 # E2E tests
 e2e-airgap-rancher: deps

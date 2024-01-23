@@ -698,6 +698,12 @@ jobs:
           if [[ -n "${QASE_RUN_ID}" ]]; then
             cd tests && make delete-qase-run
           fi
+      - name: Finalize Qase Run and publish Results
+        if: ${{ always() && job.status != 'cancelled' }}
+        run: |
+          if [[ -n "${QASE_RUN_ID}" ]]; then
+            cd tests && make publish-qase-run
+          fi
       - name: Send failed status to slack
         if: ${{ failure() && github.event_name == 'schedule' }}
         uses: slackapi/slack-github-action@v1.23.0

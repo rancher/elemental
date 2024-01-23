@@ -43,6 +43,7 @@ func main() {
 	// Define the allowed options
 	createRun := flag.Bool("create", false, "create a new Qase run")
 	deleteRun := flag.Bool("delete", false, "delete a Qase run, QASE_RUN_ID should be set")
+	publishRun := flag.Bool("publish", false, "publish a Qase report, QASE_RUN_ID should be set, it also depends on QASE_REPORT and QASE_RUN_COMPLETE")
 
 	// Parse the arguments
 	flag.Parse()
@@ -58,7 +59,10 @@ func main() {
 	} else if *deleteRun {
 		qase.DeleteRun()
 		logrus.Debugf("Qase run id %d deleted", runID)
+	} else if *publishRun {
+		qase.FinalizeResults()
+		logrus.Debugf("Qase finalization for run id %d has been done", runID)
 	} else {
-		logrus.Debugln("Nothing do to!")
+		logrus.Debugln("Nothing to do!")
 	}
 }
