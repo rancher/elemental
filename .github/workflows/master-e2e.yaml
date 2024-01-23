@@ -227,7 +227,7 @@ jobs:
       QASE_PROJECT_CODE: ELEMENTAL
       QASE_REPORT: 1
       QASE_RUN_COMPLETE: 1
-      QASE_RUN_DESCRIPTION: ${{ inputs.test_description }}
+      QASE_RUN_DESCRIPTION: TO_BE_CHANGED
       QASE_RUN_ID: ${{ inputs.qase_run_id }}
       QASE_RUN_NAME: TO_BE_CHANGED
       # For Rancher Manager
@@ -255,8 +255,14 @@ jobs:
           # 'env:' because GITHUB_WORKFLOW is a shell variable
           echo "QASE_RUN_NAME=${GITHUB_WORKFLOW}" >> ${GITHUB_ENV}
 
-          # Export it also to be used locally
+          # Also export URL of GH test run in Qase run description
+          GH_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          QASE_DESC="${{ inputs.test_description }} (${GH_RUN_URL})"
+          echo "QASE_RUN_DESCRIPTION=${QASE_DESC}" >> ${GITHUB_ENV}
+
+          # Export them also to be used locally
           export QASE_RUN_NAME="${GITHUB_WORKFLOW}"
+          export QASE_RUN_DESCRIPTION="${QASE_DESC}"
 
           # We need to always unset the faking ID variable
           unset QASE_RUN_ID
@@ -268,7 +274,7 @@ jobs:
           fi
 
           # Just an info for debugging purposes
-          echo "Export QASE_RUN_ID=${ID} and QASE_RUN_NAME=${GITHUB_WORKFLOW}"
+          echo "Export QASE_RUN_ID=${QASE_RUN_ID}, QASE_RUN_DESCRIPTION=${QASE_RUN_DESCRIPTION} and QASE_RUN_NAME=${QASE_RUN_NAME}"
       - name: Install Rancher+Elemental components
         env:
           CA_TYPE: ${{ inputs.ca_type }}
