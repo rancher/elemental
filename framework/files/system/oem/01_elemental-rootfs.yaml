@@ -34,12 +34,13 @@ stages:
           /etc/systemd
           /etc/rancher
           /etc/ssh
-          /etc/iscsi 
+          /etc/iscsi
           /etc/cni
           /home
           /opt
           /root
           /usr/libexec
+          /usr/local
           /var/log
           /var/lib/elemental
           /var/lib/rancher
