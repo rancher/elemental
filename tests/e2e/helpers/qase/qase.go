@@ -198,23 +198,26 @@ This function completely deletes a specific run. This is the exported version of
   - @return Fatal on error
 */
 func DeleteRun() {
+	// Do something only if run id is valid
+	if runID <= 0 {
+		logrus.Debug("Nothing to delete!")
+		return
+	}
+
 	cfg := qase.NewConfiguration()
 	cfg.AddDefaultHeader("Token", apiToken)
 	client := qase.NewAPIClient(cfg)
 
-	// Do something only if run id is valid
-	if runID > 0 {
-		if checkProject(client, projectCode) {
-			logrus.Debugf("Project %s is validated", projectCode)
+	if checkProject(client, projectCode) {
+		logrus.Debugf("Project %s is validated", projectCode)
 
-			// Delete test run
-			deleteRun(client, runID)
-			logrus.Debugf("Run id %d has been deleted", runID)
+		// Delete test run
+		deleteRun(client, runID)
+		logrus.Debugf("Run id %d has been deleted", runID)
 
-			// Check that we can't access the run
-			if itExists := checkRun(client, runID); itExists {
-				logrus.Fatalf("Run %d still exists", runID)
-			}
+		// Check that we can't access the run
+		if itExists := checkRun(client, runID); itExists {
+			logrus.Fatalf("Run %d still exists", runID)
 		}
 	}
 }
@@ -224,37 +227,38 @@ This function finalises the results for a specific run.
   - @return Fatal on error
 */
 func FinalizeResults() {
+	// Do something only if run id is valid
+	if runID <= 0 {
+		logrus.Debug("Nothing to finalize!")
+		return
+	}
+
 	cfg := qase.NewConfiguration()
 	cfg.AddDefaultHeader("Token", apiToken)
 	client := qase.NewAPIClient(cfg)
 
-	// Do something only if run id is valid
-	if runID > 0 {
-		if checkProject(client, projectCode) {
-			logrus.Debugf("Project %s is validated", projectCode)
+	if checkProject(client, projectCode) {
+		logrus.Debugf("Project %s is validated", projectCode)
 
-			// Complete run if needed
-			if runComplete != "" {
-				completeRun(client, runID)
+		// Complete run if needed
+		if runComplete != "" {
+			completeRun(client, runID)
 
-				// Log in Ginkgo
-				ginkgo.GinkgoWriter.Printf("Report for run ID %d has been complete\n", runID)
-			}
-
-			// Make the run publicly available
-			if report != "" {
-				runPublicResponse, _, err := client.RunsApi.UpdateRunPublicity(context.TODO(), qase.RunPublic{Status: true}, projectCode, runID)
-				if err != nil {
-					logrus.Fatalf("Error on publishing run: %v", err)
-				}
-				logrus.Debugf("Published run available here: %s", runPublicResponse.Result.Url)
-
-				// Log in Ginkgo
-				ginkgo.GinkgoWriter.Printf("Report for run ID %d available: %s\n", runID, runPublicResponse.Result.Url)
-			}
+			// Log in Ginkgo
+			ginkgo.GinkgoWriter.Printf("Report for run ID %d has been complete\n", runID)
 		}
-	} else {
-		logrus.Debug("Nothing to finalize!")
+
+		// Make the run publicly available
+		if report != "" {
+			runPublicResponse, _, err := client.RunsApi.UpdateRunPublicity(context.TODO(), qase.RunPublic{Status: true}, projectCode, runID)
+			if err != nil {
+				logrus.Fatalf("Error on publishing run: %v", err)
+			}
+			logrus.Debugf("Published run available here: %s", runPublicResponse.Result.Url)
+
+			// Log in Ginkgo
+			ginkgo.GinkgoWriter.Printf("Report for run ID %d available: %s\n", runID, runPublicResponse.Result.Url)
+		}
 	}
 }
 
@@ -289,7 +293,7 @@ This function creates/updates run/cases for specific Ginkgo tests.
 */
 func Qase(id int64, testReport ginkgo.SpecReport) {
 	// A negative or zero run/case ID means that we won't log anything
-	if runID == 0 || id <= 0 {
+	if runID <= 0 || id <= 0 {
 		return
 	}
 
