@@ -74,6 +74,9 @@ var _ = ReportAfterEach(func(report SpecReport) {
 Please note that you can change the `testCaseID` with your own variable, just pay attention to be consistent!
 You can also add more code in the `Report*` Ginkgo functions, this configuration is just the minimal stuff you need to add for the `qse-ginkgo` libray to work!
 
+**NOTE:** the `FinalizeResults()` call un `ReportAfterSuite` can be done outside with another Golang binary, this is just a simple example and you can adapt all to your needs.
+You can check another example on how it is done by having a look at the [Elemental project](https://www.github.com/rancher/elemental).
+
 Then, in your test code you have to add the case id value (`testCaseID` in our example) you want to report in Qase, for example like this:
 ```go
 func testFunc() ([]byte, error) {
