@@ -59,7 +59,6 @@ var (
 	apiToken       = os.Getenv("QASE_API_TOKEN")
 	environmentID  int64
 	envStrID       = os.Getenv("QASE_ENVIRONMENT_ID")
-	isDeleteRun    = os.Getenv("QASE_DELETE_RUN")
 	logLevel       = strings.ToUpper(os.Getenv("QASE_LOG_LEVEL"))
 	projectCode    = os.Getenv("QASE_PROJECT_CODE")
 	report         = os.Getenv("QASE_REPORT")
@@ -218,15 +217,6 @@ func FinalizeResults() {
 
 			// Log in Ginkgo
 			ginkgo.GinkgoWriter.Printf("Report for run ID %d available: %s\n", runID, runPublicResponse.Result.Url)
-		}
-
-		// Delete Run if needed - mainly used for debugging purposes!
-		if isDeleteRun != "" {
-			deleteRun(client, runID)
-
-			// Also clean the variable and the env as well
-			os.Unsetenv("QASE_RUN_ID")
-			runID = 0
 		}
 	} else {
 		logrus.Debug("Nothing to finalize!")

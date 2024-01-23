@@ -17,7 +17,6 @@ Example code to use the Qase reporter helper in Ginkgo tests.
 
 This test can be run with this command:
 $ QASE_LOG_LEVEL=debug                                          \
-  QASE_DELETE_RUN=1                                             \
   QASE_REPORT=1                                                 \
   QASE_RUN_COMPLETE=1                                           \
   QASE_RUN_NAME="Qase/Gingo Integration Run"                    \
