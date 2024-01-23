@@ -24,7 +24,6 @@ Here the variables you can use/define:
 | Variable | Description | Needed? |
 |:---:|:---:|:---:|
 | `QASE_API_TOKEN` | API token to access your Qase instance | Mandatory |
-| `QASE_DELETE_RUN` | Delete the specified run (mainly useful for debugging purposes) | Optional |
 | `QASE_ENVIRONNMENT_ID` | Use a specific environnment in a project | Optional |
 | `QASE_LOG_DEVEL` | Define log level use, see [logrus](https://pkg.go.dev/github.com/sirupsen/logrus#readme-level-logging) for more infos | Optional |
 | `QASE_PROJECT_CODE` | Code of your Qase project | Mandatory |
