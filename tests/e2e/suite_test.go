@@ -529,11 +529,6 @@ var _ = BeforeSuite(func() {
 	tools.HTTPShare("../..", ":8000")
 })
 
-var _ = ReportAfterSuite("Qase Report", func(report Report) {
-	// Finalize Qase report
-	FinalizeResults()
-})
-
 var _ = ReportBeforeEach(func(report SpecReport) {
 	// Reset case ID
 	testCaseID = -1

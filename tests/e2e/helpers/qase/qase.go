@@ -228,26 +228,30 @@ func FinalizeResults() {
 	cfg.AddDefaultHeader("Token", apiToken)
 	client := qase.NewAPIClient(cfg)
 
-	// Do something only if runID is valid
+	// Do something only if run id is valid
 	if runID > 0 {
-		// Complete run if needed
-		if runComplete != "" {
-			completeRun(client, runID)
+		if checkProject(client, projectCode) {
+			logrus.Debugf("Project %s is validated", projectCode)
 
-			// Log in Ginkgo
-			ginkgo.GinkgoWriter.Printf("Report for run ID %d has been complete\n", runID)
-		}
+			// Complete run if needed
+			if runComplete != "" {
+				completeRun(client, runID)
 
-		// Make the run publicly available
-		if report != "" {
-			runPublicResponse, _, err := client.RunsApi.UpdateRunPublicity(context.TODO(), qase.RunPublic{Status: true}, projectCode, runID)
-			if err != nil {
-				logrus.Fatalf("Error on publishing run: %v", err)
+				// Log in Ginkgo
+				ginkgo.GinkgoWriter.Printf("Report for run ID %d has been complete\n", runID)
 			}
-			logrus.Debugf("Published run available here: %s", runPublicResponse.Result.Url)
 
-			// Log in Ginkgo
-			ginkgo.GinkgoWriter.Printf("Report for run ID %d available: %s\n", runID, runPublicResponse.Result.Url)
+			// Make the run publicly available
+			if report != "" {
+				runPublicResponse, _, err := client.RunsApi.UpdateRunPublicity(context.TODO(), qase.RunPublic{Status: true}, projectCode, runID)
+				if err != nil {
+					logrus.Fatalf("Error on publishing run: %v", err)
+				}
+				logrus.Debugf("Published run available here: %s", runPublicResponse.Result.Url)
+
+				// Log in Ginkgo
+				ginkgo.GinkgoWriter.Printf("Report for run ID %d available: %s\n", runID, runPublicResponse.Result.Url)
+			}
 		}
 	} else {
 		logrus.Debug("Nothing to finalize!")
