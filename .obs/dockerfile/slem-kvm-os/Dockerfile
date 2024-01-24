@@ -56,7 +56,4 @@ RUN rm -rf /var/log/update* && \
     rm -rf /boot/vmlinux*
 
 # Rebuild initrd to setup dracut with the boot configurations
-RUN elemental init --force immutable-rootfs,grub-config,dracut-config,cloud-config-essentials,elemental-setup && \
-    # aarch64 has an uncompressed kernel so we need to link it to vmlinuz
-    kernel=$(ls /boot/Image-* 2>/dev/null | head -n1) && \
-    if [ -e "$kernel" ]; then ln -sf "${kernel#/boot/}" /boot/vmlinuz; fi
+RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup
