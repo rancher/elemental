@@ -207,6 +207,9 @@ jobs:
   e2e:
     needs: create-runner
     runs-on: ${{ needs.create-runner.outputs.uuid }}
+    outputs:
+      qase_run_id: ${{ steps.qase.outputs.qase_run_id }}
+      steps_status: ${{ join(steps.*.conclusion, ' ') }}
     env:
       ARCH: amd64
       CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
@@ -236,19 +239,24 @@ jobs:
       TIMEOUT_SCALE: 3
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
       - name: Install Go
+        id: install_go
         uses: actions/setup-go@v3
         with:
           go-version-file: tests/go.mod
       - name: Define needed system variables
+        id: define_sys_vars
         run: |
           # Add missing PATH, removed in recent distributions for security reasons...
           echo "/usr/local/bin" >> ${GITHUB_PATH}
       - name: Deploy Proxy
+        id: proxy
         if: ${{ inputs.proxy == 'elemental' || inputs.proxy == 'rancher' }}
         run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
       - name: Create Qase Run (if needed)
+        id: qase
         if: ${{ inputs.qase_run_id == 'auto' }}
         run: |
           # Export the Qase run name, as it cannot be done in
@@ -271,11 +279,16 @@ jobs:
           if [[ -n "${ID}" ]]; then
             # Export QASE_RUN_ID to be sure that we always have the same value
             echo "QASE_RUN_ID=${ID}" >> ${GITHUB_ENV}
+            export QASE_RUN_ID=${ID}
           fi
+
+          # Output for the clean step
+          echo "qase_run_id=${QASE_RUN_ID}" >> ${GITHUB_OUTPUT}
 
           # Just an info for debugging purposes
           echo "Export QASE_RUN_ID=${QASE_RUN_ID}, QASE_RUN_DESCRIPTION=${QASE_RUN_DESCRIPTION} and QASE_RUN_NAME=${QASE_RUN_NAME}"
       - name: Install Rancher+Elemental components
+        id: install_rancher_elemental
         env:
           CA_TYPE: ${{ inputs.ca_type }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
@@ -292,6 +305,7 @@ jobs:
             kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
           fi
       - name: Install backup-restore components (K3s only for now)
+        id: install_backup_restore
         if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-backup-restore
       - name: Extract component versions/informations
@@ -323,9 +337,11 @@ jobs:
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Install Chartmuseum
+        id: install_chartmuseum
         if: ${{ inputs.test_type == 'ui' }}
         run: cd tests && make e2e-install-chartmuseum
       - name: Cypress tests - Basics
+        id: cypress_basics
         # Basics means tests without an extra elemental node needed
         if: ${{ inputs.test_type == 'ui' }}
         env:
@@ -353,6 +369,7 @@ jobs:
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
+        id: upload_screenshots_cypress_basics
         if: ${{ failure() && inputs.test_type == 'ui' }}
         uses: actions/upload-artifact@v3
         with:
@@ -361,6 +378,7 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Basics)
+        id: upload_videos_cypress_basics
         # Test run video is always captured, so this action uses "always()" condition
         if: ${{ always() && inputs.test_type == 'ui' }}
         uses: actions/upload-artifact@v3
@@ -369,6 +387,7 @@ jobs:
           path: tests/cypress/latest/videos
           retention-days: 7
       - name: Deploy a node to join Rancher manager
+        id: deploy_node_ui
         if: ${{ inputs.test_type == 'ui' }}
         env:
           ISO_BOOT: ${{ inputs.iso_boot }} 
@@ -383,6 +402,7 @@ jobs:
             make e2e-ui-rancher
           )
       - name: Cypress tests - Advanced
+        id: cypress_advanced
         # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
         if: ${{ inputs.test_type == 'ui' }}
         env:
@@ -410,6 +430,7 @@ jobs:
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
+        id: upload_screenshots_cypress_advanced
         if: ${{ failure() && inputs.test_type == 'ui' }}
         uses: actions/upload-artifact@v3
         with:
@@ -418,6 +439,7 @@ jobs:
           retention-days: 7
           if-no-files-found: ignore
       - name: Upload Cypress videos (Advanced)
+        id: upload_videos_cypress_advanced
         # Test run video is always captured, so this action uses "always()" condition
         if: ${{ always() && inputs.test_type == 'ui' }}
         uses: actions/upload-artifact@v3
@@ -426,9 +448,11 @@ jobs:
           path: tests/cypress/latest/videos
           retention-days: 7
       - name: Configure Rancher & Libvirt
+        id: configure_rancher
         if: ${{ inputs.test_type == 'single_cli' }}
         run: cd tests && make e2e-configure-rancher
       - name: Create ISO image for master pool
+        id: create_iso_master
         if: ${{ inputs.test_type == 'single_cli' }}
         env:
           EMULATE_TPM: true
@@ -442,9 +466,11 @@ jobs:
           fi
           cd tests && make e2e-iso-image
       - name: Extract iPXE artifacts from ISO
+        id: extract_ipxe_artifacts
         if: ${{ inputs.test_type == 'single_cli' && inputs.iso_boot == false }}
         run: cd tests && make extract_kernel_init_squash && make ipxe
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
+        id: bootstrap_master_nodes
         if: ${{ inputs.test_type == 'single_cli' }}
         env:
           EMULATE_TPM: true
@@ -471,6 +497,7 @@ jobs:
             cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
           fi
       - name: Deploy multiple clusters (with 3 nodes by cluster)
+        id: deploy_multi_clusters
         if: inputs.test_type == 'multi_cli'
         env:
           CLUSTER_NUMBER: ${{ inputs.cluster_number }}
@@ -483,17 +510,20 @@ jobs:
           fi
           cd tests && make e2e-multi-cluster
       - name: Install a simple application
+        id: install_simple_app
         if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
       - name: Reset a node in the cluster
+        id: reset_node
         if: ${{ inputs.test_type == 'single_cli' && inputs.reset == true }}
         run: cd tests && make e2e-reset
       - name: Check app after reset
+        id: check_app
         if: ${{ inputs.test_type == 'single_cli' && inputs.reset == true && contains(inputs.upstream_cluster_version, 'k3s') }}
         run: cd tests && make e2e-check-app
       - name: Upgrade Elemental Operator
-        if: ${{ inputs.test_type == 'single_cli' && inputs.operator_upgrade != '' }}
         id: operator_upgrade
+        if: ${{ inputs.test_type == 'single_cli' && inputs.operator_upgrade != '' }}
         env:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
@@ -510,8 +540,8 @@ jobs:
           echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade Rancher Manager
-        if: ${{ inputs.test_type == 'single_cli' && inputs.rancher_upgrade != '' }}
         id: rancher_upgrade
+        if: ${{ inputs.test_type == 'single_cli' && inputs.rancher_upgrade != '' }}
         env:
           CA_TYPE: ${{ inputs.ca_type }}
           PROXY: ${{ inputs.proxy }}
@@ -531,6 +561,7 @@ jobs:
           # Export values
           echo "rm_version=${RM_VERSION}" >> ${GITHUB_OUTPUT}
       - name: Upgrade node 1 to specified OS version with osImage
+        id: upgrade_node_1
         if: ${{ inputs.test_type == 'single_cli' && inputs.upgrade_image != '' }}
         env:
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
@@ -542,6 +573,7 @@ jobs:
             make e2e-check-app
           fi
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
+        id: upgrade_other_nodes
         if: ${{ inputs.test_type == 'single_cli' && inputs.upgrade_os_channel != '' }}
         env:
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
@@ -554,6 +586,7 @@ jobs:
             make e2e-check-app
           fi
       - name: Test Backup/Restore Elemental resources with Rancher Manager
+        id: test_backup_restore
         if: ${{ inputs.test_type == 'single_cli' && contains(inputs.upstream_cluster_version, 'k3s') }}
         env:
           BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
@@ -563,8 +596,8 @@ jobs:
             make e2e-check-app
           fi
       - name: Extract ISO version
-        if: ${{ always() }}
         id: iso_version
+        if: ${{ always() }}
         run: |
           # Extract OS version from ISO
           ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
@@ -578,6 +611,7 @@ jobs:
           # Export value (even if empty!)
           echo "image_tag=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
       - name: Remove old built ISO image
+        id: clean_master_iso
         # Only one at a time is allowed, the new one will be created after if needed
         if: ${{ inputs.test_type == 'single_cli' }}
         run: rm -f *.iso
@@ -589,6 +623,7 @@ jobs:
           POOL: worker
         run: cd tests && make e2e-iso-image
       - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
+        id: bootstrap_worker_nodes
         if: ${{ inputs.test_type == 'single_cli' && inputs.node_number > 3 }}
         env:
           ISO_BOOT: true
@@ -614,16 +649,15 @@ jobs:
           if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
             make e2e-check-app
           fi
-      - name: List installed nodes
-        if: ${{ inputs.test_type == 'single_cli' }}
-        run: sudo virsh list
       - name: Uninstall Elemental Operator
+        id: uninstall_elemental_operator
         env:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
         if: ${{ inputs.destroy_runner == true && inputs.test_type == 'single_cli'  }}
         run: cd tests && make e2e-uninstall-operator
-      - name: Store logs
+      - name: Get logs
+        id: get_logs
         if: ${{ always() }}
         env:
           ELEMENTAL_SUPPORT: ${{ inputs.elemental_support }}
@@ -636,7 +670,8 @@ jobs:
             sudo rm -rf cypress/latest/downloads
             make e2e-get-logs
           )
-      - name: Upload cluster logs
+      - name: Upload logs
+        id: uploade_logs
         if: ${{ always() }}
         uses: actions/upload-artifact@v3
         with:
@@ -644,6 +679,7 @@ jobs:
           path: tests/**/logs/*
           if-no-files-found: ignore
       - name: Add summary
+        id: add_summary
         if: ${{ always() }}
         run: |
           # Define some variable(s)
@@ -698,19 +734,15 @@ jobs:
             echo "Channel: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
             echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
           fi
-      - name: Delete Qase Run if job has been cancelled
-        if: ${{ always() && job.status == 'cancelled' }}
-        run: |
-          if [[ -n "${QASE_RUN_ID}" ]]; then
-            cd tests && make delete-qase-run
-          fi
       - name: Finalize Qase Run and publish Results
+        id: finalize_qase
         if: ${{ always() && job.status != 'cancelled' }}
         run: |
           if [[ -n "${QASE_RUN_ID}" ]]; then
             cd tests && make publish-qase-run
           fi
       - name: Send failed status to slack
+        id: send_status
         if: ${{ failure() && github.event_name == 'schedule' }}
         uses: slackapi/slack-github-action@v1.23.0
         with:
@@ -740,8 +772,13 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
   clean-runner:
     if: ${{ always() }}
-    needs: e2e
+    needs: [create-runner, e2e]
     runs-on: ubuntu-latest
+    env:
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ELEMENTAL
+      QASE_RUN_ID: ${{ needs.e2e.outputs.qase_run_id }}
     steps:
       # actions/checkout MUST come before auth
       - name: Checkout
@@ -756,6 +793,12 @@ jobs:
         run: |
           gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }} || true
           gcloud --quiet secrets delete GH_REPO_${{ needs.create-runner.outputs.uuid }} || true
+      - name: Delete Qase Run if job has been cancelled
+        if: ${{ always() && contains(needs.e2e.outputs.steps_status, 'cancelled') }}
+        run: |
+          if [[ -n "${QASE_RUN_ID}" ]]; then
+            cd tests && make delete-qase-run
+          fi
   delete-runner:
     if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
     needs: [create-runner, clean-runner]
