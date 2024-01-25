@@ -20,7 +20,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/rancher/elemental/tests/e2e/helpers/qase"
+	qase "github.com/rancher-sandbox/qase-ginkgo"
 	"github.com/sirupsen/logrus"
 )
 

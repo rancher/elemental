@@ -8,8 +8,8 @@ require (
 	github.com/onsi/ginkgo/v2 v2.12.1
 	github.com/onsi/gomega v1.28.0
 	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20231019143409-a8e92d67d1e4
+	github.com/rancher-sandbox/qase-ginkgo v1.0.1
 	github.com/sirupsen/logrus v1.9.3
-	go.qase.io/client v0.0.0-20231114201952-65195ec001fa
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -22,6 +22,7 @@ require (
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/pprof v0.0.0-20230926050212-f7f687d19a98 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	go.qase.io/client v0.0.0-20231114201952-65195ec001fa // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
