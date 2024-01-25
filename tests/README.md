@@ -195,22 +195,6 @@
       -  **By:** Checking OS version on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
 
-# Tests description for e2e/helpers/qase
-
-## `qase_example_test.go`
-
-- **Describe:** Qase Ginkgo Integration - Basic tests
-    - **It:** Test a sleep function
-    - **It:** Test the Qase function with ID=30
-      -  **By:** testing that output is not empty will pass
-      -  **By:** testing that output is empty will fail
-    - **It:** Test the Qase function with ID=31
-      -  **By:** testing that output is not empty will pass
-
-## `suite_test.go`
-
-*No test defined!*
-
 # Tests description for cypress/latest/e2e/unit_tests
 
 ## `advanced_filtering.spec.ts`
