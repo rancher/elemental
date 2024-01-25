@@ -27,8 +27,8 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	. "github.com/rancher-sandbox/qase-ginkgo"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
-	. "github.com/rancher/elemental/tests/e2e/helpers/qase"
 )
 
 const (
