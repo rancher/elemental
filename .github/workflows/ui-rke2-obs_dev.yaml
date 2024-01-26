@@ -6,6 +6,7 @@ on:
     inputs:
       qase_run_id:
         description: Qase run ID where the results will be reported
+        default: auto
         required: false
         type: string
       destroy_runner:
@@ -27,8 +28,6 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
-      ui_account: user
-      qase_run_id: ${{ inputs.qase_run_id }}
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
@@ -37,6 +36,8 @@ jobs:
       iso_boot: true
       k8s_version_to_provision: v1.26.10+rke2r2
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
+      ui_account: user
       upstream_cluster_version: v1.26.10+rke2r2

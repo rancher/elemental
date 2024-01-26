@@ -6,6 +6,7 @@ on:
     inputs:
       qase_run_id:
         description: Qase run ID where the results will be reported
+        default: auto
         required: false
         type: string
       destroy_runner:
@@ -35,8 +36,6 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
-      qase_run_id: ${{ inputs.qase_run_id }}
-      ui_account: user
       cluster_name: cluster-rke2
       cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner }}
@@ -44,7 +43,9 @@ jobs:
       iso_boot: true
       k8s_version_to_provision: v1.26.10+rke2r2
       proxy: ${{ inputs.proxy }}
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
+      ui_account: user
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upstream_cluster_version: v1.26.10+rke2r2
