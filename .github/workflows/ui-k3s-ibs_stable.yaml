@@ -6,6 +6,7 @@ on:
     inputs:
       qase_run_id:
         description: Qase run ID where the results will be reported
+        default: auto
         required: false
         type: string
       destroy_runner:
@@ -35,7 +36,6 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS Deployment test with Standard K3s"
-      qase_run_id: ${{ inputs.qase_run_id }}
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
@@ -44,5 +44,6 @@ jobs:
       k8s_version_to_provision: v1.26.10+k3s2
       operator_repo: oci://registry.suse.com/rancher
       proxy: ${{ inputs.proxy }}
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
