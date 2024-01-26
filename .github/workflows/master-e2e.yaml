@@ -770,7 +770,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-  clean-runner:
+  clean-and-delete-runner:
     if: ${{ always() }}
     needs: [create-runner, e2e]
     runs-on: ubuntu-latest
@@ -793,28 +793,20 @@ jobs:
         run: |
           gcloud --quiet secrets delete PAT_TOKEN_${{ needs.create-runner.outputs.uuid }} || true
           gcloud --quiet secrets delete GH_REPO_${{ needs.create-runner.outputs.uuid }} || true
+      - name: Delete runner
+        if: ${{ needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
+        run: |
+          LOGS=$(gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
+                   --delete-disks all \
+                   --zone ${{ inputs.zone }} 2>&1)
+          # If runner is already deleted we can bypass the error
+          # NOTE: seems to still return an error if the VM is already deleted... To fix!
+          if (( $? )); then
+            echo "${LOGS}" | grep -q "resource .* was not found" && true || false
+          fi
       - name: Delete Qase Run if job has been cancelled
         if: ${{ always() && contains(needs.e2e.outputs.steps_status, 'cancelled') }}
         run: |
           if [[ -n "${QASE_RUN_ID}" ]]; then
             cd tests && make delete-qase-run
           fi
-  delete-runner:
-    if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
-    needs: [create-runner, clean-runner]
-    runs-on: ubuntu-latest
-    steps:
-      # actions/checkout MUST come before auth
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.credentials }}
-      - name: Setup gcloud
-        uses: google-github-actions/setup-gcloud@v1
-      - name: Delete runner
-        run: |
-          gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
-            --delete-disks all \
-            --zone ${{ inputs.zone }}
