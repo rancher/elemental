@@ -8,6 +8,10 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      operator_repo:
+        description: Operator version to use for initial deployment
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+        type: string
   schedule:
     - cron: '0 8 * * *'
 
@@ -22,8 +26,10 @@ jobs:
       cert-manager_version: v1.12.2
       cluster_name: airgap-cluster
       cluster_type: airgap
-      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      #destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      destroy_runner: false
       k8s_version_to_provision: v1.26.8+k3s1
+      operator_repo: ${{ inputs.operator_repo }}
       os_to_test: dev
       rancher_version: stable/latest/2.7
       test_type: cli

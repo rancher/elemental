@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("E2E - Build the airgap archive", Label("prepare-archive"), func() {
 	It("Execute the script to build the archive", func() {
-		err := exec.Command("sudo", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion).Run()
+		err := exec.Command("sudo", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo).Run()
 		Expect(err).To(Not(HaveOccurred()))
 	})
 })

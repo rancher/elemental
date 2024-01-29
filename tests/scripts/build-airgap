@@ -8,6 +8,20 @@ K3S_UPSTREAM_VERSION=$1
 CERT_MANAGER_VERSION=$2
 RANCHER_CHANNEL=$3
 K3S_DOWNSTREAM_VERSION=$4
+ELEMENTAL_REPO=$5
+
+# Set Elemental version
+case $ELEMENTAL_REPO in
+  *dev*)
+    ELEMENTAL_VERSION=dev
+    ;;
+  *staging*)
+    ELEMENTAL_VERSION=staging
+    ;;
+  *)
+    ELEMENTAL_VERSION=stable
+    ;;
+esac
 
 # Create directories
 mkdir -p /opt/rancher/{k3s_$K3S_UPSTREAM_VERSION,helm} /opt/rancher/images/{cert,rancher,registry,elemental}
@@ -47,13 +61,13 @@ fi
 
 # Get rancher manager version
 RANCHER_MANAGER_VERSION=$(ls rancher*| cut -d '-' -f '2-3')
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart > /dev/null 2>&1
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-crds-chart > /dev/null 2>&1
+helm pull $ELEMENTAL_REPO/elemental-operator-chart > /dev/null 2>&1
+helm pull $ELEMENTAL_REPO/elemental-operator-crds-chart > /dev/null 2>&1
 
 # Temporary thing to get latest version of elemental-teal-iso (very ugly...)
 wget https://raw.githubusercontent.com/fgiudici/elemental-operator/airgap-allow-only-channel-creation/scripts/elemental-airgap.sh
 chmod +x elemental-airgap.sh
-./elemental-airgap.sh -r localhost:5000 -sa dev
+./elemental-airgap.sh -r localhost:5000 -sa $ELEMENTAL_VERSION
 
 # Get Images - Rancher/Elemental
 cd /opt/rancher/images/
@@ -116,8 +130,8 @@ for i in $(cat rancher/rancher-images.txt); do
   skopeo copy docker://$i docker-archive:rancher/$(echo $i| awk -F/ '{print $2}'|sed 's/:/_/g').tar:$(echo $i| awk -F/ '{print $2}') > /dev/null 2>&1
 done
 
-# TODO: improve how to fetch the registry image
-curl -#L https://github.com/clemenko/rke_airgap_install/raw/main/registry.tar -o registry/registry.tar > /dev/null 2>&1
+# Skopeo - Registry
+skopeo copy --additional-tag registry:latest docker://registry:latest docker-archive:registry/registry.tar > /dev/null 2>&1
 
 # Compress all the things
 cd /opt/rancher/
