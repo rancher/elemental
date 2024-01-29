@@ -46,6 +46,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 				key   string
 				value string
 			}
+			airgapImagesFile := "/opt/rancher/images/elemental/elemental-images.txt"
 
 			// Wait for list of OS versions to be populated
 			WaitForOSVersion(clusterNS)
@@ -61,7 +62,8 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			Expect(baseImageURL).To(Not(BeEmpty()))
 
 			if clusterType == "airgap" {
-				baseImageURL = "localhost:5000/elemental/sle-micro-iso-5.5:2.1.0"
+				isoVersion, _ := exec.Command("bash", "-c", "awk -F '/' '/sle-micro-iso/{print $NF}' "+airgapImagesFile).Output()
+				baseImageURL = "localhost:5000/elemental/sle-micro-iso-" + string(isoVersion)
 			}
 
 			// Set poweroff to false for master pool to have time to check SeedImage cloud-config
