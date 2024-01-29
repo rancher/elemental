@@ -796,12 +796,13 @@ jobs:
       - name: Delete runner
         if: ${{ needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
         run: |
-          LOGS=$(gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
-                   --delete-disks all \
-                   --zone ${{ inputs.zone }} 2>&1)
+          # Disable failure on first error, needed for the "delete" check
+          set +e
           # If runner is already deleted we can bypass the error
           # NOTE: seems to still return an error if the VM is already deleted... To fix!
-          if (( $? )); then
+          if ! LOGS=$(gcloud --quiet compute instances delete ${{ needs.create-runner.outputs.runner }} \
+                             --delete-disks all \
+                             --zone ${{ inputs.zone }} 2>&1); then
             echo "${LOGS}" | grep -q "resource .* was not found" && true || false
           fi
       - name: Delete Qase Run if job has been cancelled
