@@ -5,8 +5,7 @@ stages:
       commands:
       - |
         if [ ! -e /run/elemental/persistent/etc/hostname ]; then
-          mkdir -p /run/elemental/persistent/etc
-          echo rancher-${RANDOM} > /run/elemental/persistent/etc/hostname
+          sysctl kernel.hostname=rancher-${RANDOM}
         fi
         ln -sf /run/elemental/persistent/etc/hostname /etc/hostname
     - if: '[ ! -f "/run/elemental/recovery_mode" ]'
