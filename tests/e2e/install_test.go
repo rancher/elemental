@@ -17,7 +17,6 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 
@@ -338,10 +337,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 	})
 
-	// Deploy operator in CLI test or if Rancher version is < 2.8
-	// because operator can not be installed trough Marketplace in Rancher 2.7.x
-	matched, _ := regexp.MatchString(`2.8`, rancherHeadVersion)
-	if strings.Contains(testType, "cli") || matched == false {
+	// Deploy operator in CLI test
+	if strings.Contains(testType, "cli") {
 		It("Installing Elemental Operator", func() {
 			// Report to Qase
 			testCaseID = 62
