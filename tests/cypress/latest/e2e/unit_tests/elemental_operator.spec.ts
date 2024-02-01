@@ -28,8 +28,8 @@ filterTests(['main', 'upgrade'], () => {
       cypressLib.burgerMenuToggle();
     });
 
-    // Install the dev operator in the main scenario for Rancher 2.8.x
-    if (isCypressTag('main') && isRancherManagerVersion('2.8')){
+    // Install the dev operator in the main scenario for Rancher >= 2.8.x
+    if (isCypressTag('main') && !isRancherManagerVersion('2.7')){
       qase(11,
         it('Add local chartmuseum repo', () => {
           cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
@@ -37,7 +37,7 @@ filterTests(['main', 'upgrade'], () => {
       );
     };
   
-    if (isRancherManagerVersion('2.8')) {
+    if (!isRancherManagerVersion('2.7')) {
       qase(13,
         it('Install Elemental operator', () => {
           cy.contains('local')
