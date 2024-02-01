@@ -21,9 +21,6 @@ on:
 
 jobs:
   ui:
-    strategy:
-      matrix:
-        rancher_version: [latest/devel/2.8, latest/devel/2.9]
     uses: ./.github/workflows/master-e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
