@@ -1,0 +1,221 @@
+# This workflow is a reusable one called by other workflows
+name: (template) CLI/UI template
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      backup_restore_version:
+        required: true
+        type: string
+      ca_type:
+        required: true
+        type: string
+      cert-manager_version:
+        required: true
+        type: string
+      cluster_name:
+        required: true
+        type: string
+      cluster_number:
+        required: true
+        type: string
+      cluster_namespace:
+        required: true
+        type: string
+      cluster_type:
+        required: true
+        type: string
+      cypress_tags:
+        required: true
+        type: string
+      destroy_runner:
+        required: true
+        type: boolean
+      elemental_ui_version:
+        required: true
+        type: string
+      iso_boot:
+        required: true
+        type: boolean
+      k8s_version_to_provision:
+        required: true
+        type: string
+      node_number:
+        required: true
+        type: string
+      operator_repo:
+        required: true
+        type: string
+      operator_upgrade:
+        required: true
+        type: string
+      os_to_test:
+        required: true
+        type: string
+      proxy:
+        required: true
+        type: string
+      public_domain:
+        required: true
+        type: string
+      public_fqdn:
+        required: true
+        type: string
+      qase_project_code:
+        required: true
+        type: string
+      qase_run_id:
+        required: true
+        type: string
+      rancher_upgrade:
+        required: true
+        type: string
+      rancher_version:
+        required: true
+        type: string
+      reset:
+        required: true
+        type: boolean
+      runner_label:
+        required: true
+        type: string
+      sequential:
+        required: true
+        type: boolean
+      test_description:
+        required: true
+        type: string
+      test_type:
+        required: true
+        type: string
+      ui_account:
+        required: true
+        type: string
+      upgrade_image:
+        required: true
+        type: string
+      upgrade_os_channel:
+        required: true
+        type: string
+      upgrade_type:
+        required: true
+        type: string
+      upstream_cluster_version:
+        required: true
+        type: string
+
+    # Secrets to set when calling this reusable workflow
+    secrets:
+      qase_api_token:
+
+jobs:
+  airgap:
+    if: ${{ inputs.cluster_type == 'airgap' }}
+    uses: ./.github/workflows/sub_airgap.yaml
+    secrets:
+      qase_api_token: ${{ secrets.qase_api_token }}
+    with:
+      cert-manager_version: ${{ inputs.cert-manager_version }}
+      cluster_name: ${{ inputs.cluster_name }}
+      cluster_namespace: ${{ inputs.cluster_namespace }}
+      cluster_type: ${{ inputs.cluster_type }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      operator_repo: ${{ inputs.operator_repo }}
+      os_to_test: ${{ inputs.os_to_test }}
+      qase_project_code: ${{ inputs.qase_project_code }}
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_version: ${{ inputs.rancher_version }}
+      runner_label: ${{ inputs.runner_label }}
+      test_description: ${{ inputs.test_description }}
+      test_type: ${{ inputs.test_type }}
+      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+
+  cli:
+    if: ${{ inputs.test_type == 'cli' }}
+    uses: ./.github/workflows/sub_cli.yaml
+    secrets:
+      qase_api_token: ${{ secrets.qase_api_token }}
+    with:
+      backup_restore_version: ${{ inputs.backup_restore_version }}
+      ca_type: ${{ inputs.ca_type }}
+      cert-manager_version: ${{ inputs.cert-manager_version }}
+      cluster_name: ${{ inputs.cluster_name }}
+      cluster_namespace: ${{ inputs.cluster_namespace }}
+      cluster_type: ${{ inputs.cluster_type }}
+      destroy_runner: ${{ inputs.destroy_runner }}
+      iso_boot: ${{ inputs.iso_boot }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      node_number: ${{ inputs.node_number }}
+      operator_repo: ${{ inputs.operator_repo }}
+      operator_upgrade: ${{ inputs.operator_upgrade }}
+      os_to_test: ${{ inputs.os_to_test }}
+      public_domain: ${{ inputs.public_domain }}
+      public_fqdn: ${{ inputs.public_fqdn }}
+      qase_project_code: ${{ inputs.qase_project_code }}
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_upgrade: ${{ inputs.rancher_upgrade }}
+      rancher_version: ${{ inputs.rancher_version }}
+      reset: ${{ inputs.reset }}
+      runner_label: ${{ inputs.runner_label }}
+      sequential: ${{ inputs.sequential }}
+      test_description: ${{ inputs.test_description }}
+      test_type: ${{ inputs.test_type }}
+      upgrade_image: ${{ inputs.upgrade_image }}
+      upgrade_os_channel: ${{ inputs.os_channel }}
+      upgrade_type: ${{ inputs.upgrade_type }}
+      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+
+  multi:
+    if: ${{ inputs.test_type == 'multi' }}
+    uses: ./.github/workflows/sub_multi.yaml
+    secrets:
+      qase_api_token: ${{ secrets.qase_api_token }}
+    with:
+      ca_type: ${{ inputs.ca_type }}
+      cert-manager_version: ${{ inputs.cert-manager_version }}
+      cluster_name: ${{ inputs.cluster_name }}
+      cluster_namespace: ${{ inputs.cluster_namespace }}
+      cluster_number: ${{ inputs.cluster_number }}
+      cluster_type: ${{ inputs.cluster_type }}
+      iso_boot: ${{ inputs.iso_boot }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      operator_repo: ${{ inputs.operator_repo }}
+      public_domain: ${{ inputs.public_domain }}
+      public_fqdn: ${{ inputs.public_fqdn }}
+      qase_project_code: ${{ inputs.qase_project_code }}
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_version: ${{ inputs.rancher_version }}
+      runner_label: ${{ inputs.runner_label }}
+      test_description: ${{ inputs.test_description }}
+      test_type: ${{ inputs.test_type }}
+      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+
+  ui:
+    if: ${{ inputs.test_type == 'ui' }}
+    uses: ./.github/workflows/sub_ui.yaml
+    secrets:
+      qase_api_token: ${{ secrets.qase_api_token }}
+    with:
+      ca_type: ${{ inputs.ca_type }}
+      cert-manager_version: ${{ inputs.cert-manager_version }}
+      cluster_name: ${{ inputs.cluster_name }}
+      cluster_namespace: ${{ inputs.cluster_namespace }}
+      cluster_type: ${{ inputs.cluster_type }}
+      cypress_tags: ${{ inputs.cypress_tags }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version }}
+      iso_boot: ${{ inputs.iso_boot }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      operator_repo: ${{ inputs.operator_repo }}
+      proxy: ${{ inputs.proxy }}
+      public_domain: ${{ inputs.public_domain }}
+      public_fqdn: ${{ inputs.public_fqdn }}
+      qase_project_code: ${{ inputs.qase_project_code }}
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_version: ${{ inputs.rancher_version }}
+      runner_label: ${{ inputs.runner_label }}
+      test_description: ${{ inputs.test_description }}
+      ui_account: ${{ inputs.ui_account }}
+      upgrade_image: ${{ inputs.upgrade_image }}
+      upgrade_os_channel: ${{ inputs.os_channel }}
+      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}

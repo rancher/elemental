@@ -1,0 +1,282 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Main template
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      backup_restore_version:
+        description: Version of backup-restore-operator to use
+        type: string
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        default: selfsigned
+        type: string
+      cert-manager_version:
+        description: Version of cert-manager to use
+        type: string
+      cluster_name:
+        description: Name of the provisioned cluster
+        required: true
+        type: string
+      cluster_number:
+        description: Number of clusters to deploy in multi-cluster test
+        type: string
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        type: string
+      cypress_tags:
+        description: Tags to filter tests we want to run
+        default: main
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      elemental_ui_version:
+        description: Version of the elemental ui which will be installed (dev/stable)
+        default: dev
+        type: string
+      iso_boot:
+        description: Choose booting from ISO
+        default: false
+        type: boolean
+      k8s_version_to_provision:
+        description: Name and version of installed K8s distribution
+        required: true
+        type: string
+      node_number:
+        description: Number of nodes to deploy on the provisioned cluster
+        default: 5
+        type: string
+      operator_repo:
+        description: Elemental operator repository to use
+        type: string
+        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+      operator_upgrade:
+        description: Elemental operator version to upgrade to
+        type: string
+      os_to_test:
+        description: OS repository to test (dev/staging/stable)
+        type: string
+        default: dev
+      proxy:
+        description: Deploy a proxy
+        type: string
+      qase_run_id:
+        description: Case run ID where the results will be reported
+        type: string
+      rancher_upgrade:
+        description: Rancher Manager channel/version to upgrade to
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use for installation
+        default: stable/latest/none
+        type: string
+      reset:
+        description: Allow reset test (mainly used on CLI tests)
+        default: false
+        type: boolean
+      runner_template:
+        description: Runner template to use
+        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
+        type: string
+      sequential:
+        description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
+        default: false
+        type: boolean
+      test_description:
+        description: Short description of the test
+        default: Unknown
+        type: string
+      test_type:
+        description: Type of test to run (cli/ui)
+        required: true
+        type: string
+      ui_account:
+        description: Account used to test RBAC role in UI
+        type: string
+      upgrade_image:
+        description: Image to use for the Elemental OS upgrade
+        type: string
+      upgrade_os_channel:
+        description: Channel to use for the Elemental OS upgrade
+        type: string
+      upgrade_type:
+        description: Type of upgrade to use for the Elemental OS upgrade
+        type: string
+      upstream_cluster_version:
+        description: Cluster upstream version where to install Rancher (K3s or RKE2)
+        default: v1.26.10+k3s2
+        type: string
+      zone:
+        description: GCP zone to host the runner
+        default: us-central1-a
+        type: string
+
+    # Secrets to set when calling this reusable workflow
+    secrets:
+      credentials:
+        description: Credentials to use to connect
+        required: true
+      pat_token:
+        # A token is needed to be able to add runner on the repo, maybe this can be changed later
+        # This token is linked to a personal account
+        # So in case of token issue you have to check (no specific order and for example):
+        # - the expiration date
+        # - if the account associated still exists
+        # - if the person still has access to the repo
+        description: PAT token used to add runner
+        required: true
+      qase_api_token:
+        description: Qase API token to use for Qase reporting
+
+jobs:
+  create-runner:
+    uses: ./.github/workflows/sub_create-runner.yaml
+    secrets:
+      credentials: ${{ secrets.credentials }}
+      pat_token: ${{ secrets.pat_token }}
+    with:
+      runner_template: ${{ inputs.runner_template }}
+      zone: ${{ inputs.zone }}
+
+  pre-qase:
+    runs-on: ubuntu-latest
+    env:
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ELEMENTAL
+    outputs:
+      qase_run_description: ${{ steps.qase.outputs.qase_run_description }}
+      qase_run_id: ${{ steps.qase.outputs.qase_run_id }}
+      qase_run_name: ${{ steps.qase.outputs.qase_run_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: tests/go.sum
+          go-version-file: tests/go.mod
+
+      - name: Create/Export Qase Run
+        id: qase
+        run: |
+          if ${{ inputs.qase_run_id == 'auto' }}; then
+            # Define and export URL of GH test run in Qase run description
+            GH_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            QASE_DESC="${{ inputs.test_description }} (${GH_RUN_URL})"
+            export QASE_RUN_DESCRIPTION="${QASE_DESC}"
+
+            # Define and export the Qase run name, as it cannot be done
+            # in 'env:' because GITHUB_WORKFLOW is a shell variable
+            # Export them also to be used locally
+            export QASE_RUN_NAME="${GITHUB_WORKFLOW}"
+
+            # Create a Qase run, get its ID
+            ID=$(cd tests && make create-qase-run)
+            
+            # Export outputs for future use
+            echo "qase_run_description=${QASE_DESC}" >> ${GITHUB_OUTPUT}
+            echo "qase_run_id=${ID}" >> ${GITHUB_OUTPUT}
+            echo "qase_run_name=${GITHUB_WORKFLOW}" >> ${GITHUB_OUTPUT}
+
+            # Just an info for debugging purposes
+            echo -e "Exported values:\nQASE_RUN_ID=${ID}\nQASE_RUN_DESCRIPTION=${QASE_DESC}\nQASE_RUN_NAME=${GITHUB_WORKFLOW}"
+          elif ${{ inputs.qase_run_id != '' }}; then
+            # If the run ID has been specified
+            echo "qase_run_id=${{ inputs.qase_run_id }}" >> ${GITHUB_OUTPUT}
+          fi
+
+  e2e:
+    needs: [create-runner, pre-qase]
+    uses: ./.github/workflows/sub_test_choice.yaml
+    secrets:
+      qase_api_token: ${{ secrets.qase_api_token }}
+    with:
+      backup_restore_version: ${{ inputs.backup_restore_version }}
+      ca_type: ${{ inputs.ca_type }}
+      cert-manager_version: ${{ inputs.cert-manager_version }}
+      cluster_name: ${{ inputs.cluster_name }}
+      cluster_namespace: fleet-default
+      cluster_number: ${{ inputs.cluster_number }}
+      cluster_type: ${{ inputs.cluster_type }}
+      cypress_tags: ${{ inputs.cypress_tags }}
+      destroy_runner: ${{ inputs.destroy_runner }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version }}
+      iso_boot: ${{ inputs.iso_boot }}
+      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      node_number: ${{ inputs.node_number }}
+      operator_repo: ${{ inputs.operator_repo }}
+      operator_upgrade: ${{ inputs.operator_upgrade }}
+      os_to_test: ${{ inputs.os_to_test }}
+      proxy: ${{ inputs.proxy }}
+      public_domain: ${{ needs.create-runner.outputs.public_domain }}
+      public_fqdn: ${{ needs.create-runner.outputs.public_fqdn }}
+      qase_project_code: ELEMENTAL
+      qase_run_id: ${{ needs.pre-qase.outputs.qase_run_id }}
+      rancher_upgrade: ${{ inputs.rancher_upgrade }}
+      rancher_version: ${{ inputs.rancher_version }}
+      reset: ${{ inputs.reset }}
+      runner_label: ${{ needs.create-runner.outputs.runner_label }}
+      sequential: ${{ inputs.sequential }}
+      test_description: ${{ inputs.test_description }}
+      test_type: ${{ inputs.test_type }}
+      ui_account: ${{ inputs.ui_account }}
+      upgrade_image: ${{ inputs.upgrade_image }}
+      upgrade_os_channel: ${{ inputs.os_channel }}
+      upgrade_type: ${{ inputs.upgrade_type }}
+      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+
+  clean-and-delete-runner:
+    if: ${{ always() }}
+    needs: [create-runner, e2e]
+    uses: ./.github/workflows/sub_clean-and-delete-runner.yaml
+    secrets:
+      credentials: ${{ secrets.credentials }}
+      pat_token: ${{ secrets.pat_token }}
+    with:
+      create_runner_result: ${{ needs.create-runner.result }}
+      destroy_runner: ${{ inputs.destroy_runner }}
+      runner_hostname: ${{ needs.create-runner.outputs.runner_hostname }}
+      steps_status: ${{ needs.e2e.outputs.steps_status }}
+      runner_label: ${{ needs.create-runner.outputs.runner_label }}
+      zone: ${{ inputs.zone }}
+
+  post-qase:
+    if: ${{ always() && needs.pre-qase.outputs.qase_run_id != '' }}
+    needs: e2e
+    runs-on: ubuntu-latest
+    env:
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ELEMENTAL
+      QASE_REPORT: 1
+      QASE_RUN_COMPLETE: 1
+      QASE_RUN_ID: ${{ needs.pre-qase.outputs.qase_run_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: tests/go.sum
+          go-version-file: tests/go.mod
+
+      - name: Finalize Qase Run and publish Results
+        if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') }}
+        run: cd tests && make publish-qase-run
+
+      - name: Delete Qase Run if job has been cancelled
+        if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') }}
+        run: cd tests && make delete-qase-run
+
+  # Just to signify that something has been cancelled and it's not useful to check the test
+  declare-cancelled:
+    if: ${{ always() && (contains(needs.e2e.outputs.steps_status, 'cancelled') || needs.e2e.result == 'cancelled' || needs.create-runner.result != 'success') }}
+    needs: [create-runner, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Specify in summary if something has been cancelled
+        run: echo "# TEST CANCELLED!" >> ${GITHUB_STEP_SUMMARY}

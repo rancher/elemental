@@ -6,7 +6,6 @@ on:
     inputs:
       qase_run_id:
         description: Qase run ID where the results will be reported
-        required: false
         type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
@@ -39,12 +38,11 @@ concurrency:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
@@ -57,5 +55,6 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
+      test_type: cli
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sle-micro/${{ inputs.slem_version }}:latest
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

@@ -1,0 +1,442 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Elemental E2E single cluster CLI tests
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      backup_restore_version:
+        required: true
+        type: string
+      ca_type:
+        required: true
+        type: string
+      cert-manager_version:
+        required: true
+        type: string
+      cluster_name:
+        required: true
+        type: string
+      cluster_namespace:
+        required: true
+        type: string
+      cluster_type:
+        required: true
+        type: string
+      destroy_runner:
+        required: true
+        type: boolean
+      iso_boot:
+        required: true
+        type: boolean
+      k8s_version_to_provision:
+        required: true
+        type: string
+      node_number:
+        required: true
+        type: string
+      operator_repo:
+        required: true
+        type: string
+      operator_upgrade:
+        required: true
+        type: string
+      os_to_test:
+        required: true
+        type: string
+      public_domain:
+        required: true
+        type: string
+      public_fqdn:
+        required: true
+        type: string
+      qase_project_code:
+        required: true
+        type: string
+      qase_run_id:
+        required: true
+        type: string
+      rancher_version:
+        required: true
+        type: string
+      rancher_upgrade:
+        required: true
+        type: string
+      reset:
+        required: true
+        type: boolean
+      runner_label:
+        required: true
+        type: string
+      sequential:
+        required: true
+        type: boolean
+      test_description:
+        required: true
+        type: string
+      test_type:
+        required: true
+        type: string
+      upgrade_image:
+        required: true
+        type: string
+      upgrade_os_channel:
+        required: true
+        type: string
+      upgrade_type:
+        required: true
+        type: string
+      upstream_cluster_version:
+        required: true
+        type: string
+
+    # Variables to set when calling this reusable workflow
+    secrets:
+      qase_api_token:
+
+jobs:
+  cli:
+    runs-on: ${{ inputs.runner_label }}
+    outputs:
+      # For this to work 'id:' in steps are mandatory!
+      steps_status: ${{ join(steps.*.conclusion, ' ') }}
+    env:
+      CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NS: ${{ inputs.cluster_namespace }}
+      CLUSTER_TYPE: ${{ inputs.cluster_type }}
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ${{ inputs.qase_project_code }}
+      QASE_RUN_ID: ${{ inputs.qase_run_id }}
+      # K3S / RKE2 flags to use for installation
+      INSTALL_K3S_SKIP_ENABLE: true
+      INSTALL_K3S_VERSION: ${{ inputs.upstream_cluster_version }}
+      INSTALL_RKE2_VERSION: ${{ inputs.upstream_cluster_version }}
+      K3S_KUBECONFIG_MODE: 0644
+      # Distribution to use to host Rancher Manager (K3s or RKE2)
+      K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+      # For Rancher Manager
+      RANCHER_VERSION: ${{ inputs.rancher_version }}
+      TEST_TYPE: ${{ inputs.test_type }}
+      TIMEOUT_SCALE: 3
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        id: setup_go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: tests/go.sum
+          go-version-file: tests/go.mod
+
+      - name: Define needed system variables
+        id: define_sys_vars
+        run: |
+          # Add missing PATH, removed in recent distributions for security reasons...
+          echo "/usr/local/bin" >> ${GITHUB_PATH}
+
+      - name: Install Rancher Manager and Elemental
+        id: install_rancher_elemental
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          PUBLIC_FQDN: ${{ inputs.public_fqdn }}
+          PUBLIC_DOMAIN: ${{ inputs.public_domain }}
+        run: cd tests && make e2e-install-rancher
+
+      - name: Workaround for DynamicSchemas for operator uninstallation (if needed)
+        id: workaround_for_dynamicschemas
+        run: |
+          # Check if DynamicSchemas for MachineInventorySelectorTemplate exists
+          if ! kubectl get dynamicschema machineinventoryselectortemplate >/dev/null 2>&1; then
+            # If not we have to add it to avoid weird issues!
+            echo "WORKAROUND: DynamicSchemas for MachineInventorySelectorTemplate is missing!"
+            kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
+          fi
+
+      - name: Install backup-restore components (K3s only for now)
+        id: install_backup_restore
+        if: ${{ contains(inputs.upstream_cluster_version, 'k3s') }}
+        run: cd tests && make e2e-install-backup-restore
+
+      - name: Extract component versions/informations
+        id: component
+        run: |
+          # Extract rancher-backup-operator version
+          BACKUP_RESTORE_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract Rancher Manager version
+          RANCHER_VERSION=$(kubectl get pod \
+                              --namespace cattle-system \
+                              -l app=rancher \
+                              -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "backup_restore_version=${BACKUP_RESTORE_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+      - name: Configure Rancher and Libvirt
+        id: configure_rancher
+        run: cd tests && make e2e-configure-rancher
+
+      - name: Create ISO image for master pool
+        id: create_iso_master
+        env:
+          EMULATE_TPM: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: master
+        run: |
+          # Only use ISO boot if the upstream cluster is RKE2
+          # due to issue with pxe, dhcp traffic
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export ISO_BOOT=true
+          fi
+          cd tests && make e2e-iso-image
+
+      - name: Extract iPXE artifacts from ISO
+        id: extract_ipxe_artifacts
+        if: ${{ inputs.iso_boot == false }}
+        run: cd tests && make extract_kernel_init_squash && make ipxe
+
+      - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
+        id: bootstrap_master_nodes
+        env:
+          EMULATE_TPM: true
+          POOL: master
+          VM_START: 1
+          VM_END: 3
+        run: |
+          # Only use ISO boot if the upstream cluster is RKE2
+          # due to issue with pxe, dhcp traffic
+          # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export ISO_BOOT=true
+            export VM_MEM=10240
+            export VM_CPU=6
+          fi
+
+          # Execute bootstrapping test
+          if ${{ inputs.sequential == true }}; then
+            # Force node bootstrapping in sequential instead of parallel
+            cd tests
+            for ((i = VM_START ; i <= VM_END ; i++)); do
+              VM_INDEX=${i} make e2e-bootstrap-node
+            done
+          else
+            cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
+          fi
+
+      - name: Install a simple application
+        id: install_simple_app
+        if: ${{ contains(inputs.upstream_cluster_version, 'k3s') }}
+        run: cd tests && make e2e-install-app && make e2e-check-app
+
+      - name: Reset a node in the cluster
+        id: reset_node
+        if: ${{ inputs.reset == true }}
+        run: cd tests && make e2e-reset
+
+      - name: Check app after reset
+        id: check_app
+        if: ${{ inputs.reset == true && contains(inputs.upstream_cluster_version, 'k3s') }}
+        run: cd tests && make e2e-check-app
+
+      - name: Upgrade Elemental Operator
+        id: operator_upgrade
+        if: ${{ inputs.operator_upgrade != '' }}
+        env:
+          OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
+        run: |
+          cd tests && make e2e-upgrade-operator
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                             --namespace cattle-elemental-system \
+                             -l app=elemental-operator \
+                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+
+      - name: Upgrade Rancher Manager
+        id: rancher_upgrade
+        if: ${{ inputs.rancher_upgrade != '' }}
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
+          PUBLIC_FQDN: ${{ inputs.public_fqdn }}
+          PUBLIC_DOMAIN: ${{ inputs.public_domain }}
+          RANCHER_UPGRADE: ${{ inputs.rancher_upgrade }}
+        run: |
+          cd tests && make e2e-upgrade-rancher-manager
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+          # Extract Rancher Manager version
+          RANCHER_VERSION=$(kubectl get pod \
+                              --namespace cattle-system \
+                              -l app=rancher \
+                              -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+      - name: Upgrade node 1 to specified OS version with osImage
+        id: upgrade_node_1
+        if: ${{ inputs.upgrade_image != '' }}
+        env:
+          UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
+          UPGRADE_TYPE: osImage
+          VM_INDEX: 1
+        run: |
+          cd tests && make e2e-upgrade-node
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+      - name: Upgrade other nodes to specified OS version with managedOSVersionName
+        id: upgrade_other_nodes
+        if: ${{ inputs.upgrade_os_channel != '' }}
+        env:
+          UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
+          UPGRADE_TYPE: managedOSVersionName
+          VM_INDEX: 2
+          VM_NUMBERS: 3
+        run: |
+          cd tests && make e2e-upgrade-node
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+      - name: Test Backup/Restore Elemental resources with Rancher Manager
+        id: test_backup_restore
+        if: ${{ contains(inputs.upstream_cluster_version, 'k3s') }}
+        env:
+          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
+        run: |
+          cd tests && make e2e-backup-restore
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+      - name: Extract ISO version
+        id: iso_version
+        if: ${{ always() }}
+        run: |
+          # Extract OS version from ISO
+          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
+          if [[ -n "${ISO}" ]]; then
+            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+            isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+              | xz -dc \
+              | cpio -i --to-stdout usr/lib/initrd-release > os-release
+            eval $(grep IMAGE_TAG os-release 2>/dev/null)
+          fi
+
+          # Export value (even if empty!)
+          echo "os_version=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
+
+      - name: Remove old built ISO image
+        id: clean_master_iso
+        # Only one at a time is allowed, the new one will be created after if needed
+        run: rm -f *.iso
+
+      - name: Create ISO image for worker pool
+        id: create_iso_worker
+        env:
+          ISO_BOOT: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: worker
+        run: cd tests && make e2e-iso-image
+
+      - name: Bootstrap additional nodes in pool "worker" (total of ${{ inputs.node_number }})
+        id: bootstrap_worker_nodes
+        if: ${{ inputs.node_number > 3 }}
+        env:
+          ISO_BOOT: true
+          POOL: worker
+          VM_START: 4
+          VM_END: ${{ inputs.node_number }}
+        run: |
+          # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
+          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+            export VM_MEM=10240
+            export VM_CPU=6
+          fi
+
+          if ${{ inputs.sequential == true }}; then
+            # Force node bootstrapping in sequential instead of parallel
+            cd tests
+            for ((i = VM_START ; i <= VM_END ; i++)); do
+              VM_INDEX=${i} make e2e-bootstrap-node
+            done
+          else
+            cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
+          fi
+
+          # Check the installed application
+          if ${{ contains(inputs.upstream_cluster_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
+
+      - name: Uninstall Elemental Operator
+        id: uninstall_elemental_operator
+        env:
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+        # Don't test Operator uninstall if we want to keep the runner for debugging purposes
+        if: ${{ inputs.destroy_runner == true }}
+        run: cd tests && make e2e-uninstall-operator
+
+      # This step must be called in each worklow that wants a summary!
+      - name: Get logs and add summary
+        id: logs_summary
+        if: ${{ always() }}
+        uses: ./.github/actions/logs-and-summary
+        with:
+          backup_restore_version: ${{ steps.component.outputs.backup_restore_version }}
+          ca_type: ${{ inputs.ca_type }}
+          cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
+          cluster_type: ${{ inputs.cluster_type }}
+          k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+          node_number: ${{ inputs.node_number }}
+          operator_upgrade: ${{ steps.operator_upgrade.outputs.operator_upgrade }}
+          operator_version: ${{ steps.component.outputs.operator_version }}
+          operator_version_upgrade: ${{ steps.operator_upgrade.outputs.operator_version }}
+          os_to_test: ${{ inputs.os_to_test }}
+          os_version: ${{ steps.iso_version.outputs.os_version }}
+          public_fqdn: ${{ inputs.public_fqdn }}
+          rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
+          rancher_image_version_upgrade: ${{ steps.rancher_upgrade.outputs.rancher_image_version }}
+          rancher_upgrade: ${{ inputs.rancher_upgrade }}
+          rancher_version: ${{ inputs.rancher_version }}
+          sequential: ${{ inputs.sequential }}
+          test_type: ${{ inputs.test_type }}
+          test_description: ${{ inputs.test_description }}
+          upgrade_image: ${{ inputs.upgrade_image }}
+          upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

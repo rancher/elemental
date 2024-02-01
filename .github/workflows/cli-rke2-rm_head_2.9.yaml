@@ -13,11 +13,10 @@ on:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI - CLI - Parallel - Deployment test with Standard RKE2"
       ca_type: private
@@ -25,4 +24,5 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_version_to_provision: v1.26.10+rke2r2
       rancher_version: latest/devel/2.9
+      test_type: cli
       upstream_cluster_version: v1.26.10+rke2r2

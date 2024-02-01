@@ -50,11 +50,10 @@ concurrency:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - Fully customizable + reset - CLI - IBS/OBS Deployment test"
       ca_type: ${{ inputs.ca_type }}
@@ -66,7 +65,8 @@ jobs:
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}
       rancher_version: ${{ inputs.rancher_version }}
+      reset: true
       runner_template: ${{ inputs.runner_template }}
       sequential: ${{ inputs.sequential }}
+      test_type: cli
       upstream_cluster_version: ${{ inputs.k8s_version }}
-      reset: true

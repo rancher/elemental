@@ -6,7 +6,6 @@ on:
     inputs:
       qase_run_id:
         description: Qase run ID where the results will be reported
-        required: false
         type: string
       cluster_type:
         description: Cluster type (empty if normal or hardened)
@@ -26,12 +25,11 @@ concurrency:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "Manual - CLI - Parallel - Deployment test + reset with Standard K3s"
       cluster_name: cluster-k3s
@@ -43,3 +41,4 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       reset: true
+      test_type: cli
