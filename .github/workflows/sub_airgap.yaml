@@ -1,0 +1,163 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Elemental E2E single cluster Airgap tests
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      cert-manager_version:
+        required: true
+        type: string
+      cluster_name:
+        required: true
+        type: string
+      cluster_namespace:
+        required: true
+        type: string
+      cluster_type:
+        required: true
+        type: string
+      k8s_version_to_provision:
+        required: true
+        type: string
+      operator_repo:
+        required: true
+        type: string
+      os_to_test:
+        required: true
+        type: string
+      qase_project_code:
+        required: true
+        type: string
+      qase_run_id:
+        required: true
+        type: string
+      rancher_version:
+        required: true
+        type: string
+      runner_label:
+        required: true
+        type: string
+      test_description:
+        required: true
+        type: string
+      test_type:
+        required: true
+        type: string
+      upstream_cluster_version:
+        required: true
+        type: string
+
+    # Variables to set when calling this reusable workflow
+    secrets:
+      qase_api_token:
+
+jobs:
+  airgap:
+    runs-on: ${{ inputs.runner_label }}
+    outputs:
+      # For this to work 'id:' in steps are mandatory!
+      steps_status: ${{ join(steps.*.conclusion, ' ') }}
+    env:
+      CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NS: ${{ inputs.cluster_namespace }}
+      CLUSTER_TYPE: ${{ inputs.cluster_type }}
+      # Distribution to use to host Rancher Manager (K3s)
+      K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision}}
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ${{ inputs.qase_project_code }}
+      QASE_RUN_ID: ${{ inputs.qase_run_id }}
+      # For Rancher Manager
+      RANCHER_VERSION: ${{ inputs.rancher_version }}
+      TEST_TYPE: ${{ inputs.test_type }}
+      TIMEOUT_SCALE: 3
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        id: setup_go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: tests/go.sum
+          go-version-file: tests/go.mod
+
+      - name: Prepare the archive file to send to air-gapped nodes
+        id: prepare_archive_file
+        run: cd tests && make e2e-prepare-archive 
+
+      - name: Deploy airgap infrastructure
+        id: deploy_airgap_infra
+        env:
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+        run: cd tests && make e2e-airgap-rancher
+
+      - name: Configure Rancher and Libvirt
+        id: configure_rancher
+        run: cd tests && make e2e-configure-rancher
+
+      - name: Extract component versions/informations
+        id: component
+        run: |
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract Rancher Manager version
+          RANCHER_VERSION=$(kubectl get pod \
+                              --namespace cattle-system \
+                              -l app=rancher \
+                              -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rancher_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+      - name: Create ISO image for master pool
+        id: create_iso_master
+        env:
+          EMULATE_TPM: true
+          OS_TO_TEST: ${{ inputs.os_to_test }}
+          POOL: master
+        run: cd tests && ISO_BOOT=true make e2e-iso-image
+
+      - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
+        id: bootstrap_master_nodes
+        env:
+          EMULATE_TPM: true
+          POOL: master
+          VM_START: 1
+          VM_END: 3
+        run: cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} ISO_BOOT=true make e2e-bootstrap-node
+
+      # This step must be called in each worklow that wants a summary!
+      - name: Get logs and add summary
+        id: logs_summary
+        if: ${{ always() }}
+        uses: ./.github/actions/logs-and-summary
+        with:
+          ca_type: ${{ inputs.ca_type }}
+          cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
+          cluster_type: ${{ inputs.cluster_type }}
+          k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+          operator_version: ${{ steps.component.outputs.operator_version }}
+          os_to_test: ${{ inputs.os_to_test }}
+          os_version: ${{ steps.iso_version.outputs.os_version }}
+          rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
+          rancher_version: ${{ inputs.rancher_version }}
+          test_type: ${{ inputs.test_type }}
+          test_description: ${{ inputs.test_description }}

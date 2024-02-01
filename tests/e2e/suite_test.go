@@ -58,7 +58,6 @@ const (
 )
 
 var (
-	arch                      string
 	backupRestoreVersion      string
 	caType                    string
 	certManagerVersion        string
@@ -404,7 +403,6 @@ func TestE2E(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	arch = os.Getenv("ARCH")
 	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
 	caType = os.Getenv("CA_TYPE")
 	certManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
@@ -413,7 +411,7 @@ var _ = BeforeSuite(func() {
 	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM := os.Getenv("EMULATE_TPM")
-	rancherHostname = os.Getenv("PUBLIC_DNS")
+	rancherHostname = os.Getenv("PUBLIC_FQDN")
 	index := os.Getenv("VM_INDEX")
 	isoBootString := os.Getenv("ISO_BOOT")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")

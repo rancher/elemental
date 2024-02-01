@@ -13,11 +13,10 @@ on:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
@@ -29,5 +28,6 @@ jobs:
       os_to_test: stable
       rancher_upgrade: latest/devel/2.7
       rancher_version: stable/latest/none
+      test_type: cli
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest
       upgrade_os_channel: dev

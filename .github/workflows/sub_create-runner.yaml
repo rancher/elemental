@@ -1,0 +1,127 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Create GitHub Actions runner on GCP
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      runner_template:
+        required: true
+        type: string
+      zone:
+        required: true
+        type: string
+
+    # Job outputs to export for caller workflow
+    outputs:
+      public_domain:
+        description: Domain of GCP runner
+        value: ${{ jobs.create.outputs.public_domain }}
+      public_fqdn:
+        description: FQDN hostname of GCP runner
+        value: ${{ jobs.create.outputs.public_fqdn }}
+      runner_hostname:
+        description: Internal name of GCP runner
+        value: ${{ jobs.create.outputs.runner_hostname }}
+      runner_label:
+        description: Unique ID of GCP runner (used as runner label)
+        value: ${{ jobs.create.outputs.runner_label }}
+
+    # Secrets to set when calling this reusable workflow
+    secrets:
+      credentials:
+        required: true
+      pat_token:
+        required: true
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    outputs:
+      public_domain: ${{ steps.dns.outputs.public_domain }}
+      public_fqdn: ${{ steps.dns.outputs.public_fqdn }}
+      runner_hostname: ${{ steps.generator.outputs.runner_hostname }}
+      runner_label: ${{ steps.generator.outputs.runner_label }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate UUID and Runner hostname
+        id: generator
+        run: |
+          # NOTE: keep the runner name to less than 63 characters!
+          UUID=$(uuidgen)
+          GH_REPO_FULL=${{ github.repository }}
+          GH_REPO=${GH_REPO_FULL#*/}
+          echo "runner_hostname=${GH_REPO//\//-}-ci-${UUID//-}" >> ${GITHUB_OUTPUT}
+          echo "runner_label=${UUID//-}" >> ${GITHUB_OUTPUT}
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.credentials }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Create runner
+        run: |
+          gcloud compute instances create ${{ steps.generator.outputs.runner_hostname }} \
+            --source-instance-template ${{ inputs.runner_template }} \
+            --zone ${{ inputs.zone }}
+
+      - name: Create GCP secrets
+        run: |
+          echo -n ${{ secrets.pat_token }} \
+            | gcloud secrets create PAT_TOKEN_${{ steps.generator.outputs.runner_label }} --data-file=-
+          echo -n ${{ github.repository }} \
+            | gcloud secrets create GH_REPO_${{ steps.generator.outputs.runner_label }} --data-file=-
+
+      - name: Get public FQDN and DOMAIN
+        id: dns
+        run: |
+          # Define function
+          reverseip() {
+            local IFS
+            IFS=.
+            set -- $1
+            echo $4.$3.$2.$1
+          }
+
+          # Do a timed out loop here, as gcloud can sometimes fail
+          typeset -i i=0
+          while true; do
+            # Get public IP
+            PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
+                        | awk '/${{ steps.generator.outputs.runner_hostname }}/ {print $6}')
+
+            # Exit if we reach the timeout or if IP is set
+            if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
+              break
+            fi
+
+            # Wait a little before retrying
+            sleep 2
+          done
+
+          # Get the public FQDN
+          PUBLIC_FQDN=$(host -l ${PUBLIC_IP} 2> /dev/null \
+                       | awk '{sub(/\.$/, ""); print $5}')
+
+          # Get the public DOMAIN
+          RIP=$(reverseip ${PUBLIC_IP})
+          PUBLIC_DOMAIN=${PUBLIC_FQDN/${RIP}./}
+
+          # Raise an error if either IP and/or DNS are empty
+          if [[ -z "${PUBLIC_IP}" || -z "${PUBLIC_FQDN}" || -z "${PUBLIC_DOMAIN}" ]]; then
+            echo "Either PUBLIC_IP/PUBLIC_FQDN/PUBLIC_DOMAIN are empty!" >&2
+            false
+          fi
+
+          # Export the values
+          echo "public_fqdn=${PUBLIC_FQDN}" >> ${GITHUB_OUTPUT}
+          echo "public_domain=${PUBLIC_DOMAIN}" >> ${GITHUB_OUTPUT}
+
+          # Show the value in the runner logs, could be useful for debugging purposes
+          echo "Public FQDN: ${PUBLIC_FQDN}"
+          echo "Public DOMAIN: ${PUBLIC_DOMAIN}"

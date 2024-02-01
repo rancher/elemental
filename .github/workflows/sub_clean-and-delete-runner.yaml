@@ -1,0 +1,73 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Clean and delete GitHub Actions runner on GCP
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      create_runner_result:
+        description: Status of the create-runner job
+        required: true
+        type: string
+      destroy_runner:
+        required: true
+        type: boolean
+      runner_hostname:
+        required: true
+        type: string
+      steps_status:
+        description: Status of all the steps from the previous job
+        required: true
+        type: string
+      runner_label:
+        required: true
+        type: string
+      zone:
+        required: true
+        type: string
+
+    # Secrets to set when calling this reusable workflow
+    secrets:
+      credentials:
+        required: true
+      pat_token:
+        required: true
+
+jobs:
+  clean-delete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.credentials }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Delete GCP secrets
+        run: |
+          for SECRET in PAT_TOKEN GH_REPO; do
+            gcloud --quiet secrets delete ${SECRET}_${{ inputs.runner_label }} || true
+          done
+
+      - name: Delete runner
+        if: ${{ inputs.create_runner_result == 'success' && inputs.destroy_runner == true }}
+        run: |
+          # Disable failure on first error, needed for the "delete" check
+          set +e
+
+          # If runner is already deleted we can bypass the error
+          if ! LOGS=$(gcloud --quiet compute instances delete ${{ inputs.runner_hostname }} \
+                             --delete-disks all \
+                             --zone ${{ inputs.zone }} 2>&1); then
+            echo "${LOGS}" | grep -q "resource .* was not found" || RC=1
+            # Show logs in case of error
+            (( RC )) && echo "${LOGS}" || true
+          fi
+
+          # Force exit with the *real* error code
+          exit ${RC:-0}

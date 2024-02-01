@@ -24,11 +24,10 @@ on:
 
 jobs:
   ui:
-    uses: ./.github/workflows/master-e2e.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       ui_account: user
       ca_type: private

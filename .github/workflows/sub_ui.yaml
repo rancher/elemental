@@ -1,0 +1,319 @@
+# This workflow is a reusable one called by other workflows
+name: (template) Elemental E2E UI tests
+
+on:
+  workflow_call:
+    # Variables to set when calling this reusable workflow
+    inputs:
+      ca_type:
+        required: true
+        type: string
+      cert-manager_version:
+        required: true
+        type: string
+      cluster_name:
+        required: true
+        type: string
+      cluster_namespace:
+        required: true
+        type: string
+      cluster_type:
+        required: true
+        type: string
+      cypress_tags:
+        required: true
+        type: string
+      elemental_ui_version:
+        required: true
+        type: string
+      iso_boot:
+        required: true
+        type: boolean
+      k8s_version_to_provision:
+        required: true
+        type: string
+      operator_repo:
+        required: true
+        type: string
+      proxy:
+        required: true
+        type: string
+      public_domain:
+        required: true
+        type: string
+      public_fqdn:
+        required: true
+        type: string
+      qase_project_code:
+        required: true
+        type: string
+      qase_run_id:
+        required: true
+        type: string
+      rancher_version:
+        required: true
+        type: string
+      runner_label:
+        required: true
+        type: string
+      test_description:
+        required: true
+        type: string
+      ui_account:
+        required: true
+        type: string
+      upgrade_image:
+        required: true
+        type: string
+      upgrade_os_channel:
+        required: true
+        type: string
+      upstream_cluster_version:
+        required: true
+        type: string
+
+    # Variables to set when calling this reusable workflow
+    secrets:
+      qase_api_token:
+
+jobs:
+  ui:
+    runs-on: ${{ inputs.runner_label }}
+    outputs:
+      # For this to work 'id:' in steps are mandatory!
+      steps_status: ${{ join(steps.*.conclusion, ' ') }}
+    env:
+      CLUSTER_NAME: ${{ inputs.cluster_name }}
+      CLUSTER_NS: ${{ inputs.cluster_namespace }}
+      # QASE variables
+      QASE_API_TOKEN: ${{ secrets.qase_api_token }}
+      QASE_PROJECT_CODE: ${{ inputs.qase_project_code }}
+      QASE_RUN_ID: ${{ inputs.qase_run_id }}
+      # NOTE: this REPORT var is needed for Cypress!
+      QASE_REPORT: 1
+      # K3S / RKE2 flags to use for installation
+      INSTALL_K3S_SKIP_ENABLE: true
+      INSTALL_K3S_VERSION: ${{ inputs.upstream_cluster_version }}
+      INSTALL_RKE2_VERSION: ${{ inputs.upstream_cluster_version }}
+      K3S_KUBECONFIG_MODE: 0644
+      # Distribution to use to host Rancher Manager (K3s or RKE2)
+      K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+      # For K8s cluster to provision with Rancher Manager
+      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        id: setup_go
+        uses: actions/setup-go@v5
+        with:
+          cache-dependency-path: tests/go.sum
+          go-version-file: tests/go.mod
+
+      - name: Define needed system variables
+        id: define_sys_vars
+        run: |
+          # Add missing PATH, removed in recent distributions for security reasons...
+          echo "/usr/local/bin" >> ${GITHUB_PATH}
+
+      - name: Deploy Proxy
+        id: proxy
+        if: ${{ inputs.proxy == 'elemental' || inputs.proxy == 'rancher' }}
+        run: docker run -d --name squid_proxy -v $(pwd)/tests/assets/squid.conf:/etc/squid/squid.conf -p 3128:3128 wernight/squid
+
+      - name: Install Rancher Manager and Elemental
+        id: install_rancher_elemental
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
+          CERT_MANAGER_VERSION: ${{ inputs.cert-manager_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          PROXY: ${{ inputs.proxy }}
+          PUBLIC_FQDN: ${{ inputs.public_fqdn }}
+          PUBLIC_DOMAIN: ${{ inputs.public_domain }}
+          RANCHER_VERSION: ${{ inputs.rancher_version }}
+        run: cd tests && make e2e-install-rancher
+
+      - name: Extract component versions/informations
+        id: component
+        run: |
+          # Extract CertManager version
+          CERT_MANAGER_VERSION=$(kubectl get pod \
+                                   --namespace cert-manager \
+                                   -l app=cert-manager \
+                                   -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Extract Rancher Manager version
+          RANCHER_VERSION=$(kubectl get pod \
+                              --namespace cattle-system \
+                              -l app=rancher \
+                              -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+      - name: Install Chartmuseum
+        id: install_chartmuseum
+        run: cd tests && make e2e-install-chartmuseum
+
+      # Basics means tests without an extra elemental node needed
+      - name: Cypress tests - Basics
+        id: cypress_basics
+        env:
+          BROWSER: chrome
+          CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
+          CYPRESS_DOCKER: 'cypress/included:10.9.0'
+          CYPRESS_TAGS: ${{ inputs.cypress_tags }}
+          ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
+          ISO_BOOT: ${{ inputs.iso_boot }}
+          K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
+          RANCHER_PASSWORD: rancherpassword
+          RANCHER_URL: https://${{ inputs.public_fqdn }}/dashboard
+          RANCHER_USER: admin
+          SPEC: |
+            /workdir/e2e/unit_tests/first_connection.spec.ts
+            /workdir/e2e/unit_tests/elemental_operator.spec.ts
+            /workdir/e2e/unit_tests/elemental_plugin.spec.ts
+            /workdir/e2e/unit_tests/user.spec.ts
+            /workdir/e2e/unit_tests/menu.spec.ts
+            /workdir/e2e/unit_tests/machine_registration.spec.ts
+            /workdir/e2e/unit_tests/advanced_filtering.spec.ts
+          UI_ACCOUNT: ${{ inputs.ui_account }}
+          UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
+        run: cd tests && make start-cypress-tests
+
+      - name: Upload Cypress screenshots (Basics)
+        id: upload_screenshots_cypress_basics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-basics-${{ inputs.cluster_name }}
+          path: tests/cypress/latest/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos (Basics)
+        id: upload_videos_cypress_basics
+        # Test run video is always captured, so this action uses "always()" condition
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-basics-${{ inputs.cluster_name }}
+          path: tests/cypress/latest/videos
+          retention-days: 7
+
+      - name: Deploy a node to join Rancher manager
+        id: deploy_node_ui
+        env:
+          ISO_BOOT: ${{ inputs.iso_boot }}
+          VM_INDEX: 1
+          VM_MEM: 8192
+          HOST_MEMORY_RESERVED: 49152
+        run: |
+          cd tests && (
+            # Removing 'downloads' is needed to avoid this error during 'make':
+            # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
+            sudo rm -rf cypress/latest/downloads
+            make e2e-ui-rancher
+          )
+
+      # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
+      - name: Cypress tests - Advanced
+        id: cypress_advanced
+        env:
+          BROWSER: firefox
+          CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
+          CYPRESS_DOCKER: 'cypress/included:10.9.0'
+          CYPRESS_TAGS: ${{ inputs.cypress_tags }}
+          ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          PROXY: ${{ inputs.proxy }}
+          RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
+          RANCHER_PASSWORD: rancherpassword
+          RANCHER_URL: https://${{ inputs.public_fqdn }}/dashboard
+          RANCHER_USER: admin
+          SPEC: |
+            /workdir/e2e/unit_tests/machine_selector.spec.ts
+            /workdir/e2e/unit_tests/machine_inventory.spec.ts
+            /workdir/e2e/unit_tests/reset.spec.ts
+            /workdir/e2e/unit_tests/deploy_app.spec.ts
+            /workdir/e2e/unit_tests/upgrade-operator.spec.ts
+            /workdir/e2e/unit_tests/upgrade-ui-extension.spec.ts
+            /workdir/e2e/unit_tests/upgrade.spec.ts
+          UI_ACCOUNT: ${{ inputs.ui_account }}
+          UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
+          UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
+        run: cd tests && make start-cypress-tests
+
+      - name: Upload Cypress screenshots (Advanced)
+        id: upload_screenshots_cypress_advanced
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
+          path: tests/cypress/latest/screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Upload Cypress videos (Advanced)
+        id: upload_videos_cypress_advanced
+        # Test run video is always captured, so this action uses "always()" condition
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-advanced-${{ inputs.cluster_name }}
+          path: tests/cypress/latest/videos
+          retention-days: 7
+
+      - name: Extract ISO version
+        id: iso_version
+        if: ${{ always() }}
+        run: |
+          # Extract OS version from ISO
+          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
+          if [[ -n "${ISO}" ]]; then
+            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+            isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+              | xz -dc \
+              | cpio -i --to-stdout usr/lib/initrd-release > os-release
+            eval $(grep IMAGE_TAG os-release 2>/dev/null)
+          fi
+
+          # Export value (even if empty!)
+          echo "os_version=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
+
+      # This step must be called in each worklow that wants a summary!
+      - name: Get logs and add summary
+        id: logs_summary
+        if: ${{ always() }}
+        uses: ./.github/actions/logs-and-summary
+        with:
+          ca_type: ${{ inputs.ca_type }}
+          cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
+          cluster_type: ${{ inputs.cluster_type }}
+          elemental_ui_version: ${{ inputs.elemental_ui_version }}
+          k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+          node_number: ${{ inputs.node_number }}
+          operator_version: ${{ steps.component.outputs.operator_version }}
+          os_version: ${{ steps.iso_version.outputs.os_version }}
+          proxy: ${{ inputs.proxy }}
+          public_fqdn: ${{ inputs.public_fqdn }}
+          rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
+          rancher_version: ${{ inputs.rancher_version }}
+          sequential: ${{ inputs.sequential }}
+          test_type: ${{ inputs.test_type }}
+          test_description: ${{ inputs.test_description }}
+          ui_account: ${{ inputs.ui_account }}
+          upgrade_image: ${{ inputs.upgrade_image }}
+          upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
