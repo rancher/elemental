@@ -1,0 +1,7 @@
+name: "Branding"
+stages:
+   boot:
+    - name: "Recovery"
+      if: '[ -f "/run/elemental/recovery_mode" ]'
+      hostname: "recovery"
+
