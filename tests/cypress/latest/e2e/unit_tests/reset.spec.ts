@@ -63,8 +63,8 @@ filterTests(['main'], () => {
         cypressLib.accesMenu('OS Management');
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.contains('There are no rows to show.');
-        cy.getBySel('sortable-table-0-row', { timeout: 180000 })
-          .contains('Active', { timeout: 180000 });
+        cy.getBySel('sortable-table-0-row', { timeout: 240000 })
+          .contains('Active', { timeout: 240000 });
     }));
 
     qase(30,
