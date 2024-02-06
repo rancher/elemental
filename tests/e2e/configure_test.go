@@ -147,7 +147,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 	})
 
 	It("Configure Libvirt (if needed)", func() {
-		if !strings.Contains(clusterType, "airgap") {
+		if !strings.Contains(testType, "airgap") {
 			// Report to Qase
 			testCaseID = 68
 
