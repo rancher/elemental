@@ -17,7 +17,6 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"time"
 
@@ -226,7 +225,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 	})
 
-	It("Installing Rancher Manager", func() {
+	It("Install Rancher Manager", func() {
 		// Report to Qase
 		testCaseID = 61
 
@@ -338,30 +337,30 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		}
 	})
 
-	// Deploy operator in CLI test or if Rancher version is < 2.8
-	// because operator can not be installed trough Marketplace in Rancher 2.7.x
-	matched, _ := regexp.MatchString(`2.8`, rancherHeadVersion)
-	if strings.Contains(testType, "cli") || matched == false {
-		It("Installing Elemental Operator", func() {
-			// Report to Qase
-			testCaseID = 62
+	// Deploy operator in CLI test
+	It("Install Elemental Operator if needed", func() {
+		if strings.Contains(testType, "cli") {
+			By("Installing Operator for CLI tests", func() {
+				// Report to Qase
+				testCaseID = 62
 
-			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-				RunHelmCmdWithRetry("upgrade", "--install", chart,
-					operatorRepo+"/"+chart+"-chart",
-					"--namespace", "cattle-elemental-system",
-					"--create-namespace",
-					"--wait", "--wait-for-jobs",
-				)
+				for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
+					RunHelmCmdWithRetry("upgrade", "--install", chart,
+						operatorRepo+"/"+chart+"-chart",
+						"--namespace", "cattle-elemental-system",
+						"--create-namespace",
+						"--wait", "--wait-for-jobs",
+					)
 
-				// Delay few seconds for all to be installed
-				time.Sleep(tools.SetTimeout(20 * time.Second))
-			}
+					// Delay few seconds for all to be installed
+					time.Sleep(tools.SetTimeout(20 * time.Second))
+				}
 
-			// Wait for pod to be started
-			Eventually(func() error {
-				return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
-		})
-	}
+				// Wait for pod to be started
+				Eventually(func() error {
+					return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+			})
+		}
+	})
 })

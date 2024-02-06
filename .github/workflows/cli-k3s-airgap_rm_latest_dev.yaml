@@ -13,11 +13,10 @@ on:
 
 jobs:
   cli:
-    uses: ./.github/workflows/master-airgap.yaml
+    uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
     with:
       test_description: "CI - CLI - Airgap K3S - RM Latest Devel"
       cert-manager_version: v1.12.2
@@ -27,4 +26,5 @@ jobs:
       k8s_version_to_provision: v1.26.8+k3s1
       os_to_test: dev
       rancher_version: latest/devel/2.7
+      test_type: cli
       upstream_cluster_version: 1.26.8

@@ -1,0 +1,172 @@
+# This action is a reusable one called by local workflows
+name: logs-and-summary
+description: 'Add logs and summary for an Elemental E2E test'
+
+# Variables to set when calling this action
+inputs:
+  backup_restore_version:
+    default: "Unknown"
+    type: string
+  ca_type:
+    default: "Unknown"
+    type: string
+  cert_manager_version:
+    default: "Unknown"
+    type: string
+  cluster_type:
+    default: "Unknown"
+    type: string
+  elemental_ui_version:
+    default: "Unknown"
+    type: string
+  k8s_version_to_provision:
+    default: "Unknown"
+    type: string
+  node_number:
+    default: "Unknown"
+    type: string
+  operator_upgrade:
+    default: "Unknown"
+    type: string
+  operator_version:
+    default: "Unknown"
+    type: string
+  operator_version_upgrade:
+    default: "Unknown"
+    type: string
+  os_to_test:
+    default: "Unknown"
+    type: string
+  os_version:
+    default: "Unknown"
+    type: string
+  proxy:
+    # NOTE: 'proxy' var cannot be configured with a default value!
+    type: string
+  public_fqdn:
+    default: "Unknown"
+    type: string
+  rancher_image_version:
+    default: "Unknown"
+    type: string
+  rancher_image_version_upgrade:
+    default: "Unknown"
+    type: string
+  rancher_upgrade:
+    default: "Unknown"
+    type: string
+  rancher_version:
+    default: "Unknown"
+    type: string
+  sequential:
+    default: "Unknown"
+    type: boolean
+  test_description:
+    default: "Unknown"
+    type: string
+  test_type:
+    default: "Unknown"
+    type: string
+  ui_account:
+    default: "Unknown"
+    type: string
+  upgrade_image:
+    default: "Unknown"
+    type: string
+  upgrade_os_channel:
+    default: "Unknown"
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get logs
+      env:
+        ELEMENTAL_SUPPORT: https://github.com/rancher/elemental-operator/releases/download/v1.3.4/elemental-support_1.3.4_linux_amd64
+        PROXY: ${{ inputs.proxy }}
+        RANCHER_LOG_COLLECTOR: https://raw.githubusercontent.com/rancherlabs/support-tools/master/collection/rancher/v2.x/logs-collector/rancher2_logs_collector.sh
+      shell: bash
+      run: |
+        cd tests && (
+          # Removing 'downloads' is needed to avoid this error during 'make':
+          # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
+          sudo rm -rf cypress/latest/downloads
+          make e2e-get-logs
+        )
+
+    - name: Upload logs
+      uses: actions/upload-artifact@v4
+      with:
+        name: support-logs
+        path: tests/**/logs/*
+        if-no-files-found: ignore
+
+    - name: Add summary
+      if: ${{ always() }}
+      shell: bash
+      run: |
+        # Define some variable(s)
+        ${{ inputs.sequential == true }} && BOOTSTRAP_METHOD="Sequential" || BOOTSTRAP_METHOD="Parallel"
+
+        # Get nodes configuration (use the first one, they are all identical)
+        NODE=$(sudo virsh list --name | head -1)
+        if [[ -n "${NODE}" ]]; then
+          VCPU=$(sudo virsh vcpucount --live ${NODE})
+          VMEM=$(sudo virsh dommemstat --live ${NODE} | awk '/^actual/ { print $2 }')
+          (( VMEM /= 1048576 ))
+        fi
+
+        # Add summary: General informations
+        echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
+        echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
+        if ${{ inputs.test_type == 'cli' }}; then
+          echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
+        fi
+        echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
+        if ${{ inputs.cluster_type == '' }}; then
+          echo "Type of cluster deployed: normal" >> ${GITHUB_STEP_SUMMARY}
+        else
+          echo "Type of cluster deployed: ${{ inputs.cluster_type }}" >> ${GITHUB_STEP_SUMMARY}
+        fi
+        echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
+
+        # Add summary: Rancher Manager
+        echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}
+        echo "Rancher Manager URL: https://${{ inputs.public_fqdn }}/dashboard" >> ${GITHUB_STEP_SUMMARY}
+        echo "Rancher Manager Image: ${{ inputs.rancher_image_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
+        if ${{ inputs.ca_type == 'private' }}; then
+          echo "CertManager Image: N/A" >> ${GITHUB_STEP_SUMMARY}
+        else
+          echo "CertManager Image: ${{ inputs.cert_manager_version }}" >> ${GITHUB_STEP_SUMMARY}
+        fi
+
+        # Add summary: Elemental
+        echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental OS version: ${{ inputs.os_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental Operator Image: ${{ inputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental Backup/Restore Operator Image: ${{ inputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
+
+        # Add summary: Kubernetes
+        echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
+        echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+
+        # Add summary: Cluster
+        echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}
+        echo "Number of CPU: ${VCPU:-Unknown}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Memory size: ${VMEM:-Unknown}GB" >> ${GITHUB_STEP_SUMMARY}
+
+        # Add summary: Upgrade
+        if ${{ inputs.upgrade_image != '' || inputs.upgrade_os_channel != '' }}; then
+          echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Upgrade: ${{ inputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Elemental Operator Image: ${{ inputs.operator_version_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Image: ${{ inputs.rancher_image_version_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Channel: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
+        fi
