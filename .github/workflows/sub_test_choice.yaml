@@ -111,7 +111,7 @@ on:
 
 jobs:
   airgap:
-    if: ${{ inputs.cluster_type == 'airgap' }}
+    if: ${{ inputs.test_type == 'airgap' }}
     uses: ./.github/workflows/sub_airgap.yaml
     secrets:
       qase_api_token: ${{ secrets.qase_api_token }}

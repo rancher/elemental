@@ -87,14 +87,20 @@ jobs:
           cache-dependency-path: tests/go.sum
           go-version-file: tests/go.mod
 
+      - name: Define needed system variables
+        id: define_sys_vars
+        run: |
+          # Add missing PATH, removed in recent distributions for security reasons...
+          echo "/usr/local/bin" >> ${GITHUB_PATH}
+
       - name: Prepare the archive file to send to air-gapped nodes
         id: prepare_archive_file
+        env:
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
         run: cd tests && make e2e-prepare-archive 
 
       - name: Deploy airgap infrastructure
         id: deploy_airgap_infra
-        env:
-          OPERATOR_REPO: ${{ inputs.operator_repo }}
         run: cd tests && make e2e-airgap-rancher
 
       - name: Configure Rancher and Libvirt

@@ -61,7 +61,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(baseImageURL).To(Not(BeEmpty()))
 
-			if clusterType == "airgap" {
+			if testType == "airgap" {
 				isoVersion, _ := exec.Command("bash", "-c", "awk -F '/' '/sle-micro-iso/{print $NF}' "+airgapImagesFile).Output()
 				baseImageURL = "localhost:5000/elemental/sle-micro-iso-" + string(isoVersion)
 			}
