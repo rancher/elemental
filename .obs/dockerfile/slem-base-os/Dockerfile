@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
+#!BuildName: SLE-Micro-base-container
 #!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:latest
 #!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:%VERSION%
 #!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
