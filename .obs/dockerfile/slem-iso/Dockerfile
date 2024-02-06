@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-#!BuildTag: suse/sle-micro-iso/%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro-iso/%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro-iso/%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildName: build-iso-image
+#!BuildTag: suse/sle-micro/sle-micro-iso-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/sle-micro-iso-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/sle-micro-iso-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 10
 #!BuildConstraint: hardware:memory:size unit=G 16
 
