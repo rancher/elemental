@@ -246,7 +246,7 @@ jobs:
 
   post-qase:
     if: ${{ always() && needs.pre-qase.outputs.qase_run_id != '' }}
-    needs: e2e
+    needs: [pre-qase, e2e]
     runs-on: ubuntu-latest
     env:
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
@@ -266,7 +266,16 @@ jobs:
 
       - name: Finalize Qase Run and publish Results
         if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') }}
-        run: cd tests && make publish-qase-run
+        run: |
+          REPORT=$(cd tests && make publish-qase-run)
+          echo "${REPORT}"
+
+          # Extract report URL and put it in summary
+          REPORT_URL=$(awk '/available:/ { print $NF }' <<<${REPORT})
+          if [[ -n "${REPORT_URL}" ]]; then
+            echo "## QASE Reporting" >> ${GITHUB_STEP_SUMMARY}
+            echo "Public Qase report: ${REPORT_URL}" >> ${GITHUB_STEP_SUMMARY}
+          fi
 
       - name: Delete Qase Run if job has been cancelled
         if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') }}
