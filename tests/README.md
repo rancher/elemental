@@ -19,7 +19,8 @@
 
 - **Describe:** Install Elemental Operator
     - **It:** Add local chartmuseum repo
-    - **It:** Install Elemental operator
+    - **It:** Install latest stable Elemental operator
+    - **It:** Install latest dev Elemental operator
 
 ## `elemental_plugin.spec.ts`
 
