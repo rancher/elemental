@@ -20,7 +20,7 @@ RUN zypper --installroot /osimage in --no-recommends -y filesystem
 
 # make system bootable
 # iputils: https://github.com/rancher/elemental/issues/1138
-RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut iputils kernel systemd bash
+RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut iputils kernel-default systemd bash
 
 #!ArchExclusiveLine: x86_64
 RUN if [ `uname -m` = "x86-64" ]; then zypper --installroot /osimage in --no-recommends -y syslinux grub2-i386-pc grub2-x86_64-efi; fi
