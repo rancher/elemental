@@ -24,7 +24,7 @@ Release:        0
 Summary:        A Rancher and Kubernetes optimized immutable Linux distribution
 License:        Apache-2.0
 Group:          System/Management
-URL:            https://github.com/rancher-sandbox/%{name}
+URL:            https://github.com/rancher/%{name}
 Source:         %{name}-%{version}.tar
 Source1:        LICENSE
 Source2:        README.md
