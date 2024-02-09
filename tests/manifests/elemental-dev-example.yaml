@@ -1,0 +1,89 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: MachineInventorySelectorTemplate
+metadata:
+  name: fire-machine-selector
+  namespace: fleet-default
+spec:
+  template:
+    spec:
+      selector:
+        matchExpressions:
+          - key: element
+            operator: In
+            values: [ 'fire' ]
+---
+kind: Cluster
+apiVersion: provisioning.cattle.io/v1
+metadata:
+  name: volcano
+  namespace: fleet-default
+spec:
+  rkeConfig:
+    machineGlobalConfig:
+      etcd-expose-metrics: false
+      profile: null
+    machinePools:
+      - controlPlaneRole: true
+        etcdRole: true
+        machineConfigRef:
+          apiVersion: elemental.cattle.io/v1beta1
+          kind: MachineInventorySelectorTemplate
+          name: fire-machine-selector
+        name: fire-pool
+        quantity: 1
+        unhealthyNodeTimeout: 0s
+        workerRole: true
+    machineSelectorConfig:
+      - config:
+          protect-kernel-defaults: false
+    registries: {}
+  kubernetesVersion: v1.24.8+k3s1
+---
+apiVersion: elemental.cattle.io/v1beta1
+kind: MachineRegistration
+metadata:
+  name: fire-nodes
+  namespace: fleet-default
+spec:
+  machineName: test-${System Information/UUID}
+  config:
+    cloud-config:
+      users:
+        - name: root
+          passwd: root
+    elemental:
+      reset:
+        debug: true
+        enabled: true
+        reset-persistent: true
+        reset-oem: true
+      install:
+        reboot: true
+        device-selector:
+        - key: Name
+          operator: In
+          values:
+          - /dev/sda
+          - /dev/vda
+          - /dev/nvme0
+        debug: true
+  machineInventoryLabels:
+    element: fire
+    manufacturer: "${System Information/Manufacturer}"
+    productName: "${System Information/Product Name}"
+    serialNumber: "${System Information/Serial Number}"
+    machineUUID: "${System Information/UUID}"
+---
+apiVersion: elemental.cattle.io/v1beta1
+kind: SeedImage
+metadata:
+  name: fire-img
+  namespace: fleet-default
+spec:
+  type: iso
+  baseImage: docker.io/local/elemental-iso:dev
+  registrationRef:
+    apiVersion: elemental.cattle.io/v1beta1
+    kind: MachineRegistration
+    name: fire-nodes
+    namespace: fleet-default
