@@ -157,3 +157,7 @@ The steps are equivalent for downgrades, by just checking out older versions of 
     ```bash
     kubectl apply -f tests/manifests/elemental-dev-upgrade-example.yaml
     ```
+
+1. Troubleshoot eventual issues
+
+    In case of errors, refer to the [upgrade troubleshooting documentation](https://elemental.docs.rancher.com/troubleshooting-upgrade).
