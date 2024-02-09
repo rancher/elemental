@@ -20,8 +20,8 @@ RUN zypper in --no-recommends -y procps openssl openssh openssh-server \
     \
     avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \
     container-selinux ethtool fuse-overlayfs haveged hdparm hostname iptables \
-    issue-generator jq k9s keyutils lshw lsof lsscsi mdadm multipath-tools \
-    netcat-openbsd net-tools nfs-client nfsidmap \
+    issue-generator jq keyutils lshw lsof lsscsi mdadm multipath-tools \
+    netcat-openbsd net-tools nfs-client \
     nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
     procmail psmisc rpcbind runc selinux-policy selinux-policy-targeted \
     selinux-tools slirp4netns strace sudo sysstat system-user-nobody \
