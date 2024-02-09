@@ -67,7 +67,6 @@ Cypress.Commands.add('createMachReg', (
   checkIsoBuilding=false,
   customCloudConfig='',
   checkDefaultCloudConfig=true ) => {
-  let selector
   cy.clickNavMenu(["Dashboard"]);
   cy.getBySel('button-create-registration-endpoint')
     .click();
@@ -118,14 +117,8 @@ Cypress.Commands.add('createMachReg', (
     //  cy.getBySel('select-os-version-build-media')
     //    .click();
     //}
-    // Next if condition will be removed once ui extension 1.3.0 is released
-    if (utils.isUIVersion('stable')) {
-      cy.getBySel('select-os-version-build-iso')
-        .click();
-    } else {
-      cy.getBySel('select-os-version-build-media')
-        .click();
-    }
+    cy.getBySel('select-os-version-build-media')
+      .click();
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
@@ -148,20 +141,19 @@ Cypress.Commands.add('createMachReg', (
       cy.contains('ISO x86_64 (unstable)')
         .click();
     }
-    utils.isUIVersion('stable') ? selector="iso" : selector="media";
-    cy.getBySel(`build-${selector}-btn`)
+    cy.getBySel(`build-media-btn`)
       .click();
-    cy.getBySel(`build-${selector}-btn`)
+    cy.getBySel(`build-media-btn`)
       .get('.icon-spin');
     // Download button is disabled while ISO is building
-    cy.getBySel(`download-${selector}-btn`).should(($input) => {
+    cy.getBySel(`download-media-btn`).should(($input) => {
       expect($input).to.have.attr('disabled')
     })
     // Download button is enabled once ISO building done
-    cy.getBySel(`download-${selector}-btn`, { timeout: 600000 }).should(($input) => {
+    cy.getBySel(`download-media-btn`, { timeout: 600000 }).should(($input) => {
       expect($input).to.not.have.attr('disabled')
     })
-    cy.getBySel(`download-${selector}-btn`)
+    cy.getBySel(`download-media-btn`)
       .click()
     cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
   }
@@ -238,14 +230,8 @@ Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabel
       cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
         .click();
       cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
-      // Following condition could be removed when we will release next Elemental UI (> 1.2.0)
-      if (utils.isUIVersion('dev')) {
-        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
-          > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], {parseSpecialCharSequences: false});
-      } else {
-        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1})
-          > .no-resize`).type(hwLabels[key], {parseSpecialCharSequences: false});
-      };
+      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
+        > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], {parseSpecialCharSequences: false});
       nthChildIndex += 3;
     };
   };
