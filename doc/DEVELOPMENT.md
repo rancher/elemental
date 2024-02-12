@@ -51,7 +51,7 @@ Clone the following repositories in your development environment:
     Using the `elemental-toolkit` repo:  
 
     ```bash
-    make build-docker-cli
+    make VERSION=dev build
     ```
 
     This will build a `docker.io/local/elemental-toolkit:dev` image that can be referenced in the following steps.  
@@ -121,7 +121,7 @@ The steps are equivalent for downgrades, by just checking out older versions of 
 
     ```bash
     git checkout my-next-feature-branch
-    make build-docker-cli
+    make VERSION=dev build
     ```
 
 1. Build a local OS image and push it to the test registry  
