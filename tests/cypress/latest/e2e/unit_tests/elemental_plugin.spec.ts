@@ -14,7 +14,7 @@ limitations under the License.
 
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
-import { isUIVersion } from '../../support/utils';
+import { isRancherManagerVersion, isUIVersion } from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
@@ -33,10 +33,15 @@ filterTests(['main', 'upgrade'], () => {
         !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages') : null;
       })
     );
+
+    // Add rancher-ui-plugin-charts repo because its part of Rancher Prime
+    it('Add rancher-ui-plugin-charts repo', () => {
+      isRancherManagerVersion('head') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
+    });
     
     qase(12,
       it('Enable extension support', () => {
-        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
+        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true, isRancherManagerVersion('head')) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion('head'));
       })
     );
   
