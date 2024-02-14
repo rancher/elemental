@@ -43,9 +43,8 @@ spec:
             - "http://172.18.0.2:30000"
       configs:
         "172.18.0.2:30000":
-          tls:
-            insecure_skip_verify: true    
-  kubernetesVersion: v1.24.8+k3s1
+          insecureSkipVerify: true    
+  kubernetesVersion: v1.27.10+k3s1
 ---
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
