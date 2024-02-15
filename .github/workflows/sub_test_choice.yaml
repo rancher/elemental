@@ -162,7 +162,7 @@ jobs:
       test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       upgrade_image: ${{ inputs.upgrade_image }}
-      upgrade_os_channel: ${{ inputs.os_channel }}
+      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upgrade_type: ${{ inputs.upgrade_type }}
       upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
 
@@ -217,5 +217,5 @@ jobs:
       test_description: ${{ inputs.test_description }}
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}
-      upgrade_os_channel: ${{ inputs.os_channel }}
+      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upstream_cluster_version: ${{ inputs.upstream_cluster_version }}

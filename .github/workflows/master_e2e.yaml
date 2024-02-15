@@ -225,7 +225,7 @@ jobs:
       test_type: ${{ inputs.test_type }}
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}
-      upgrade_os_channel: ${{ inputs.os_channel }}
+      upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upgrade_type: ${{ inputs.upgrade_type }}
       upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
 
