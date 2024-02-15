@@ -217,13 +217,14 @@
 
 - **Describe:** Install Elemental Operator
     - **It:** Add local chartmuseum repo
-    - **It:** Install latest stable Elemental operator
     - **It:** Install latest dev Elemental operator
+    - **It:** Install latest stable Elemental operator
 
 ## `elemental_plugin.spec.ts`
 
 - **Describe:** Install Elemental plugin
     - **It:** Add elemental-ui repo
+    - **It:** Add rancher-ui-plugin-charts repo
     - **It:** Enable extension support
     - **It:** Install Elemental plugin
 
