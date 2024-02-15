@@ -42,9 +42,9 @@ describe('Upgrade tests', () => {
 
   filterTests(['upgrade'], () => {
     // Add dev OS Version Channel if stable operator is installed
-    // because we do not update the operator in UI test so far
+    // because we do not update the operator in RKE2 UI test so far
     // Only RKE2 tests use os version channel
-    if (utils.isK8sVersion("rke2") && utils.isRancherManagerVersion('2.8')) {
+    if (utils.isK8sVersion("rke2") && !utils.isRancherManagerVersion('2.7')) {
       it('Add dev channel for RKE2 upgrade', () => {
         cy.addOsVersionChannel('dev');
       })
