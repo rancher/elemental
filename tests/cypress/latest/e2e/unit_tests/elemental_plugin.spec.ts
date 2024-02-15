@@ -34,9 +34,9 @@ filterTests(['main', 'upgrade'], () => {
       })
     );
 
-    // Add rancher-ui-plugin-charts repo because its part of Rancher Prime
+    // Add rancher-ui-plugin-charts repo because its part of Rancher Prime in 2.8 and 2.9-head
     it('Add rancher-ui-plugin-charts repo', () => {
-      isRancherManagerVersion('head') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
+      isRancherManagerVersion('2.8-head') || isRancherManagerVersion('2.9-head') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
     });
     
     qase(12,
