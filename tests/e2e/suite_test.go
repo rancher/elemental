@@ -499,8 +499,15 @@ var _ = BeforeSuite(func() {
 		rancherUpgradeHeadVersion = s[2]
 	}
 
-	// Enable multi-cluster support if needed
-	if testType == "multi_cli" {
+	switch testType {
+	case "airgap":
+		// Enable airgap support
+		clusterYaml = "../assets/cluster-airgap.yaml"
+		registrationYaml = "../assets/machineRegistration.yaml"
+		seedImageYaml = "../assets/seedImage.yaml"
+		selectorYaml = "../assets/selector.yaml"
+	case "multi":
+		// Enable multi-cluster support
 		if clusterNumber != "" {
 			var err error
 			numberOfClusters, err = strconv.Atoi(clusterNumber)
@@ -511,16 +518,12 @@ var _ = BeforeSuite(func() {
 		registrationYaml = "../assets/machineRegistration-multi.yaml"
 		seedImageYaml = "../assets/seedImage-multi.yaml"
 		selectorYaml = "../assets/selector-multi.yaml"
-	} else {
+	default:
+		// Default cluster support
 		clusterYaml = "../assets/cluster.yaml"
 		registrationYaml = "../assets/machineRegistration.yaml"
 		seedImageYaml = "../assets/seedImage.yaml"
 		selectorYaml = "../assets/selector.yaml"
-	}
-
-	// Enable airgap support if needed
-	if testType == "airgap" {
-		clusterYaml = "../assets/cluster-airgap.yaml"
 	}
 
 	// Start HTTP server
