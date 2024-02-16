@@ -55,7 +55,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Define local Kubeconfig file
 	localKubeconfig := os.Getenv("HOME") + "/.kube/config"
 
-	It("Install upsteam K8s cluster", func() {
+	It("Install upstream K8s cluster", func() {
 		if strings.Contains(k8sUpstreamVersion, "rke2") {
 			// Report to Qase
 			testCaseID = 60
@@ -253,12 +253,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		// Wait for all pods to be started
 		checkList := [][]string{
 			{"cattle-system", "app=rancher"},
-			{"cattle-fleet-local-system", "app=fleet-agent"},
 			{"cattle-system", "app=rancher-webhook"},
+			{"cattle-fleet-local-system", "app=fleet-agent"},
+			{"cattle-provisioning-capi-system", "control-plane=controller-manager"},
 		}
 		Eventually(func() error {
 			return rancher.CheckPod(k, checkList)
-		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+		}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(BeNil())
 
 		// We have to restart Rancher Manager to be sure that Private CA is used
 		if caType == "private" {
@@ -339,7 +340,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 	// Deploy operator in CLI test
 	It("Install Elemental Operator if needed", func() {
-		if strings.Contains(testType, "cli") {
+		if testType == "cli" || testType == "multi" {
 			By("Installing Operator for CLI tests", func() {
 				// Report to Qase
 				testCaseID = 62

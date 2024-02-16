@@ -106,8 +106,9 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 			}
 
 			// Apply to k8s
-			err = kubectl.Apply(clusterNS, registrationTmp)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return kubectl.Apply(clusterNS, registrationTmp)
+			}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 
 			// Check that the machine registration is correctly created
 			CheckCreatedRegistration(clusterNS, "machine-registration-multi")

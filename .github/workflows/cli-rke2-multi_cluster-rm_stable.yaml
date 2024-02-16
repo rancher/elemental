@@ -32,6 +32,6 @@ jobs:
       k8s_version_to_provision: v1.26.10+rke2r2
       qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
-      test_type: multi_cli
+      test_type: multi
       upstream_cluster_version: v1.26.10+rke2r2
       zone: us-central1-b
