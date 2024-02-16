@@ -36,7 +36,7 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
-      k8s_version_to_provision: v1.26.10+rke2r2
+      k8s_version_to_provision: v1.27.10+rke2r1
       rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
       test_type: ui
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest

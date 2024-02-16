@@ -107,6 +107,7 @@ on:
         type: string
       upstream_cluster_version:
         description: Cluster upstream version where to install Rancher (K3s or RKE2)
+        #default: v1.27.10+k3s2
         default: v1.26.10+k3s2
         type: string
       zone:
