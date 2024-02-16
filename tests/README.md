@@ -84,7 +84,7 @@
 ## `install_test.go`
 
 - **Describe:** E2E - Install Rancher Manager
-    - **It:** Install upsteam K8s cluster
+    - **It:** Install upstream K8s cluster
       -  **By:** Installing RKE2
       -  **By:** Configuring hardened cluster
       -  **By:** Starting RKE2
