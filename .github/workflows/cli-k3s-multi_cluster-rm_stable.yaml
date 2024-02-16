@@ -28,7 +28,7 @@ jobs:
       cluster_number: 20
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       iso_boot: true
-      k8s_version_to_provision: v1.26.10+k3s2
+      k8s_version_to_provision: v1.27.10+k3s2
       qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
       test_type: multi

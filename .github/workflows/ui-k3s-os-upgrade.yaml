@@ -39,7 +39,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: stable
       iso_boot: true
-      k8s_version_to_provision: v1.26.10+k3s2
+      k8s_version_to_provision: v1.27.10+k3s2
       proxy: ${{ inputs.proxy }}
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
