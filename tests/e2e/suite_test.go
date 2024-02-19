@@ -16,7 +16,6 @@ package e2e_test
 
 import (
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -182,37 +181,31 @@ func WaitCluster(ns, cn string) {
 				}
 
 				// Check if rancher-system-agent.service has some issue
-				if s.conditionType == "Provisioned" || s.conditionType == "Ready" || s.conditionStatus == "Updated" {
-					msg, _ := kubectl.Run("get", "cluster",
-						"--namespace", ns, cn,
-						"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].message}")
+				if s.conditionType == "Provisioned" || s.conditionType == "Ready" || s.conditionType == "Updated" {
+					msg := "error applying plan -- check rancher-system-agent.service logs on node for more information"
+
+					// Extract the list of failed nodes
+					listIP, _ := kubectl.Run("get", "machine",
+						"--namespace", ns,
+						"-o", "jsonpath={.items[?(@.status.conditions[*].message==\""+msg+"\")].status.addresses[?(@.type==\"InternalIP\")].address}")
 
 					// We can try to restart the rancher-system-agent service on the failing node
 					// because sometimes it can fail just because of a sporadic/timeout issue and a restart can fix it!
-					if strings.Contains(msg, "check rancher-system-agent.service logs on node") {
-						// Get the Elemental hostname and then the *real* hostname
-						substr := regexp.MustCompile(`(` + cn + `-.*): error`).FindStringSubmatch(msg)
-						for _, node := range strings.Split(substr[1], ",") {
-							// Get node IP
-							ip, _ := elemental.GetExternalMachineIP(ns, node)
-
-							if ip != "" {
-								// Set 'client' to be able to access the node through SSH
-								cl := &tools.Client{
-									Host:     ip + ":22",
-									Username: userName,
-									Password: userPassword,
-								}
-
-								// Log the workaround, could be useful
-								GinkgoWriter.Printf("!! rancher-system-agent issue !! Service has been restarted on %s\n", node)
-
-								// Restart rancher-system-agent service on the node
-								// NOTE: wait a little to be sure that all is restarted before continuing
-								RunSSHWithRetry(cl, "systemctl restart rancher-system-agent.service")
-								time.Sleep(tools.SetTimeout(15 * time.Second))
-							}
+					for _, ip := range strings.Fields(listIP) {
+						// Set 'client' to be able to access the node through SSH
+						cl := &tools.Client{
+							Host:     ip + ":22",
+							Username: userName,
+							Password: userPassword,
 						}
+
+						// Log the workaround, could be useful
+						GinkgoWriter.Printf("!! rancher-system-agent issue !! Service has been restarted on node with IP %s\n", ip)
+
+						// Restart rancher-system-agent service on the node
+						// NOTE: wait a little to be sure that all is restarted before continuing
+						RunSSHWithRetry(cl, "systemctl restart rancher-system-agent.service")
+						time.Sleep(tools.SetTimeout(15 * time.Second))
 					}
 				}
 			}
