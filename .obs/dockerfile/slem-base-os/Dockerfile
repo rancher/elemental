@@ -44,6 +44,9 @@ RUN zypper --installroot /osimage in --no-recommends -y apparmor-parser
 # add elemental
 RUN zypper --installroot /osimage in --no-recommends -y elemental
 
+# add transactional updates utilities
+RUN zypper --installroot /osimage in --no-recommends -y transactional-update
+
 # end of mandatory package installs for SLE Micro
 
 # make derived containers possible
