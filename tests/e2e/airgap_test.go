@@ -170,7 +170,6 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			// Set flags for Rancher Manager installation
 			flags := []string{
 				"upgrade", "--install", "rancher", string(rancherAirgapVersion),
-				//"upgrade", "--install", "rancher", "/opt/rancher/helm/rancher-" + rancherHeadVersion + ".tgz",
 				"--namespace", "cattle-system",
 				"--create-namespace",
 				"--set", "hostname=rancher-manager.test",

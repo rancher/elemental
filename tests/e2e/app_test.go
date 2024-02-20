@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -55,6 +56,19 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
 
+		By("Scaling the deployment to the number of nodes", func() {
+			nodeList, err := kubectl.RunWithoutErr("get", "nodes", "-o", "jsonpath={.items[*].metadata.name}")
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(nodeList).To(Not(BeEmpty()))
+
+			nodeNumber := len(strings.Fields(nodeList))
+			Expect(nodeNumber).To(Not(BeNil()))
+
+			out, err := kubectl.Run("scale", "--replicas="+fmt.Sprint(nodeNumber), "deployment/"+appName)
+			Expect(err).To(Not(HaveOccurred()), out)
+			Expect(out).To(ContainSubstring("deployment.apps/" + appName + " scaled"))
+		})
+
 		By("Waiting for deployment to be rollout", func() {
 			// Wait for application to be started
 			// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
@@ -73,32 +87,34 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 
 			// Wait until at least an IP address is returned
 			Eventually(func() bool {
-				ip, _ := kubectl.Run(cmd...)
+				ip, _ := kubectl.RunWithoutErr(cmd...)
 				return tools.IsIPv4(strings.Fields(ip)[0])
 			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeTrue())
 
 			// Get load balancer IPs
-			appIPs, err := kubectl.Run(cmd...)
+			appIPs, err := kubectl.RunWithoutErr(cmd...)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(appIPs).To(Not(BeEmpty()))
 
 			// Loop on each IP to check the application
 			for _, ip := range strings.Fields(appIPs) {
-				GinkgoWriter.Printf("Checking node with IP %s...\n", ip)
+				if tools.IsIPv4(ip) {
+					GinkgoWriter.Printf("Checking node with IP %s...\n", ip)
 
-				// Retry if needed, could take some times if a pod is restarted for example
-				var htmlPage []byte
-				Eventually(func() error {
-					htmlPage, err = exec.Command("curl", "http://"+ip+":8080").CombinedOutput()
-					return err
-				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
+					// Retry if needed, could take some times if a pod is restarted for example
+					var htmlPage []byte
+					Eventually(func() error {
+						htmlPage, err = exec.Command("curl", "http://"+ip+":8080").CombinedOutput()
+						return err
+					}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 
-				// Check HTML page content
-				Expect(string(htmlPage)).To(And(
-					ContainSubstring("Hello world!"),
-					ContainSubstring("My hostname is hello-world-"),
-					ContainSubstring(ip+":8080"),
-				), string(htmlPage))
+					// Check HTML page content
+					Expect(string(htmlPage)).To(And(
+						ContainSubstring("Hello world!"),
+						ContainSubstring("My hostname is hello-world-"),
+						ContainSubstring(ip+":8080"),
+					), string(htmlPage))
+				}
 			}
 		})
 	})
