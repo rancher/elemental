@@ -7,7 +7,6 @@
 #!BuildConstraint: hardware:memory:size unit=G 16
 
 ARG SLEMICRO_VERSION
-ARG SLE_VERSION
 
 FROM suse/sle-micro/kvm-${SLEMICRO_VERSION}:latest AS os
 FROM suse/sle-micro/${SLEMICRO_VERSION}:latest AS builder
@@ -22,7 +21,7 @@ COPY --from=os / rootfs
 RUN elemental --debug --config-dir . build-iso -o /output -n "sle-micro-kvm.$(uname -m)-%VERSION%-Build%RELEASE%" dir:rootfs
 
 # Only keep the ISO as a result
-FROM bci/bci-busybox:$SLE_VERSION
+FROM alp/bci/bci-busybox
 COPY --from=builder /output /elemental-iso
 
 ARG SLEMICRO_VERSION
