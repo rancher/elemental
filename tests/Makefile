@@ -47,14 +47,17 @@ generate-readme:
 # Qase commands
 create-qase-run: deps
 	@go run qase/qase_cmd.go -create
+
 delete-qase-run: deps
 	@go run qase/qase_cmd.go -delete
+
 publish-qase-run: deps
 	@go run qase/qase_cmd.go -publish
 
 # E2E tests
 e2e-airgap-rancher: deps
 	ginkgo --label-filter airgap-rancher -r -v ./e2e
+
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
 

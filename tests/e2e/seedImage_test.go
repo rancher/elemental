@@ -46,7 +46,6 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 				key   string
 				value string
 			}
-			airgapImagesFile := "/opt/rancher/images/elemental/elemental-images.txt"
 
 			// Wait for list of OS versions to be populated
 			WaitForOSVersion(clusterNS)
@@ -62,7 +61,8 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			Expect(baseImageURL).To(Not(BeEmpty()))
 
 			if testType == "airgap" {
-				isoVersion, _ := exec.Command("bash", "-c", "awk -F '/' '/sle-micro-iso/{print $NF}' "+airgapImagesFile).Output()
+				airgapImagesFile := os.Getenv("HOME") + "/airgap_rancher/images/elemental/elemental-images.txt"
+				isoVersion, _ := exec.Command("bash", "-c", "awk -F/ '/sle-micro-iso/{print $NF}' "+airgapImagesFile).Output()
 				baseImageURL = "localhost:5000/elemental/sle-micro-iso-" + string(isoVersion)
 			}
 
