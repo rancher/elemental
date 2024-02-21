@@ -1,0 +1,10 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: ManagedOSImage
+metadata:
+  name: dev-upgrade
+  namespace: fleet-default
+spec:
+  # Set to the new Elemental version you would like to upgrade to or track the latest tag
+  osImage: "172.18.0.2:30000/elemental-os:dev-next"
+  clusterTargets:
+    - clusterName: volcano
