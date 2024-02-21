@@ -22,7 +22,7 @@ COPY --from=os / rootfs
 RUN elemental --debug --config-dir . build-iso -o /output -n "sle-micro-base.$(uname -m)-%VERSION%-Build%RELEASE%" dir:rootfs
 
 # Only keep the ISO as a result
-FROM bci/bci-busybox:$SLE_VERSION
+FROM alp/bci/bci-busybox
 COPY --from=builder /output /elemental-iso
 
 ARG SLEMICRO_VERSION
