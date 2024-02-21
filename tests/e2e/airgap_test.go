@@ -17,7 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
-	"strings"
+	"regexp"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -29,8 +29,10 @@ import (
 
 var _ = Describe("E2E - Build the airgap archive", Label("prepare-archive"), func() {
 	It("Execute the script to build the archive", func() {
-		err := exec.Command("sudo", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo).Run()
-		Expect(err).To(Not(HaveOccurred()))
+		// Could be useful for manual debugging!
+		GinkgoWriter.Printf("Executed command: %s %s %s %s %s %s\n", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo)
+		out, err := exec.Command(airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo).CombinedOutput()
+		Expect(err).To(Not(HaveOccurred()), string(out))
 	})
 })
 
@@ -68,6 +70,8 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 	})
 
 	It("Install K3S/Rancher in the rancher-manager machine", func() {
+		airgapRepo := os.Getenv("HOME") + "/airgap_rancher"
+		optRancher := "/opt/rancher"
 		userName := "root"
 		password := "root"
 		client := &tools.Client{
@@ -75,11 +79,6 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			Username: userName,
 			Password: password,
 		}
-
-		// Get the version of the Elemental Operator
-		out, err := exec.Command("bash", "-c", "ls /opt/rancher/helm/elemental-operator-chart-*.tgz | cut -d '-' -f 4").Output()
-		Expect(err).To(Not(HaveOccurred()))
-		elementalVersion := strings.Trim(string(out), "\n")
 
 		// Create kubectl context
 		// Default timeout is too small, so New() cannot be used
@@ -91,34 +90,34 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 		By("Sending the archive file into the rancher server", func() {
 			// Make sure SSH is available
-			Eventually(func() string {
-				out, _ := client.RunSSH("echo SSH_OK")
-				out = strings.Trim(out, "\n")
-				return out
-			}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+			CheckSSH(client)
 
 			// Send the airgap archive
-			err := client.SendFile("/opt/airgap_rancher.zst", "/opt/airgap_rancher.zst", "0644")
+			err := client.SendFile(os.Getenv("HOME")+"/airgap_rancher.zst", "/opt/airgap_rancher.zst", "0644")
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Extract the airgap archive
-			_, err = client.RunSSH("mkdir /opt/rancher; tar -I zstd -vxf /opt/airgap_rancher.zst -C /opt/rancher")
+			_, err = client.RunSSH("mkdir " + optRancher + "; tar -I zstd -vxf /opt/airgap_rancher.zst -C " + optRancher)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Deploying airgap infrastructure by executing the deploy script", func() {
-			_, err := client.RunSSH("/opt/rancher/k3s_" + k8sUpstreamVersion + "/deploy-airgap " + k8sUpstreamVersion + " " + certManagerVersion)
-			Expect(err).To(Not(HaveOccurred()))
+			value := regexp.MustCompile(`v(.*)\+.*`).FindStringSubmatch(k8sUpstreamVersion)
+			out, err := client.RunSSH(optRancher + "/k3s_" + value[1] + "/deploy-airgap " + k8sUpstreamVersion + " " + certManagerVersion)
+			Expect(err).To(Not(HaveOccurred()), out)
 		})
 
 		By("Getting the kubeconfig file of the airgap cluster", func() {
 			// Define local Kubeconfig file
 			localKubeconfig := os.Getenv("HOME") + "/.kube/config"
-			Expect(err).To(Not(HaveOccurred()))
+
 			err := os.Mkdir(os.Getenv("HOME")+"/.kube", 0755)
 			Expect(err).To(Not(HaveOccurred()))
+
 			err = client.GetFile(localKubeconfig, "/etc/rancher/k3s/k3s.yaml", 0644)
 			Expect(err).To(Not(HaveOccurred()))
+			// NOTE: not sure that this is need because we have the config file in ~/.kube/
+
 			err = os.Setenv("KUBECONFIG", localKubeconfig)
 			Expect(err).To(Not(HaveOccurred()))
 
@@ -129,7 +128,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 		By("Installing kubectl", func() {
 			// TODO: Variable for kubectl version
-			err := exec.Command("curl", "-LO", "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl").Run()
+			err := exec.Command("curl", "-sLO", "https://dl.k8s.io/release/v1.28.2/bin/linux/amd64/kubectl").Run()
 			Expect(err).To(Not(HaveOccurred()))
 			err = exec.Command("chmod", "+x", "kubectl").Run()
 			Expect(err).To(Not(HaveOccurred()))
@@ -140,7 +139,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		By("Installing CertManager", func() {
 			// Set flags for cert-manager installation
 			flags := []string{
-				"upgrade", "--install", "cert-manager", "/opt/rancher/helm/cert-manager-" + certManagerVersion + ".tgz",
+				"upgrade", "--install", "cert-manager", airgapRepo + "/helm/cert-manager-" + certManagerVersion + ".tgz",
 				"--namespace", "cert-manager",
 				"--create-namespace",
 				"--set", "image.repository=rancher-manager.test:5000/cert/cert-manager-controller",
@@ -164,7 +163,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 		By("Installing Rancher", func() {
 			// TODO: Use the DeployRancherManager function from install.go
-			rancherAirgapVersion, err := exec.Command("bash", "-c", "ls /opt/rancher/helm/rancher-*.tgz").Output()
+			rancherAirgapVersion, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/rancher-*.tgz").Output()
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Set flags for Rancher Manager installation
@@ -198,8 +197,11 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		By("Installing Elemental Operator", func() {
 			// Install Elemental Operator CRDs first
 			// Set flags for Elemental Operator CRDs installation
+			elementalCrdsVersion, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-crds-chart-*.tgz").Output()
+			Expect(err).To(Not(HaveOccurred()))
+
 			flags := []string{
-				"upgrade", "--install", "elemental-crds", "/opt/rancher/helm/elemental-operator-crds-chart-" + elementalVersion,
+				"upgrade", "--install", "elemental-crds", string(elementalCrdsVersion),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			}
@@ -208,8 +210,11 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			time.Sleep(20 * time.Second)
 
 			// Set flags for Elemental Operator installation
+			elementalVersion, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz").Output()
+			Expect(err).To(Not(HaveOccurred()))
+
 			flags = []string{
-				"upgrade", "--install", "elemental", "/opt/rancher/helm/elemental-operator-chart-" + elementalVersion,
+				"upgrade", "--install", "elemental", string(elementalVersion),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 				"--set", "image.repository=rancher-manager.test:5000/elemental/elemental-operator",
@@ -222,7 +227,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			RunHelmCmdWithRetry(flags...)
 
 			// Wait for pod to be started
-			err := rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+			err = rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
 			Expect(err).To(Not(HaveOccurred()))
 		})
 	})
