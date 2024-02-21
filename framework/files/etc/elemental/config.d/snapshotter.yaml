@@ -1,0 +1,3 @@
+snapshotter:
+  type: btrfs
+  max-snaps: 4

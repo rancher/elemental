@@ -142,6 +142,9 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
+%dir %{_sysconfdir}/elemental
+%dir %{_sysconfdir}/elemental/config.d
+%config %{_sysconfdir}/elemental/config.d/snapshotter.yaml 
 %dir %{_sysconfdir}/cos
 %config %{_sysconfdir}/cos/bootargs.cfg
 %dir %{_sysconfdir}/dracut.conf.d
