@@ -35,7 +35,7 @@ Clone the following repositories in your development environment:
 
     At this stage you may want to enable Extensions and install the Elemental extension from the Rancher web UI.  
 
-1. Build a local image containing the `elemental-registry`
+1. Build a local image containing the `elemental-register` binary
 
     Using the `elemental-operator` repo:  
 
