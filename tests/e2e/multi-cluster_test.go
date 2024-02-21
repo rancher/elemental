@@ -116,7 +116,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 
 		By("Downloading MachineRegistration file", func() {
 			// Download the new YAML installation config file
-			tokenURL, err := kubectl.Run("get", "MachineRegistration",
+			tokenURL, err := kubectl.RunWithoutErr("get", "MachineRegistration",
 				"--namespace", clusterNS, machineRegName,
 				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
@@ -284,7 +284,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 				ip := GetNodeIP(hostName)
 
 				// Get MachineInventory name
-				nodeName, err := kubectl.Run("get", "MachineInventory",
+				nodeName, err := kubectl.RunWithoutErr("get", "MachineInventory",
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[?(@.metadata.annotations.elemental\\.cattle\\.io/registration-ip==\""+ip+"\")].metadata.name}")
 				Expect(err).To(Not(HaveOccurred()))

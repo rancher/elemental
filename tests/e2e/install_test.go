@@ -30,14 +30,14 @@ import (
 func rolloutDeployment(ns, d string) {
 	// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
 	Eventually(func() string {
-		status, _ := kubectl.Run("rollout", "restart", "deployment/"+d,
+		status, _ := kubectl.RunWithoutErr("rollout", "restart", "deployment/"+d,
 			"--namespace", ns)
 		return status
 	}, tools.SetTimeout(1*time.Minute), 20*time.Second).Should(ContainSubstring("restarted"))
 
 	// Wait for deployment to be restarted
 	Eventually(func() string {
-		status, _ := kubectl.Run("rollout", "status", "deployment/"+d,
+		status, _ := kubectl.RunWithoutErr("rollout", "status", "deployment/"+d,
 			"--namespace", ns)
 		return status
 	}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
@@ -234,7 +234,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 		// Inject secret for Private CA
 		if caType == "private" {
-			_, err := kubectl.Run("create", "secret",
+			_, err := kubectl.RunWithoutErr("create", "secret",
 				"--namespace", "cattle-system",
 				"tls", "tls-rancher-ingress",
 				"--cert=tls.crt",
@@ -242,7 +242,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			)
 			Expect(err).To(Not(HaveOccurred()))
 
-			_, err = kubectl.Run("create", "secret",
+			_, err = kubectl.RunWithoutErr("create", "secret",
 				"--namespace", "cattle-system",
 				"generic", "tls-ca",
 				"--from-file=cacerts.pem=./cacerts.pem",
@@ -283,7 +283,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 		By("Configuring kubectl to use Rancher admin user", func() {
 			// Getting internal username for admin
-			internalUsername, err := kubectl.Run("get", "user",
+			internalUsername, err := kubectl.RunWithoutErr("get", "user",
 				"-o", "jsonpath={.items[?(@.username==\"admin\")].metadata.name}",
 			)
 			Expect(err).To(Not(HaveOccurred()))
@@ -299,7 +299,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// NOTE: loop until the cmd return something, it could take some time
 			var rancherCA string
 			Eventually(func() error {
-				rancherCA, err = kubectl.Run("get", "secret",
+				rancherCA, err = kubectl.RunWithoutErr("get", "secret",
 					"--namespace", "cattle-system",
 					"tls-rancher-ingress",
 					"-o", "jsonpath={.data.tls\\.crt}",

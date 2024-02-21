@@ -226,7 +226,7 @@ Check that Cluster resource has been correctly created
 func CheckCreatedCluster(ns, cn string) {
 	// Check that the cluster is correctly created
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "cluster",
+		out, _ := kubectl.RunWithoutErr("get", "cluster",
 			"--namespace", ns,
 			cn, "-o", "jsonpath={.metadata.name}")
 		return out
@@ -241,7 +241,7 @@ Check that Cluster resource has been correctly created
 */
 func CheckCreatedRegistration(ns, rn string) {
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "MachineRegistration",
+		out, _ := kubectl.RunWithoutErr("get", "MachineRegistration",
 			"--namespace", clusterNS,
 			"-o", "jsonpath={.items[*].metadata.name}")
 		return out
@@ -256,7 +256,7 @@ Check that a SelectorTemplate resource has been correctly created
 */
 func CheckCreatedSelectorTemplate(ns, sn string) {
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "MachineInventorySelectorTemplate",
+		out, _ := kubectl.RunWithoutErr("get", "MachineInventorySelectorTemplate",
 			"--namespace", ns,
 			"-o", "jsonpath={.items[*].metadata.name}")
 		return out
@@ -270,7 +270,7 @@ Wait for OSVersion to be populated
 */
 func WaitForOSVersion(ns string) {
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "ManagedOSVersion",
+		out, _ := kubectl.RunWithoutErr("get", "ManagedOSVersion",
 			"--namespace", ns,
 			"-o", "jsonpath={.items[*].metadata.name}")
 		return out
@@ -302,7 +302,7 @@ func DownloadBuiltISO(ns, seedName, filename string) {
 
 	// Check that the seed image is correctly created
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "SeedImage",
+		out, _ := kubectl.RunWithoutErr("get", "SeedImage",
 			"--namespace", ns,
 			seedName,
 			"-o", "jsonpath={.status}")
@@ -310,7 +310,7 @@ func DownloadBuiltISO(ns, seedName, filename string) {
 	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
 
 	// Get URL
-	seedImageURL, err := kubectl.Run("get", "SeedImage",
+	seedImageURL, err := kubectl.RunWithoutErr("get", "SeedImage",
 		"--namespace", ns,
 		seedName,
 		"-o", "jsonpath={.status.downloadURL}")

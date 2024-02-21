@@ -58,7 +58,7 @@ Get state of the cluster
   - @returns The YAML structure or an error
 */
 func GetClusterState(ns, cluster, condition string) (string, error) {
-	out, err := kubectl.Run("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
+	out, err := kubectl.RunWithoutErr("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
 	if err != nil {
 		return "", err
 	}
@@ -72,7 +72,7 @@ Get nodeName from MachineInventory
   - @returns Corresponding external machine name
 */
 func GetExternalMachine(ns, machine string) (string, error) {
-	node, err := kubectl.Run("get", "Machine",
+	node, err := kubectl.RunWithoutErr("get", "Machine",
 		"--namespace", ns, machine,
 		"-o", "jsonpath={.status.addresses[?(@.type==\"Hostname\")].address}")
 	if err != nil {
@@ -89,7 +89,7 @@ Get IP from MachineInventory
   - @returns Corresponding machine IP
 */
 func GetExternalMachineIP(ns, machine string) (string, error) {
-	node, err := kubectl.Run("get", "Machine",
+	node, err := kubectl.RunWithoutErr("get", "Machine",
 		"--namespace", ns, machine,
 		"-o", "jsonpath={.status.addresses[?(@.type==\"InternalIP\")].address}")
 	if err != nil {
@@ -106,7 +106,7 @@ Get container URI from ManagedOSVersion
   - @returns URI of container image
 */
 func GetImageURI(ns, os string) (string, error) {
-	uri, err := kubectl.Run("get", "ManagedOSVersion",
+	uri, err := kubectl.RunWithoutErr("get", "ManagedOSVersion",
 		"--namespace", ns, os,
 		"-o", "jsonpath={.spec.metadata.uri}")
 
@@ -124,7 +124,7 @@ Get Machine from MachineInventory
   - @returns Corresponding internal machine name
 */
 func GetInternalMachine(ns, machineInventory string) (string, error) {
-	machine, err := kubectl.Run("get", "Machine",
+	machine, err := kubectl.RunWithoutErr("get", "Machine",
 		"--namespace", ns,
 		"-o", "jsonpath={.items[?(@.status.nodeRef.name==\""+machineInventory+"\")].metadata.name}")
 	if err != nil {
@@ -139,7 +139,7 @@ Get container image used for Elemental operator
   - @returns The container image used or an error
 */
 func GetOperatorImage() (string, error) {
-	operatorImage, err := kubectl.Run("get", "pod",
+	operatorImage, err := kubectl.RunWithoutErr("get", "pod",
 		"--namespace", "cattle-elemental-system",
 		"-l", "app=elemental-operator", "-o", "jsonpath={.items[*].status.containerStatuses[*].image}")
 	if err != nil {
@@ -172,7 +172,7 @@ Get MachineInventory name (aka. server id)
   - @returns The name/id of the server or an error
 */
 func GetServerID(ns string, index int) (string, error) {
-	serverID, err := kubectl.Run("get", "MachineInventories",
+	serverID, err := kubectl.RunWithoutErr("get", "MachineInventories",
 		"--namespace", ns,
 		"-o", "jsonpath={.items["+fmt.Sprint(index-1)+"].metadata.name}")
 	if err != nil {
@@ -209,7 +209,7 @@ Set a label on MachineInventory
   - @returns Nothing or an error
 */
 func SetMachineInventoryLabel(ns, node, key, value string) error {
-	_, err := kubectl.Run("label", "machineinventory",
+	_, err := kubectl.RunWithoutErr("label", "machineinventory",
 		"--namespace", ns, node,
 		"--overwrite", key+"="+value)
 	if err != nil {

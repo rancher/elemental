@@ -28,7 +28,7 @@ import (
 )
 
 func deleteFinalizers(ns, object, value string) {
-	_, err := kubectl.Run("patch", object,
+	_, err := kubectl.RunWithoutErr("patch", object,
 		"--namespace", ns, value, "--type", "merge",
 		"--patch", "{\"metadata\":{\"finalizers\":null}}")
 	Expect(err).To(Not(HaveOccurred()))
@@ -37,7 +37,7 @@ func deleteFinalizers(ns, object, value string) {
 
 func testClusterAvailability(ns, cluster string) {
 	Eventually(func() string {
-		out, _ := kubectl.Run("get", "cluster",
+		out, _ := kubectl.RunWithoutErr("get", "cluster",
 			"--namespace", ns, cluster,
 			"-o", "jsonpath={.metadata.name}")
 		return out
@@ -92,7 +92,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 			By("Deleting cluster resource", func() {
 				Eventually(func() error {
-					_, err := kubectl.Run("delete", "cluster",
+					_, err := kubectl.RunWithoutErr("delete", "cluster",
 						"--namespace", ns, name)
 					return err
 				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
@@ -104,7 +104,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			// NOTE: wait a bit for the cluster deletion to be started (it's running in background)
 			time.Sleep(1 * time.Minute)
 
-			machineList, err := kubectl.Run("get", "MachineInventory",
+			machineList, err := kubectl.RunWithoutErr("get", "MachineInventory",
 				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
 			Expect(err).To(Not(HaveOccurred()))
 

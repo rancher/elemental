@@ -31,7 +31,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 		testCaseID = 54
 
 		// Get the machine inventory name list
-		machineInventory, err := kubectl.Run("get", "MachineInventory",
+		machineInventory, err := kubectl.RunWithoutErr("get", "MachineInventory",
 			"--namespace", clusterNS,
 			"-o", "jsonpath='{.items[*].metadata.name}'")
 		Expect(err).To(Not(HaveOccurred()))
@@ -39,7 +39,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 
 		By("Configuring reset at MachineInventory level", func() {
 			// Patch the first machine inventory to enable reset
-			_, err = kubectl.Run("patch", "MachineInventory", firstMachineInventory,
+			_, err = kubectl.RunWithoutErr("patch", "MachineInventory", firstMachineInventory,
 				"--namespace", clusterNS, "--type", "merge",
 				"--patch-file", resetMachineInv)
 			Expect(err).To(Not(HaveOccurred()))
@@ -48,14 +48,14 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 		By("Deleting and removing the node from the cluster", func() {
 			machineToRemove, err := elemental.GetInternalMachine(clusterNS, firstMachineInventory)
 			Expect(err).To(Not(HaveOccurred()))
-			_, err = kubectl.Run("delete", "machines", machineToRemove,
+			_, err = kubectl.RunWithoutErr("delete", "machines", machineToRemove,
 				"--namespace", clusterNS)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
 		By("Checking that MachineInventory is deleted", func() {
 			Eventually(func() string {
-				out, _ := kubectl.Run("get", "MachineInventory",
+				out, _ := kubectl.RunWithoutErr("get", "MachineInventory",
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
@@ -64,7 +64,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 
 		By("Checking that MachineInventory is back after the reset", func() {
 			Eventually(func() string {
-				out, _ := kubectl.Run("get", "MachineInventory",
+				out, _ := kubectl.RunWithoutErr("get", "MachineInventory",
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out

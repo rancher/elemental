@@ -95,7 +95,7 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 			"-l", "app=rancher",
 			"-o", "jsonpath={.items[*].status.containerStatuses[*].image}",
 		}
-		versionBeforeUpgrade, err := kubectl.Run(getImageVersion...)
+		versionBeforeUpgrade, err := kubectl.RunWithoutErr(getImageVersion...)
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Upgrade Rancher Manager
@@ -111,7 +111,7 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		// Wait for Rancher Manager to be restarted
 		// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
 		Eventually(func() string {
-			status, _ := kubectl.Run(
+			status, _ := kubectl.RunWithoutErr(
 				"rollout",
 				"--namespace", "cattle-system",
 				"status", "deployment/rancher",
@@ -134,13 +134,13 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 
 		// Check that all pods are using the same version
 		Eventually(func() int {
-			out, _ := kubectl.Run(getImageVersion...)
+			out, _ := kubectl.RunWithoutErr(getImageVersion...)
 			return len(strings.Fields(out))
 		}, tools.SetTimeout(3*time.Minute), 10*time.Second).Should(Equal(1))
 
 		// Get after-upgrade Rancher Manager version
 		// and check that it's different to the before-upgrade version
-		versionAfterUpgrade, err := kubectl.Run(getImageVersion...)
+		versionAfterUpgrade, err := kubectl.RunWithoutErr(getImageVersion...)
 		Expect(err).To(Not(HaveOccurred()))
 		Expect(versionAfterUpgrade).To(Not(Equal(versionBeforeUpgrade)))
 	})
@@ -206,14 +206,14 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					GinkgoWriter.Printf("!! ManagedOSVersionChannel not synced !! Triggering a re-sync!\n")
 
 					// Get current syncInterval
-					syncValue, err := kubectl.Run("get", "managedOSVersionChannel",
+					syncValue, err := kubectl.RunWithoutErr("get", "managedOSVersionChannel",
 						"--namespace", clusterNS, channel,
 						"-o", "jsonpath={.spec.syncInterval}")
 					Expect(err).To(Not(HaveOccurred()))
 					Expect(syncValue).To(Not(BeEmpty()))
 
 					// Reduce syncInterval to force an update
-					_, err = kubectl.Run("patch", "managedOSVersionChannel",
+					_, err = kubectl.RunWithoutErr("patch", "managedOSVersionChannel",
 						"--namespace", clusterNS, channel,
 						"--type", "merge",
 						"--patch", "{\"spec\":{\"syncInterval\":\"1m\"}}")
@@ -232,7 +232,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					Expect(OSVersion).To(Not(BeEmpty()))
 
 					// Re-patch syncInterval to the initial value
-					_, err = kubectl.Run("patch", "managedOSVersionChannel",
+					_, err = kubectl.RunWithoutErr("patch", "managedOSVersionChannel",
 						"--namespace", clusterNS, channel,
 						"--type", "merge",
 						"--patch", "{\"spec\":{\"syncInterval\":\""+syncValue+"\"}}")
@@ -243,7 +243,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				value = string(OSVersion)
 
 				// Extract the value to check after the upgrade
-				out, err := kubectl.Run("get", "ManagedOSVersion",
+				out, err := kubectl.RunWithoutErr("get", "ManagedOSVersion",
 					"--namespace", clusterNS, value,
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))

@@ -106,14 +106,14 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 		})
 
 		By("Checking that the backup has been done", func() {
-			out, err := kubectl.Run("get", "backup", backupResourceName,
+			out, err := kubectl.RunWithoutErr("get", "backup", backupResourceName,
 				"-o", "jsonpath={.metadata.name}")
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(out).To(ContainSubstring(backupResourceName))
 
 			// Check operator logs
 			Eventually(func() string {
-				out, _ := kubectl.Run("logs", "-l app.kubernetes.io/name=rancher-backup",
+				out, _ := kubectl.RunWithoutErr("logs", "-l app.kubernetes.io/name=rancher-backup",
 					"--tail=-1", "--since=5m",
 					"--namespace", "cattle-resources-system")
 				return out
@@ -128,14 +128,14 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 		By("Deleting some Elemental resources", func() {
 			for _, obj := range []string{"MachineRegistration", "MachineInventorySelectorTemplate"} {
 				// List the resources
-				list, err := kubectl.Run("get", obj,
+				list, err := kubectl.RunWithoutErr("get", obj,
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delete the resources
 				for _, rsc := range strings.Split(list, " ") {
-					_, err := kubectl.Run("delete", obj, "--namespace", clusterNS, rsc)
+					_, err := kubectl.RunWithoutErr("delete", obj, "--namespace", clusterNS, rsc)
 					Expect(err).To(Not(HaveOccurred()))
 				}
 			}
@@ -143,7 +143,7 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 
 		By("Adding a restore resource", func() {
 			// Get the backup file from the previous backup
-			backupFile, err := kubectl.Run("get", "backup", backupResourceName, "-o", "jsonpath={.status.filename}")
+			backupFile, err := kubectl.RunWithoutErr("get", "backup", backupResourceName, "-o", "jsonpath={.status.filename}")
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Set the backup file in the restore resource
@@ -158,14 +158,14 @@ var _ = Describe("E2E - Test Backup/Restore", Label("test-backup-restore"), func
 		By("Checking that the restore has been done", func() {
 			// Wait until resources are available again
 			Eventually(func() string {
-				out, _ := kubectl.Run("get", "restore", restoreResourceName,
+				out, _ := kubectl.RunWithoutErr("get", "restore", restoreResourceName,
 					"-o", "jsonpath={.metadata.name}")
 				return out
 			}, tools.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(restoreResourceName))
 
 			// Check operator logs
 			Eventually(func() string {
-				out, _ := kubectl.Run("logs", "-l app.kubernetes.io/name=rancher-backup",
+				out, _ := kubectl.RunWithoutErr("logs", "-l app.kubernetes.io/name=rancher-backup",
 					"--tail=-1", "--since=5m",
 					"--namespace", "cattle-resources-system")
 				return out
