@@ -69,4 +69,3 @@ jobs:
       runner_template: ${{ inputs.runner_template }}
       sequential: ${{ inputs.sequential }}
       test_type: cli
-      upstream_cluster_version: ${{ inputs.k8s_version }}
