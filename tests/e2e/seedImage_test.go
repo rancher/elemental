@@ -68,7 +68,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 
 			// Set poweroff to false for master pool to have time to check SeedImage cloud-config
 			if poolType == "master" && isoBoot {
-				_, err := kubectl.Run("patch", "MachineRegistration",
+				_, err := kubectl.RunWithoutErr("patch", "MachineRegistration",
 					"--namespace", clusterNS, machineRegName,
 					"--type", "merge", "--patch",
 					"{\"spec\":{\"config\":{\"elemental\":{\"install\":{\"poweroff\":false}}}}}")
@@ -90,7 +90,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 
 				// And apply it
-				_, err = kubectl.Run("patch", "MachineRegistration",
+				_, err = kubectl.RunWithoutErr("patch", "MachineRegistration",
 					"--namespace", clusterNS, machineRegName,
 					"--type", "merge", "--patch-file", emulatedTmp,
 				)

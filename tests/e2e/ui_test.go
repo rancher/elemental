@@ -36,7 +36,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 
 	It("Configure libvirt and bootstrap a node", func() {
 		By("Downloading MachineRegistration", func() {
-			tokenURL, err := kubectl.Run("get", "MachineRegistration",
+			tokenURL, err := kubectl.RunWithoutErr("get", "MachineRegistration",
 				"--namespace", clusterNS,
 				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))

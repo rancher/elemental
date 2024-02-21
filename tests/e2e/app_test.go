@@ -64,7 +64,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 			nodeNumber := len(strings.Fields(nodeList))
 			Expect(nodeNumber).To(Not(BeNil()))
 
-			out, err := kubectl.Run("scale", "--replicas="+fmt.Sprint(nodeNumber), "deployment/"+appName)
+			out, err := kubectl.RunWithoutErr("scale", "--replicas="+fmt.Sprint(nodeNumber), "deployment/"+appName)
 			Expect(err).To(Not(HaveOccurred()), out)
 			Expect(out).To(ContainSubstring("deployment.apps/" + appName + " scaled"))
 		})
@@ -73,7 +73,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 			// Wait for application to be started
 			// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
 			Eventually(func() string {
-				status, _ := kubectl.Run("rollout", "status", "deployment/"+appName)
+				status, _ := kubectl.RunWithoutErr("rollout", "status", "deployment/"+appName)
 				return status
 			}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
 		})

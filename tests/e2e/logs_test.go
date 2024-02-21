@@ -87,7 +87,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			var getResources []getResourceLog = []getResourceLog{Bundles}
 			for _, r := range getResources {
 				for _, v := range r.Verb {
-					outcmd, err := kubectl.Run(v, r.Name, "--all-namespaces")
+					outcmd, err := kubectl.RunWithoutErr(v, r.Name, "--all-namespaces")
 					checkRC(err)
 					err = os.WriteFile(r.Name+"-"+v+".log", []byte(outcmd), os.ModePerm)
 					checkRC(err)

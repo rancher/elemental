@@ -52,7 +52,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			By("Downloading MachineRegistration file", func() {
 				// Download the new YAML installation config file
 				machineRegName := "machine-registration-" + poolType + "-" + clusterName
-				tokenURL, err := kubectl.Run("get", "MachineRegistration",
+				tokenURL, err := kubectl.RunWithoutErr("get", "MachineRegistration",
 					"--namespace", clusterNS, machineRegName,
 					"-o", "jsonpath={.status.registrationURL}")
 				Expect(err).To(Not(HaveOccurred()))
@@ -189,7 +189,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 			// Check that the selector has been correctly created
 			Eventually(func() string {
-				out, _ := kubectl.Run("get", "MachineInventorySelector",
+				out, _ := kubectl.RunWithoutErr("get", "MachineInventorySelector",
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
