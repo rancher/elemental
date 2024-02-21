@@ -19,7 +19,7 @@ RUN zypper in --no-recommends -y procps openssl openssh openssh-server \
     vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
     \
     avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \
-    container-selinux ethtool fuse-overlayfs haveged hdparm hostname iptables \
+    container-selinux ethtool fuse-overlayfs hdparm hostname iptables \
     issue-generator jq keyutils lshw lsof lsscsi mdadm multipath-tools \
     netcat-openbsd net-tools nfs-client \
     nss-mdns open-iscsi open-vm-tools pciutils pciutils-ids podman policycoreutils \
