@@ -33,7 +33,7 @@ RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager-
 RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y grub2-arm64-efi raspberrypi-firmware raspberrypi-firmware-config raspberrypi-firmware-dt u-boot-rpiarm64; fi
 
 # make SUSE happy
-RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-release systemd-presets-branding-Elemental
+RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-release systemd-presets-branding-Elemental btrfsmaintenance
 
 # Full support for btrfs
 RUN zypper --installroot /osimage in --no-recommends -y btrfsmaintenance
