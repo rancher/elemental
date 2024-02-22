@@ -45,7 +45,8 @@ RUN ARCH=$(uname -m); \
       iproute2 \
       podman \
       sed \
-      btrfsprogs
+      btrfsprogs \
+      snapper
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
