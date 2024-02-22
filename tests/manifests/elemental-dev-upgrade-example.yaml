@@ -8,3 +8,14 @@ spec:
   osImage: "172.18.0.2:30000/elemental-os:dev-next"
   clusterTargets:
     - clusterName: volcano
+  upgradeContainer:
+    envs:
+      # Use UPGRADE_RECOVERY_ONLY to upgrade the recovery partition only. (This also has the same effect as FORCE="true")
+      - name: UPGRADE_RECOVERY_ONLY
+        value: "false"
+      # Use UPGRADE_RECOVERY to upgrade both system and recovery partitions. (This also has the same effect as FORCE="true")
+      - name: UPGRADE_RECOVERY
+        value: "true"
+      # Use FORCE to force an upgrade. This is how version downgrades can be performed.
+      - name: FORCE
+        value: "false"
