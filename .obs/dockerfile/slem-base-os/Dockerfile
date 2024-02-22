@@ -35,6 +35,9 @@ RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y grub
 # make SUSE happy
 RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-Rancher-release systemd-presets-branding-Elemental
 
+# Full support for btrfs
+RUN zypper --installroot /osimage in --no-recommends -y btrfsmaintenance
+
 # make elemental-register happy
 RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
 
