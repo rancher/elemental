@@ -46,6 +46,7 @@ RUN ARCH=$(uname -m); \
       podman \
       sed \
       btrfsprogs \
+      btrfsmaintenance \
       snapper
 
 # elemental-register dependencies
