@@ -121,7 +121,7 @@ The steps are equivalent for downgrades, by just checking out older versions of 
 
     ```bash
     git checkout my-next-feature-branch
-    make VERSION=dev build
+    make VERSION=dev GIT_COMMIT=test-upgrade build
     ```
 
 1. Build a local OS image and push it to the test registry  
@@ -157,6 +157,17 @@ The steps are equivalent for downgrades, by just checking out older versions of 
     ```bash
     kubectl apply -f tests/manifests/elemental-dev-upgrade-example.yaml
     ```
+
+1. Test the `elemental version` on the upgraded machine
+
+    On the Elemental machine that has just been upgraded
+
+    ```bash
+    elemental version
+    ```
+
+    The version should include the `GIT_COMMIT` value that was set in the steps just above.  
+    You can override the `GIT_COMMIT` variable when building the `elemental-toolkit` to test upgrades without actual code changes.  
 
 1. Troubleshoot eventual issues
 
