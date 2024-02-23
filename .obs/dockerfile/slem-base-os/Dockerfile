@@ -8,7 +8,7 @@
 #
 
 ARG SLE_VERSION
-FROM alp/bci/bci-base as host
+FROM suse/sle-micro/sle-micro-builder-container as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
