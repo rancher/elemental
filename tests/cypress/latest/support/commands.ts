@@ -105,20 +105,17 @@ Cypress.Commands.add('createMachReg', (
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
     
-    // Revert in ui extension, will be needed again soon
-    //if (utils.isUIVersion('stable')) {
-    //  cy.getBySel('select-os-version-build-iso')
-    //    .click();
-    //} else {
-    //  cy.getBySel('select-media-type-build-media')
-    //    .click();
-    //  cy.contains('Iso')
-    //    .click();
-    //  cy.getBySel('select-os-version-build-media')
-    //    .click();
-    //}
-    cy.getBySel('select-os-version-build-media')
-      .click();
+    if (utils.isUIVersion('stable')) {
+      cy.getBySel('select-os-version-build-media')
+        .click();
+    } else {
+      cy.getBySel('select-media-type-build-media')
+        .click();
+      cy.contains('Iso')
+        .click();
+      cy.getBySel('select-os-version-build-media')
+        .click();
+    }
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
