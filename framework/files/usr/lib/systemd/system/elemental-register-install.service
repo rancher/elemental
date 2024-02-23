@@ -3,8 +3,6 @@ Description=Elemental Register Install
 Documentation=https://elemental.docs.rancher.com
 Wants=network-online.target
 After=network-online.target
-Wants=time-sync.target
-After=time-sync.target
 
 [Service]
 EnvironmentFile=-/etc/default/elemental
