@@ -7,8 +7,8 @@
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
-ARG SLE_VERSION
-FROM suse/sle-micro/sle-micro-builder-container as host
+ARG SLEMICRO_VERSION
+FROM suse/sle-micro/sle-micro-builder-container-$SLEMICRO_VERSION as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
