@@ -15,4 +15,4 @@ config:
       reset-oem: true
       power-off: false
       reboot: true
-machineName: my-machine
+machineName: ${System Data/Runtime/Hostname}

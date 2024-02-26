@@ -22,4 +22,4 @@ spec:
         poweroff: true
         device: /dev/sda
         debug: true
-  machineName: %VM_NAME%-${System Information/UUID}
+  machineName: ${System Data/Runtime/Hostname}
