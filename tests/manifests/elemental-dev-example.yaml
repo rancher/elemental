@@ -94,3 +94,23 @@ spec:
     kind: MachineRegistration
     name: fire-nodes
     namespace: fleet-default
+---
+apiVersion: elemental.cattle.io/v1beta1
+kind: SeedImage
+metadata:
+  name: fire-img-loopdevice
+  namespace: fleet-default
+spec:
+  cloud-config:
+    write_files:
+    - path: /etc/elemental/config.d/snapshotter.yaml
+      content: |
+        snapshotter:
+          type: loopdevice
+  type: iso
+  baseImage: docker.io/local/elemental-iso:dev
+  registrationRef:
+    apiVersion: elemental.cattle.io/v1beta1
+    kind: MachineRegistration
+    name: fire-nodes
+    namespace: fleet-default
