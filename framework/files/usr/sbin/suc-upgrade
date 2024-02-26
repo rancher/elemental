@@ -90,7 +90,7 @@ function isEqualVersion() {
     mount --rbind $HOST_DIR/run /run
 
     if [ "$UPGRADE_RECOVERY_ONLY" = "true" ]; then
-        elemental --debug upgrade --recovery-only --system dir:/
+        elemental --debug upgrade-recovery --recovery-system.uri dir:/
         exit 0
     fi
 
