@@ -5,22 +5,22 @@ push_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso
+        package: build-iso-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso-base
+        package: build-iso-base-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro
+        package: SLE-Micro-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-base
+        package: SLE-Micro-base-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-kvm
+        package: SLE-Micro-kvm-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-rt
+        package: SLE-Micro-rt-container
   filters:
     branches:
       only:
@@ -34,22 +34,22 @@ tag_workflow:
         package: elemental
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso
+        package: build-iso-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: build-iso-base
+        package: build-iso-base-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro
+        package: SLE-Micro-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-base
+        package: SLE-Micro-base-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-kvm
+        package: SLE-Micro-kvm-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
-        package: SLE-Micro-rt
+        package: SLE-Micro-rt-container
   filters:
     event: tag_push
 
@@ -61,27 +61,27 @@ pr_workflow:
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: build-iso-base
+        source_package: build-iso-base-image
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: build-iso
+        source_package: build-iso-image
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro
+        source_package: SLE-Micro-container
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro-base
+        source_package: SLE-Micro-base-container
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro-kvm
+        source_package: SLE-Micro-kvm-container
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
-        source_package: SLE-Micro-rt
+        source_package: SLE-Micro-rt-container
         target_project: isv:Rancher:Elemental:PR
   filters:
     event: pull_request
