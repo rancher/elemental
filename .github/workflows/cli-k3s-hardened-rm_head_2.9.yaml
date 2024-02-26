@@ -19,6 +19,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
       test_description: "CI - CLI - Parallel - Deployment test with Hardened K3s"
+      backup_restore_version: v5.0.0-rc2
       cert-manager_version: v1.11.1
       cluster_name: cluster-k3s
       cluster_type: hardened
