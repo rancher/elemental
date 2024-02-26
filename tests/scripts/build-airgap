@@ -4,6 +4,21 @@
 
 set -e -x
 
+# Retry helm command in case of sporadic issue
+function RunHelmCmdWithRetry() {
+  # Wait for a maximum of 1 minute
+  for ((i=0; i<60; i++)); do
+    # If helm command is OK then we simply return (exit the function)
+    helm $* && return
+
+    # Wait a little
+    sleep 5
+  done
+
+  # If we are here then an error happened!
+  return 1
+}
+
 # Variable(s)
 K3S_UPSTREAM_VERSION=$1
 CERT_MANAGER_VERSION=$2
@@ -56,19 +71,19 @@ cp ${DEPLOY_AIRGAP_SCRIPT} .
 cd ${OPT_RANCHER}/helm/
 
 # Add repos
-helm repo add jetstack https://charts.jetstack.io > /dev/null 2>&1
-helm repo add rancher-${RANCHER_CHANNEL} https://releases.rancher.com/server-charts/${RANCHER_CHANNEL} > /dev/null 2>&1
-helm repo update > /dev/null 2>&1
+RunHelmCmdWithRetry repo add jetstack https://charts.jetstack.io > /dev/null 2>&1
+RunHelmCmdWithRetry repo add rancher-${RANCHER_CHANNEL} https://releases.rancher.com/server-charts/${RANCHER_CHANNEL} > /dev/null 2>&1
+RunHelmCmdWithRetry repo update > /dev/null 2>&1
 
 # Get charts
-helm pull jetstack/cert-manager --version ${CERT_MANAGER_VERSION} > /dev/null 2>&1
+RunHelmCmdWithRetry pull jetstack/cert-manager --version ${CERT_MANAGER_VERSION} > /dev/null 2>&1
 [[ "${RANCHER_CHANNEL}" == "latest" ]] && DEVEL="--devel"
-helm pull rancher-${RANCHER_CHANNEL}/rancher ${DEVEL} > /dev/null 2>&1
+RunHelmCmdWithRetry pull rancher-${RANCHER_CHANNEL}/rancher ${DEVEL} > /dev/null 2>&1
 
 # Get rancher manager version
 RANCHER_MANAGER_VERSION=$(ls rancher* 2>/dev/null | cut -d '-' -f '2-3')
 for i in elemental-operator-chart elemental-operator-crds-chart ; do
-  helm pull ${ELEMENTAL_REPO}/${i} > /dev/null 2>&1
+  RunHelmCmdWithRetry pull ${ELEMENTAL_REPO}/${i} > /dev/null 2>&1
 done
 
 # Temporary thing to get latest version of elemental-teal-iso (very ugly...)
@@ -114,15 +129,15 @@ sort -u ${IMAGES_FILE_UNSORTED} > ${RANCHER_IMAGES_FILE}
 # Cert-manager image list
 CERT_IMAGES_FILE=cert/cert-manager-images.txt
 ELEMENTAL_IMAGES_FILE=elemental/elemental-images.txt
-helm template --kube-version=1.22 ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
+RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
   | awk '$1 ~ /image:/ {print $2}' \
   | sed s/\"//g > ${CERT_IMAGES_FILE}
 
 # Elemental image list
-helm template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
+RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
   | awk '$1 ~ /image:/ {print $2}' \
   | sed s/\"//g > ${ELEMENTAL_IMAGES_FILE}
-helm template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
+RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
   | grep 'seedimage-builder' \
   | awk '{print $2}' >> ${ELEMENTAL_IMAGES_FILE}
 
