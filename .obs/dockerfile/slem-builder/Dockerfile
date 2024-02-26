@@ -28,7 +28,7 @@ COPY --from=host /builderimage /
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-builder-container-$SLEMICRO_VERSION
-ARG IMAGE_TAG=%VERSION%-%RELEASE%
+ARG IMAGE_TAG=1.0-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro
