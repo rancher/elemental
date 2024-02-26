@@ -2,8 +2,8 @@
 # Define the names/tags of the container
 #!BuildName: SLE-Micro-builder-container
 #!BuildTag: suse/sle-micro/sle-micro-builder-container-%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro/sle-micro-builder-container-%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro/sle-micro-builder-container-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/sle-micro-builder-container-%%SLEMICRO_VERSION%%:1.0
+#!BuildTag: suse/sle-micro/sle-micro-builder-container-%%SLEMICRO_VERSION%%:1.0-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
