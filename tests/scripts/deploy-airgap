@@ -2,6 +2,21 @@
 
 set -e -x
 
+# Retry skopeo command in case of sporadic issue
+function RunSkopeoCmdWithRetry() {
+  # Wait for a maximum of 1 minute
+  for ((i=0; i<60; i++)); do
+    # If skopeo command is OK then we simply return (exit the function)
+    skopeo $* && return
+
+    # Wait a little
+    sleep 5
+  done
+
+  # If we are here then an error happened!
+  return 1
+}
+
 # Variable(s)
 K3S_UPSTREAM_VERSION=$1
 CERT_MANAGER_VERSION=$2
@@ -92,6 +107,6 @@ IMAGES_PATH=${OPT_RANCHER}/images
 for type in elemental cert rancher; do
   for file in $(ls ${IMAGES_PATH}/${type} 2>/dev/null | grep -v txt); do
     VAR=$(awk -F_ "{print \"rancher-manager.test:5000/${type}/\"\$1\":\"\$2}" <<< ${file/.tar})
-    skopeo copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false
+    RunSkopeoCmdWithRetry copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false
   done
 done
