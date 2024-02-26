@@ -4,7 +4,7 @@ description: 'Add logs and summary for an Elemental E2E test'
 
 # Variables to set when calling this action
 inputs:
-  backup_restore_version:
+  backup_operator_version:
     default: "Unknown"
     type: string
   ca_type:
@@ -146,7 +146,7 @@ runs:
         echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental OS version: ${{ inputs.os_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental Operator Image: ${{ inputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "Elemental Backup/Restore Operator Image: ${{ inputs.backup_restore_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental Backup/Restore Operator Image: ${{ inputs.backup_operator_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
 
