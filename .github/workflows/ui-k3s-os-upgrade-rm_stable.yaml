@@ -35,4 +35,4 @@ jobs:
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-iso-5.5:latest

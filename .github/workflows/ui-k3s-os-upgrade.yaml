@@ -23,7 +23,7 @@ on:
       # Test OS upgrade with OS image in this test ("Use image from registry")
       upgrade_image:
         description: Upgrade image to use
-        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/5.5:latest
+        default: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-iso-5.5:latest
         type: string
 
 jobs:
