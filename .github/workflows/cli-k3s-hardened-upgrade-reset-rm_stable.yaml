@@ -32,5 +32,5 @@ jobs:
       rancher_version: stable/latest/none
       reset: true
       test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-iso-5.5:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-container-5.5:latest
       upgrade_os_channel: dev
