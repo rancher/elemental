@@ -153,7 +153,7 @@ jobs:
           EMULATE_TPM: true
           OS_TO_TEST: ${{ inputs.os_to_test }}
           POOL: master
-        run: cd tests && ISO_BOOT=true make e2e-iso-image
+        run: cd tests && BOOT_TYPE=iso make e2e-iso-image
 
       - name: Extract ISO version
         id: iso_version
@@ -179,7 +179,7 @@ jobs:
           POOL: master
           VM_START: 1
           VM_END: 3
-        run: cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} ISO_BOOT=true make e2e-bootstrap-node
+        run: cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} BOOT_TYPE=iso make e2e-bootstrap-node
 
       # This step must be called in each worklow that wants a summary!
       - name: Get logs and add summary

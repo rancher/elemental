@@ -26,11 +26,11 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
+      boot_type: iso
       cluster_name: cluster-k3s
       cypress_tags: upgrade
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: stable
-      iso_boot: true
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui

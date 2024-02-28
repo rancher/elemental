@@ -4,6 +4,10 @@ name: UI-OBS-Manual-Workflow
 on:
   workflow_dispatch:
     inputs:
+      boot_type:
+        description: Boot type (iso/raw)
+        default: iso
+        type: string
       cluster_type:
         description: Cluster type (empty if normal or hardened)
         type: string
@@ -44,11 +48,11 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test"
+      boot_type: ${{ inputs.boot_type }}
       cluster_name: cluster-ui-obs-manual
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
-      iso_boot: true
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}

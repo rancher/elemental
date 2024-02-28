@@ -8,6 +8,10 @@ on:
       backup_restore_version:
         description: Version of backup-restore-operator to use
         type: string
+      boot_type:
+        description: Choose booting type (pxe, iso, raw) 
+        default: pxe 
+        type: string
       ca_type:
         description: CA type to use (selfsigned or private)
         default: selfsigned
@@ -37,10 +41,6 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: dev
         type: string
-      iso_boot:
-        description: Choose booting from ISO
-        default: false
-        type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version (K3s or RKE2)
         default: v1.27.8+k3s2
@@ -197,6 +197,7 @@ jobs:
       qase_api_token: ${{ secrets.qase_api_token }}
     with:
       backup_restore_version: ${{ inputs.backup_restore_version }}
+      boot_type: ${{ inputs.boot_type }}
       ca_type: ${{ inputs.ca_type }}
       cert-manager_version: ${{ inputs.cert-manager_version }}
       cluster_name: ${{ inputs.cluster_name }}
@@ -206,7 +207,6 @@ jobs:
       cypress_tags: ${{ inputs.cypress_tags }}
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
-      iso_boot: ${{ inputs.iso_boot }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}

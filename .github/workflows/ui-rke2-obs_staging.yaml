@@ -26,12 +26,12 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
+      boot_type: raw
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
-      iso_boot: true
       k8s_downstream_version: v1.27.8+rke2r1
       k8s_upstream_version: v1.26.10+rke2r2
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher

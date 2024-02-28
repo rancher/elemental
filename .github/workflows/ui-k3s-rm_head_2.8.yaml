@@ -27,11 +27,11 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
       test_description: "CI/Manual - UI - Deployment test with Standard K3s"
+      boot_type: iso
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
-      iso_boot: true
       proxy: ${{ inputs.proxy || 'elemental' }}
       rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.8' }}
       test_type: ui

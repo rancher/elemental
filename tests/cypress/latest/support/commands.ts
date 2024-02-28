@@ -111,8 +111,13 @@ Cypress.Commands.add('createMachReg', (
     } else {
       cy.getBySel('select-media-type-build-media')
         .click();
-      cy.contains('Iso')
-        .click();
+      if (Cypress.env('boot_type') == 'raw') {
+        cy.contains('Raw')
+          .click();
+      } else {
+        cy.contains('Iso')
+          .click();
+      }
       cy.getBySel('select-os-version-build-media')
         .click();
     }
@@ -122,7 +127,7 @@ Cypress.Commands.add('createMachReg', (
       // Will try to improve it in next version
       if (utils.isOperatorVersion('staging')) {
         // In rare case, we might want to test upgrading from staging to dev
-        utils.isUpgradeOsChannel('dev') ? cy.contains('ISO x86_64 (unstable)').click(): null;
+        utils.isUpgradeOsChannel('dev') ? cy.contains('(unstable)').click(): null;
       } else {
         // We cannot use v2.0.2 because the latest stable operator is not in the marketplace yet
           //cy.contains('ISO x86_64 v2.0.2')
@@ -135,7 +140,7 @@ Cypress.Commands.add('createMachReg', (
       cy.contains('ISO x86_64 v1.2.3')
         .click();
     } else {
-      cy.contains('ISO x86_64 (unstable)')
+      cy.contains('(unstable)')
         .click();
     }
     cy.getBySel(`build-media-btn`)
@@ -152,7 +157,11 @@ Cypress.Commands.add('createMachReg', (
     })
     cy.getBySel(`download-media-btn`)
       .click()
-    cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
+    if (Cypress.env('boot_type') == 'raw') {
+      cy.verifyDownload('.raw', { contains:true, timeout: 180000, interval: 5000 });
+    } else {
+      cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
+    }
   }
   
   // Try to download the registration file and check it

@@ -42,7 +42,7 @@ fi
 mkdir -p logs ${VM_NAME}
 
 # iPXE stuff will not be used if ISO is set
-if [[ ${ISO_BOOT} == "true" ]]; then
+if [[ ${BOOT_TYPE} == "iso" ]]; then
   ISO=$(realpath ../../elemental-*.iso 2>/dev/null)
 
   # Exit if ISO is not available
@@ -54,11 +54,26 @@ if [[ ${ISO_BOOT} == "true" ]]; then
   ln -s ${ISO} ${VM_NAME}/
 
   # Force ISO boot
-  INSTALL_FLAG+=" --cdrom ${VM_NAME}/${ISO##*/}"
+  INSTALL_FLAG+=" --cdrom ${VM_NAME}/${ISO##*/} --noreboot"
   
   # Use noautoconsole to check SeedImage cloud-config
   # because we need to ssh into the VM when it is installing
   [[ ${POOL} == "master" ]] && INSTALL_FLAG+=" --noautoconsole"
+elif [[ ${BOOT_TYPE} == "raw" ]]; then
+  RAW_IMAGE=$(realpath ../../elemental-*.raw 2>/dev/null)
+
+  # Exit if RAW is not available
+  [[ ! -f ${RAW_IMAGE} ]] \
+    && echo "File ${RAW_IMAGE} not found! Exiting!" >&2 \
+    && exit 1  
+  
+  # We need to resize the raw image according to the HDD_SIZE
+  /usr/bin/qemu-img resize ${RAW_IMAGE} ${HDD_SIZE}G
+
+  # Soft-link the ISO to avoid "Could not define storage pool" error
+  ln -s ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
+
+  INSTALL_FLAG+=" --noautoconsole"
 else
   # Create symlink for binary but only if it doesn't exist
   SYM_LINK=../../ipxe.efi
@@ -75,8 +90,8 @@ else
     ln -s ${IPXE_BIN} ${SYM_LINK}
   fi
 
-  # Force PXE boot
-  INSTALL_FLAG+=" --pxe"
+  # Force PXE boot and add noreboot flag (cannot be used with raw image)
+  INSTALL_FLAG+=" --pxe --noreboot"
 fi
 
 # VM variables
@@ -97,7 +112,6 @@ CMD="sudo virt-install \
        --console pty,target_type=virtio \
        --rng random \
        --tpm ${EMULATED_TPM} \
-       --noreboot \
        --network network=default,bridge=virbr0,model=virtio,mac=${MAC} \
        ${INSTALL_FLAG}"
 

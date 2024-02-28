@@ -48,7 +48,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		// Report to Qase
 		testCaseID = 9
 
-		if !isoBoot {
+		if !isoBoot && !rawBoot {
 			By("Downloading MachineRegistration file", func() {
 				// Download the new YAML installation config file
 				machineRegName := "machine-registration-" + poolType + "-" + clusterName

@@ -8,6 +8,9 @@ on:
       backup_restore_version:
         required: true
         type: string
+      boot_type:
+        required: true
+        type: string
       ca_type:
         required: true
         type: string
@@ -24,9 +27,6 @@ on:
         required: true
         type: string
       destroy_runner:
-        required: true
-        type: boolean
-      iso_boot:
         required: true
         type: boolean
       k8s_downstream_version:
@@ -213,13 +213,13 @@ jobs:
           # Only use ISO boot if the upstream cluster is RKE2
           # due to issue with pxe, dhcp traffic
           if ${{ contains(inputs.k8s_upstream_version, 'rke') }}; then
-            export ISO_BOOT=true
+            export BOOT_TYPE=iso
           fi
           cd tests && make e2e-iso-image
 
       - name: Extract iPXE artifacts from ISO
         id: extract_ipxe_artifacts
-        if: ${{ inputs.iso_boot == false }}
+        if: ${{ inputs.boot_type == 'pxe' }}
         run: cd tests && make extract_kernel_init_squash && make ipxe
 
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
@@ -234,7 +234,7 @@ jobs:
           # due to issue with pxe, dhcp traffic
           # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
           if ${{ contains(inputs.k8s_upstream_version, 'rke') }}; then
-            export ISO_BOOT=true
+            export BOOT_TYPE=iso
             export VM_MEM=10240
             export VM_CPU=6
           fi
@@ -366,7 +366,7 @@ jobs:
       - name: Create ISO image for worker pool
         id: create_iso_worker
         env:
-          ISO_BOOT: true
+          BOOT_TYPE: iso
           OS_TO_TEST: ${{ inputs.os_to_test }}
           POOL: worker
         run: cd tests && make e2e-iso-image
@@ -375,7 +375,7 @@ jobs:
         id: bootstrap_worker_nodes
         if: ${{ inputs.node_number > 3 }}
         env:
-          ISO_BOOT: true
+          BOOT_TYPE: iso
           POOL: worker
           VM_START: 4
           VM_END: ${{ inputs.node_number }}
