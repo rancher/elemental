@@ -34,11 +34,11 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
       test_description: "Manual - Fully customizable - UI - IBS Deployment test with Standard K3s"
+      boot_type: iso
       cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
-      iso_boot: true
       operator_repo: oci://registry.suse.com/rancher
       proxy: ${{ inputs.proxy }}
       qase_run_id: ${{ inputs.qase_run_id }}

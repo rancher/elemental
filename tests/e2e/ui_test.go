@@ -58,7 +58,7 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		if !isoBoot {
+		if !isoBoot && !rawBoot {
 			By("Configuring iPXE boot script for network installation", func() {
 				numberOfFile, err := network.ConfigureiPXE(httpSrv)
 				Expect(err).To(Not(HaveOccurred()))
@@ -90,6 +90,23 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			out, err := exec.Command(installVMScript, vmName, macAdrs).CombinedOutput()
 			GinkgoWriter.Printf("%s\n", out)
 			Expect(err).To(Not(HaveOccurred()))
+			if rawBoot {
+				// The VM will boot first on the recovery partition to create the normal partition
+				// No need to check the recovery process
+				// Only make sure the VM is up and running on the normal partition
+				CheckSSH(client)
+
+				// Wait for the end of the elemental-register process
+				Eventually(func() error {
+					_, err := client.RunSSH("(journalctl --no-pager -u elemental-register.service) | grep -Eiq 'Finished Elemental Register'")
+					return err
+				}, tools.SetTimeout(4*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+
+				// Wait a bit more to be sure the VM is ready and halt it
+				time.Sleep(1 * time.Minute)
+				err := exec.Command("sudo", "virsh", "destroy", vmName).Run()
+				Expect(err).To(Not(HaveOccurred()))
+			}
 		})
 
 		By("Checking that the VM is available in Rancher", func() {

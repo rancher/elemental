@@ -2,7 +2,7 @@
 
 set -evx
 
-ELEMENTAL_ISO="/home/gh-runner/actions-runner/_work/elemental/elemental/elemental-from-cypress.iso"
+ELEMENTAL_MEDIA_PATH="/home/gh-runner/actions-runner/_work/elemental/elemental/elemental-from-cypress.$BOOT_TYPE"
 
 # Start a simple HTTP server for sharing some config files
 HTTP_SRV_CMD="python3 -m http.server"
@@ -17,6 +17,7 @@ npm install
 
 # Start Cypress tests with docker
 docker run -v $PWD:/workdir -w /workdir               \
+    -e BOOT_TYPE=$BOOT_TYPE                           \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                     \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION     \
     -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO             \
@@ -41,9 +42,9 @@ docker run -v $PWD:/workdir -w /workdir               \
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
-if [[ ! -f ${ELEMENTAL_ISO} ]]; then
+if [[ ! -f ${ELEMENTAL_MEDIA_PATH} ]]; then
   # Move elemental.iso into the expected folder
-  mv downloads/*.iso ${ELEMENTAL_ISO}
+  mv downloads/*.${BOOT_TYPE} ${ELEMENTAL_MEDIA_PATH} 2>/dev/null; true
 fi
 popd
 

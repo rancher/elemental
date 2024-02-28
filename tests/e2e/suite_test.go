@@ -84,6 +84,7 @@ var (
 	rancherUpgradeChannel     string
 	rancherUpgradeHeadVersion string
 	rancherUpgradeVersion     string
+	rawBoot                   bool
 	registrationYaml          string
 	seedImageYaml             string
 	selectorYaml              string
@@ -398,6 +399,7 @@ func TestE2E(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
+	bootTypeString := os.Getenv("BOOT_TYPE")
 	caType = os.Getenv("CA_TYPE")
 	certManagerVersion = os.Getenv("CERT_MANAGER_VERSION")
 	clusterName = os.Getenv("CLUSTER_NAME")
@@ -407,7 +409,6 @@ var _ = BeforeSuite(func() {
 	eTPM := os.Getenv("EMULATE_TPM")
 	rancherHostname = os.Getenv("PUBLIC_FQDN")
 	index := os.Getenv("VM_INDEX")
-	isoBootString := os.Getenv("ISO_BOOT")
 	k8sDownstreamVersion = os.Getenv("K8S_DOWNSTREAM_VERSION")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	number := os.Getenv("VM_NUMBERS")
@@ -469,12 +470,12 @@ var _ = BeforeSuite(func() {
 		sequential = false
 	}
 
-	// Same for isoBoot
-	switch isoBootString {
-	case "true":
+	// Same for bootType
+	switch bootTypeString {
+	case "iso":
 		isoBoot = true
-	default:
-		isoBoot = false
+	case "raw":
+		rawBoot = true
 	}
 
 	// Extract Rancher Manager channel/version to install

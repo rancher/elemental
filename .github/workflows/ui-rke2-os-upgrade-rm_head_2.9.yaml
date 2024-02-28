@@ -29,16 +29,16 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      ui_account: user
+      boot_type: iso
       ca_type: private
       cluster_name: cluster-rke2
       cypress_tags: upgrade
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
-      iso_boot: true
       k8s_downstream_version: v1.27.8+rke2r1
       k8s_upstream_version: v1.26.10+rke2r2
       rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
       test_type: ui
+      ui_account: user
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-container-6.0:latest
       upgrade_os_channel: dev

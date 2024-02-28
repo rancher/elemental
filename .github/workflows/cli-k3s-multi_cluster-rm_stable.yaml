@@ -24,10 +24,10 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
       test_description: "CI/Manual - CLI - MultiCluster - Deployment test with Standard K3s"
+      boot_type: iso
       cluster_name: cluster-k3s
       cluster_number: 20
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      iso_boot: true
       qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
       test_type: multi

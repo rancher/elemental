@@ -5,6 +5,9 @@ on:
   workflow_call:
     # Variables to set when calling this reusable workflow
     inputs:
+      boot_type:
+        required: true
+        type: string
       ca_type:
         required: true
         type: string
@@ -26,9 +29,6 @@ on:
       elemental_ui_version:
         required: true
         type: string
-      iso_boot:
-        required: true
-        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -169,12 +169,12 @@ jobs:
       - name: Cypress tests - Basics
         id: cypress_basics
         env:
+          BOOT_TYPE: ${{ inputs.boot_type }}
           BROWSER: chrome
           CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
           CYPRESS_DOCKER: 'cypress/included:10.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
-          ISO_BOOT: ${{ inputs.iso_boot }}
           K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
@@ -216,7 +216,7 @@ jobs:
       - name: Deploy a node to join Rancher manager
         id: deploy_node_ui
         env:
-          ISO_BOOT: ${{ inputs.iso_boot }}
+          BOOT_TYPE: ${{ inputs.boot_type }}
           VM_INDEX: 1
           VM_MEM: 8192
           HOST_MEMORY_RESERVED: 49152
@@ -232,6 +232,7 @@ jobs:
       - name: Cypress tests - Advanced
         id: cypress_advanced
         env:
+          BOOT_TYPE: ${{ inputs.boot_type }}
           BROWSER: firefox
           CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
           CYPRESS_DOCKER: 'cypress/included:10.9.0'

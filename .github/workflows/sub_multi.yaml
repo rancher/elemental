@@ -5,6 +5,9 @@ on:
   workflow_call:
     # Variables to set when calling this reusable workflow
     inputs:
+      boot_type:
+        required: true
+        type: string
       ca_type:
         required: true
         type: string
@@ -23,9 +26,6 @@ on:
       cluster_type:
         required: true
         type: string
-      iso_boot:
-        required: true
-        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -149,7 +149,7 @@ jobs:
         id: deploy_multi_clusters
         env:
           CLUSTER_NUMBER: ${{ inputs.cluster_number }}
-          ISO_BOOT: ${{ inputs.iso_boot }}
+          BOOT_TYPE: ${{ inputs.boot_type }}
         run: |
           # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
           if ${{ contains(inputs.k8s_upstream_version, 'rke') }}; then

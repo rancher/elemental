@@ -2,7 +2,13 @@ config:
   cloud-config:
     users:
     - name: root
-      passwd: root
+      passwd: r0s@pwd1
+    write_files:
+      - path: /etc/ssh/sshd_config
+        content: |
+          PermitRootLogin yes
+        owner: root:root
+        permissions: 644
   elemental:
     install:
       poweroff: true
