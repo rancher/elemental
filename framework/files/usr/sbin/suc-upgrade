@@ -72,7 +72,6 @@ function isActiveSystem() {
         esac
     fi
 
-
     if isEqualVersion; then
         echo "Upgrade already done with release:"
         cat ${HOST_DIR}${RELEASE_FILE}
