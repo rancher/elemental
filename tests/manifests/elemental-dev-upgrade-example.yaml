@@ -10,7 +10,7 @@ spec:
     - clusterName: volcano
   upgradeContainer:
     envs:
-      # Use UPGRADE_RECOVERY_ONLY to upgrade the recovery partition only.
+      # Use UPGRADE_RECOVERY_ONLY to upgrade the recovery partition only. (This has the same effect as FORCE="true")
       - name: UPGRADE_RECOVERY_ONLY
         value: "false"
       # Use UPGRADE_RECOVERY to upgrade both system and recovery partitions.
