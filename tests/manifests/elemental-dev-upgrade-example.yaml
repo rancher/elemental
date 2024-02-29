@@ -10,10 +10,10 @@ spec:
     - clusterName: volcano
   upgradeContainer:
     envs:
-      # Use UPGRADE_RECOVERY_ONLY to upgrade the recovery partition only. (This also has the same effect as FORCE="true")
+      # Use UPGRADE_RECOVERY_ONLY to upgrade the recovery partition only.
       - name: UPGRADE_RECOVERY_ONLY
         value: "false"
-      # Use UPGRADE_RECOVERY to upgrade both system and recovery partitions. (This also has the same effect as FORCE="true")
+      # Use UPGRADE_RECOVERY to upgrade both system and recovery partitions.
       - name: UPGRADE_RECOVERY
         value: "true"
       # Use FORCE to force an upgrade. This is how version downgrades can be performed.

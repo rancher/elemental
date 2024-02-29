@@ -68,7 +68,7 @@ function isEqualVersion() {
         esac
     fi
 
-    if [ "$FORCE" != "true" ] && [ "$UPGRADE_RECOVERY_ONLY" != "true" ] && [ "$UPGRADE_RECOVERY" != "true" ]; then
+    if [ "$FORCE" != "true" ] && [ "$UPGRADE_RECOVERY_ONLY" != "true" ]; then
         if isEqualVersion; then
             echo "Upgrade already done with release:"
             cat ${HOST_DIR}${RELEASE_FILE}
@@ -96,7 +96,8 @@ function isEqualVersion() {
 
     if [ "$UPGRADE_RECOVERY" = "true" ]; then
         elemental --debug upgrade --recovery --bootloader --system dir:/
-        exit 0
+        nsenter -i -m -t 1 -- reboot
+        exit 1
     fi
    
     elemental --debug upgrade --bootloader --system dir:/
