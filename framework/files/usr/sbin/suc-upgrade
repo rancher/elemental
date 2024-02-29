@@ -68,15 +68,15 @@ function isEqualVersion() {
         esac
     fi
 
-    if [ "$FORCE" != "true" ]; then
-        if isEqualVersion; then
-            echo "Upgrade already done with release:"
-            cat ${HOST_DIR}${RELEASE_FILE}
+    if isEqualVersion; then
+        echo "Upgrade already done with release:"
+        cat ${HOST_DIR}${RELEASE_FILE}
 
-            config
-            exit 0
-        fi
+        config
+        exit 0
+    fi
 
+    if [ "$FORCE" != "true" ] && [ "$UPGRADE_RECOVERY_ONLY" != "true" ]; then
         if ! isHigherVersion; then
             echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
             cat ${HOST_DIR}${RELEASE_FILE}
@@ -88,8 +88,17 @@ function isEqualVersion() {
     config
     mount --rbind $HOST_DIR/dev /dev
     mount --rbind $HOST_DIR/run /run
-   
-    elemental --debug upgrade --bootloader --system dir:/
+
+    if [ "$UPGRADE_RECOVERY_ONLY" = "true" ]; then
+        elemental --debug upgrade-recovery --recovery-system.uri dir:/
+        exit 0
+    fi
+
+    if [ "$UPGRADE_RECOVERY" = "true" ]; then
+        elemental --debug upgrade --recovery --bootloader --system dir:/
+    else 
+        elemental --debug upgrade --bootloader --system dir:/
+    fi
 
     STATE_PATH=/run/initramfs/elemental-state
     [ ! -d "${STATE_PATH}" ] && STATE_PATH=/run/initramfs/cos-state
