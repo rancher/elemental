@@ -96,11 +96,9 @@ function isEqualVersion() {
 
     if [ "$UPGRADE_RECOVERY" = "true" ]; then
         elemental --debug upgrade --recovery --bootloader --system dir:/
-        nsenter -i -m -t 1 -- reboot
-        exit 1
+    else 
+        elemental --debug upgrade --bootloader --system dir:/
     fi
-   
-    elemental --debug upgrade --bootloader --system dir:/
 
     STATE_PATH=/run/initramfs/elemental-state
     [ ! -d "${STATE_PATH}" ] && STATE_PATH=/run/initramfs/cos-state
