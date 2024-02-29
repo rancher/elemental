@@ -72,15 +72,15 @@ function isActiveSystem() {
         esac
     fi
 
+    if isEqualVersion; then
+        echo "Upgrade already done with release:"
+        cat ${HOST_DIR}${RELEASE_FILE}
+
+        config
+        exit 0
+    fi
+    
     if [ "$FORCE" != "true" ]; then
-        if isEqualVersion; then
-            echo "Upgrade already done with release:"
-            cat ${HOST_DIR}${RELEASE_FILE}
-
-            config
-            exit 0
-        fi
-
         if ! isHigherVersion; then
             echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
             cat ${HOST_DIR}${RELEASE_FILE}
