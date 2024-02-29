@@ -83,6 +83,19 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("NotFound"))
 		})
 
+		// NOTE: the operator cannot be reinstall now because there are still CRDs pending to be removed
+		By("Checking that Elemental operator CRDs cannot be reinstalled", func() {
+			chart := "elemental-operator-crds"
+			out, err := kubectl.RunHelmBinaryWithOutput("upgrade", "--install", chart,
+				operatorRepo+"/"+chart+"-chart",
+				"--namespace", "cattle-elemental-system",
+				"--create-namespace",
+				"--wait", "--wait-for-jobs",
+			)
+			Expect(err).To(HaveOccurred(), out)
+			Expect(out).To(ContainSubstring("CRDs from previous installations are pending to be removed"))
+		})
+
 		// NOTE: we have to run this in background to be able to apply the workaround!
 		var wg sync.WaitGroup
 		wg.Add(1)
@@ -100,7 +113,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		}(clusterNS, clusterName)
 
 		// Removing finalizers from MachineInventory and Machine
-		By("WORKAROUND: Removing finalizers from MachineInventory/Machine", func() {
+		By("Removing finalizers from MachineInventory/Machine", func() {
 			// NOTE: wait a bit for the cluster deletion to be started (it's running in background)
 			time.Sleep(1 * time.Minute)
 
@@ -113,12 +126,12 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				Expect(err).To(Not(HaveOccurred()))
 
 				// Delete blocking Finalizers
-				GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for MachineInventory '%s'...\n", machine)
+				GinkgoWriter.Printf("Deleting Finalizers for MachineInventory '%s'...\n", machine)
 				deleteFinalizers(clusterNS, "MachineInventory", machine)
 
 				// Only if Machine is still present
 				if internalMachine != "" {
-					GinkgoWriter.Printf("WORKAROUND EXECUTED: deleting Finalizers for Machine '%s'...\n", internalMachine)
+					GinkgoWriter.Printf("Deleting Finalizers for Machine '%s'...\n", internalMachine)
 					deleteFinalizers(clusterNS, "Machine", internalMachine)
 				}
 			}
@@ -131,7 +144,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			out, err := kubectl.Run("get", "cluster",
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.metadata.name}")
-			Expect(err).To(HaveOccurred())
+			Expect(err).To(HaveOccurred(), out)
 			Expect(out).To(ContainSubstring("NotFound"))
 		})
 	})
