@@ -68,21 +68,19 @@ function isEqualVersion() {
         esac
     fi
 
-    if [ "$FORCE" != "true" ] && [ "$UPGRADE_RECOVERY_ONLY" != "true" ]; then
-        if isEqualVersion; then
-            echo "Upgrade already done with release:"
-            cat ${HOST_DIR}${RELEASE_FILE}
+    if isEqualVersion; then
+        echo "Upgrade already done with release:"
+        cat ${HOST_DIR}${RELEASE_FILE}
 
-            config
-            exit 0
-        fi
+        config
+        exit 0
+    fi
 
-        if ! isHigherVersion; then
-            echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
-            cat ${HOST_DIR}${RELEASE_FILE}
+    if [ "$FORCE" != "true" ] && ! isHigherVersion; then
+        echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
+        cat ${HOST_DIR}${RELEASE_FILE}
 
-            exit 0
-        fi
+        exit 0
     fi
 
     config
