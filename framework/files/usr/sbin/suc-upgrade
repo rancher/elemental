@@ -76,11 +76,13 @@ function isEqualVersion() {
         exit 0
     fi
 
-    if [ "$FORCE" != "true" ] && ! isHigherVersion; then
-        echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
-        cat ${HOST_DIR}${RELEASE_FILE}
+    if [ "$FORCE" != "true" ] && [ "$UPGRADE_RECOVERY_ONLY" != "true" ]; then
+        if ! isHigherVersion; then
+            echo "Current OS is in a higher version, use FORCE to downgrade. Current version:"
+            cat ${HOST_DIR}${RELEASE_FILE}
 
-        exit 0
+            exit 0
+        fi
     fi
 
     config
