@@ -1,6 +1,8 @@
 #!/bin/bash
 
-set -e -x
+# Deploy Airgap
+
+set -x
 
 # Retry skopeo command in case of sporadic issue
 function RunSkopeoCmdWithRetry() {
@@ -14,7 +16,7 @@ function RunSkopeoCmdWithRetry() {
   done
 
   # If we are here then an error happened!
-  return 1
+  exit 1
 }
 
 # Variable(s)
@@ -98,7 +100,7 @@ spec:
 EOF
 
 # Wait for registry to be ready
-sleep 45
+sleep 1m
 
 # Load images inside the local registry
 IMAGES_PATH=${OPT_RANCHER}/images

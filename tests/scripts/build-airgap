@@ -2,7 +2,7 @@
 
 # Build Airgap
 
-set -e -x
+set -x
 
 # Retry helm command in case of sporadic issue
 function RunHelmCmdWithRetry() {
@@ -16,7 +16,22 @@ function RunHelmCmdWithRetry() {
   done
 
   # If we are here then an error happened!
-  return 1
+  exit 1
+}
+
+# Retry skopeo command in case of sporadic issue
+function RunSkopeoCmdWithRetry() {
+  # Wait for a maximum of 1 minute
+  for ((i=0; i<60; i++)); do
+    # If skopeo command is OK then we simply return (exit the function)
+    skopeo $* && return
+
+    # Wait a little
+    sleep 5
+  done
+
+  # If we are here then an error happened!
+  exit 1
 }
 
 # Variable(s)
@@ -148,7 +163,7 @@ grep 'registry.opensuse.*sle-micro-iso' ${OPT_RANCHER}/helm/elemental-images.txt
 # Skopeo - cert-manager
 for i in $(< ${CERT_IMAGES_FILE}); do
   VAR=$(awk -F/ '{print $3}' <<< ${i})
-  skopeo copy docker://${i} docker-archive:cert/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:cert/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
 done
 
 # Skopeo - Elemental
@@ -158,17 +173,17 @@ for i in $(< ${ELEMENTAL_IMAGES_FILE}); do
     || VALUE=\$8
 
   VAR=$(awk -F/ "{print ${VALUE}}" <<< ${i})
-  skopeo copy docker://${i} docker-archive:elemental/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:elemental/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
 done
 
 # Skopeo - Rancher
 for i in $(< ${RANCHER_IMAGES_FILE}); do
   VAR=$(awk -F/ '{print $2}' <<< ${i})
-  skopeo copy docker://${i} docker-archive:rancher/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:rancher/${VAR//:/_}.tar:${VAR} > /dev/null 2>&1
 done
 
 # Skopeo - Registry
-skopeo copy --additional-tag registry:latest docker://registry:latest docker-archive:registry/registry.tar > /dev/null 2>&1
+RunSkopeoCmdWithRetry copy --additional-tag registry:latest docker://registry:latest docker-archive:registry/registry.tar > /dev/null 2>&1
 
 # Compress all the things
 cd ${OPT_RANCHER}
