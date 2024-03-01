@@ -141,7 +141,7 @@ RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-o
   | grep 'seedimage-builder' \
   | awk '{print $2}' >> ${ELEMENTAL_IMAGES_FILE}
 
-# Temporary thing to get latest version of elemental-teal-iso (very ugly...)
+# Temporary thing to get latest version of sle-micro-iso (very ugly...)
 grep 'registry.opensuse.*sle-micro-iso' ${OPT_RANCHER}/helm/elemental-images.txt >> ${ELEMENTAL_IMAGES_FILE}
 
 # Get images
