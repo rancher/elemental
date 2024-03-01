@@ -119,7 +119,6 @@ jobs:
       cert-manager_version: ${{ inputs.cert-manager_version }}
       cluster_name: ${{ inputs.cluster_name }}
       cluster_namespace: ${{ inputs.cluster_namespace }}
-      cluster_type: ${{ inputs.cluster_type }}
       k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}

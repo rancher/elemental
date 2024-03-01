@@ -71,7 +71,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
       reset:
         description: Allow reset test (mainly used on CLI tests)
@@ -107,7 +107,6 @@ on:
         type: string
       upstream_cluster_version:
         description: Cluster upstream version where to install Rancher (K3s or RKE2)
-        #default: v1.27.10+k3s2
         default: v1.26.10+k3s2
         type: string
       zone:

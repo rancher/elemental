@@ -62,8 +62,8 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 
 			if testType == "airgap" {
 				airgapImagesFile := os.Getenv("HOME") + "/airgap_rancher/images/elemental/elemental-images.txt"
-				isoVersion, _ := exec.Command("bash", "-c", "awk -F/ '/sle-micro-iso/{print $NF}' "+airgapImagesFile).Output()
-				baseImageURL = "localhost:5000/elemental/sle-micro-iso-" + string(isoVersion)
+				isoVersion, _ := exec.Command("bash", "-c", "awk -F/ '/sle-micro-iso/ {print $NF}' "+airgapImagesFile).Output()
+				baseImageURL = "localhost:5000/elemental/sle-micro-" + string(isoVersion)
 			}
 
 			// Set poweroff to false for master pool to have time to check SeedImage cloud-config
