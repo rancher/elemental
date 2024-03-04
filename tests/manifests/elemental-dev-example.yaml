@@ -44,7 +44,7 @@ spec:
       configs:
         "172.18.0.2:30000":
           insecureSkipVerify: true    
-  kubernetesVersion: v1.27.10+k3s1
+  kubernetesVersion: v1.27.8+k3s2
 ---
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration

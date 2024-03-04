@@ -29,7 +29,7 @@ jobs:
       cluster_number: 10
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       iso_boot: true
-      k8s_downstream_version: v1.27.10+rke2r1
+      k8s_downstream_version: v1.27.8+rke2r1
       k8s_upstream_version: v1.26.10+rke2r2
       qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5

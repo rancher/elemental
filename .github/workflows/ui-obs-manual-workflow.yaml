@@ -16,8 +16,8 @@ on:
         default: dev
         type: string
       k8s_downstream_version:
-        description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
-        default: v1.27.10+k3s2
+        description: Rancher cluster downstream version (K3s or RKE2)
+        default: v1.27.8+k3s2
         type: string
       operator_repo:
         description: Elemental operator repository to use
