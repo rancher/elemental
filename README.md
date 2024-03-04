@@ -1,6 +1,8 @@
 # Elemental
 
-[![Code style](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
+[![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
+
+## Regular tests
 
 | Rancher stable (night) | Rancher head 2.7 (8am) | Rancher head 2.8 (9am) | Rancher head 2.9 (10am) |
 | - | - | - | - |
@@ -24,8 +26,13 @@
 | [![UI-K3s-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_stable.yaml) | [![UI-K3s-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.7.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.7.yaml) | [![UI-K3s-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.8.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.8.yaml) | [![UI-K3s-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.9.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-os-upgrade-rm_head_2.9.yaml)
 | [![UI-RKE2-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_stable.yaml) | [![UI-RKE2-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.7.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.7.yaml) | [![UI-RKE2-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.8.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.8.yaml) | [![UI-RKE2-OS-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.9.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-os-upgrade-rm_head_2.9.yaml)
 
-## Airgap test
-[![CLI-K3s-Airgap-RM_latest](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml) [![CLI-K3s-Airgap-RM_stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml)
+## Airgap tests
+
+[![CLI-K3s-Airgap-RM_stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml) (Tested ith Rancher stable)
+
+[![CLI-K3s-Airgap-RM_latest_devel](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml) (Tested with Rancher latest RC)
+
+## Goal
 
 Elemental is a software stack enabling a centralized, full cloud-native OS management solution with Kubernetes.
 
@@ -34,3 +41,19 @@ Cluster Node OSes are built and maintained via container images through the [Ele
 The [Elemental Operator](https://github.com/rancher/elemental-operator) and the [Rancher System Agent](https://github.com/rancher/system-agent) enable Rancher Manager to fully control Elemental clusters, from the installation and management of the OS on the Nodes to the provisioning of new K3s or RKE2 clusters in a centralized way.
 
 Follow our [Quickstart](https://rancher.github.io/elemental/quickstart/) or see the [full docs](https://rancher.github.io/elemental/) for more info.
+
+## License
+
+Copyright (c) 2020-2024 [SUSE, LLC](http://suse.com)
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+[http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

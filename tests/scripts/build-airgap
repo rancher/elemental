@@ -45,10 +45,10 @@ OPT_RANCHER=${HOME}/airgap_rancher
 
 # Set Elemental version
 case ${ELEMENTAL_REPO} in
-  *dev*)
+  */dev/*)
     ELEMENTAL_VERSION=dev
     ;;
-  *staging*)
+  */staging/*)
     ELEMENTAL_VERSION=staging
     ;;
   *)
@@ -56,13 +56,14 @@ case ${ELEMENTAL_REPO} in
     ;;
 esac
 
-# Format upstream version
-TMP_UPSTREAM_VERSION=${K3S_UPSTREAM_VERSION/+*}
-K8S_UPSTREAM_VERSION=${TMP_UPSTREAM_VERSION/v}
+# Format K8s version
+TMP_VER=${K3S_UPSTREAM_VERSION/+*}
+K8S_UPSTREAM_VERSION=${TMP_VER/v}
+TMP_VER=${K3S_DOWNSTREAM_VERSION/+*}
+K8S_DOWNSTREAM_VERSION=${TMP_VER/v}
 
 # Create directories
-mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},helm} ${OPT_RANCHER}/images/{cert,rancher,registry,elemental}
-cd ${OPT_RANCHER}/k3s_${K8S_UPSTREAM_VERSION}/
+mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},k3s_${K8S_DOWNSTREAM_VERSION},helm} ${OPT_RANCHER}/images/{cert,rancher,registry,elemental}
 
 # Install packages
 sudo zypper --no-refresh -n in skopeo yq
@@ -71,16 +72,18 @@ sudo zypper --no-refresh -n in skopeo yq
 sudo sh -c 'echo "192.168.122.102 rancher-manager.test" >> /etc/hosts'
 
 # Download k3s and rancher
-K3S_URL=https://github.com/k3s-io/k3s/releases/download/${K3S_UPSTREAM_VERSION}
-for i in k3s-airgap-images-amd64.tar.zst k3s; do
-  curl -sOL ${K3S_URL}/${i}
+for k8s_ver in ${K3S_UPSTREAM_VERSION}:${K8S_UPSTREAM_VERSION} ${K3S_DOWNSTREAM_VERSION}:${K8S_DOWNSTREAM_VERSION}; do
+  K3S_URL=https://github.com/k3s-io/k3s/releases/download/${k8s_ver%:*}
+  for i in k3s-airgap-images-amd64.tar.zst k3s; do
+    curl -sL ${K3S_URL}/${i} -o ${OPT_RANCHER}/k3s_${k8s_ver#*:}/${i}
+
+    # Get the install script
+    curl -sfL https://get.k3s.io -o ${OPT_RANCHER}/k3s_${k8s_ver#*:}/install.sh
+
+    # Get the airgap deploy script
+    cp ${DEPLOY_AIRGAP_SCRIPT} ${OPT_RANCHER}/k3s_${k8s_ver#*:}
+  done
 done
-
-# Get the install script
-curl -sfL https://get.k3s.io -o install.sh
-
-# Get the airgap deploy script
-cp ${DEPLOY_AIRGAP_SCRIPT} .
 
 # Get Helm Charts
 cd ${OPT_RANCHER}/helm/
@@ -94,17 +97,18 @@ RunHelmCmdWithRetry repo update > /dev/null 2>&1
 RunHelmCmdWithRetry pull jetstack/cert-manager --version ${CERT_MANAGER_VERSION} > /dev/null 2>&1
 [[ "${RANCHER_CHANNEL}" == "latest" ]] && DEVEL="--devel"
 RunHelmCmdWithRetry pull rancher-${RANCHER_CHANNEL}/rancher ${DEVEL} > /dev/null 2>&1
-
-# Get rancher manager version
-RANCHER_MANAGER_VERSION=$(ls rancher* 2>/dev/null | cut -d '-' -f '2-3')
 for i in elemental-operator-chart elemental-operator-crds-chart ; do
   RunHelmCmdWithRetry pull ${ELEMENTAL_REPO}/${i} > /dev/null 2>&1
 done
 
-# Temporary thing to get latest version of elemental-teal-iso (very ugly...)
+# Get rancher manager version
+RANCHER_MANAGER_VERSION=$(ls rancher* 2>/dev/null | cut -d '-' -f '2-3')
+
+# Temporary thing to get latest version of sle-micro-iso (very ugly...)
+ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
-curl -sOL https://raw.githubusercontent.com/fgiudici/elemental-operator/airgap-allow-only-channel-creation/scripts/${ELEMENTAL_AIRGAP_SCRIPT}
-sh ${ELEMENTAL_AIRGAP_SCRIPT} -r localhost:5000 -sa ${ELEMENTAL_VERSION}
+curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
+bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r localhost:5000 -sa ${ELEMENTAL_VERSION}
 
 # Get Images - Rancher/Elemental
 cd ${OPT_RANCHER}/images/
@@ -136,7 +140,9 @@ done
 
 # Except for rancher/kubectl
 grep 'rancher/kubectl' ${IMAGES_FILE_TMP} >> ${IMAGES_FILE_UNSORTED}
-grep "rancher/system-agent-installer-k3s:${K8S_DOWNSTREAM_VERSION}" ${IMAGES_FILE_TMP} >> ${IMAGES_FILE_UNSORTED}
+for k8s_ver in ${K8S_UPSTREAM_VERSION} ${K8S_DOWNSTREAM_VERSION}; do
+  grep "rancher/system-agent-installer-k3s:v${k8s_ver}" ${IMAGES_FILE_TMP} >> ${IMAGES_FILE_UNSORTED}
+done
 
 # Final sort
 sort -u ${IMAGES_FILE_UNSORTED} > ${RANCHER_IMAGES_FILE}
