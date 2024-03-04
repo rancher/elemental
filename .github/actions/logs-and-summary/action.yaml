@@ -19,7 +19,10 @@ inputs:
   elemental_ui_version:
     default: "Unknown"
     type: string
-  k8s_version_to_provision:
+  k8s_downstream_version:
+    default: "Unknown"
+    type: string
+  k8s_upstream_version:
     default: "Unknown"
     type: string
   node_number:
@@ -132,7 +135,9 @@ runs:
 
         # Add summary: Rancher Manager
         echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}
-        echo "Rancher Manager URL: https://${{ inputs.public_fqdn }}/dashboard" >> ${GITHUB_STEP_SUMMARY}
+        if ${{ inputs.public_fqdn != 'Unknown' }}; then
+          echo "Rancher Manager URL: https://${{ inputs.public_fqdn }}/dashboard" >> ${GITHUB_STEP_SUMMARY}
+        fi
         echo "Rancher Manager Image: ${{ inputs.rancher_image_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Rancher Manager Version: ${{ inputs.rancher_version }}" >> ${GITHUB_STEP_SUMMARY}
         if ${{ inputs.ca_type == 'private' }}; then
@@ -152,8 +157,8 @@ runs:
 
         # Add summary: Kubernetes
         echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
-        echo "K3s on Rancher Manager: ${{ env.INSTALL_K3S_VERSION }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_version_to_provision }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K3s on Rancher Manager: ${{ inputs.k8s_upstream_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_downstream_version }}" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Cluster
         echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}

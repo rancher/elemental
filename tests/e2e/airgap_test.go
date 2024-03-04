@@ -30,8 +30,8 @@ import (
 var _ = Describe("E2E - Build the airgap archive", Label("prepare-archive"), func() {
 	It("Execute the script to build the archive", func() {
 		// Could be useful for manual debugging!
-		GinkgoWriter.Printf("Executed command: %s %s %s %s %s %s\n", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo)
-		out, err := exec.Command(airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sVersion, operatorRepo).CombinedOutput()
+		GinkgoWriter.Printf("Executed command: %s %s %s %s %s %s\n", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sDownstreamVersion, operatorRepo)
+		out, err := exec.Command(airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sDownstreamVersion, operatorRepo).CombinedOutput()
 		Expect(err).To(Not(HaveOccurred()), string(out))
 	})
 })

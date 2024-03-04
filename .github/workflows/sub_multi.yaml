@@ -26,7 +26,10 @@ on:
       iso_boot:
         required: true
         type: boolean
-      k8s_version_to_provision:
+      k8s_downstream_version:
+        required: true
+        type: string
+      k8s_upstream_version:
         required: true
         type: string
       operator_repo:
@@ -56,9 +59,6 @@ on:
       test_type:
         required: true
         type: string
-      upstream_cluster_version:
-        required: true
-        type: string
 
     # Variables to set when calling this reusable workflow
     secrets:
@@ -81,13 +81,13 @@ jobs:
       QASE_RUN_ID: ${{ inputs.qase_run_id }}
       # K3S / RKE2 flags to use for installation
       INSTALL_K3S_SKIP_ENABLE: true
-      INSTALL_K3S_VERSION: ${{ inputs.upstream_cluster_version }}
-      INSTALL_RKE2_VERSION: ${{ inputs.upstream_cluster_version }}
+      INSTALL_K3S_VERSION: ${{ inputs.k8s_upstream_version }}
+      INSTALL_RKE2_VERSION: ${{ inputs.k8s_upstream_version }}
       K3S_KUBECONFIG_MODE: 0644
       # Distribution to use to host Rancher Manager (K3s or RKE2)
-      K8S_UPSTREAM_VERSION: ${{ inputs.upstream_cluster_version }}
+      K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
       # For K8s cluster to provision with Rancher Manager
-      K8S_VERSION_TO_PROVISION: ${{ inputs.k8s_version_to_provision }}
+      K8S_DOWNSTREAM_VERSION: ${{ inputs.k8s_downstream_version }}
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}
       TEST_TYPE: ${{ inputs.test_type }}
@@ -152,7 +152,7 @@ jobs:
           ISO_BOOT: ${{ inputs.iso_boot }}
         run: |
           # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
-          if ${{ contains(inputs.upstream_cluster_version, 'rke') }}; then
+          if ${{ contains(inputs.k8s_upstream_version, 'rke') }}; then
             export VM_MEM=10240
             export VM_CPU=6
           fi
@@ -184,7 +184,8 @@ jobs:
           ca_type: ${{ inputs.ca_type }}
           cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
           cluster_type: ${{ inputs.cluster_type }}
-          k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+          k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+          k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
           operator_version: ${{ steps.component.outputs.operator_version }}
           os_version: ${{ steps.iso_version.outputs.os_version }}
           public_fqdn: ${{ inputs.public_fqdn }}

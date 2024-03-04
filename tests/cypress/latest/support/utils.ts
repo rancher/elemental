@@ -9,7 +9,7 @@ export const isCypressTag = (tag: string) => {
 // Check the K8s version
 export const isK8sVersion = (version: string) => {
   version = version.toLowerCase();
-  return (new RegExp(version)).test(Cypress.env("k8s_version"));
+  return (new RegExp(version)).test(Cypress.env("k8s_downstream_version"));
 }
 
 // Check the Elemental operator version
@@ -47,7 +47,7 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
   cy.contains(k8sVersion)
     .click();
   // Configure proxy if proxy is set to elemental
-  if ( Cypress.env('proxy') == "elemental") {
+  if (Cypress.env('proxy') == "elemental") {
     cy.contains('Agent Environment Vars')
       .click();
     cy.get('#agentEnv > .key-value')

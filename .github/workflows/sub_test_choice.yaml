@@ -38,7 +38,10 @@ on:
       iso_boot:
         required: true
         type: boolean
-      k8s_version_to_provision:
+      k8s_downstream_version:
+        required: true
+        type: string
+      k8s_upstream_version:
         required: true
         type: string
       node_number:
@@ -101,9 +104,6 @@ on:
       upgrade_type:
         required: true
         type: string
-      upstream_cluster_version:
-        required: true
-        type: string
 
     # Secrets to set when calling this reusable workflow
     secrets:
@@ -119,7 +119,7 @@ jobs:
       cert-manager_version: ${{ inputs.cert-manager_version }}
       cluster_name: ${{ inputs.cluster_name }}
       cluster_namespace: ${{ inputs.cluster_namespace }}
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}
       qase_project_code: ${{ inputs.qase_project_code }}
@@ -128,7 +128,7 @@ jobs:
       runner_label: ${{ inputs.runner_label }}
       test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
-      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
   cli:
     if: ${{ inputs.test_type == 'cli' }}
@@ -144,7 +144,7 @@ jobs:
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       iso_boot: ${{ inputs.iso_boot }}
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
@@ -163,7 +163,7 @@ jobs:
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upgrade_type: ${{ inputs.upgrade_type }}
-      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
   multi:
     if: ${{ inputs.test_type == 'multi' }}
@@ -178,7 +178,7 @@ jobs:
       cluster_number: ${{ inputs.cluster_number }}
       cluster_type: ${{ inputs.cluster_type }}
       iso_boot: ${{ inputs.iso_boot }}
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       public_domain: ${{ inputs.public_domain }}
       public_fqdn: ${{ inputs.public_fqdn }}
@@ -188,7 +188,7 @@ jobs:
       runner_label: ${{ inputs.runner_label }}
       test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
-      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
   ui:
     if: ${{ inputs.test_type == 'ui' }}
@@ -204,7 +204,7 @@ jobs:
       cypress_tags: ${{ inputs.cypress_tags }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_boot: ${{ inputs.iso_boot }}
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       public_domain: ${{ inputs.public_domain }}
@@ -217,4 +217,4 @@ jobs:
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
-      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}

@@ -60,7 +60,7 @@ jobs:
       cluster_name: my-own-cluster
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
-      k8s_version_to_provision: ${{ inputs.k8s_version }}
+      k8s_downstream_version: ${{ inputs.k8s_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}

@@ -16,27 +16,27 @@ pushd cypress/latest
 npm install
 
 # Start Cypress tests with docker
-docker run -v $PWD:/workdir -w /workdir                     \
-    -e CYPRESS_TAGS=$CYPRESS_TAGS                           \
-    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION           \
-    -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO                   \
-    -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION           \
-    -e K8S_VERSION_TO_PROVISION=$K8S_VERSION_TO_PROVISION   \
-    -e OPERATOR_REPO=$OPERATOR_REPO                         \
-    -e PROXY=$PROXY                                         \
-    -e QASE_API_TOKEN=$QASE_API_TOKEN                       \
-    -e QASE_REPORT=$QASE_REPORT                             \
-    -e QASE_RUN_ID=$QASE_RUN_ID                             \
-    -e RANCHER_VERSION=$RANCHER_VERSION                     \
-    -e RANCHER_PASSWORD=$RANCHER_PASSWORD                   \
-    -e RANCHER_URL=$RANCHER_URL                             \
-    -e RANCHER_USER=$RANCHER_USER                           \
-    -e UI_ACCOUNT=$UI_ACCOUNT                               \
-    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                         \
-    -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL               \
-    --add-host host.docker.internal:host-gateway            \
-    --ipc=host                                              \
-    $CYPRESS_DOCKER                                         \
+docker run -v $PWD:/workdir -w /workdir               \
+    -e CYPRESS_TAGS=$CYPRESS_TAGS                     \
+    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION     \
+    -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO             \
+    -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION     \
+    -e K8S_DOWNSTREAM_VERSION=$K8S_DOWNSTREAM_VERSION \
+    -e OPERATOR_REPO=$OPERATOR_REPO                   \
+    -e PROXY=$PROXY                                   \
+    -e QASE_API_TOKEN=$QASE_API_TOKEN                 \
+    -e QASE_REPORT=$QASE_REPORT                       \
+    -e QASE_RUN_ID=$QASE_RUN_ID                       \
+    -e RANCHER_VERSION=$RANCHER_VERSION               \
+    -e RANCHER_PASSWORD=$RANCHER_PASSWORD             \
+    -e RANCHER_URL=$RANCHER_URL                       \
+    -e RANCHER_USER=$RANCHER_USER                     \
+    -e UI_ACCOUNT=$UI_ACCOUNT                         \
+    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                   \
+    -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL         \
+    --add-host host.docker.internal:host-gateway      \
+    --ipc=host                                        \
+    $CYPRESS_DOCKER                                   \
     -s $SPEC
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos

@@ -24,7 +24,6 @@ jobs:
       cluster_name: cluster-k3s
       cluster_type: hardened
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_version_to_provision: v1.27.10+k3s2
       node_number: 3
       rancher_version: latest/devel/2.7
       test_type: cli

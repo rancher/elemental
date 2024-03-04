@@ -51,7 +51,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 		basePatterns = []pattern{
 			{
 				key:   "%K8S_VERSION%",
-				value: k8sVersion,
+				value: k8sDownstreamVersion,
 			},
 			{
 				key:   "%PASSWORD%",

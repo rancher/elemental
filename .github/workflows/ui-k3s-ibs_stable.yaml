@@ -39,7 +39,6 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_boot: true
-      k8s_version_to_provision: v1.27.10+k3s2
       operator_repo: oci://registry.suse.com/rancher
       proxy: ${{ inputs.proxy }}
       qase_run_id: ${{ inputs.qase_run_id }}

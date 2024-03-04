@@ -28,22 +28,22 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   const { isFileExist, findFiles } = require('cy-verify-downloads');
   on('task', { isFileExist, findFiles })
 
-  config.baseUrl                  = url.replace(/\/$/, );
-  config.env.cache_session        = process.env.CACHE_SESSION || false;
-  config.env.chartmuseum_repo     = process.env.CHARTMUSEUM_REPO;
-  config.env.cluster              = process.env.CLUSTER_NAME;
-  config.env.cypress_tags         = process.env.CYPRESS_TAGS;
-  config.env.elemental_ui_version = process.env.ELEMENTAL_UI_VERSION;
-  config.env.k8s_version          = process.env.K8S_VERSION_TO_PROVISION;
-  config.env.operator_repo        = process.env.OPERATOR_REPO;
-  config.env.password             = process.env.RANCHER_PASSWORD;
-  config.env.proxy_ip             = process.env.PROXY_IP;
-  config.env.proxy                = process.env.PROXY;
-  config.env.rancher_version      = process.env.RANCHER_VERSION;
-  config.env.ui_account           = process.env.UI_ACCOUNT;
-  config.env.upgrade_image        = process.env.UPGRADE_IMAGE;
-  config.env.upgrade_os_channel   = process.env.UPGRADE_OS_CHANNEL;
-  config.env.username             = process.env.RANCHER_USER;
+  config.baseUrl                    = url.replace(/\/$/, );
+  config.env.cache_session          = process.env.CACHE_SESSION || false;
+  config.env.chartmuseum_repo       = process.env.CHARTMUSEUM_REPO;
+  config.env.cluster                = process.env.CLUSTER_NAME;
+  config.env.cypress_tags           = process.env.CYPRESS_TAGS;
+  config.env.elemental_ui_version   = process.env.ELEMENTAL_UI_VERSION;
+  config.env.k8s_downstream_version = process.env.K8S_DOWNSTREAM_VERSION;
+  config.env.operator_repo          = process.env.OPERATOR_REPO;
+  config.env.password               = process.env.RANCHER_PASSWORD;
+  config.env.proxy_ip               = process.env.PROXY_IP;
+  config.env.proxy                  = process.env.PROXY;
+  config.env.rancher_version        = process.env.RANCHER_VERSION;
+  config.env.ui_account             = process.env.UI_ACCOUNT;
+  config.env.upgrade_image          = process.env.UPGRADE_IMAGE;
+  config.env.upgrade_os_channel     = process.env.UPGRADE_OS_CHANNEL;
+  config.env.username               = process.env.RANCHER_USER;
 
   return config;
 };

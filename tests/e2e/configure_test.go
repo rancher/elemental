@@ -44,7 +44,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			},
 			{
 				key:   "%K8S_VERSION%",
-				value: k8sVersion,
+				value: k8sDownstreamVersion,
 			},
 		}
 

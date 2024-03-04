@@ -41,9 +41,13 @@ on:
         description: Choose booting from ISO
         default: false
         type: boolean
-      k8s_version_to_provision:
-        description: Name and version of installed K8s distribution
-        required: true
+      k8s_downstream_version:
+        description: Rancher cluster downstream version (K3s or RKE2)
+        default: v1.27.10+k3s2
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version (K3s or RKE2)
+        default: v1.26.10+k3s2
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
@@ -104,10 +108,6 @@ on:
         type: string
       upgrade_type:
         description: Type of upgrade to use for the Elemental OS upgrade
-        type: string
-      upstream_cluster_version:
-        description: Cluster upstream version where to install Rancher (K3s or RKE2)
-        default: v1.26.10+k3s2
         type: string
       zone:
         description: GCP zone to host the runner
@@ -206,7 +206,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_boot: ${{ inputs.iso_boot }}
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
@@ -227,7 +227,7 @@ jobs:
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upgrade_type: ${{ inputs.upgrade_type }}
-      upstream_cluster_version: ${{ inputs.upstream_cluster_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
   clean-and-delete-runner:
     if: ${{ always() }}

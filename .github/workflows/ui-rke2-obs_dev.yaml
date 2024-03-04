@@ -32,10 +32,10 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: dev
       iso_boot: true
-      k8s_version_to_provision: v1.27.10+rke2r1
+      k8s_downstream_version: v1.27.10+rke2r1
+      k8s_upstream_version: v1.26.10+rke2r2
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
       ui_account: user
-      upstream_cluster_version: v1.26.10+rke2r2

@@ -22,6 +22,5 @@ jobs:
       backup_restore_version: v4.0.0
       cluster_name: cluster-k3s
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_version_to_provision: v1.27.10+k3s2
       rancher_version: latest/devel/2.8
       test_type: cli

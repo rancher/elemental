@@ -69,7 +69,7 @@ var (
 	rancherHostname           string
 	isoBoot                   bool
 	k8sUpstreamVersion        string
-	k8sVersion                string
+	k8sDownstreamVersion      string
 	numberOfClusters          int
 	numberOfVMs               int
 	operatorUpgrade           string
@@ -409,8 +409,8 @@ var _ = BeforeSuite(func() {
 	rancherHostname = os.Getenv("PUBLIC_FQDN")
 	index := os.Getenv("VM_INDEX")
 	isoBootString := os.Getenv("ISO_BOOT")
+	k8sDownstreamVersion = os.Getenv("K8S_DOWNSTREAM_VERSION")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
-	k8sVersion = os.Getenv("K8S_VERSION_TO_PROVISION")
 	number := os.Getenv("VM_NUMBERS")
 	clusterNumber := os.Getenv("CLUSTER_NUMBER")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
