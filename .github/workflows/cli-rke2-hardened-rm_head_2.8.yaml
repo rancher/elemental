@@ -23,7 +23,7 @@ jobs:
       cluster_name: cluster-rke2
       cluster_type: hardened
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      k8s_downstream_version: v1.27.10+rke2r1
+      k8s_downstream_version: v1.27.8+rke2r1
       k8s_upstream_version: v1.26.10+rke2r2
       node_number: 3
       rancher_version: latest/devel/2.8

@@ -43,7 +43,7 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version (K3s or RKE2)
-        default: v1.27.10+k3s2
+        default: v1.27.8+k3s2
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version (K3s or RKE2)
