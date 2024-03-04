@@ -280,7 +280,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					defer wg.Done()
 					defer GinkgoRecover()
 
-					if strings.Contains(k8sVersion, "rke2") {
+					if strings.Contains(k8sDownstreamVersion, "rke2") {
 						By("Configuring kubectl command on node "+h, func() {
 							dir := "/var/lib/rancher/rke2/bin"
 							kubeCfg := "export KUBECONFIG=/etc/rancher/rke2/rke2.yaml"
@@ -299,7 +299,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 						Eventually(func() string {
 							out, _ := cl.RunSSH("kubectl version 2>/dev/null | grep 'Server Version:'")
 							return out
-						}, tools.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sVersion))
+						}, tools.SetTimeout(5*time.Minute), 5*time.Second).Should(ContainSubstring(k8sDownstreamVersion))
 					})
 
 					By("Checking cluster agent on "+h, func() {

@@ -21,12 +21,12 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 filterTests(['main'], () => {
   Cypress.config();
   describe('Reset testing', () => {
-    const clusterName   = "mycluster"
-    const elementalUser = "elemental-user"
-    const k8sVersion    = Cypress.env('k8s_version');
-    const proxy         = "http://172.17.0.1:3128" 
-    const uiAccount     = Cypress.env('ui_account');
-    const uiPassword    = "rancherpassword"
+    const clusterName          = "mycluster"
+    const elementalUser        = "elemental-user"
+    const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
+    const proxy                = "http://172.17.0.1:3128" 
+    const uiAccount            = Cypress.env('ui_account');
+    const uiPassword           = "rancherpassword"
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -69,7 +69,7 @@ filterTests(['main'], () => {
 
     qase(30,
       it('Create Elemental cluster', () => {
-        utils.createCluster(clusterName, k8sVersion, proxy);
+        utils.createCluster(clusterName, k8sDownstreamVersion, proxy);
       }));
   });
 });

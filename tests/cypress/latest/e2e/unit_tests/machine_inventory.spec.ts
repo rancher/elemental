@@ -20,16 +20,16 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const elementalUser = "elemental-user"
-  const hwLabels      = ["TotalCPUThread", "TotalMemory", "CPUModel",
-                        "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
-                        "CPUVendorTotalCPUCores"]
-  const k8sVersion    = Cypress.env('k8s_version');
-  const clusterName   = "mycluster"
-  const proxy         = "http://172.17.0.1:3128"
-  const uiAccount     = Cypress.env('ui_account');
-  const uiPassword    = "rancherpassword"
-  let hostname        = ""
+  const elementalUser        = "elemental-user"
+  const hwLabels             = ["TotalCPUThread", "TotalMemory", "CPUModel",
+                               "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
+                               "CPUVendorTotalCPUCores"]
+  const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
+  const clusterName          = "mycluster"
+  const proxy                = "http://172.17.0.1:3128"
+  const uiAccount            = Cypress.env('ui_account');
+  const uiPassword           = "rancherpassword"
+  let hostname               = ""
   // Test if machine inventory uses hostname given by DHCP
   utils.isK8sVersion("k3s") && utils.isCypressTag("main") ? hostname=('node-001') : hostname=('my-machine');
 
@@ -84,7 +84,7 @@ describe('Machine inventory testing', () => {
   filterTests(['main', 'upgrade'], () => {
     qase(30,
       it('Create Elemental cluster', () => {
-        utils.createCluster(clusterName, k8sVersion, proxy);
+        utils.createCluster(clusterName, k8sDownstreamVersion, proxy);
       })
     );
   });

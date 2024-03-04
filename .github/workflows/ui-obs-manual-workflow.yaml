@@ -15,7 +15,7 @@ on:
         description: Elemental UI version to use
         default: dev
         type: string
-      k8s_version_to_provision:
+      k8s_downstream_version:
         description: Version of K8s to deploy on the cluster (only K3s or RKE2 are supported)
         default: v1.27.10+k3s2
         type: string
@@ -49,7 +49,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       iso_boot: true
-      k8s_version_to_provision: ${{ inputs.k8s_version_to_provision }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}
