@@ -126,7 +126,7 @@ runs:
           echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
         fi
         echo "Type of certificate for Rancher Manager: ${{ inputs.ca_type }}" >> ${GITHUB_STEP_SUMMARY}
-        if ${{ inputs.cluster_type == '' }}; then
+        if ${{ inputs.cluster_type == 'Unknown' }}; then
           echo "Type of cluster deployed: normal" >> ${GITHUB_STEP_SUMMARY}
         else
           echo "Type of cluster deployed: ${{ inputs.cluster_type }}" >> ${GITHUB_STEP_SUMMARY}
@@ -157,8 +157,8 @@ runs:
 
         # Add summary: Kubernetes
         echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
-        echo "K3s on Rancher Manager: ${{ inputs.k8s_upstream_version }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "K8s version deployed on the cluster(s): ${{ inputs.k8s_downstream_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s upstream version: ${{ inputs.k8s_upstream_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s downstream version: ${{ inputs.k8s_downstream_version }}" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Cluster
         echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}
@@ -166,7 +166,7 @@ runs:
         echo "Memory size: ${VMEM:-Unknown}GB" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Upgrade
-        if ${{ inputs.upgrade_image != '' || inputs.upgrade_os_channel != '' }}; then
+        if ${{ inputs.upgrade_image != 'Unknown' || inputs.upgrade_os_channel != 'Unknown' }}; then
           echo "## Upgrade details" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Upgrade: ${{ inputs.operator_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Elemental Operator Image: ${{ inputs.operator_version_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
