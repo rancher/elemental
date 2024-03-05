@@ -9,7 +9,7 @@
 
 ARG SLEMICRO_VERSION
 
-FROM suse/sle-micro/sle-micro-builder-container-${SLEMICRO_VERSION}:latest as host
+FROM suse/sle-micro/${SLEMICRO_VERSION}/toolbox:latest as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
@@ -35,9 +35,6 @@ RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y grub
 
 # make SUSE happy
 RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-release systemd-presets-branding-Elemental btrfsmaintenance
-
-# Full support for btrfs
-RUN zypper --installroot /osimage in --no-recommends -y btrfsmaintenance
 
 # make elemental-register happy
 RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
