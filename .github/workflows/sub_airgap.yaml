@@ -137,6 +137,23 @@ jobs:
           POOL: master
         run: cd tests && ISO_BOOT=true make e2e-iso-image
 
+      - name: Extract ISO version
+        id: iso_version
+        if: ${{ always() }}
+        run: |
+          # Extract OS version from ISO
+          ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
+          if [[ -n "${ISO}" ]]; then
+            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+            isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+              | xz -dc \
+              | cpio -i --to-stdout usr/lib/initrd-release > os-release
+            eval $(grep IMAGE_TAG os-release 2>/dev/null)
+          fi
+
+          # Export value (even if empty!)
+          echo "os_version=${IMAGE_TAG}" >> ${GITHUB_OUTPUT}
+
       - name: Bootstrap node 1, 2 and 3 in pool "master" (use Emulated TPM if possible)
         id: bootstrap_master_nodes
         env:
@@ -152,14 +169,16 @@ jobs:
         if: ${{ always() }}
         uses: ./.github/actions/logs-and-summary
         with:
-          ca_type: ${{ inputs.ca_type }}
+          ca_type: selfsigned
           cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
+          cluster_type: ${{ inputs.test_type }}
           k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
           k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
+          node_number: 3
           operator_version: ${{ steps.component.outputs.operator_version }}
           os_to_test: ${{ inputs.os_to_test }}
           os_version: ${{ steps.iso_version.outputs.os_version }}
           rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
           rancher_version: ${{ inputs.rancher_version }}
-          test_type: ${{ inputs.test_type }}
+          test_type: cli
           test_description: ${{ inputs.test_description }}
