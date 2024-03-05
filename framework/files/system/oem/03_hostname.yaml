@@ -1,0 +1,6 @@
+name: "Fallback hostname"
+stages:
+  initramfs:
+    - if: '[ ! -f /etc/hostname ]'
+      commands:
+        - sysctl kernel.hostname=rancher-${RANDOM}
