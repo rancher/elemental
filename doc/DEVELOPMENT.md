@@ -100,7 +100,8 @@ Clone the following repositories in your development environment:
     wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img -o jsonpath="{.status.downloadURL}"` -O elemental-dev.x86_64.iso
     ```
 
-    The default example also creates a seed image using the loopdevice snapshotter:
+    The default example also creates a seed image using the `loopdevice` snapshotter.  
+    Beware that the loopdevice images are registered to a different `MachineRegistration`.  
 
     ```bash
     wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img-loopdevice -o jsonpath="{.status.downloadURL}"` -O elemental-dev-loopdevice.x86_64.iso
@@ -156,6 +157,18 @@ The steps are equivalent for downgrades, by just checking out older versions of 
     docker push 172.18.0.2:30000/elemental-os:dev-next
     ```
 
+1. Ensure that the `system-upgrade-controller` is up and running on the downstream cluster:  
+
+    ```text
+    # kubectl -n cattle-system get pods
+    NAME                                                              READY   STATUS      RESTARTS   AGE
+    apply-system-agent-upgrader-on-test-loopdev-c00616c7-e1e9-cnr2g   0/1     Completed   0          113s
+    cattle-cluster-agent-697cd48b4-zqfsg                              1/1     Running     0          56s
+    helm-operation-hk7js                                              0/2     Completed   0          2m39s
+    rancher-webhook-7dc6679459-hrgzc                                  1/1     Running     0          2m29s
+    system-upgrade-controller-78cfb99bb7-22blj                        1/1     Running     0          2m28s
+    ```
+
 1. Trigger the upgrade (on a Cluster level)
 
     Using the `elemental` repo:
@@ -164,12 +177,36 @@ The steps are equivalent for downgrades, by just checking out older versions of 
     kubectl apply -f tests/manifests/elemental-dev-upgrade-example.yaml
     ```
 
+1. Monitor the `cattle-system` namespace on the downstream cluster to see the upgrade pod appear:
+
+    ```text
+    kubectl -n cattle-system get pods -w
+    NAME                                                              READY   STATUS      RESTARTS   AGE
+    apply-system-agent-upgrader-on-test-loopdev-c00616c7-e1e9-cnr2g   0/1     Completed   0          113s
+    cattle-cluster-agent-697cd48b4-zqfsg                              1/1     Running     0          56s
+    helm-operation-hk7js                                              0/2     Completed   0          2m39s
+    rancher-webhook-7dc6679459-hrgzc                                  1/1     Running     0          2m29s
+    system-upgrade-controller-78cfb99bb7-22blj                        1/1     Running     0          2m28s
+    apply-os-upgrader-dev-upgrade-on-test-loopdev-c00616c7-e1-v69kj   0/1     Pending     0          0s
+    apply-os-upgrader-dev-upgrade-on-test-loopdev-c00616c7-e1-v69kj   0/1     Pending     0          0s
+    apply-os-upgrader-dev-upgrade-on-test-loopdev-c00616c7-e1-v69kj   0/1     Init:0/1    0          0s
+    apply-os-upgrader-dev-upgrade-on-test-loopdev-c00616c7-e1-v69kj   0/1     Init:0/1    0          4s
+    ```
+
+    Then follow the upgrade logs:
+
+    ```bash
+    kubectl -n cattle-system logs apply-os-upgrader-dev-upgrade-on-test-loopdev-c00616c7-e1-v69kj -f
+    ```
+
+    Upon successful upgrade, the system should reboot to the upgraded partition.
+
 1. Test the `elemental version` on the upgraded machine
 
     On the Elemental machine that has just been upgraded
 
     ```bash
-    elemental version
+    elemental version --long
     ```
 
     The version should include the `GIT_COMMIT` value that was set in the steps just above.  
