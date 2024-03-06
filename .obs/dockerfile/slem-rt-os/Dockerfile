@@ -20,7 +20,7 @@ RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.suse.sle.micro.rancher
+# labelprefix=com.suse.sle.micro
 LABEL org.opencontainers.image.title="SLE Micro for Rancher RT"
 LABEL org.opencontainers.image.description="Image containing SLE Micro for Rancher RT - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"

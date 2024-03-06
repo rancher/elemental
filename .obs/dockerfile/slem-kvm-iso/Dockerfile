@@ -31,7 +31,7 @@ ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-kvm-iso-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.rancher.slem
+# labelprefix=com.suse.sle.micro
 LABEL org.opencontainers.image.title="SLE Micro kvm ISO"
 LABEL org.opencontainers.image.description="Includes the SLE Micro kvm ISO"
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
