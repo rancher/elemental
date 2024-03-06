@@ -47,6 +47,8 @@ on:
 
     # Variables to set when calling this reusable workflow
     secrets:
+      credentials:
+        required: true
       qase_api_token:
 
 jobs:
@@ -75,6 +77,22 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        id: authenticate
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.credentials }}
+
+      - name: Setup gcloud
+        id: setup_gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Download QCOW2 VM image
+        id: download_qcow2
+        run: |
+          QCOW2_FILE="rancher-image.qcow2"
+          gcloud storage cp gs://elemental-airgap-image/${QCOW2_FILE} ${HOME}/${QCOW2_FILE}
 
       - name: Setup Go
         id: setup_go

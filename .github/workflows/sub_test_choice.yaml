@@ -107,6 +107,7 @@ on:
 
     # Secrets to set when calling this reusable workflow
     secrets:
+      credentials:
       qase_api_token:
 
 jobs:
@@ -114,6 +115,7 @@ jobs:
     if: ${{ inputs.test_type == 'airgap' }}
     uses: ./.github/workflows/sub_airgap.yaml
     secrets:
+      credentials: ${{ secrets.credentials }}
       qase_api_token: ${{ secrets.qase_api_token }}
     with:
       cert-manager_version: ${{ inputs.cert-manager_version }}

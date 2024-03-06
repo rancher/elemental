@@ -193,6 +193,7 @@ jobs:
     needs: [create-runner, pre-qase]
     uses: ./.github/workflows/sub_test_choice.yaml
     secrets:
+      credentials: ${{ secrets.credentials }}
       qase_api_token: ${{ secrets.qase_api_token }}
     with:
       backup_restore_version: ${{ inputs.backup_restore_version }}
