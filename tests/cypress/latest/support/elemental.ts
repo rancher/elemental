@@ -66,7 +66,7 @@ export class Elemental {
     cy.contains('.outer-container > .header', 'Elemental');
     cy.clickButton('Next');
     // Workaround for https://github.com/rancher/rancher/issues/43379
-    if (isCypressTag('upgrade') && !isRancherManagerVersion('2.7')) {
+    if (isCypressTag('upgrade') && !isRancherManagerVersion('head')) {
       cy.get('[data-testid="string-input-channel.repository"]')
         .type('registry.suse.com/rancher/elemental-teal-channel')
       cy.get('[data-testid="string-input-channel.tag"]')
