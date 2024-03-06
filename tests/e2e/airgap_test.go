@@ -50,16 +50,11 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
-		By("Downloading the qcow2 image from GCP storage", func() {
-			err := exec.Command("/opt/google-cloud-sdk/bin/gcloud", "storage", "cp", "gs://elemental-airgap-image/rancher-image.qcow2", os.Getenv("HOME")+"/rancher-image.qcow2").Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
-
 		By("Creating the Rancher Manager VM", func() {
 			err := exec.Command("sudo", "virt-install",
 				"--name", "rancher-manager",
-				"--memory", "4096",
-				"--vcpus", "2",
+				"--memory", "16384",
+				"--vcpus", "4",
 				"--disk", "path="+os.Getenv("HOME")+"/rancher-image.qcow2,bus=sata",
 				"--import",
 				"--os-variant", "opensuse-unknown",
@@ -103,8 +98,12 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 		By("Deploying airgap infrastructure by executing the deploy script", func() {
 			value := regexp.MustCompile(`v(.*)\+.*`).FindStringSubmatch(k8sUpstreamVersion)
-			out, err := client.RunSSH(optRancher + "/k3s_" + value[1] + "/deploy-airgap " + k8sUpstreamVersion + " " + certManagerVersion)
-			Expect(err).To(Not(HaveOccurred()), out)
+			cmd := optRancher + "/k3s_" + value[1] + "/deploy-airgap " + k8sUpstreamVersion + " " + certManagerVersion
+
+			// Could be useful for manual debugging!
+			GinkgoWriter.Printf("Executed command: %s\n", cmd)
+			out, err := client.RunSSH(cmd)
+			Expect(err).To(Not(HaveOccurred()), string(out))
 		})
 
 		By("Getting the kubeconfig file of the airgap cluster", func() {
@@ -174,12 +173,12 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 				"--set", "hostname=rancher-manager.test",
 				"--set", "extraEnv[0].name=CATTLE_SERVER_URL",
 				"--set", "extraEnv[0].value=https://rancher-manager.test",
-				"--set", "extraEnv[1].name=CATTLE_BOOTSTRAP_PASSWORD",
-				"--set", "extraEnv[1].value=rancherpassword",
+				"--set", "bootstrapPassword=rancherpassword",
 				"--set", "replicas=1",
 				"--set", "useBundledSystemChart=true",
 				"--set", "rancherImage=rancher-manager.test:5000/rancher/rancher",
 				"--set", "systemDefaultRegistry=rancher-manager.test:5000",
+				"--wait", "--wait-for-jobs",
 			}
 
 			RunHelmCmdWithRetry(flags...)
