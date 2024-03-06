@@ -92,7 +92,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Extract the airgap archive
-			_, err = client.RunSSH("mkdir " + optRancher + "; tar -I zstd -vxf /opt/airgap_rancher.zst -C " + optRancher)
+			_, err = client.RunSSH("mkdir " + optRancher + "; tar -I pzstd -vxf /opt/airgap_rancher.zst -C " + optRancher)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 

@@ -106,9 +106,23 @@ sleep 1m
 IMAGES_PATH=${OPT_RANCHER}/images
 
 # Elemental + Cert-Manager + Rancher
+loop=0
 for type in elemental cert rancher; do
   for file in $(ls ${IMAGES_PATH}/${type} 2>/dev/null | grep -v txt); do
     VAR=$(awk -F_ "{print \"rancher-manager.test:5000/${type}/\"\$1\":\"\$2}" <<< ${file/.tar})
-    RunSkopeoCmdWithRetry copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false
+    RunSkopeoCmdWithRetry copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false &
+
+    # Wait for skopeo jobs to finish if we already have too much jobs in parallel
+    # This is to avoid the "too many requests to registry" error!
+    if (( ++loop > 50 )); then
+      echo "Wait for sync..."
+      wait
+
+      # Reset loop counter
+      loop=0
+    fi
   done
 done
+
+# Wait for *ALL* skopeo jobs to finish
+wait
