@@ -22,7 +22,7 @@ COPY --from=os / rootfs
 RUN elemental --debug --config-dir . build-iso -o /output -n "sle-micro.$(uname -m)-%VERSION%-Build%RELEASE%" dir:rootfs
 
 # Only keep the ISO as a result
-FROM bci/bci-busybox:$SLE_VERSION
+FROM suse/sle-micro/$SLE_VERSION/toolbox
 COPY --from=builder /output /elemental-iso
 
 ARG SLEMICRO_VERSION
@@ -44,5 +44,4 @@ LABEL com.suse.supportlevel="l3"
 # endlabelprefix
 
 # By default run a shell
-ENTRYPOINT ["busybox"]
-CMD ["sh"]
+ENTRYPOINT ["/bin/sh"]
