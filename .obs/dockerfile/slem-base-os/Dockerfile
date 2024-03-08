@@ -39,9 +39,6 @@ RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-release system
 # make elemental-register happy
 RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
 
-# make Rancher (containerd) happy
-RUN zypper --installroot /osimage in --no-recommends -y apparmor-parser
-
 # add elemental
 RUN zypper --installroot /osimage in --no-recommends -y elemental
 
