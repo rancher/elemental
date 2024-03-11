@@ -29,6 +29,11 @@ spec:
                 - if: '[ ! -f /oem/grubenv ]'
                   commands:
                     - grub2-editenv /oem/grubenv set extra_cmdline=ipv6.disable=1 && shutdown -r now
+        - path: /etc/ssh/sshd_config
+          content: |
+            PermitRootLogin yes
+          owner: root:root
+          permissions: 644
     elemental:
       install:
         reboot: false
