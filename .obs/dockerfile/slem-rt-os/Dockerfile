@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
 #!ExclusiveArch: x86_64
+#!BuildName: SLE-Micro-rt-container
 #!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:latest
 #!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%
 #!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
@@ -12,7 +13,7 @@ ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/rt-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
-FROM suse/sle-micro/$SLEMICRO_VERSION:latest AS os
+FROM suse/sle-micro/sle-micro-container-$SLEMICRO_VERSION:latest AS os
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
