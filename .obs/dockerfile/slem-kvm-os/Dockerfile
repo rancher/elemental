@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
+#!BuildName: SLE-Micro-kvm-container
 #!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:latest
 #!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%
 #!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
@@ -8,7 +9,7 @@
 
 ARG SLEMICRO_VERSION
 
-FROM suse/sle-micro/base-${SLEMICRO_VERSION}:latest
+FROM suse/sle-micro/sle-micro-base-container-${SLEMICRO_VERSION}:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
