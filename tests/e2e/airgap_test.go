@@ -219,7 +219,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 				"--set", "image.repository=rancher-manager.test:5000/elemental/elemental-operator",
 				"--set", "registryUrl=",
 				"--set", "seedImage.repository=rancher-manager.test:5000/elemental/seedimage-builder",
-				"--set", "channel.repository=rancher-manager.test:5000/elemental/elemental-channel",
+				"--set", "channel.image=rancher-manager.test:5000/elemental/elemental-channel-localhost",
 				"--wait", "--wait-for-jobs",
 			}
 

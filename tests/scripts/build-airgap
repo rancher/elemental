@@ -9,7 +9,7 @@ function RunHelmCmdWithRetry() {
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If helm command is OK then we simply return (exit the function)
-    helm $* && return
+    helm $* && return 0
 
     # Wait a little
     sleep 5
@@ -21,10 +21,22 @@ function RunHelmCmdWithRetry() {
 
 # Retry skopeo command in case of sporadic issue
 function RunSkopeoCmdWithRetry() {
+  CMD=$*
+
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If skopeo command is OK then we simply return (exit the function)
-    skopeo $* > /dev/null && return
+    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return 0
+
+    # If resource access is denied retry with local access
+    case ${ERRMSG} in
+      *requested\ access\ to\ the\ resource\ is\ denied*)
+        CMD=${CMD/docker:\/\//docker-daemon:}
+	;;
+      *Storing\ signatures\ for\ docker\ tar\ files\ is\ not\ supported*)
+        CMD=${CMD/copy/copy --remove-signatures}
+	;;
+    esac
 
     # Wait a little
     sleep 5
@@ -108,7 +120,7 @@ RANCHER_MANAGER_VERSION=$(ls rancher* 2>/dev/null | cut -d '-' -f '2-3')
 ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
 curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
-bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r localhost:5000 -sa ${ELEMENTAL_VERSION}
+bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r localhost:5000 -sa ${ELEMENTAL_VERSION} || exit 1
 
 # Get Images - Rancher/Elemental
 cd ${OPT_RANCHER}/images/
@@ -119,44 +131,33 @@ curl -sL https://github.com/rancher/rancher/releases/download/v${RANCHER_MANAGER
 
 # Cert-manager image list
 CERT_IMAGES_FILE=cert/cert-manager-images.txt
-RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
+RunHelmCmdWithRetry template ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
   | awk '$1 ~ /image:/ {print $2}' \
   | sed s/\"//g > ${CERT_IMAGES_FILE}
 
 # Elemental image list
 ELEMENTAL_IMAGES_FILE=elemental/elemental-images.txt
-RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
-  | awk '$1 ~ /image:/ {print $2}' \
-  | sed s/\"//g > ${ELEMENTAL_IMAGES_FILE}
-RunHelmCmdWithRetry template --kube-version=1.22 ${OPT_RANCHER}/helm/elemental-operator-chart-*.tgz \
-  | grep 'seedimage-builder' \
-  | awk '{print $2}' >> ${ELEMENTAL_IMAGES_FILE}
-
-# Temporary thing to get latest version of sle-micro-iso (very ugly...)
-grep 'registry.opensuse.*sle-micro-iso' ${OPT_RANCHER}/helm/elemental-images.txt >> ${ELEMENTAL_IMAGES_FILE}
+cp -f ${OPT_RANCHER}/helm/elemental-images.txt ${ELEMENTAL_IMAGES_FILE}
 
 # Get images
 # Skopeo - cert-manager
 for i in $(< ${CERT_IMAGES_FILE}); do
   VAR=$(awk -F/ '{print $3}' <<< ${i})
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:cert/${VAR//:/_}.tar:${VAR} &
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:cert/${VAR/:/_}.tar:${VAR} &
 done
 
 # Skopeo - Elemental
 for i in $(< ${ELEMENTAL_IMAGES_FILE}); do
-  grep -q 'sle-micro-iso' <<< ${i} \
-    && VALUE="\$8\"-\"\$9" \
-    || VALUE=\$8
+  VAR=$(awk -F/ '{if ($(NF-1) ~ /elemental-teal/ || $(NF-1) ~ /sle-micro/) {print $(NF-1)"/"$NF} else {print $NF}}')
 
-  VAR=$(awk -F/ "{print ${VALUE}}" <<< ${i})
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:elemental/${VAR//:/_}.tar:${VAR} &
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:elemental/${VAR/:/_}.tar:${VAR} &
 done
 
 # Skopeo - Rancher
 loop=0
 for i in $(< ${RANCHER_IMAGES_FILE}); do
   VAR=$(awk -F/ '{print $2}' <<< ${i})
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:rancher/${VAR//:/_}.tar:${VAR} &
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:rancher/${VAR/:/_}.tar:${VAR} &
 
   # Wait for skopeo jobs to finish if we already have too much jobs in parallel
   # This is to avoid the "too many requests to registry" error!

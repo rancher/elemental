@@ -6,10 +6,22 @@ set -x
 
 # Retry skopeo command in case of sporadic issue
 function RunSkopeoCmdWithRetry() {
+  CMD=$*
+
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If skopeo command is OK then we simply return (exit the function)
-    skopeo $* && return
+    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return 0
+
+    # If resource access is denied retry with local access
+    case ${ERRMSG} in
+      *requested\ access\ to\ the\ resource\ is\ denied*)
+        CMD=${CMD/docker:\/\//docker-daemon:}
+	;;
+      *Storing\ signatures\ for\ docker\ tar\ files\ is\ not\ supported*)
+        CMD=${CMD/copy/copy --remove-signatures}
+	;;
+    esac
 
     # Wait a little
     sleep 5
@@ -108,7 +120,8 @@ IMAGES_PATH=${OPT_RANCHER}/images
 # Elemental + Cert-Manager + Rancher
 loop=0
 for type in elemental cert rancher; do
-  for file in $(ls ${IMAGES_PATH}/${type} 2>/dev/null | grep -v txt); do
+  for file in $(ls ${IMAGES_PATH}/${type}/*.tar 2>/dev/null); do
+    file=${file##*/}
     VAR=$(awk -F_ "{print \"rancher-manager.test:5000/${type}/\"\$1\":\"\$2}" <<< ${file/.tar})
     RunSkopeoCmdWithRetry copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false &
 
