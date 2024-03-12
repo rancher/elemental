@@ -9,8 +9,8 @@
 ARG SLE_VERSION
 ARG SLEMICRO_VERSION
 
-FROM suse/sle-micro/kvm-${SLEMICRO_VERSION}:latest AS os
-FROM suse/sle-micro/${SLEMICRO_VERSION}:latest AS builder
+FROM suse/sle-micro/sle-micro-kvm-container-${SLEMICRO_VERSION}:latest AS os
+FROM suse/sle-micro/sle-micro-container-${SLEMICRO_VERSION}:latest AS builder
 
 WORKDIR /iso
 
