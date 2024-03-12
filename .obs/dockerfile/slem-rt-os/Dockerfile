@@ -2,15 +2,15 @@
 # Define the names/tags of the container
 #!ExclusiveArch: x86_64
 #!BuildName: SLE-Micro-rt-container
-#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro/rt-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/sle-micro-rt-container-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/sle-micro-rt-container-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/sle-micro-rt-container-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/rt-$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-rt-container-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 FROM suse/sle-micro/sle-micro-container-$SLEMICRO_VERSION:latest AS os

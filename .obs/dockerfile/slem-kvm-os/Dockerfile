@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
 #!BuildName: SLE-Micro-kvm-container
-#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro/kvm-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sle-micro/sle-micro-kvm-container-%%SLEMICRO_VERSION%%:latest
+#!BuildTag: suse/sle-micro/sle-micro-kvm-container-%%SLEMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sle-micro/sle-micro-kvm-container-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
@@ -19,7 +19,7 @@ RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-
 
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-kvm-container-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
