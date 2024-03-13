@@ -31,29 +31,27 @@ import (
 )
 
 const (
-	airgapBuildScript        = "../scripts/build-airgap"
-	appYaml                  = "../assets/hello-world_app.yaml"
-	backupYaml               = "../assets/backup.yaml"
-	ciTokenYaml              = "../assets/local-kubeconfig-token-skel.yaml"
-	configPrivateCAScript    = "../scripts/config-private-ca"
-	configRKE2Yaml           = "../assets/config_rke2.yaml"
-	dumbRegistrationYaml     = "../assets/dumb_machineRegistration.yaml"
-	emulateTPMYaml           = "../assets/emulateTPM.yaml"
-	getOSScript              = "../scripts/get-name-from-managedosversion"
-	httpSrv                  = "http://192.168.122.1:8000"
-	installConfigYaml        = "../../install-config.yaml"
-	installHardenedScript    = "../scripts/config-hardened"
-	installVMScript          = "../scripts/install-vm"
-	localKubeconfigYaml      = "../assets/local-kubeconfig-skel.yaml"
-	netDefaultFileName       = "../assets/net-default.xml"
-	netDefaultAirgapFileName = "../assets/net-default-airgap.xml"
-	numberOfNodesMax         = 30
-	resetMachineInv          = "../assets/reset_machine_inventory.yaml"
-	restoreYaml              = "../assets/restore.yaml"
-	upgradeSkelYaml          = "../assets/upgrade_skel.yaml"
-	userName                 = "root"
-	userPassword             = "r0s@pwd1"
-	vmNameRoot               = "node"
+	airgapBuildScript     = "../scripts/build-airgap"
+	appYaml               = "../assets/hello-world_app.yaml"
+	backupYaml            = "../assets/backup.yaml"
+	ciTokenYaml           = "../assets/local-kubeconfig-token-skel.yaml"
+	configPrivateCAScript = "../scripts/config-private-ca"
+	configRKE2Yaml        = "../assets/config_rke2.yaml"
+	dumbRegistrationYaml  = "../assets/dumb_machineRegistration.yaml"
+	emulateTPMYaml        = "../assets/emulateTPM.yaml"
+	getOSScript           = "../scripts/get-name-from-managedosversion"
+	httpSrv               = "http://192.168.122.1:8000"
+	installConfigYaml     = "../../install-config.yaml"
+	installHardenedScript = "../scripts/config-hardened"
+	installVMScript       = "../scripts/install-vm"
+	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
+	numberOfNodesMax      = 30
+	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
+	restoreYaml           = "../assets/restore.yaml"
+	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
+	userName              = "root"
+	userPassword          = "r0s@pwd1"
+	vmNameRoot            = "node"
 )
 
 var (
@@ -70,6 +68,7 @@ var (
 	isoBoot                   bool
 	k8sUpstreamVersion        string
 	k8sDownstreamVersion      string
+	netDefaultFileName        string
 	numberOfClusters          int
 	numberOfVMs               int
 	operatorUpgrade           string
@@ -513,6 +512,7 @@ var _ = BeforeSuite(func() {
 	case "airgap":
 		// Enable airgap support
 		clusterYaml = "../assets/cluster-airgap.yaml"
+		netDefaultFileName = "../assets/net-default-airgap.xml"
 		registrationYaml = "../assets/machineRegistration.yaml"
 		seedImageYaml = "../assets/seedImage.yaml"
 		selectorYaml = "../assets/selector.yaml"
@@ -525,12 +525,14 @@ var _ = BeforeSuite(func() {
 		}
 
 		clusterYaml = "../assets/cluster-multi.yaml"
+		netDefaultFileName = "../assets/net-default.xml"
 		registrationYaml = "../assets/machineRegistration-multi.yaml"
 		seedImageYaml = "../assets/seedImage-multi.yaml"
 		selectorYaml = "../assets/selector-multi.yaml"
 	default:
 		// Default cluster support
 		clusterYaml = "../assets/cluster.yaml"
+		netDefaultFileName = "../assets/net-default.xml"
 		registrationYaml = "../assets/machineRegistration.yaml"
 		seedImageYaml = "../assets/seedImage.yaml"
 		selectorYaml = "../assets/selector.yaml"

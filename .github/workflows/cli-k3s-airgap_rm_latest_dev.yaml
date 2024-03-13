@@ -19,7 +19,6 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
       test_description: "CI - CLI - Airgap K3S - RM Latest Devel"
-      cert-manager_version: v1.12.2
       cluster_name: airgap-cluster
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_downstream_version: v1.27.10+k3s2
