@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
+#
 #!BuildName: SLE-Micro-kvm-container
 #!BuildTag: suse/sle-micro/sle-micro-kvm-container-%%SLEMICRO_VERSION%%:latest
 #!BuildTag: suse/sle-micro/sle-micro-kvm-container-%%SLEMICRO_VERSION%%:%VERSION%
@@ -17,21 +18,12 @@ RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 # replace default kernel with smaller one, sufficient to run kvm guests
 RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent
 
+MAINTAINER SUSE LLC (https://www.suse.com/)
+
 ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-kvm-container-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
-
-# IMPORTANT: Setup elemental-release used for versioning/upgrade. The
-# values here should reflect the tag of the image being built
-# Also used by elemental-populate-labels
-RUN grep -v "IMAGE_REPO\|IMAGE_TAG\|IMAGE=\|TIMESTAMP\|GRUB_ENTRY_NAME" /etc/os-release > /tmp/os-release
-RUN mv /tmp/os-release /etc/os-release
-RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
-    echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
-    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
-    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
-    echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro
@@ -43,6 +35,17 @@ LABEL org.opencontainers.image.source="%SOURCEURL%"
 LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 # endlabelprefix
+
+# IMPORTANT: Setup elemental-release used for versioning/upgrade. The
+# values here should reflect the tag of the image being built
+# Also used by elemental-populate-labels
+RUN grep -v "IMAGE_REPO\|IMAGE_TAG\|IMAGE=\|TIMESTAMP\|GRUB_ENTRY_NAME" /etc/os-release > /tmp/os-release
+RUN mv /tmp/os-release /etc/os-release
+RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
+    echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
+    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
+    echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
+    echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
 
 # Ensure /tmp is mounted as tmpfs by default
 RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
