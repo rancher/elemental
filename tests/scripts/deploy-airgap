@@ -11,16 +11,16 @@ function RunSkopeoCmdWithRetry() {
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If skopeo command is OK then we simply return (exit the function)
-    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return 0
+    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return
 
     # If resource access is denied retry with local access
     case ${ERRMSG} in
       *requested\ access\ to\ the\ resource\ is\ denied*)
         CMD=${CMD/docker:\/\//docker-daemon:}
-	;;
+      ;;
       *Storing\ signatures\ for\ docker\ tar\ files\ is\ not\ supported*)
         CMD=${CMD/copy/copy --remove-signatures}
-	;;
+      ;;
     esac
 
     # Wait a little
@@ -33,7 +33,6 @@ function RunSkopeoCmdWithRetry() {
 
 # Variable(s)
 K3S_UPSTREAM_VERSION=$1
-CERT_MANAGER_VERSION=$2
 OPT_RANCHER=/opt/rancher
 
 # Format upstream version
@@ -71,7 +70,7 @@ systemctl enable --now k3s
 # Wait and add link
 sleep 30
 mkdir -p ${HOME}/.kube
-ln -s /etc/rancher/k3s/k3s.yaml ${HOME}/.kube/config
+ln -sf /etc/rancher/k3s/k3s.yaml ${HOME}/.kube/config
 
 # Run local registry
 cat <<EOF | kubectl apply -f -
@@ -119,22 +118,22 @@ IMAGES_PATH=${OPT_RANCHER}/images
 
 # Elemental + Cert-Manager + Rancher
 loop=0
-for type in elemental cert rancher; do
-  for file in $(ls ${IMAGES_PATH}/${type}/*.tar 2>/dev/null); do
-    file=${file##*/}
-    VAR=$(awk -F_ "{print \"rancher-manager.test:5000/${type}/\"\$1\":\"\$2}" <<< ${file/.tar})
-    RunSkopeoCmdWithRetry copy docker-archive:${IMAGES_PATH}/${type}/${file} docker://${VAR} --dest-tls-verify=false &
+for file in $(find ${IMAGES_PATH} -name '*.tar' 2>/dev/null); do
+  LOCAL_PATH="${file#*${IMAGES_PATH}}"
+  DOCKER_PATH="rancher-manager.test:5000${LOCAL_PATH/.tar}"
 
-    # Wait for skopeo jobs to finish if we already have too much jobs in parallel
-    # This is to avoid the "too many requests to registry" error!
-    if (( ++loop > 50 )); then
-      echo "Wait for sync..."
-      wait
+  # Add to local registry
+  RunSkopeoCmdWithRetry copy docker-archive:${file} docker://${DOCKER_PATH/_/:} --dest-tls-verify=false &
 
-      # Reset loop counter
-      loop=0
-    fi
-  done
+  # Wait for skopeo jobs to finish if we already have too much jobs in parallel
+  # This is to avoid the "too many requests to registry" error!
+  if (( ++loop > 50 )); then
+    echo "Wait for sync..."
+    wait
+
+    # Reset loop counter
+    loop=0
+  fi
 done
 
 # Wait for *ALL* skopeo jobs to finish

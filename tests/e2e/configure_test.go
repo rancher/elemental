@@ -158,7 +158,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				}
 
 				// Wait a bit between virsh commands
-				time.Sleep(1 * time.Minute)
+				time.Sleep(30 * time.Second)
 				err := exec.Command("sudo", "virsh", "net-create", netDefaultFileName).Run()
 				Expect(err).To(Not(HaveOccurred()))
 			})

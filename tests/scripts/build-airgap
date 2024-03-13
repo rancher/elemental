@@ -9,7 +9,7 @@ function RunHelmCmdWithRetry() {
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If helm command is OK then we simply return (exit the function)
-    helm $* && return 0
+    helm $* && return
 
     # Wait a little
     sleep 5
@@ -26,16 +26,16 @@ function RunSkopeoCmdWithRetry() {
   # Wait for a maximum of 1 minute
   for ((i=0; i<60; i++)); do
     # If skopeo command is OK then we simply return (exit the function)
-    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return 0
+    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return
 
     # If resource access is denied retry with local access
     case ${ERRMSG} in
       *requested\ access\ to\ the\ resource\ is\ denied*)
         CMD=${CMD/docker:\/\//docker-daemon:}
-	;;
+        ;;
       *Storing\ signatures\ for\ docker\ tar\ files\ is\ not\ supported*)
         CMD=${CMD/copy/copy --remove-signatures}
-	;;
+        ;;
     esac
 
     # Wait a little
@@ -53,7 +53,8 @@ RANCHER_CHANNEL=$3
 K3S_DOWNSTREAM_VERSION=$4
 ELEMENTAL_REPO=$5
 DEPLOY_AIRGAP_SCRIPT=$(realpath ../scripts/deploy-airgap)
-OPT_RANCHER=${HOME}/airgap_rancher
+OPT_RANCHER="${HOME}/airgap_rancher"
+REPO_SERVER="rancher-manager.test:5000"
 
 # Set Elemental version
 case ${ELEMENTAL_REPO} in
@@ -75,13 +76,13 @@ TMP_VER=${K3S_DOWNSTREAM_VERSION/+*}
 K8S_DOWNSTREAM_VERSION=${TMP_VER/v}
 
 # Create directories
-mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},k3s_${K8S_DOWNSTREAM_VERSION},helm} ${OPT_RANCHER}/images/{cert,rancher,registry,elemental}
+mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},k3s_${K8S_DOWNSTREAM_VERSION},helm} ${OPT_RANCHER}/images/registry
 
 # Install packages
 sudo zypper --no-refresh -n in skopeo yq
 
 # Add rancher manager in /etc/hosts
-sudo sh -c 'echo "192.168.122.102 rancher-manager.test" >> /etc/hosts'
+sudo sh -c "echo '192.168.122.102 ${REPO_SERVER%:*}' >> /etc/hosts"
 
 # Download k3s and rancher
 for k8s_ver in ${K3S_UPSTREAM_VERSION}:${K8S_UPSTREAM_VERSION} ${K3S_DOWNSTREAM_VERSION}:${K8S_DOWNSTREAM_VERSION}; do
@@ -105,59 +106,57 @@ RunHelmCmdWithRetry repo add jetstack https://charts.jetstack.io > /dev/null 2>&
 RunHelmCmdWithRetry repo add rancher-${RANCHER_CHANNEL} https://releases.rancher.com/server-charts/${RANCHER_CHANNEL} > /dev/null 2>&1
 RunHelmCmdWithRetry repo update > /dev/null 2>&1
 
-# Get charts
-RunHelmCmdWithRetry pull jetstack/cert-manager --version ${CERT_MANAGER_VERSION} > /dev/null 2>&1
+# Get CertManager charts
+[[ "${CERT_MANAGER_VERSION}" != "latest" ]] && VER_OPT="--version ${CERT_MANAGER_VERSION}"
+RunHelmCmdWithRetry pull jetstack/cert-manager ${VER_OPT} > /dev/null 2>&1
+
+# Get CertManager version
+CERT_MANAGER_VERSION=$(ls cert-manager-*.tgz 2>/dev/null)
+CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION#cert-manager-*}
+CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION%.*}
+
+# Get Rancher charts
 [[ "${RANCHER_CHANNEL}" == "latest" ]] && DEVEL="--devel"
 RunHelmCmdWithRetry pull rancher-${RANCHER_CHANNEL}/rancher ${DEVEL} > /dev/null 2>&1
 for i in elemental-operator-chart elemental-operator-crds-chart ; do
   RunHelmCmdWithRetry pull ${ELEMENTAL_REPO}/${i} > /dev/null 2>&1
 done
 
-# Get rancher manager version
-RANCHER_MANAGER_VERSION=$(ls rancher* 2>/dev/null | cut -d '-' -f '2-3')
+# Get Rancher Manager version
+RANCHER_MANAGER_VERSION=$(ls rancher-*.tgz 2>/dev/null)
+RANCHER_MANAGER_VERSION=${RANCHER_MANAGER_VERSION#rancher-*}
+RANCHER_MANAGER_VERSION=${RANCHER_MANAGER_VERSION%.*}
 
 # Temporary thing to get latest version of sle-micro-iso (very ugly...)
 ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
 curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
-bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r localhost:5000 -sa ${ELEMENTAL_VERSION} || exit 1
+bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa ${ELEMENTAL_VERSION} || exit 1
+rm -f ${ELEMENTAL_AIRGAP_SCRIPT}
 
-# Get Images - Rancher/Elemental
+# Get container images
 cd ${OPT_RANCHER}/images/
 
 # Rancher image list
-RANCHER_IMAGES_FILE=rancher/rancher-images.txt
-curl -sL https://github.com/rancher/rancher/releases/download/v${RANCHER_MANAGER_VERSION%.*}/rancher-images.txt -o ${RANCHER_IMAGES_FILE}
+RANCHER_REPO=https://github.com/rancher/rancher/releases/download/v${RANCHER_MANAGER_VERSION}
+RANCHER_IMAGES_FILE=rancher-images.txt
+curl -sOL ${RANCHER_REPO}/${RANCHER_IMAGES_FILE}
 
-# Cert-manager image list
-CERT_IMAGES_FILE=cert/cert-manager-images.txt
+# CertManager image list
+CERT_IMAGES_FILE=cert-manager-images.txt
 RunHelmCmdWithRetry template ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
   | awk '$1 ~ /image:/ {print $2}' \
   | sed s/\"//g > ${CERT_IMAGES_FILE}
 
 # Elemental image list
-ELEMENTAL_IMAGES_FILE=elemental/elemental-images.txt
-cp -f ${OPT_RANCHER}/helm/elemental-images.txt ${ELEMENTAL_IMAGES_FILE}
+ELEMENTAL_IMAGES_FILE=elemental-images.txt
+mv -f ${OPT_RANCHER}/helm/elemental-images.txt ${ELEMENTAL_IMAGES_FILE}
 
 # Get images
-# Skopeo - cert-manager
-for i in $(< ${CERT_IMAGES_FILE}); do
-  VAR=$(awk -F/ '{print $3}' <<< ${i})
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:cert/${VAR/:/_}.tar:${VAR} &
-done
-
-# Skopeo - Elemental
-for i in $(< ${ELEMENTAL_IMAGES_FILE}); do
-  VAR=$(awk -F/ '{if ($(NF-1) ~ /elemental-teal/ || $(NF-1) ~ /sle-micro/) {print $(NF-1)"/"$NF} else {print $NF}}')
-
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:elemental/${VAR/:/_}.tar:${VAR} &
-done
-
-# Skopeo - Rancher
 loop=0
-for i in $(< ${RANCHER_IMAGES_FILE}); do
-  VAR=$(awk -F/ '{print $2}' <<< ${i})
-  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:rancher/${VAR/:/_}.tar:${VAR} &
+for i in $(< ${CERT_IMAGES_FILE}) $(< ${ELEMENTAL_IMAGES_FILE}) $(< ${RANCHER_IMAGES_FILE}); do
+  mkdir -p ${i%/*}
+  RunSkopeoCmdWithRetry copy docker://${i} docker-archive:${i/:/_}.tar:${i} &
 
   # Wait for skopeo jobs to finish if we already have too much jobs in parallel
   # This is to avoid the "too many requests to registry" error!
