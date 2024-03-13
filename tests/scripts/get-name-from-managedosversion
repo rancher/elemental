@@ -5,10 +5,10 @@
 set -e -x
 
 # Variables
-KIND_OF_OS=$1
-CHECK_FOR_ISO=$2
-INVERTED="| not"
-GREP_OPTS="-v"
+typeset -l KIND_OF_OS=$1
+typeset -l CHECK_FOR_ISO=$2
+typeset INVERTED="| not"
+typeset GREP_OPTS="-v"
 
 # Define if we check for stable or unstable OS
 case ${KIND_OF_OS} in
