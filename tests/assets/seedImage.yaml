@@ -10,10 +10,16 @@ spec:
       - name: root
         passwd: r0s@pwd1
     write_files:
-      - append: true
+      - path: /etc/elemental-test
+        append: true
         content: |
           SeedImage cloud-config-test
-        path: /etc/elemental-test
+      - path: /etc/ssh/sshd_config
+        append: true
+        content: |
+          PermitRootLogin yes
+        owner: root:root
+        permissions: 644
   registrationRef:
     apiVersion: elemental.cattle.io/v1beta1
     kind: MachineRegistration
