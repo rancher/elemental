@@ -71,6 +71,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 	It("Install K3S/Rancher in the rancher-manager machine", func() {
 		airgapRepo := os.Getenv("HOME") + "/airgap_rancher"
+		archiveFile := "airgap_rancher.zst"
 		certPath := "/quay.io/jetstack/"
 		optRancher := "/opt/rancher"
 		password := "root"
@@ -95,15 +96,26 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		}
 
 		By("Sending the archive file into the rancher server", func() {
+			// Destination archive file
+			destFile := optRancher + "/" + archiveFile
+
 			// Make sure SSH is available
 			CheckSSH(client)
 
+			// Create the destination repository
+			_, err := client.RunSSH("mkdir -p " + optRancher)
+			Expect(err).To(Not(HaveOccurred()))
+
 			// Send the airgap archive
-			err := client.SendFile(os.Getenv("HOME")+"/airgap_rancher.zst", "/opt/airgap_rancher.zst", "0644")
+			err = client.SendFile(os.Getenv("HOME")+"/"+archiveFile, destFile, "0644")
 			Expect(err).To(Not(HaveOccurred()))
 
 			// Extract the airgap archive
-			_, err = client.RunSSH("mkdir " + optRancher + "; tar -I pzstd -vxf /opt/airgap_rancher.zst -C " + optRancher)
+			_, err = client.RunSSH("tar -I pzstd -vxf " + destFile + " -C " + optRancher)
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Delete the archive file, not needed anymore, this will save some storage too!
+			_, err = client.RunSSH("rm -f " + destFile)
 			Expect(err).To(Not(HaveOccurred()))
 		})
 
