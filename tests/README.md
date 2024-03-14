@@ -7,7 +7,6 @@
 - **Describe:** E2E - Deploy K3S/Rancher in airgap environment
     - **It:** Create the rancher-manager machine
       -  **By:** Updating the default network configuration
-      -  **By:** Downloading the qcow2 image from GCP storage
       -  **By:** Creating the Rancher Manager VM
     - **It:** Install K3S/Rancher in the rancher-manager machine
       -  **By:** Sending the archive file into the rancher server
