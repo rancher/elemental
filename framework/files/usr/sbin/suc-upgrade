@@ -72,7 +72,6 @@ function isEqualVersion() {
         echo "Upgrade already done with release:"
         cat ${HOST_DIR}${RELEASE_FILE}
 
-        config
         exit 0
     fi
 
