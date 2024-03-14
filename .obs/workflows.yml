@@ -11,6 +11,12 @@ push_workflow:
         package: build-iso-base-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
+        package: build-iso-kvm-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: build-iso-rt-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
         package: SLE-Micro-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
@@ -40,6 +46,12 @@ tag_workflow:
         package: build-iso-base-image
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
+        package: build-iso-kvm-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
+        package: build-iso-rt-image
+    - trigger_services:
+        project: isv:Rancher:Elemental:Dev
         package: SLE-Micro-container
     - trigger_services:
         project: isv:Rancher:Elemental:Dev
@@ -62,6 +74,14 @@ pr_workflow:
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
         source_package: build-iso-base-image
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: build-iso-kvm-image
+        target_project: isv:Rancher:Elemental:PR
+    - branch_package:
+        source_project: isv:Rancher:Elemental:Dev
+        source_package: build-iso-rt-image
         target_project: isv:Rancher:Elemental:PR
     - branch_package:
         source_project: isv:Rancher:Elemental:Dev
