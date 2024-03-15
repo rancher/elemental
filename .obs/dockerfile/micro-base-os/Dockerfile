@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildName: SLE-Micro-base-container
-#!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:latest
-#!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sle-micro/sle-micro-base-container-%%SLEMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildName: SL-Micro-base-container
+#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:latest
+#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:%VERSION%
+#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
-ARG SLEMICRO_VERSION
+ARG SLMICRO_VERSION
 
-FROM suse/sle-micro/${SLEMICRO_VERSION}/toolbox:latest as host
+FROM suse/sl-micro/${SLMICRO_VERSION}/toolbox:latest as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
@@ -34,7 +34,7 @@ RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager-
 RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y grub2-arm64-efi raspberrypi-firmware raspberrypi-firmware-config raspberrypi-firmware-dt u-boot-rpiarm64; fi
 
 # make SUSE happy
-RUN zypper --installroot /osimage in --no-recommends -y SLE-Micro-release systemd-presets-branding-Elemental btrfsmaintenance audit
+RUN zypper --installroot /osimage in --no-recommends -y SL-Micro-release systemd-presets-branding-Elemental btrfsmaintenance audit
 
 # make elemental-register happy
 RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
@@ -42,7 +42,7 @@ RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
 # add elemental
 RUN zypper --installroot /osimage in --no-recommends -y elemental
 
-# end of mandatory package installs for SLE Micro
+# end of mandatory package installs for SUSE Linux Micro
 
 # make derived containers possible
 RUN zypper --installroot /osimage in --no-recommends -y zypper
@@ -51,9 +51,9 @@ FROM scratch as osimage
 
 COPY --from=host /osimage /
 
-ARG SLEMICRO_VERSION
+ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/sle-micro-base-container-$SLEMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/sl-micro-base-container-$SLMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -63,12 +63,12 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
     echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
-    echo GRUB_ENTRY_NAME=\"SLE Micro\" >> /etc/os-release
+    echo GRUB_ENTRY_NAME=\"SUSE Linux Micro\" >> /etc/os-release
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
-# labelprefix=com.suse.sle.micro
-LABEL org.opencontainers.image.title="SLE Micro Base Container"
-LABEL org.opencontainers.image.description="Container image for SLE Micro Base - a containerized OS layer for Kubernetes."
+# labelprefix=com.suse.sl.micro
+LABEL org.opencontainers.image.title="SUSE Linux Micro Base Container"
+LABEL org.opencontainers.image.description="Container image for SUSE Linux Micro Base - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
@@ -79,7 +79,7 @@ LABEL org.openbuildservice.disturl="%DISTURL%"
 LABEL com.suse.supportlevel="l3"
 LABEL com.suse.eula="sle-eula"
 LABEL com.suse.lifecycle-url="https://www.suse.com/lifecycle#suse-linux-enterprise-micro"
-LABEL com.suse.image-type="sle-micro"
+LABEL com.suse.image-type="sl-micro"
 LABEL com.suse.release-stage="beta"
 # endlabelprefix
 
