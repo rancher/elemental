@@ -15,7 +15,7 @@ FROM suse/sl-micro/sl-micro-base-container-${SLMICRO_VERSION}:latest
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 
 # extend -base with baremetal and usability packages
-RUN zypper in --no-recommends -y procps openssl openssh openssh-server \
+RUN zypper in --no-recommends -y procps openssh openssh-server \
     vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
     \
     avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \

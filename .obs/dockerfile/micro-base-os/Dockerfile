@@ -37,7 +37,7 @@ RUN if [ `uname -m` = "aarch64" ]; then zypper --installroot /osimage in -y grub
 RUN zypper --installroot /osimage in --no-recommends -y SL-Micro-release systemd-presets-branding-Elemental btrfsmaintenance audit
 
 # make elemental-register happy
-RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2
+RUN zypper --installroot /osimage in --no-recommends -y dmidecode lvm2 openssl
 
 # add elemental
 RUN zypper --installroot /osimage in --no-recommends -y elemental
