@@ -165,16 +165,45 @@ Cypress.Commands.add('createMachReg', (
   // Check Cloud configuration
   // TODO: Maybe the check may be improved in one line
   if (checkDefaultCloudConfig) {
-    cy.getBySel('yaml-editor-code-mirror')
-      .should('include.text','config:')
-      .should('include.text','cloud-config:')
-      .should('include.text','users:')
-      .should('include.text','- name: root')
-      .should('include.text','passwd: root')
-      .should('include.text','elemental:')
-      .should('include.text','install:')
-      .should('include.text','device: /dev/nvme0n1')
-      .should('include.text','poweroff: true');
+    if (utils.isUIVersion('dev')) {
+      cy.getBySel('yaml-editor-code-mirror')
+        .should('include.text','config:')
+        .should('include.text','cloud-config:')
+        .should('include.text','users:')
+        .should('include.text','- name: root')
+        .should('include.text','passwd: root')
+        .should('include.text','elemental:')
+        .should('include.text','install:')
+        .should('include.text','device-selector:')
+        .should('include.text','- key: Name')
+        .should('include.text','operator: In')
+        .should('include.text','values:')
+        .should('include.text','- /dev/sda')
+        .should('include.text','- /dev/vda')
+        .should('include.text','- /dev/nvme0')
+        .should('include.text','- key: Size')
+        .should('include.text','operator: Gt')
+        .should('include.text','values:')
+        .should('include.text','- 25Gi')
+        .should('include.text','reboot: true')
+        .should('include.text','snapshotter:')
+        .should('include.text','type: btrfs')
+        .should('include.text','reset:')
+        .should('include.text','reboot: true')
+        .should('include.text','reset-oem: true')
+        .should('include.text','reset-persistent: true');
+    } else {
+      cy.getBySel('yaml-editor-code-mirror')
+        .should('include.text','config:')
+        .should('include.text','cloud-config:')
+        .should('include.text','users:')
+        .should('include.text','- name: root')
+        .should('include.text','passwd: root')
+        .should('include.text','elemental:')
+        .should('include.text','install:')
+        .should('include.text','device: /dev/nvme0n1')
+        .should('include.text','poweroff: true');
+    }
   }
 
   // Check label and annotation in YAML
