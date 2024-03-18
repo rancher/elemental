@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-OS-Upgrade
+name: CLI-RKE2-Manual-Upgrade-Workflow
 
 on:
   workflow_dispatch:
@@ -11,6 +11,14 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: v1.27.8+rke2r1
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+rke2r2
+        type: string
       operator_repo:
         description: Operator version to use for initial deployment
         default: oci://registry.suse.com/rancher
@@ -21,7 +29,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
       slem_version:
         description: SLE Micro version
@@ -41,10 +49,9 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
       ca_type: private
-      cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}
-      k8s_downstream_version: v1.27.8+rke2r1
-      k8s_upstream_version: v1.26.10+rke2r2
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
       operator_repo: ${{ inputs.operator_repo }}
