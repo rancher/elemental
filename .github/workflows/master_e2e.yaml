@@ -21,7 +21,7 @@ on:
         type: string
       cluster_name:
         description: Name of the provisioned cluster
-        required: true
+        default: elemental-cluster
         type: string
       cluster_number:
         description: Number of clusters to deploy in multi-cluster test
@@ -42,12 +42,10 @@ on:
         default: dev
         type: string
       k8s_downstream_version:
-        description: Rancher cluster downstream version (K3s or RKE2)
-        default: v1.27.8+k3s2
+        description: Rancher cluster downstream version to use
         type: string
       k8s_upstream_version:
-        description: Rancher cluster upstream version (K3s or RKE2)
-        default: v1.26.10+k3s2
+        description: Rancher cluster upstream version to use
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
@@ -74,7 +72,7 @@ on:
         description: Rancher Manager channel/version to upgrade to
         type: string
       rancher_version:
-        description: Rancher Manager channel/version/head_version to use for installation
+        description: Rancher Manager channel/version/head_version to use
         default: stable/latest
         type: string
       reset:

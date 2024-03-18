@@ -20,8 +20,12 @@ on:
         default: dev
         type: string
       k8s_downstream_version:
-        description: Rancher cluster downstream version (K3s or RKE2)
+        description: Rancher cluster downstream version to use
         default: v1.27.8+k3s2
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+k3s2
         type: string
       operator_repo:
         description: Elemental operator repository to use
@@ -33,7 +37,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
       runner_template:
         description: Runner template to use
@@ -48,11 +52,11 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
       boot_type: ${{ inputs.boot_type }}
-      cluster_name: cluster-ui-obs-manual
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
       rancher_version: ${{ inputs.rancher_version }}

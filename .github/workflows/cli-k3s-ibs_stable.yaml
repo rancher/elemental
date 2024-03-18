@@ -4,9 +4,6 @@ name: CLI-K3s-IBS_Stable
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        type: string
       cluster_type:
         description: Cluster type (empty if normal or hardened)
         type: string
@@ -14,9 +11,20 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: v1.27.8+k3s2
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+k3s2
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
 
 jobs:
@@ -27,9 +35,10 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
-      cluster_name: cluster-k3s
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
       qase_run_id: ${{ inputs.qase_run_id }}

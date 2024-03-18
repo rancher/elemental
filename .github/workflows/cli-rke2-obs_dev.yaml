@@ -14,9 +14,17 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: v1.27.8+rke2r1
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+rke2r2
+        type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
 
 jobs:
@@ -28,11 +36,10 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
       ca_type: private
-      cluster_name: cluster-rke2
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
-      k8s_downstream_version: v1.27.8+rke2r1
-      k8s_upstream_version: v1.26.10+rke2r2
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       os_to_test: dev
       qase_run_id: ${{ inputs.qase_run_id }}

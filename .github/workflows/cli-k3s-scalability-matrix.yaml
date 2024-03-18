@@ -1,0 +1,49 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-Scalability
+
+on:
+  workflow_dispatch:
+    inputs:
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.8+k3s2"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.26.10+k3s2"'
+        type: string
+  schedule:
+    # Every Sunday at 4am UTC (11pm in us-central1)
+    - cron: '0 4 * * 0'
+
+jobs:
+  cli:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.8+k3s2"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.26.10+k3s2"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","latest/devel")) }}
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
+    with:
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      node_number: 60
+      qase_run_id: ${{ inputs.qase_run_id }}
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      rancher_version: ${{ matrix.rancher_version }}
+      runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
+      test_type: cli
+      zone: us-central1-f

@@ -16,13 +16,21 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: stable
         type: string
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: v1.27.8+k3s2
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+k3s2
+        type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
 
 jobs:
@@ -34,10 +42,11 @@ jobs:
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
       boot_type: iso
-      cluster_name: cluster-k3s
       cypress_tags: main
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: oci://registry.suse.com/rancher
       proxy: ${{ inputs.proxy }}
       qase_run_id: ${{ inputs.qase_run_id }}

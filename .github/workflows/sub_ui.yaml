@@ -205,7 +205,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots-basics-${{ inputs.cluster_name }}
+          name: cypress-screenshots-basics-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -216,7 +216,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos-basics-${{ inputs.cluster_name }}
+          name: cypress-videos-basics-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/videos
           retention-days: 7
 
@@ -270,7 +270,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
+          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -281,7 +281,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos-advanced-${{ inputs.cluster_name }}
+          name: cypress-videos-advanced-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/videos
           retention-days: 7
 
