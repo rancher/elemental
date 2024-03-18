@@ -1,9 +1,13 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-K3s-OS-Upgrade
+name: CLI-OBS-Manual-Upgrade-Workflow
 
 on:
   workflow_dispatch:
     inputs:
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        default: selfsigned
+        type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
         type: string
@@ -11,17 +15,25 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: v1.27.8+k3s2
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.26.10+k3s2
+        type: string
       operator_repo:
         description: Operator version to use for initial deployment
         default: oci://registry.suse.com/rancher
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
-        default: latest/devel/2.7
+        default: latest/devel/2.8
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest/none
+        default: stable/latest
         type: string
       slem_version:
         description: SLE Micro version
@@ -40,8 +52,10 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
-      cluster_name: cluster-k3s
+      ca_type: ${{ inputs.ca_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
+      k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
       operator_repo: ${{ inputs.operator_repo }}
