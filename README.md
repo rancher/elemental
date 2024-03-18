@@ -28,7 +28,7 @@
 
 ## Airgap tests
 
-[![CLI-K3s-Airgap-RM_stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml) (Tested ith Rancher stable)
+[![CLI-K3s-Airgap-RM_stable](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_stable.yaml) (Tested with Rancher stable)
 
 [![CLI-K3s-Airgap-RM_latest_devel](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml/badge.svg?branch=main)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap_rm_latest_dev.yaml) (Tested with Rancher latest RC)
 
