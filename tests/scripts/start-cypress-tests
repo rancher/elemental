@@ -19,6 +19,7 @@ npm install
 docker run -v $PWD:/workdir -w /workdir               \
     -e BOOT_TYPE=$BOOT_TYPE                           \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                     \
+    -e ELEMENTAL_DEV_VERSION=$ELEMENTAL_DEV_VERSION   \
     -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION     \
     -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO             \
     -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION     \

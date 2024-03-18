@@ -52,14 +52,14 @@ describe('Elemental operator upgrade tests', () => {
           cy.clickButton('Upgrade');
           cy.contains('.header > .title', 'elemental-operator');
           cy.clickButton('Next');
-          cy.get('[data-testid="string-input-channel.repository"]')
+          cy.get('[data-testid="string-input-channel.image"]')
             .clear()
-          cy.get('[data-testid="string-input-channel.repository"]')
-            .type('rancher/elemental-channel')
+          cy.get('[data-testid="string-input-channel.image"]')
+            .type('registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-channel')
           cy.get('[data-testid="string-input-channel.tag"]')
             .clear()
           cy.get('[data-testid="string-input-channel.tag"]')
-            .type('1.5.0')
+            .type(Cypress.env('elemental_dev_version'))
           cy.clickButton('Upgrade');
           cy.contains('SUCCESS: helm', {timeout:120000});
           cy.contains('Installed App: elemental-operator Pending-Upgrade', {timeout:120000});

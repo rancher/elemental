@@ -34,6 +34,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.chartmuseum_repo       = process.env.CHARTMUSEUM_REPO;
   config.env.cluster                = process.env.CLUSTER_NAME;
   config.env.cypress_tags           = process.env.CYPRESS_TAGS;
+  config.env.elemental_dev_version  = process.env.ELEMENTAL_DEV_VERSION;
   config.env.elemental_ui_version   = process.env.ELEMENTAL_UI_VERSION;
   config.env.k8s_downstream_version = process.env.K8S_DOWNSTREAM_VERSION;
   config.env.operator_repo          = process.env.OPERATOR_REPO;
