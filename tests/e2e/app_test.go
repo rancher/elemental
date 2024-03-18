@@ -57,9 +57,11 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		Expect(err).To(Not(HaveOccurred()))
 
 		By("Scaling the deployment to the number of nodes", func() {
-			nodeList, err := kubectl.RunWithoutErr("get", "nodes", "-o", "jsonpath={.items[*].metadata.name}")
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(nodeList).To(Not(BeEmpty()))
+			var nodeList string
+			Eventually(func() string {
+				nodeList, _ = kubectl.RunWithoutErr("get", "nodes", "-o", "jsonpath={.items[*].metadata.name}")
+				return nodeList
+			}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(Not(BeEmpty()))
 
 			nodeNumber := len(strings.Fields(nodeList))
 			Expect(nodeNumber).To(Not(BeNil()))
