@@ -18,7 +18,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI - CLI - Parallel - OS Upgrade test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}

@@ -18,7 +18,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI - CLI - Parallel - Deployment test with Standard K3s"
       backup_restore_version: v5.0.0-rc2
       cluster_name: cluster-k3s
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}

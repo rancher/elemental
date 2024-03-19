@@ -22,7 +22,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI/Manual - UI - Deployment test with Standard RKE2"
       boot_type: raw
       ca_type: private
       cluster_name: cluster-rke2

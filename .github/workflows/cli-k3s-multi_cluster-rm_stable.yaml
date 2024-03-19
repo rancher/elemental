@@ -23,7 +23,6 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
-      test_description: "CI/Manual - CLI - MultiCluster - Deployment test with Standard K3s"
       boot_type: iso
       cluster_name: cluster-k3s
       cluster_number: 20

@@ -55,7 +55,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "Manual - Fully customizable + reset - CLI - IBS/OBS Deployment test"
       ca_type: ${{ inputs.ca_type }}
       cluster_name: my-own-cluster
       cluster_type: ${{ inputs.cluster_type }}
