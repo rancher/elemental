@@ -1,5 +1,5 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "SLE Micro virtual image Install"
+  grub-entry-name: "SL Micro Virtual Image Install"
 
 squash-no-compression: true

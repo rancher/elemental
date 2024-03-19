@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
 #!BuildName: SL-Micro-base-container
-#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:latest
-#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sl-micro/sl-micro-base-container-%%SLMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container:latest
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container:%VERSION%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
@@ -53,7 +53,7 @@ COPY --from=host /osimage /
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/sl-micro-base-container-$SLMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -67,7 +67,7 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sl.micro
-LABEL org.opencontainers.image.title="SUSE Linux Micro Base Container"
+LABEL org.opencontainers.image.title="SUSE Linux Micro Base OS Container"
 LABEL org.opencontainers.image.description="Container image for SUSE Linux Micro Base - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"

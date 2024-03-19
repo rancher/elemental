@@ -1,15 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
 #!BuildName: SL-Micro-container
-#!BuildTag: suse/sl-micro/sl-micro-container-%%SLMICRO_VERSION%%:latest
-#!BuildTag: suse/sl-micro/sl-micro-container-%%SLMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sl-micro/sl-micro-container-%%SLMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:latest
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:%VERSION%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLMICRO_VERSION
 
-FROM suse/sl-micro/sl-micro-base-container-${SLMICRO_VERSION}:latest
+FROM suse/sl-micro/${SLMICRO_VERSION}/base-os-container:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
@@ -29,7 +29,7 @@ RUN zypper in --no-recommends -y procps openssh openssh-server \
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/sl-micro-container-$SLMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -45,8 +45,8 @@ RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sl.micro
-LABEL org.opencontainers.image.title="SUSE Linux Micro Container"
-LABEL org.opencontainers.image.description="Container image SUSE Linux Micro - a containerized OS layer for Kubernetes."
+LABEL org.opencontainers.image.title="SUSE Linux Micro Baremetal OS Container"
+LABEL org.opencontainers.image.description="SUSE Linux Micro Baremetal OS - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"

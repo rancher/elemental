@@ -1,16 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#
 #!BuildName: SL-Micro-kvm-container
-#!BuildTag: suse/sl-micro/sl-micro-kvm-container-%%SLMICRO_VERSION%%:latest
-#!BuildTag: suse/sl-micro/sl-micro-kvm-container-%%SLMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sl-micro/sl-micro-kvm-container-%%SLMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container:latest
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container:%VERSION%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLMICRO_VERSION
 
-FROM suse/sl-micro/sl-micro-base-container-${SLMICRO_VERSION}:latest
+FROM suse/sl-micro/${SLMICRO_VERSION}/base-os-container:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
@@ -22,7 +21,7 @@ MAINTAINER SUSE LLC (https://www.suse.com/)
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/sl-micro-kvm-container-$SLMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers

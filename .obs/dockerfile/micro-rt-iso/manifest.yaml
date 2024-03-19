@@ -1,5 +1,5 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "SLE Micro real-time Install"
+  grub-entry-name: "SL Micro Realtime Install"
 
 squash-no-compression: true
