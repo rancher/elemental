@@ -47,7 +47,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test"
       boot_type: ${{ inputs.boot_type }}
       cluster_name: cluster-ui-obs-manual
       cluster_type: ${{ inputs.cluster_type }}

@@ -18,7 +18,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI - CLI - Parallel - Deployment test with Hardened RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       cluster_type: hardened
