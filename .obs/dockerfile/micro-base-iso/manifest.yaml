@@ -1,5 +1,5 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "SLE Micro base Install"
+  grub-entry-name: "SL Micro Base Install"
 
 squash-no-compression: true

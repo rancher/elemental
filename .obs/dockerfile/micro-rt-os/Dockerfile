@@ -2,15 +2,15 @@
 # Define the names/tags of the container
 #!ExclusiveArch: x86_64
 #!BuildName: SL-Micro-rt-container
-#!BuildTag: suse/sl-micro/sl-micro-rt-container-%%SLMICRO_VERSION%%:latest
-#!BuildTag: suse/sl-micro/sl-micro-rt-container-%%SLMICRO_VERSION%%:%VERSION%
-#!BuildTag: suse/sl-micro/sl-micro-rt-container-%%SLMICRO_VERSION%%:%VERSION%-%RELEASE%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:latest
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:%VERSION%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #
 
 ARG SLMICRO_VERSION
 
-FROM suse/sl-micro/sl-micro-container-$SLMICRO_VERSION:latest AS os
+FROM suse/sl-micro/${SLMICRO_VERSION}/baremetal-os-container:latest AS os
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
@@ -22,13 +22,13 @@ MAINTAINER SUSE LLC (https://www.suse.com/)
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/sl-micro-rt-container-$SLMICRO_VERSION
+ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/rt-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sl.micro
-LABEL org.opencontainers.image.title="SUSE Linux Micro for Rancher RT"
-LABEL org.opencontainers.image.description="Image containing SUSE Linux Micro for Rancher RT - a containerized OS layer for Kubernetes."
+LABEL org.opencontainers.image.title="SUSE Linux Micro Realtime OS Container"
+LABEL org.opencontainers.image.description="Image containing SUSE Linux Micro Realtime - a containerized OS layer for Kubernetes."
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.source="%SOURCEURL%"

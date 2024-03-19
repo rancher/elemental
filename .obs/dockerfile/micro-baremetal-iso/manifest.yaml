@@ -1,6 +1,6 @@
 iso:
   bootloader-in-rootfs: true
-  grub-entry-name: "SLE Micro Install"
+  grub-entry-name: "SL Micro Baremetal Install"
 
 squash-no-compression: true
 
