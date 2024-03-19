@@ -20,19 +20,17 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 Cypress.config();
 describe('Machine inventory testing', () => {
+  const clusterName          = "mycluster"
   const elementalUser        = "elemental-user"
   const hwLabels             = ["TotalCPUThread", "TotalMemory", "CPUModel",
                                "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
                                "CPUVendorTotalCPUCores"]
   const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
-  const clusterName          = "mycluster"
   const proxy                = "http://172.17.0.1:3128"
   const uiAccount            = Cypress.env('ui_account');
   const uiPassword           = "rancherpassword"
-  let hostname               = ""
-  // Test if machine inventory uses hostname given by DHCP
-  utils.isK8sVersion("k3s") && utils.isCypressTag("main") ? hostname=('node-001') : hostname=('my-machine');
-
+  const vmNumber             = 3;
+  
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
     cy.visit('/');
@@ -49,19 +47,21 @@ describe('Machine inventory testing', () => {
       it('Check that machine inventory has been created', () => {
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.contains('Namespace: fleet-default')
-        cy.getBySel('sortable-cell-0-0')
-          .contains('Active')
-          .should('exist');
-        cy.getBySel('sortable-cell-0-1')
-          .contains(hostname)
-          .should('exist');
+        for (let i = 0; i < vmNumber; i++) {
+          cy.getBySel(`sortable-cell-${i}-0`)
+            .contains('Active')
+            .should('exist');
+          cy.getBySel(`sortable-cell-${i}-1`)
+            .contains(`node-00${i + 1}`)
+            .should('exist');
+        }
       })
     );
 
     qase(29,
       it('Check we can see our embedded hardware labels', () => {
         cy.clickNavMenu(["Inventory of Machines"]);
-        cy.contains(hostname)
+        cy.contains('node-001')
           .click()
         cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', true);
         for (const key in hwLabels) {

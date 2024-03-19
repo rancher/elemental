@@ -25,6 +25,7 @@ filterTests(['main'], () => {
     const elementalUser = "elemental-user"
     const uiAccount     = Cypress.env('ui_account');
     const uiPassword    = "rancherpassword"
+    const vmNumber      = 3;
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -42,7 +43,7 @@ filterTests(['main'], () => {
   
     qase(25,
       it('Testing selector without any rule', () => {
-        cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
+        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`)
           .should('exist');
       })
     );
@@ -76,7 +77,7 @@ filterTests(['main'], () => {
         cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
         cy.get('@match-value').click()
         cy.get('@match-value').type('myInvLabelValue1');
-        cy.contains('.banner', 'Matches all 1 existing Inventory of Machines')
+        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`)
           .should('exist');
       })
     );

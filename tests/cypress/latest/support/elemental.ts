@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { isCypressTag, isRancherManagerVersion } from '~/support/utils';
+import { isCypressTag } from '~/support/utils';
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
@@ -65,13 +65,6 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('.outer-container > .header', 'Elemental');
     cy.clickButton('Next');
-    // Workaround for https://github.com/rancher/rancher/issues/43379
-    if (isCypressTag('upgrade') && !isRancherManagerVersion('head')) {
-      cy.get('[data-testid="string-input-channel.repository"]')
-        .type('registry.suse.com/rancher/elemental-teal-channel')
-      cy.get('[data-testid="string-input-channel.tag"]')
-        .type('1.3.5')
-    }
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', {timeout:120000});
     cy.reload;

@@ -67,11 +67,11 @@ elif [[ ${BOOT_TYPE} == "raw" ]]; then
     && echo "File ${RAW_IMAGE} not found! Exiting!" >&2 \
     && exit 1  
   
-  # We need to resize the raw image according to the HDD_SIZE
-  /usr/bin/qemu-img resize ${RAW_IMAGE} ${HDD_SIZE}G
+  # Duplicate the raw image depending on nodes number
+  cp ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
 
-  # Soft-link the ISO to avoid "Could not define storage pool" error
-  ln -s ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
+  # We need to resize the raw image according to the HDD_SIZE
+  /usr/bin/qemu-img resize ${VM_NAME}/${VM_NAME}.img ${HDD_SIZE}G
 
   INSTALL_FLAG+=" --noautoconsole"
 else
