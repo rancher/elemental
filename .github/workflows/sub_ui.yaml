@@ -85,6 +85,7 @@ jobs:
     env:
       CLUSTER_NAME: ${{ inputs.cluster_name }}
       CLUSTER_NS: ${{ inputs.cluster_namespace }}
+      CYPRESS_TAGS: ${{ inputs.cypress_tags }}
       # QASE variables
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
       QASE_PROJECT_CODE: ${{ inputs.qase_project_code }}
@@ -223,19 +224,25 @@ jobs:
           path: tests/cypress/latest/videos
           retention-days: 7
 
-      - name: Deploy a node to join Rancher manager
+      - name: Deploy nodes to join Rancher manager
         id: deploy_node_ui
         env:
           BOOT_TYPE: ${{ inputs.boot_type }}
-          VM_INDEX: 1
-          VM_MEM: 8192
-          HOST_MEMORY_RESERVED: 49152
+          POOL: master
+          VM_MEM: 10240
+          VM_CPU: 6
         run: |
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-            make e2e-ui-rancher
+            # Enable multi-nodes only for main scenario
+            if ${{ contains(inputs.cypress_tags, 'main') }}; then
+              export VM_NUMBERS=3
+            else
+              export VM_NUMBERS=1
+            fi
+            VM_INDEX=1 make e2e-ui-rancher
           )
 
       # Advanced means tests which needs an extra elemental node (provisioned with libvirt)

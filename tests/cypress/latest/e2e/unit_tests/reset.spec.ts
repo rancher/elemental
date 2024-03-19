@@ -27,6 +27,7 @@ filterTests(['main'], () => {
     const proxy                = "http://172.17.0.1:3128" 
     const uiAccount            = Cypress.env('ui_account');
     const uiPassword           = "rancherpassword"
+    const vmNumber             = 3;
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -39,14 +40,16 @@ filterTests(['main'], () => {
       qase(54,
         it('Enable reset in machine inventory', () => {
           cy.clickNavMenu(["Inventory of Machines"]);
-          cy.getBySel('sortable-table-0-action-button').click();
-          cy.contains('Edit YAML').click();
-          cy.contains('annotations').as('anno')
-          cy.get('@anno').click(0,0)
-          cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
-          cy.getBySel('action-button-async-button')
-          .contains('Save')
-          .click();
+          for (let i = 0; i < vmNumber; i++) {
+            cy.getBySel(`sortable-table-${i}-action-button`).click();
+            cy.contains('Edit YAML').click();
+            cy.contains('annotations').as('anno')
+            cy.get('@anno').click(0,0)
+            cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
+            cy.getBySel('action-button-async-button')
+              .contains('Save')
+              .click();
+          }
       }));
     };
 
@@ -63,8 +66,10 @@ filterTests(['main'], () => {
         cypressLib.accesMenu('OS Management');
         cy.clickNavMenu(["Inventory of Machines"]);
         cy.contains('There are no rows to show.');
-        cy.getBySel('sortable-table-0-row', { timeout: 180000 })
-          .contains('Active', { timeout: 180000 });
+        for (let i = 0; i < vmNumber; i++) {
+          cy.getBySel(`sortable-table-${i}-row`, { timeout: 180000 })
+            .contains('Active', { timeout: 180000 });
+        }
     }));
 
     qase(30,

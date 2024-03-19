@@ -26,4 +26,4 @@ config:
         type: btrfs
       poweroff: true
       debug: true
-machineName: my-machine
+machineName: ${System Data/Runtime/Hostname}

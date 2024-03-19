@@ -41,7 +41,7 @@ filterTests(['main', 'upgrade'], () => {
     
     qase(12,
       it('Enable extension support', () => {
-        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true, isRancherManagerVersion('head')) : cypressLib.enableExtensionSupport(false, isRancherManagerVersion('head'));
+        isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
       })
     );
   

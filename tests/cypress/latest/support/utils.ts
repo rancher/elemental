@@ -40,6 +40,15 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
     .type(clusterName);
   cy.getBySel('name-ns-description-description')
     .type('My Elemental testing cluster');
+  cy.contains('.labeled-input.create', 'Machine Count')
+    .clear()
+  if (isCypressTag('main')) {
+    cy.contains('.labeled-input.create', 'Machine Count')
+      .type('3');
+  } else {
+    cy.contains('.labeled-input.create', 'Machine Count')
+      .type('1');
+  }
   cy.contains('Show deprecated Kubernetes')
     .click();
   cy.contains('Kubernetes Version')
@@ -53,22 +62,22 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
     cy.get('#agentEnv > .key-value')
       .contains('Add')
       .click();
-    cy.get('.key > input')
+    cy.getBySel('input-kv-item-key-0')
       .type('HTTP_PROXY');
-    cy.get('.no-resize')
+    cy.getBySel('kv-item-value-0')
       .type(proxy);
     cy.get('#agentEnv > .key-value')
       .contains('Add')
       .click();
-    cy.get(':nth-child(7) > input')
+    cy.getBySel('input-kv-item-key-1')
       .type('HTTPS_PROXY');
-    cy.get(':nth-child(8) > > [data-testid="text-area-auto-grow"]').type(proxy);
+    cy.getBySel('kv-item-value-1').type(proxy);
     cy.get('#agentEnv > .key-value')
       .contains('Add')
       .click();
-    cy.get(':nth-child(10) > input')
+    cy.getBySel('input-kv-item-key-2')
       .type('NO_PROXY');
-    cy.get(':nth-child(11) > > [data-testid="text-area-auto-grow"]')
+    cy.getBySel('kv-item-value-2')
       .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
     }
   cy.clickButton('Create');
