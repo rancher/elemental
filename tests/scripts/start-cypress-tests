@@ -36,6 +36,7 @@ docker run -v $PWD:/workdir -w /workdir               \
     -e UI_ACCOUNT=$UI_ACCOUNT                         \
     -e UPGRADE_IMAGE=$UPGRADE_IMAGE                   \
     -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL         \
+    -e VM_NUMBER=$VM_END                              \
     --add-host host.docker.internal:host-gateway      \
     --ipc=host                                        \
     $CYPRESS_DOCKER                                   \

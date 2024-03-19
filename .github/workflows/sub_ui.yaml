@@ -100,6 +100,8 @@ jobs:
       K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_DOWNSTREAM_VERSION: ${{ inputs.k8s_downstream_version }}
+      VM_END: 3
+      VM_START: 1
     steps:
       - name: Checkout
         id: checkout
@@ -221,19 +223,19 @@ jobs:
           path: tests/cypress/latest/videos
           retention-days: 7
 
-      - name: Deploy a node to join Rancher manager
+      - name: Deploy nodes to join Rancher manager
         id: deploy_node_ui
         env:
           BOOT_TYPE: ${{ inputs.boot_type }}
-          VM_INDEX: 1
-          VM_MEM: 8192
-          HOST_MEMORY_RESERVED: 49152
+          POOL: master
+          VM_MEM: 10240
+          VM_CPU: 6
         run: |
           cd tests && (
             # Removing 'downloads' is needed to avoid this error during 'make':
             # 'pattern all: open .../elemental/tests/cypress/downloads: permission denied'
             sudo rm -rf cypress/latest/downloads
-            make e2e-ui-rancher
+            VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-ui-rancher
           )
 
       # Advanced means tests which needs an extra elemental node (provisioned with libvirt)
