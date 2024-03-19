@@ -59,9 +59,6 @@ on:
       snap_type:
         required: true
         type: string
-      test_description:
-        required: true
-        type: string
       test_type:
         required: true
         type: string
@@ -210,4 +207,3 @@ jobs:
           rancher_version: ${{ inputs.rancher_version }}
           snap_type: ${{ inputs.snap_type }}
           test_type: ${{ inputs.test_type }}
-          test_description: ${{ inputs.test_description }}

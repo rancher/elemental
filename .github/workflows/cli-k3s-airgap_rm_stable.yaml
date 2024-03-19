@@ -18,7 +18,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI - CLI - Airgap K3S - RM Stable"
       cluster_name: airgap-cluster
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       test_type: airgap

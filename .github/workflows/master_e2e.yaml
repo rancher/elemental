@@ -93,10 +93,6 @@ on:
         description: Type to use for snapshot partitions (btrfs/loopdevice)
         default: btrfs
         type: string
-      test_description:
-        description: Short description of the test
-        default: Unknown
-        type: string
       test_type:
         description: Type of test to run (cli/ui)
         required: true
@@ -227,7 +223,6 @@ jobs:
       runner_label: ${{ needs.create-runner.outputs.runner_label }}
       sequential: ${{ inputs.sequential }}
       snap_type: ${{ inputs.snap_type }}
-      test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}

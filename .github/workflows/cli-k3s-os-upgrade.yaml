@@ -44,7 +44,6 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
-      test_description: "Manual - CLI - Parallel - OS Upgrade test with Standard K3s"
       cluster_name: cluster-k3s
       destroy_runner: ${{ inputs.destroy_runner }}
       node_number: 5

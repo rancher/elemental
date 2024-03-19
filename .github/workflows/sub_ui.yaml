@@ -59,9 +59,6 @@ on:
       runner_label:
         required: true
         type: string
-      test_description:
-        required: true
-        type: string
       ui_account:
         required: true
         type: string
@@ -341,7 +338,6 @@ jobs:
           rancher_version: ${{ inputs.rancher_version }}
           sequential: ${{ inputs.sequential }}
           test_type: ${{ inputs.test_type }}
-          test_description: ${{ inputs.test_description }}
           ui_account: ${{ inputs.ui_account }}
           upgrade_image: ${{ inputs.upgrade_image }}
           upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

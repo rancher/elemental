@@ -44,7 +44,6 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
     with:
-      test_description: "Manual - CLI - Parallel - OS Upgrade test with Standard RKE2"
       ca_type: private
       cluster_name: cluster-rke2
       destroy_runner: ${{ inputs.destroy_runner }}

@@ -26,7 +26,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      test_description: "CI/Manual - UI - Deployment test with Standard K3s"
       boot_type: iso
       cluster_name: cluster-k3s
       cypress_tags: main

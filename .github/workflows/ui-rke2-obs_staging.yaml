@@ -25,7 +25,6 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
-      test_description: "Manual - Fully customizable - UI - IBS/OBS Deployment test with Standard RKE2"
       boot_type: raw
       ca_type: private
       cluster_name: cluster-rke2
