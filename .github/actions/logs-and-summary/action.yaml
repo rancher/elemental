@@ -86,6 +86,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Get Epoch time
+      id: date
+      shell: bash
+      run: echo "epoch=$(date +'%s')" >> ${GITHUB_OUTPUT}
+
     - name: Get logs
       env:
         ELEMENTAL_SUPPORT: https://github.com/rancher/elemental-operator/releases/download/v1.3.4/elemental-support_1.3.4_linux_amd64
@@ -103,7 +108,8 @@ runs:
     - name: Upload logs
       uses: actions/upload-artifact@v4
       with:
-        name: support-logs
+        # Use PUBLIC_FQDN to avoid issue with parallel jobs, as it is unique
+        name: support-logs-${{ inputs.public_fqdn }}-${{ steps.date.outputs.epoch }}
         path: tests/**/logs/*
         if-no-files-found: ignore
 
