@@ -2,9 +2,9 @@
 # Define the names/tags of the container
 #!ExclusiveArch: x86_64
 #!BuildName: SL-Micro-rt-container
-#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:latest
-#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:%VERSION%
-#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-container-image:%VERSION%-%RELEASE%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-os-container:latest
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-os-container:%VERSION%
+#!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-os-container:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
 #!UseOBSRepositories
 
