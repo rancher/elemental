@@ -83,8 +83,11 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 			_, macAdrs := GetNodeInfo(hostName)
 			Expect(macAdrs).To(Not(BeEmpty()))
 
+			client, _ := GetNodeInfo(hostName)
+			Expect(client).To(Not(BeNil()))
+
 			wg.Add(1)
-			go func(s, h, m string, i int) {
+			go func(s, h, m string, i int, cl *tools.Client) {
 				defer wg.Done()
 				defer GinkgoRecover()
 
@@ -95,8 +98,27 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 					// Execute node deployment in parallel
 					err := exec.Command(s, h, m).Run()
 					Expect(err).To(Not(HaveOccurred()))
+
+					if rawBoot {
+						// The VM will boot first on the recovery partition to create the normal partition
+						// No need to check the recovery process
+						// Only make sure the VM is up and running on the normal partition
+						CheckSSH(cl)
+
+						// Wait for the end of the elemental-register process
+						Eventually(func() error {
+							_, err := cl.RunSSH("(journalctl --no-pager -u elemental-register.service) | grep -Eiq 'Finished Elemental Register'")
+							return err
+						}, tools.SetTimeout(4*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+
+						// Wait a bit more to be sure the VM is ready and halt it
+						time.Sleep(1 * time.Minute)
+						err := exec.Command("sudo", "virsh", "destroy", vmName).Run()
+						Expect(err).To(Not(HaveOccurred()))
+					}
+
 				})
-			}(installVMScript, hostName, macAdrs, index)
+			}(installVMScript, hostName, macAdrs, index, client)
 
 			// Wait a bit before starting more nodes to reduce CPU and I/O load
 			bootstrappedNodes = misc.WaitNodesBoot(index, vmIndex, bootstrappedNodes, numberOfNodesMax)

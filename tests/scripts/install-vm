@@ -70,8 +70,8 @@ elif [[ ${BOOT_TYPE} == "raw" ]]; then
   # We need to resize the raw image according to the HDD_SIZE
   /usr/bin/qemu-img resize ${RAW_IMAGE} ${HDD_SIZE}G
 
-  # Soft-link the ISO to avoid "Could not define storage pool" error
-  ln -s ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
+  # Duplicate the raw image depending on nodes number
+  cp ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
 
   INSTALL_FLAG+=" --noautoconsole"
 else
