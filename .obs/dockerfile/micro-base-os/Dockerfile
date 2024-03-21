@@ -5,7 +5,7 @@
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container:%VERSION%
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/base-os-container:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 8
-#
+#!UseOBSRepositories
 
 ARG SLMICRO_VERSION
 
