@@ -9,7 +9,7 @@
 
 ARG SLMICRO_VERSION
 
-FROM suse/sl-micro/${SLMICRO_VERSION}/toolbox:latest as host
+FROM suse/sle-micro/${SLMICRO_VERSION}/toolbox:latest as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
