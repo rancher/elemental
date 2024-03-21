@@ -5,6 +5,7 @@
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-iso-image:%VERSION%-%RELEASE%
 #!BuildConstraint: hardware:disk:size unit=G 10
 #!BuildConstraint: hardware:memory:size unit=G 16
+#!UseOBSRepositories
 
 ARG SLMICRO_VERSION
 
