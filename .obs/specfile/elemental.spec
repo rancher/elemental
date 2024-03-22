@@ -67,9 +67,6 @@ cp -a framework/files/* %{buildroot}
 
 rm -rf %{buildroot}/var/log/journal
 
-# remove placeholders
-rm -rf %{buildroot}/usr/libexec/.placeholder
-
 %pre
 %if 0%{?suse_version}
 %service_add_pre elemental-populate-node-labels.service
@@ -159,7 +156,8 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %{_unitdir}/elemental-populate-node-labels.service
 %{_unitdir}/elemental-system-agent.service
 %{_sbindir}/elemental-populate-node-labels
-%dir /usr/libexec
+%dir %{_libexecdir}/elemental-checker
+%{_libexecdir}/elemental-checker/network-online.sh
 %dir %{systemdir}
 %dir %{oemdir}
 %{oemdir}/*
