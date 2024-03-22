@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+#!ExclusiveArch: x86_64
 #!BuildName: build-rt-iso-image
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-iso-image:latest
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/rt-iso-image:%VERSION%
