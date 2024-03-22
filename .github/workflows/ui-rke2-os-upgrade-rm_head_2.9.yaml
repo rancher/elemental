@@ -40,5 +40,5 @@ jobs:
       rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.9' }}
       test_type: ui
       ui_account: user
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sle-micro/sle-micro-container-6.0:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
       upgrade_os_channel: dev
