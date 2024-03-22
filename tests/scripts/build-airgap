@@ -127,7 +127,7 @@ RANCHER_MANAGER_VERSION=$(ls rancher-*.tgz 2>/dev/null)
 RANCHER_MANAGER_VERSION=${RANCHER_MANAGER_VERSION#rancher-*}
 RANCHER_MANAGER_VERSION=${RANCHER_MANAGER_VERSION%.*}
 
-# Temporary thing to get latest version of sle-micro-iso (very ugly...)
+# Get the Elemental repositories
 ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
 curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
