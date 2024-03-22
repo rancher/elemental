@@ -40,6 +40,10 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
     .type(clusterName);
   cy.getBySel('name-ns-description-description')
     .type('My Elemental testing cluster');
+  cy.contains('.labeled-input.create', 'Machine Count')
+    .clear()
+  cy.contains('.labeled-input.create', 'Machine Count')
+    .type(Cypress.env('vm_number'));
   cy.contains('Show deprecated Kubernetes')
     .click();
   cy.contains('Kubernetes Version')

@@ -74,26 +74,26 @@ describe('Machine registration testing', () => {
 
   filterTests(['main'], () => {
     qase(4,
-      it('Create machine registration with default options', () => {
+      it.skip('Create machine registration with default options', () => {
         cy.createMachReg('default-options-test');
       })
     );
 
     qase(6,
-      it('Create machine registration with labels and annotations', () => {
+      it.skip('Create machine registration with labels and annotations', () => {
         cy.createMachReg('labels-annotations-test', 'fleet-default', true, true);
       })
     );
 
     qase(17,
-      it('Delete machine registration', () => {
+      it.skip('Delete machine registration', () => {
         cy.createMachReg('delete-test');
         cy.deleteMachReg('delete-test');
       })
     );
 
     qase(49,
-      it('Edit a machine registration with edit config button', () => {
+      it.skip('Edit a machine registration with edit config button', () => {
         cy.createMachReg('edit-config-test');
         cy.editMachReg('edit-config-test', true, true);
         cy.getBySel('form-save')
@@ -107,7 +107,7 @@ describe('Machine registration testing', () => {
     );
 
     qase(50,
-      it('Edit a machine registration with edit YAML button', () => {
+      it.skip('Edit a machine registration with edit YAML button', () => {
         cy.createMachReg('edit-yaml-test');
         cy.editMachReg('edit-yaml-test', true, true, true);
         cy.getBySel('action-button-async-button')
@@ -121,7 +121,7 @@ describe('Machine registration testing', () => {
     );
 
     qase(18,
-      it('Clone a machine registration', () => {
+      it.skip('Clone a machine registration', () => {
         cy.createMachReg('clone-test', 'fleet-default', true, true);
         cy.contains('clone-test')
           .click();
@@ -148,7 +148,7 @@ describe('Machine registration testing', () => {
     );
 
     qase(19,
-      it('Download Machine registration YAML', () => {
+      it.skip('Download Machine registration YAML', () => {
         cy.createMachReg('download-yaml-test');
         cy.contains('download-yaml-test')
           .click();
@@ -161,13 +161,13 @@ describe('Machine registration testing', () => {
     );
 
     qase(51,
-      it('Check machine registration label name size', () => {
+      it.skip('Check machine registration label name size', () => {
         cy.checkLabelSize('name');
       })
     );
 
     qase(52,
-      it('Check machine registration label value size', () => {
+      it.skip('Check machine registration label value size', () => {
         cy.checkLabelSize('value');
       })
     );

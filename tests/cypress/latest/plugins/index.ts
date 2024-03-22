@@ -46,6 +46,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.upgrade_image          = process.env.UPGRADE_IMAGE;
   config.env.upgrade_os_channel     = process.env.UPGRADE_OS_CHANNEL;
   config.env.username               = process.env.RANCHER_USER;
+  config.env.vm_number              = process.env.VM_NUMBER;
 
   return config;
 };
