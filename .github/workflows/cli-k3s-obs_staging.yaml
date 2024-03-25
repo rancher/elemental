@@ -19,10 +19,6 @@ on:
         default: stable/latest/none
         type: string
 
-concurrency:
-  group: e2e-k3s-obs-staging-${{ github.head_ref || github.ref }}-${{ github.repository }}
-  cancel-in-progress: true
-
 jobs:
   cli:
     uses: ./.github/workflows/master_e2e.yaml
