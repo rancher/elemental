@@ -35,6 +35,9 @@ on:
       operator_repo:
         required: true
         type: string
+      os_to_test:
+        required: true
+        type: string
       public_domain:
         required: true
         type: string
@@ -150,6 +153,7 @@ jobs:
         env:
           CLUSTER_NUMBER: ${{ inputs.cluster_number }}
           BOOT_TYPE: ${{ inputs.boot_type }}
+          OS_TO_TEST: ${{ inputs.os_to_test }}
         run: |
           # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
           if ${{ contains(inputs.k8s_upstream_version, 'rke') }}; then
@@ -187,6 +191,7 @@ jobs:
           k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
           k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
           operator_version: ${{ steps.component.outputs.operator_version }}
+          os_to_test: ${{ inputs.os_to_test }}
           os_version: ${{ steps.iso_version.outputs.os_version }}
           public_fqdn: ${{ inputs.public_fqdn }}
           rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
