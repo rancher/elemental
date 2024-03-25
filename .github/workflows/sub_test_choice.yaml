@@ -182,6 +182,7 @@ jobs:
       cluster_type: ${{ inputs.cluster_type }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
+      os_to_test: ${{ inputs.os_to_test }}
       public_domain: ${{ inputs.public_domain }}
       public_fqdn: ${{ inputs.public_fqdn }}
       qase_project_code: ${{ inputs.qase_project_code }}
