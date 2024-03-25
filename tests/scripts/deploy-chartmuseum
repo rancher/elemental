@@ -8,6 +8,9 @@ set -e -x
 # Add missing PATH, removed in recent distributions for security reasons...
 PATH+=:/usr/local/bin
 
+# Variables
+REPO=$1
+
 # Create a systemctl file for chartmuseum
 cat > /etc/systemd/system/chartmuseum.service << EOF
 [Unit]
@@ -42,8 +45,8 @@ helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add chartmuseum http://localhost:8080
 
 # Download needed helm charts
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-crds-chart
-helm pull oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher/elemental-operator-chart
+helm pull $REPO/elemental-operator-crds-chart
+helm pull $REPO/elemental-operator-chart
 
 # Extract helm charts
 tar -xvzf elemental-operator-crds-*

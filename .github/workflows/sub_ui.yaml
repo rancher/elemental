@@ -163,15 +163,17 @@ jobs:
 
       - name: Install Chartmuseum
         id: install_chartmuseum
+        env: 
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
         run: |
           cd tests && make e2e-install-chartmuseum
           # Extract latest dev operator version
-          OPERATOR_DEV_CHART=$(ls elemental-operator-chart*)
-          i=${OPERATOR_DEV_CHART##*-}
-          OPERATOR_DEV_VERSION=${i%.tgz}
+          OPERATOR_CHART=$(ls elemental-operator-chart*)
+          i=${OPERATOR_CHART##*-}
+          OPERATOR_VERSION=${i%.tgz}
 
           # Export value
-          echo "operator_dev_version=${OPERATOR_DEV_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "chartmuseum_operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
 
       # Basics means tests without an extra elemental node needed
       - name: Cypress tests - Basics
