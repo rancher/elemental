@@ -157,7 +157,7 @@ rm -rf %{buildroot}/var/log/journal
 %{_unitdir}/elemental-system-agent.service
 %{_sbindir}/elemental-populate-node-labels
 %dir %{_libexecdir}/elemental-checker
-%{_libexecdir}/elemental-checker/network-online.sh
+%{_libexecdir}/elemental-checker/elemental-register.sh
 %dir %{systemdir}
 %dir %{oemdir}
 %{oemdir}/*
