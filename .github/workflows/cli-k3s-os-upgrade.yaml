@@ -32,10 +32,6 @@ on:
         default: dev
         type: string
 
-concurrency:
-  group: cli-k3s-os-upgrade-${{ github.head_ref || github.ref }}-${{ github.repository }}
-  cancel-in-progress: true
-
 jobs:
   cli:
     uses: ./.github/workflows/master_e2e.yaml

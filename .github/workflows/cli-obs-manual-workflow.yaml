@@ -44,10 +44,6 @@ on:
         default: false
         type: boolean
 
-concurrency:
-  group: cli-obs-manual-workflow-${{ github.head_ref || github.ref }}-${{ github.repository }}
-  cancel-in-progress: true
-
 jobs:
   cli:
     uses: ./.github/workflows/master_e2e.yaml
