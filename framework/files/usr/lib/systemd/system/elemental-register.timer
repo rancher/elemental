@@ -1,6 +1,9 @@
 [Unit]
 Description=Run elemental-register every 30 minutes
 Documentation=https://elemental.docs.rancher.com
+# Do not run the timer for installation media or recovery system
+ConditionPathExists=!/run/elemental/live_mode
+ConditionPathExists=!/run/elemental/recovery_mode
 
 [Timer]
 OnStartupSec=5
