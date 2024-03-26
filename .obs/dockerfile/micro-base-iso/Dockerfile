@@ -23,6 +23,7 @@ RUN zypper --installroot /busybox in --no-recommends -y busybox
 
 # Version value is taken form the elemental repository tags
 # Release value of this image and os image are unrelated
+# must be ...<flavor>.<arch>... for OBS
 RUN elemental --debug --config-dir . build-iso -o /output -n "sl-micro-%%SLMICRO_VERSION%%-base.$(uname -m)-%VERSION%-Build%RELEASE%" dir:rootfs
 
 # Only keep the ISO as a result and busybox
