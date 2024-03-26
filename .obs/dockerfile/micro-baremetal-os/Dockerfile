@@ -74,4 +74,4 @@ RUN rm -rf /var/log/update* && \
     rm -rf /boot/vmlinux*
 
 # Rebuild initrd to setup dracut with the boot configurations
-RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup
+RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
