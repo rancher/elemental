@@ -169,7 +169,10 @@ jobs:
           # Extract OS version from ISO
           ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
           if [[ -n "${ISO}" ]]; then
-            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name initrd -print 2>/dev/null)
+            [[ "${{ inputs.os_to_test }}" == "dev" ]] \
+              && INITRD_NAME="elemental.initrd*" \
+              || INITRD_NAME="initrd"
+            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name ${INITRD_NAME} -print 2>/dev/null)
             isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
               | xz -dc \
               | cpio -i --to-stdout usr/lib/initrd-release > os-release
