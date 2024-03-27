@@ -2,6 +2,7 @@
 name: UI-K3s
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       destroy_runner:
@@ -45,7 +46,7 @@ jobs:
       boot_type: iso
       ca_type: selfsigned
       cypress_tags: main
-      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      #destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       elemental_ui_version: dev
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}

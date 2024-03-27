@@ -2,6 +2,7 @@
 name: CLI-K3s
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       ca_type:
@@ -71,7 +72,7 @@ jobs:
     with:
       ca_type: ${{ matrix.ca_type }}
       cluster_type: ${{ matrix.cluster_type }}
-      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      #destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
       rancher_version: ${{ matrix.rancher_version }}
