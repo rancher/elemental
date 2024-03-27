@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# This script extracts the kernel and initrd files from an ISO image
+
+set -e -x
+
+# Cleaning function
+function clean_and_exit() {
+  typeset ERR_MSG="$@"
+
+  sudo umount ${TMP_DIR} >/dev/null 2>&1 \
+    || error "Cannot unmount ${TMP_DIR}!"
+  rmdir ${TMP_DIR} \
+    || error "Cannot delete ${TMP_DIR}!"
+  [[ -n "${ERR_MSG}" ]] \
+    && error "${ERR_MSG}"
+
+  exit 0
+}
+
+# Error function
+function error() {
+  echo -e "$@" >&2
+  exit 1
+}
+
+# Variables
+typeset ISO_FILE=$1
+typeset FILENAME=${ISO_FILE%.iso}
+
+# ISO must be provided!
+[[ -z "${ISO_FILE}" ]] && error "ISO filename must be provided!"
+
+# Loop mount the ISO to get the file
+TMP_DIR=$(mktemp -d ${0##*/}.XXXXXXXXXX)
+sudo mount -o loop ${ISO_FILE} ${TMP_DIR} >/dev/null 2>&1 \
+  || error "Cannot mount ISO file ${ISO_FILE}"
+
+# Extract initrd, kernel and squashfs
+for I in initrd linux squashfs; do
+  # Squashfs is a little bit different
+  [[ "${I}" == "squashfs" ]] && NAME="rootfs.squashfs" || NAME=${I}
+
+  # Extract file
+  find -L ${TMP_DIR} -name ${NAME} -exec sudo cp {} ${FILENAME}-${I} \;
+
+  # Just check that each needed files are here and not empty
+  if [[ ! -s "${FILENAME}-${I}" ]]; then
+    clean_and_exit "File ${FILENAME}-${I} does not exist or is empty!"
+  fi
+
+  # Fix owner/permissions
+  sudo chown $(id -u):$(id -g) ${FILENAME}-${I} \
+    || error "Cannot change owner for ${FILENAME}-${I}!"
+  chmod 644 ${FILENAME}-${I} \
+    || error "Cannot change permissions for ${FILENAME}-${I}!"
+done
+
+# Clean all
+clean_and_exit

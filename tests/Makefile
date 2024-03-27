@@ -14,22 +14,16 @@ ifeq ($(TEST_TYPE),multi)
 endif
 
 extract_kernel_init_squash:
-	@VAR=$(ISO); \
-	INITRD_FILE=$$(isoinfo -R -i $(ISO) -find -type f -name initrd -print 2>/dev/null); \
-	KERNEL_FILE=$$(isoinfo -R -i $(ISO) -find -type f -name kernel -print 2>/dev/null); \
-	[[ -z "$${KERNEL_FILE}" ]] && KERNEL_FILE=$$(isoinfo -R -i $(ISO) -find -type f -name linux -print 2>/dev/null); \
-	isoinfo -x /rootfs.squashfs -R -i $(ISO) > $${VAR/\.iso/.squashfs} 2>/dev/null; \
-	isoinfo -x $${INITRD_FILE} -R -i $(ISO) > $${VAR/\.iso/-initrd} 2>/dev/null; \
-	isoinfo -x $${KERNEL_FILE} -R -i $(ISO) > $${VAR/\.iso/-kernel} 2>/dev/null
+	@./scripts/get-boot-files-for-pxe $(ISO)
 
 ipxe:
 	@VAR=$(notdir $(ISO)); \
 	echo "#!ipxe" > $(IPXE); \
 	echo "set arch amd64" >> $(IPXE); \
 	echo "set url tftp://10.0.2.2/$${VAR##*/}" >> $(IPXE); \
-	echo "set kernel $${VAR/\.iso/-kernel}" >> $(IPXE); \
+	echo "set kernel $${VAR/\.iso/-linux}" >> $(IPXE); \
 	echo "set initrd $${VAR/\.iso/-initrd}" >> $(IPXE); \
-	echo "set rootfs $${VAR/\.iso/.squashfs}" >> $(IPXE); \
+	echo "set rootfs $${VAR/\.iso/-squashfs}" >> $(IPXE); \
 	echo "# set config http://example.com/machine-config" >> $(IPXE); \
 	echo "# set cmdline cos.setup=/run/initramfs/live/cloud-config extra.values=1" >> $(IPXE); \
 	echo "initrd \$${url}/\$${initrd}" >> $(IPXE); \
