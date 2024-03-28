@@ -22,4 +22,6 @@ spec:
         poweroff: true
         device: /dev/sda
         debug: true
+        snapshotter:
+          type: %SNAP_TYPE%
   machineName: ${System Data/Runtime/Hostname}

@@ -56,6 +56,9 @@ on:
       runner_label:
         required: true
         type: string
+      snap_type:
+        required: true
+        type: string
       test_description:
         required: true
         type: string
@@ -151,8 +154,9 @@ jobs:
       - name: Deploy multiple clusters (with 3 nodes by cluster)
         id: deploy_multi_clusters
         env:
-          CLUSTER_NUMBER: ${{ inputs.cluster_number }}
           BOOT_TYPE: ${{ inputs.boot_type }}
+          CLUSTER_NUMBER: ${{ inputs.cluster_number }}
+          SNAP_TYPE: ${{ inputs.snap_type }}
           OS_TO_TEST: ${{ inputs.os_to_test }}
         run: |
           # Set RAM to 10GB for RKE2 and vCPU to 6, a bit more than the recommended values
@@ -199,5 +203,6 @@ jobs:
           public_fqdn: ${{ inputs.public_fqdn }}
           rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
           rancher_version: ${{ inputs.rancher_version }}
+          snap_type: ${{ inputs.snap_type }}
           test_type: ${{ inputs.test_type }}
           test_description: ${{ inputs.test_description }}

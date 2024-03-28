@@ -64,6 +64,9 @@ inputs:
   sequential:
     default: "Unknown"
     type: boolean
+  snap_type:
+    default: "btrfs"
+    type: string
   test_description:
     default: "Unknown"
     type: string
@@ -148,17 +151,18 @@ runs:
 
         # Add summary: Elemental
         echo "### Elemental" >> ${GITHUB_STEP_SUMMARY}
-        echo "Elemental ISO image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "Elemental OS version: ${{ inputs.os_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental ISO Image: ${{ inputs.os_to_test }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Elemental OS Version: ${{ inputs.os_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental Operator Image: ${{ inputs.operator_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental Backup/Restore Operator Image: ${{ inputs.backup_operator_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental UI Extension Version: ${{ inputs.elemental_ui_version }}" >> ${GITHUB_STEP_SUMMARY}
         echo "Elemental UI User: ${{ inputs.ui_account }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "OS Image Snapshot Type: ${{ inputs.snap_type }}" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Kubernetes
         echo "### Kubernetes" >> ${GITHUB_STEP_SUMMARY}
-        echo "K8s upstream version: ${{ inputs.k8s_upstream_version }}" >> ${GITHUB_STEP_SUMMARY}
-        echo "K8s downstream version: ${{ inputs.k8s_downstream_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s Upstream Version: ${{ inputs.k8s_upstream_version }}" >> ${GITHUB_STEP_SUMMARY}
+        echo "K8s Downstream Version: ${{ inputs.k8s_downstream_version }}" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Cluster
         echo "### Cluster nodes" >> ${GITHUB_STEP_SUMMARY}
@@ -173,5 +177,5 @@ runs:
           echo "Rancher Manager Image: ${{ inputs.rancher_image_version_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Rancher Manager Version: ${{ inputs.rancher_upgrade }}" >> ${GITHUB_STEP_SUMMARY}
           echo "Channel: ${{ inputs.upgrade_os_channel }}" >> ${GITHUB_STEP_SUMMARY}
-          echo "Upgrade image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
+          echo "Upgrade Image: ${{ inputs.upgrade_image }}" >> ${GITHUB_STEP_SUMMARY}
         fi

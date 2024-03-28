@@ -116,6 +116,10 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 						value: pool,
 					},
 					{
+						key:   "%SNAP_TYPE%",
+						value: snapType,
+					},
+					{
 						key:   "%USER%",
 						value: userName,
 					},

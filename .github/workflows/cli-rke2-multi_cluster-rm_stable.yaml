@@ -34,4 +34,5 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
       test_type: multi
+      snap_type: loopdevice
       zone: us-central1-b

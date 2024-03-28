@@ -25,4 +25,5 @@ jobs:
       k8s_downstream_version: v1.27.8+rke2r1
       k8s_upstream_version: v1.26.10+rke2r2
       rancher_version: latest/devel/2.8
+      snap_type: loopdevice
       test_type: cli

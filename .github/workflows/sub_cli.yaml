@@ -74,6 +74,9 @@ on:
       sequential:
         required: true
         type: boolean
+      snap_type:
+        required: true
+        type: string
       test_description:
         required: true
         type: string
@@ -201,6 +204,8 @@ jobs:
 
       - name: Configure Rancher and Libvirt
         id: configure_rancher
+        env:
+          SNAP_TYPE: ${{ inputs.snap_type }}
         run: cd tests && make e2e-configure-rancher
 
       - name: Create ISO image for master pool
@@ -436,6 +441,7 @@ jobs:
           rancher_upgrade: ${{ inputs.rancher_upgrade }}
           rancher_version: ${{ inputs.rancher_version }}
           sequential: ${{ inputs.sequential }}
+          snap_type: ${{ inputs.snap_type }}
           test_type: ${{ inputs.test_type }}
           test_description: ${{ inputs.test_description }}
           upgrade_image: ${{ inputs.upgrade_image }}
