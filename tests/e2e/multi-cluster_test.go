@@ -54,6 +54,10 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 				value: k8sDownstreamVersion,
 			},
 			{
+				key:   "%SNAP_TYPE%",
+				value: snapType,
+			},
+			{
 				key:   "%PASSWORD%",
 				value: userPassword,
 			},

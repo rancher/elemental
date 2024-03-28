@@ -54,4 +54,6 @@ spec:
           values:
           - 25Gi
         debug: true
+        snapshotter:
+          type: %SNAP_TYPE%
   machineName: %VM_NAME%-${System Information/UUID}

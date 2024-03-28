@@ -89,6 +89,10 @@ on:
         description: Defines if bootstrapping is done sequentially (true) or in parallel (false)
         default: false
         type: boolean
+      snap_type:
+        description: Type to use for snapshot partitions (btrfs/loopdevice)
+        default: btrfs
+        type: string
       test_description:
         description: Short description of the test
         default: Unknown
@@ -222,6 +226,7 @@ jobs:
       reset: ${{ inputs.reset }}
       runner_label: ${{ needs.create-runner.outputs.runner_label }}
       sequential: ${{ inputs.sequential }}
+      snap_type: ${{ inputs.snap_type }}
       test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       ui_account: ${{ inputs.ui_account }}

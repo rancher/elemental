@@ -43,4 +43,5 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       reset: true
+      snap_type: loopdevice
       test_type: cli

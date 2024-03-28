@@ -38,6 +38,9 @@ on:
       runner_label:
         required: true
         type: string
+      snap_type:
+        required: true
+        type: string
       test_description:
         required: true
         type: string
@@ -119,6 +122,8 @@ jobs:
 
       - name: Configure Rancher and Libvirt
         id: configure_rancher
+        env:
+          SNAP_TYPE: ${{ inputs.snap_type }}
         run: cd tests && make e2e-configure-rancher
 
       - name: Extract component versions/informations
@@ -201,5 +206,6 @@ jobs:
           os_version: ${{ steps.iso_version.outputs.os_version }}
           rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
           rancher_version: ${{ inputs.rancher_version }}
+          snap_type: ${{ inputs.snap_type }}
           test_type: cli
           test_description: ${{ inputs.test_description }}

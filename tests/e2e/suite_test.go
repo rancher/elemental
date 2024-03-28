@@ -64,7 +64,6 @@ var (
 	clusterYaml               string
 	elementalSupport          string
 	emulateTPM                bool
-	rancherHostname           string
 	isoBoot                   bool
 	k8sUpstreamVersion        string
 	k8sDownstreamVersion      string
@@ -78,6 +77,7 @@ var (
 	proxy                     string
 	rancherChannel            string
 	rancherHeadVersion        string
+	rancherHostname           string
 	rancherLogCollector       string
 	rancherVersion            string
 	rancherUpgrade            string
@@ -89,6 +89,7 @@ var (
 	seedImageYaml             string
 	selectorYaml              string
 	sequential                bool
+	snapType                  string
 	testCaseID                int64
 	testType                  string
 	upgradeImage              string
@@ -407,7 +408,6 @@ var _ = BeforeSuite(func() {
 	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM := os.Getenv("EMULATE_TPM")
-	rancherHostname = os.Getenv("PUBLIC_FQDN")
 	index := os.Getenv("VM_INDEX")
 	k8sDownstreamVersion = os.Getenv("K8S_DOWNSTREAM_VERSION")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
@@ -418,10 +418,12 @@ var _ = BeforeSuite(func() {
 	os2Test = os.Getenv("OS_TO_TEST")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
+	rancherHostname = os.Getenv("PUBLIC_FQDN")
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	rancherUpgrade = os.Getenv("RANCHER_UPGRADE")
 	seqString := os.Getenv("SEQUENTIAL")
+	snapType = os.Getenv("SNAP_TYPE")
 	testType = os.Getenv("TEST_TYPE")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
 	upgradeOSChannel = os.Getenv("UPGRADE_OS_CHANNEL")

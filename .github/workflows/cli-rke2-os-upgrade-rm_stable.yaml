@@ -30,6 +30,7 @@ jobs:
       os_to_test: stable
       rancher_upgrade: latest/devel/2.8
       rancher_version: stable/latest/none
+      snap_type: loopdevice
       test_type: cli
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
       upgrade_os_channel: dev

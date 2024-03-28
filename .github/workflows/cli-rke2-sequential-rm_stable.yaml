@@ -31,4 +31,5 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: stable/latest/none
       sequential: true
+      snap_type: loopdevice
       test_type: cli
