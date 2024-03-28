@@ -89,9 +89,6 @@ on:
       snap_type:
         required: true
         type: string
-      test_description:
-        required: true
-        type: string
       test_type:
         required: true
         type: string
@@ -132,7 +129,6 @@ jobs:
       rancher_version: ${{ inputs.rancher_version }}
       runner_label: ${{ inputs.runner_label }}
       snap_type: ${{ inputs.snap_type }}
-      test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
@@ -165,7 +161,6 @@ jobs:
       runner_label: ${{ inputs.runner_label }}
       sequential: ${{ inputs.sequential }}
       snap_type: ${{ inputs.snap_type }}
-      test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
@@ -195,7 +190,6 @@ jobs:
       rancher_version: ${{ inputs.rancher_version }}
       runner_label: ${{ inputs.runner_label }}
       snap_type: ${{ inputs.snap_type }}
-      test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
@@ -222,7 +216,6 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_label: ${{ inputs.runner_label }}
-      test_description: ${{ inputs.test_description }}
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

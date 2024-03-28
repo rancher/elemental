@@ -1,0 +1,55 @@
+# This workflow calls the master E2E workflow with custom variables
+name: UI-K3s-Upgrade
+
+on:
+  workflow_dispatch:
+    inputs:
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.8+k3s2"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.26.10+k3s2"'
+        type: string
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use
+        default: '"stable/latest"'
+        type: string
+  schedule:
+    # From Monday to Saturday at 4am UTC (11pm in us-central1)
+    - cron: '0 4 * * 1-6'
+
+jobs:
+  ui:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.8+k3s2"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.26.10+k3s2"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","latest/devel/2.7","latest/devel/2.8","latest/devel/2.9"')) }}
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+    with:
+      boot_type: iso
+      ca_type: selfsigned
+      cypress_tags: upgrade
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      elemental_ui_version: stable
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      proxy: ${{ inputs.proxy || 'elemental' }}
+      rancher_version: ${{ matrix.rancher_version }}
+      test_type: ui
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest

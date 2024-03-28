@@ -21,7 +21,7 @@ on:
         type: string
       cluster_name:
         description: Name of the provisioned cluster
-        required: true
+        default: elemental-cluster
         type: string
       cluster_number:
         description: Number of clusters to deploy in multi-cluster test
@@ -42,12 +42,10 @@ on:
         default: dev
         type: string
       k8s_downstream_version:
-        description: Rancher cluster downstream version (K3s or RKE2)
-        default: v1.27.8+k3s2
+        description: Rancher cluster downstream version to use
         type: string
       k8s_upstream_version:
-        description: Rancher cluster upstream version (K3s or RKE2)
-        default: v1.26.10+k3s2
+        description: Rancher cluster upstream version to use
         type: string
       node_number:
         description: Number of nodes to deploy on the provisioned cluster
@@ -74,7 +72,7 @@ on:
         description: Rancher Manager channel/version to upgrade to
         type: string
       rancher_version:
-        description: Rancher Manager channel/version/head_version to use for installation
+        description: Rancher Manager channel/version/head_version to use
         default: stable/latest
         type: string
       reset:
@@ -92,10 +90,6 @@ on:
       snap_type:
         description: Type to use for snapshot partitions (btrfs/loopdevice)
         default: btrfs
-        type: string
-      test_description:
-        description: Short description of the test
-        default: Unknown
         type: string
       test_type:
         description: Type of test to run (cli/ui)
@@ -227,7 +221,6 @@ jobs:
       runner_label: ${{ needs.create-runner.outputs.runner_label }}
       sequential: ${{ inputs.sequential }}
       snap_type: ${{ inputs.snap_type }}
-      test_description: ${{ inputs.test_description }}
       test_type: ${{ inputs.test_type }}
       ui_account: ${{ inputs.ui_account }}
       upgrade_image: ${{ inputs.upgrade_image }}

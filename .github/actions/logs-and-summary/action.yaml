@@ -67,9 +67,6 @@ inputs:
   snap_type:
     default: "btrfs"
     type: string
-  test_description:
-    default: "Unknown"
-    type: string
   test_type:
     default: "Unknown"
     type: string
@@ -103,7 +100,8 @@ runs:
     - name: Upload logs
       uses: actions/upload-artifact@v4
       with:
-        name: support-logs
+        # Use PUBLIC_FQDN to avoid issue with parallel jobs, as it is unique
+        name: support-logs-${{ inputs.public_fqdn }}
         path: tests/**/logs/*
         if-no-files-found: ignore
 
@@ -124,7 +122,7 @@ runs:
 
         # Add summary: General informations
         echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
-        echo -e "***${{ inputs.test_description }}***\n" >> ${GITHUB_STEP_SUMMARY}
+        echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
         if ${{ inputs.test_type == 'cli' }}; then
           echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
         fi
@@ -134,7 +132,7 @@ runs:
         else
           echo "Type of cluster deployed: ${{ inputs.cluster_type }}" >> ${GITHUB_STEP_SUMMARY}
         fi
-        echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
+        echo "Type of test: ${{ inputs.test_type }}" >> ${GITHUB_STEP_SUMMARY}
 
         # Add summary: Rancher Manager
         echo "### Rancher Manager" >> ${GITHUB_STEP_SUMMARY}

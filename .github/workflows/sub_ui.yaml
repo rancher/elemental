@@ -59,9 +59,6 @@ on:
       runner_label:
         required: true
         type: string
-      test_description:
-        required: true
-        type: string
       ui_account:
         required: true
         type: string
@@ -208,7 +205,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots-basics-${{ inputs.cluster_name }}
+          name: cypress-screenshots-basics-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -219,7 +216,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos-basics-${{ inputs.cluster_name }}
+          name: cypress-videos-basics-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/videos
           retention-days: 7
 
@@ -273,7 +270,7 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
+          name: cypress-screenshots-advanced-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/screenshots
           retention-days: 7
           if-no-files-found: ignore
@@ -284,7 +281,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos-advanced-${{ inputs.cluster_name }}
+          name: cypress-videos-advanced-${{ inputs.cluster_name }}-${{ inputs.public_fqdn }}
           path: tests/cypress/latest/videos
           retention-days: 7
 
@@ -329,7 +326,6 @@ jobs:
           rancher_version: ${{ inputs.rancher_version }}
           sequential: ${{ inputs.sequential }}
           test_type: ${{ inputs.test_type }}
-          test_description: ${{ inputs.test_description }}
           ui_account: ${{ inputs.ui_account }}
           upgrade_image: ${{ inputs.upgrade_image }}
           upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
