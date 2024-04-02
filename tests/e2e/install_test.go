@@ -229,12 +229,13 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		// Report to Qase
 		testCaseID = 61
 
-		err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
-		Expect(err).To(Not(HaveOccurred()))
-
 		// Inject secret for Private CA
 		if caType == "private" {
-			_, err := kubectl.RunWithoutErr("create", "secret",
+			// The namespace must exist before adding secret
+			err := exec.Command("kubectl", "create", "namespace", "cattle-system").Run()
+			Expect(err).To(Not(HaveOccurred()))
+
+			_, err = kubectl.RunWithoutErr("create", "secret",
 				"--namespace", "cattle-system",
 				"tls", "tls-rancher-ingress",
 				"--cert=tls.crt",
@@ -250,6 +251,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		}
 
+		err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
+		Expect(err).To(Not(HaveOccurred()))
+
 		// Wait for all pods to be started
 		checkList := [][]string{
 			{"cattle-system", "app=rancher"},
@@ -260,14 +264,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 		Eventually(func() error {
 			return rancher.CheckPod(k, checkList)
 		}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(BeNil())
-
-		// We have to restart Rancher Manager to be sure that Private CA is used
-		if caType == "private" {
-			rolloutDeployment("cattle-system", "rancher")
-		}
-
-		// A bit dirty be better to wait a little here for all to be correctly started
-		time.Sleep(2 * time.Minute)
 
 		// Check issuer for Private CA
 		if caType == "private" {
