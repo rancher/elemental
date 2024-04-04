@@ -11,7 +11,19 @@ config:
         permissions: 644
   elemental:
     install:
+      device-selector:
+      - key: Name
+        operator: In
+        values:
+          - /dev/sda
+          - /dev/vda
+          - /dev/nvme0n1
+      - key: Size
+        operator: Gt
+        values:
+          - 25Gi
+      snapshotter:
+        type: btrfs
       poweroff: true
-      device: /dev/sda
       debug: true
 machineName: my-machine
