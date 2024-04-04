@@ -353,14 +353,19 @@ jobs:
           # Extract OS version from ISO
           ISO=$(file -Ls *.iso 2>/dev/null | awk -F':' '/boot sector/ { print $1 }')
           if [[ -n "${ISO}" ]]; then
-            [[ "${{ inputs.os_to_test }}" == "dev" ]] \
-              && INITRD_NAME="elemental.initrd*" \
-              || INITRD_NAME="initrd"
-            INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name ${INITRD_NAME} -print 2>/dev/null)
-            isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
-              | xz -dc \
-              | cpio -i --to-stdout usr/lib/initrd-release > os-release
-            eval $(grep IMAGE_TAG os-release 2>/dev/null)
+            # NOTE: always keep 'initrd' at the end, as there is always a link with this name
+            for INITRD_NAME in elemental.initrd* initrd; do
+              INITRD_FILE=$(isoinfo -i ${ISO} -R -find -type f -name ${INITRD_NAME} -print 2>/dev/null)
+              if [[ -n "${INITRD_FILE}" ]]; then
+                isoinfo -i ${ISO} -R -x ${INITRD_FILE} 2>/dev/null \
+                  | xz -dc \
+                  | cpio -i --to-stdout usr/lib/initrd-release > os-release
+                eval $(grep IMAGE_TAG os-release 2>/dev/null)
+
+                # We found an initrd, stop here
+                break
+              fi
+            done
           fi
 
           # Export value (even if empty!)
