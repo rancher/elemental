@@ -24,6 +24,8 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
+	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"golang.org/x/mod/semver"
 )
 
 var _ = Describe("E2E - Configure test", Label("configure"), func() {
@@ -137,6 +139,15 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 				// Create Yaml file
 				for _, p := range patterns {
 					err := tools.Sed(p.key, p.value, registrationTmp)
+					Expect(err).To(Not(HaveOccurred()))
+				}
+
+				// Stable version of Elemental Operator does not support snapshotter option
+				// NOTE: a bit dirty, but this is a workaround until Dev become the new Stable
+				operatorVersion, err := elemental.GetOperatorVersion()
+				if semver.Compare("v"+operatorVersion, "v1.6.0") == -1 {
+					GinkgoWriter.Printf("Found operator Stable version, apply workaround for pool %s.\n", pool)
+					err = exec.Command("sed", "-i", "/snapshotter:/,/type:/d", registrationTmp).Run()
 					Expect(err).To(Not(HaveOccurred()))
 				}
 
