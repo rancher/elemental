@@ -10,6 +10,7 @@ require (
 	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20240328132501-e38cbb7563a8
 	github.com/rancher-sandbox/qase-ginkgo v1.0.1
 	github.com/sirupsen/logrus v1.9.3
+	golang.org/x/mod v0.15.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
