@@ -162,7 +162,7 @@ func GetOperatorVersion() (string, error) {
 	// Extract version
 	operatorVersion := strings.Split(operatorImage, ":")
 
-	return operatorVersion[1], nil
+	return operatorVersion[len(operatorVersion)-1], nil
 }
 
 /*
