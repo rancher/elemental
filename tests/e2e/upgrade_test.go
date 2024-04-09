@@ -106,6 +106,15 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 			rancherUpgradeHeadVersion,
 			caType, proxy,
 		)
+
+		// Check if we have the "may still be processing the request" error to workaround it
+		// Manual tests showed that the upgrade is OK after some times, so just ignore the error
+		if err != nil {
+			errMsg := strings.Split(err.Error(), ":")
+			if out := errMsg[len(errMsg)-1]; strings.Contains(out, "but may still be processing the request") {
+				err = nil
+			}
+		}
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Wait for Rancher Manager to be restarted
