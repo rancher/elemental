@@ -141,6 +141,8 @@ rm -rf %{buildroot}/var/log/journal
 %license LICENSE
 %dir %{_sysconfdir}/elemental
 %config %{_sysconfdir}/elemental/bootargs.cfg
+%dir %{_sysconfdir}/elemental/config.d
+%config %{_sysconfdir}/elemental/config.d/*
 %dir %{_sysconfdir}/dracut.conf.d
 %config %{_sysconfdir}/dracut.conf.d/51-certificates-initrd.conf
 %config %{_sysconfdir}/dracut.conf.d/99-elemental-systemd.conf
