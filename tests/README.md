@@ -158,11 +158,12 @@
       -  **By:** Downloading MachineRegistration
       -  **By:** Starting default network
       -  **By:** Configuring iPXE boot script for network installation
-      -  **By:** Adding VM in default network
-      -  **By:** Creating and installing VM
-      -  **By:** Checking that the VM is available in Rancher
-      -  **By:** Restarting the VM to add it in the cluster
-      -  **By:** Checking VM connection
+      -  **By:** Installing node +h
+    - **It:** Add the nodes in Rancher Manager
+      -  **By:** Restarting +h+ to add it in the cluster
+      -  **By:** Checking +h+ SSH connection
+      -  **By:** Checking that TPM is correctly configured on +h
+      -  **By:** Checking OS version on +h
 
 ## `uninstall-operator_test.go`
 
