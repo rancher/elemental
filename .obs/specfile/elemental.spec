@@ -30,8 +30,8 @@ Source1:        LICENSE
 Source2:        README.md
 Source3:        %{name}-rpmlintrc
 
-Requires:       elemental-toolkit >= 2.0.0
-Requires:       elemental-toolkit < 2.1.0
+Requires:       elemental-toolkit >= 2.1.0
+Requires:       elemental-toolkit < 2.2.0
 Requires:       elemental-register
 Requires:       elemental-system-agent
 Requires:       elemental-support
