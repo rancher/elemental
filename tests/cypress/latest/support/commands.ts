@@ -432,8 +432,7 @@ Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
   sizeToCheck == "name" ? cy.addMachInvLabel('labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', 'mylabelvalue', false) : null;
   sizeToCheck == "value" ? cy.addMachInvLabel('mylabelname', 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', false) : null;
   // A banner should appear alerting you about the size exceeded
-  // Following condition could be removed when we will release next Elemental UI (> 1.2.0)
-  utils.isUIVersion('dev') ? cy.get('[data-testid="banner-content"]') : cy.get('.banner > span');
+  cy.get('[data-testid="banner-content"]')
   // Create button should be disabled
   cy.getBySel('form-save').should(($input) => {
     expect($input).to.have.attr('disabled')
