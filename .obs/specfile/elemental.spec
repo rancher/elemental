@@ -142,8 +142,8 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
-%dir %{_sysconfdir}/cos
-%config %{_sysconfdir}/cos/bootargs.cfg
+%dir %{_sysconfdir}/elemental
+%config %{_sysconfdir}/elemental/bootargs.cfg
 %dir %{_sysconfdir}/dracut.conf.d
 %config %{_sysconfdir}/dracut.conf.d/51-certificates-initrd.conf
 %config %{_sysconfdir}/dracut.conf.d/99-elemental-systemd.conf
@@ -159,7 +159,8 @@ rm -rf %{buildroot}/usr/libexec/.placeholder
 %{_unitdir}/elemental-populate-node-labels.service
 %{_unitdir}/elemental-system-agent.service
 %{_sbindir}/elemental-populate-node-labels
-%dir /usr/libexec
+%dir %{_libexecdir}/elemental-checker
+%{_libexecdir}/elemental-checker/elemental-register.sh
 %dir %{systemdir}
 %dir %{oemdir}
 %{oemdir}/*
