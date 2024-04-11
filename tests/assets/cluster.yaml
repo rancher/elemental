@@ -16,6 +16,7 @@ spec:
       profile: null
     machinePools:
       - controlPlaneRole: true
+        drainBeforeDelete: true
         etcdRole: true
         machineConfigRef:
           apiVersion: elemental.cattle.io/v1beta1
