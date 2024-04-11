@@ -40,6 +40,7 @@ jobs:
       k8s_upstream_version: v1.26.10+rke2r2
       rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
-      ui_account: user
+      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
+      #ui_account: user
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
       upgrade_os_channel: dev

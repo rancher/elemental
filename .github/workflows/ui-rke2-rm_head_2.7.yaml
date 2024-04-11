@@ -33,4 +33,5 @@ jobs:
       k8s_upstream_version: v1.26.10+rke2r2
       rancher_version: ${{ inputs.rancher_version || 'latest/devel/2.7' }}
       test_type: ui
-      ui_account: user
+      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
+      #ui_account: user
