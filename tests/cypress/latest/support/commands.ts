@@ -105,7 +105,7 @@ Cypress.Commands.add('createMachReg', (
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
     
-    if (utils.isUIVersion('stable')) {
+    if (utils.isCypressTag('upgrade')) {
       cy.getBySel('select-os-version-build-media')
         .click();
     } else {
@@ -129,15 +129,11 @@ Cypress.Commands.add('createMachReg', (
         // In rare case, we might want to test upgrading from staging to dev
         utils.isUpgradeOsChannel('dev') ? cy.contains('(unstable)').click(): null;
       } else {
-        // We cannot use v2.0.2 because the latest stable operator is not in the marketplace yet
-          //cy.contains('ISO x86_64 v2.0.2')
-          cy.contains('ISO x86_64 v1.2.3')
+          cy.contains('ISO x86_64 v2.0.2')
           .click();
       }
     } else if (utils.isOperatorVersion('registry.suse.com')) {
-      // We cannot use v2.0.2 because the latest stable operator is not in the marketplace yet
-      //cy.contains('ISO x86_64 v2.0.2')
-      cy.contains('ISO x86_64 v1.2.3')
+      cy.contains('ISO x86_64 v2.0.2')
         .click();
     } else {
       cy.contains('(unstable)')

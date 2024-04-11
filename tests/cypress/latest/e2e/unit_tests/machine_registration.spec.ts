@@ -215,7 +215,7 @@ describe('Machine registration testing', () => {
         true,
         //checkIsoBuilding
         true,
-        'custom_cloud-config.yaml',
+        'custom_cloud-config_upgrade.yaml',
         //checkDefaultCloudConfig
         false);
         cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);
