@@ -22,10 +22,6 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      # Using user account has to be disable due to this bug
-      # https://github.com/rancher/elemental-ui/issues/64
-      # Fixed in elemental-ui 1.1.0
-      #ui_account: user
       test_description: "CI/Manual - UI - Deployment test with Standard RKE2"
       boot_type: raw
       ca_type: private
@@ -37,3 +33,5 @@ jobs:
       k8s_upstream_version: v1.26.10+rke2r2
       rancher_version: ${{ inputs.rancher_version || 'stable/latest/none' }}
       test_type: ui
+      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
+      #ui_account: user

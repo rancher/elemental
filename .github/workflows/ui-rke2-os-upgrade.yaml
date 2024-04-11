@@ -45,5 +45,6 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
-      ui_account: user
+      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
+      #ui_account: user
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
