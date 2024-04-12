@@ -45,6 +45,13 @@ describe('Upgrade tests', () => {
     // because we do not update the operator in RKE2 UI test so far
     // Only RKE2 tests use os version channel
     if (utils.isK8sVersion("rke2") && !utils.isRancherManagerVersion('2.7')) {
+      // With operator 1.4.2, dev and stable cannot live together
+      // Let's delete the stable channel first
+      it('Delete stable channel for RKE2 upgrade', () => {
+        cy.clickNavMenu(["Advanced", "OS Version Channels"]);
+        cy.deleteAllResources();
+      })
+
       it('Add dev channel for RKE2 upgrade', () => {
         cy.addOsVersionChannel('dev');
       })
@@ -79,7 +86,7 @@ describe('Upgrade tests', () => {
         cy.contains('Target Cluster')
         cy.getBySel('cluster-target')
           .click();
-        cy.get('#vs7__listbox')
+        cy.get('.vs__dropdown-menu')
           .contains(clusterName)
           .click();
         if (utils.isK8sVersion("k3s")) {
