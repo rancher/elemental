@@ -27,6 +27,7 @@ spec:
         unhealthyNodeTimeout: 0s
         workerRole: true
       - controlPlaneRole: false
+        drainBeforeDelete: true
         etcdRole: false
         machineConfigRef:
           apiVersion: elemental.cattle.io/v1beta1
