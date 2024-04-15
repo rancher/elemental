@@ -18,6 +18,10 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { isCypressTag, isRancherManagerVersion } from '~/support/utils';
 import { Elemental } from '~/support/elemental';
+import { slowCypressDown } from 'cypress-slow-down'
+
+// slow down each command by 500ms
+slowCypressDown(500)
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();

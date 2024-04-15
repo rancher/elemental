@@ -17,7 +17,6 @@ export default defineConfig({
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       return require('./plugins/index.ts')(on, config)
     },
-    experimentalSessionAndOrigin: true,
     supportFile: './support/e2e.ts',
     fixturesFolder: './fixtures',
     screenshotsFolder: './screenshots',
