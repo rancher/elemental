@@ -131,9 +131,7 @@ describe('Upgrade tests', () => {
           .contains(clusterName)
           .click();
         cy.get('.primaryheader')
-          .contains('Active');
-        cy.get('.primaryheader')
-          .contains('Active', {timeout: 420000}).should('not.exist');
+          .contains('Updating', {timeout: 420000});
         cy.get('.primaryheader')
           .contains('Active', {timeout: 720000});
       })
