@@ -17,6 +17,10 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { slowCypressDown } from 'cypress-slow-down'
+
+// slow down each command by 500ms
+slowCypressDown(500)
 
 Cypress.config();
 describe('Machine inventory testing', () => {
