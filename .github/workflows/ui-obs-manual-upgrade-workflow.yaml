@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-RKE2-Manual-Upgrade-Workflow
+name: UI-OBS-Manual-Upgrade-Workflow
 
 on:
   workflow_dispatch:
@@ -8,33 +8,28 @@ on:
         description: Destroy the auto-generated self-hosted runner
         default: true
         type: boolean
+      elemental_ui_version:
+        description: Version of the elemental ui which will be installed (dev/stable)
+        default: stable
+        type: string
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: v1.27.8+rke2r1
+        default: v1.27.8+k3s2
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: v1.26.10+rke2r2
+        default: v1.26.10+k3s2
         type: string
-      operator_repo:
-        description: Operator version to use for initial deployment
-        default: oci://registry.suse.com/rancher
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
-        default: auto
-        type: string
-      rancher_upgrade:
-        description: Rancher Manager channel/version to upgrade to
-        default: latest/devel/2.8
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
         default: stable/latest
-        type: string
-      slem_version:
-        description: SLE Micro version
-        default: 6.0
         type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
@@ -42,25 +37,23 @@ on:
         type: string
 
 jobs:
-  cli:
+  ui:
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
-      qase_api_token: ${{ secrets.QASE_API_TOKEN_CLI }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
-      ca_type: private
+      boot_type: iso
+      cypress_tags: upgrade
       destroy_runner: ${{ inputs.destroy_runner }}
+      elemental_ui_version: ${{ inputs.elemental_ui_version }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
-      node_number: 5
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
-      operator_repo: ${{ inputs.operator_repo }}
-      os_to_test: stable
+      proxy: ${{ inputs.proxy }}
       qase_run_id: ${{ inputs.qase_run_id }}
-      rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
-      snap_type: loopdevice
-      test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sl-micro/${{ inputs.slem_version }}/baremetal-os-container:latest
+      test_type: ui
+      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
+      #ui_account: user
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
