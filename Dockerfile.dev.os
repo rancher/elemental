@@ -60,7 +60,8 @@ RUN ARCH=$(uname -m); \
 RUN ARCH=$(uname -m); \
     [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-      selinux-policy-targeted \
+      patterns-microos-selinux \
+      k3s-selinux \
       audit
 
 # Add system files
