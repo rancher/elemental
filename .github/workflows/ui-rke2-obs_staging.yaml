@@ -4,10 +4,6 @@ name: UI-RKE2-OBS_Staging
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        default: auto
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -19,6 +15,10 @@ on:
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
         default: v1.27.8+rke2r1
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation

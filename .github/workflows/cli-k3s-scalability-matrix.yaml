@@ -4,9 +4,6 @@ name: CLI-K3s-Scalability
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -18,6 +15,10 @@ on:
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
         default: '"v1.26.10+k3s2"'
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
   schedule:
     # Every Sunday at 4am UTC (11pm in us-central1)
@@ -40,9 +41,9 @@ jobs:
     with:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       node_number: 60
-      qase_run_id: ${{ inputs.qase_run_id }}
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       runner_template: elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v5
       test_type: cli

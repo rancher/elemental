@@ -35,13 +35,12 @@ on:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
         default: stable/latest
-        type: string
-      runner_template:
-        description: Runner template to use
-        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
         type: string
 
 jobs:
@@ -59,6 +58,6 @@ jobs:
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       proxy: ${{ inputs.proxy }}
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
-      runner_template: ${{ inputs.runner_template }}
       test_type: ui
