@@ -47,17 +47,28 @@ RUN ARCH=$(uname -m); \
       sed \
       btrfsprogs \
       btrfsmaintenance \
-      snapper \
-      libopenssl1_1
+      snapper
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
     [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
     zypper --non-interactive install --no-recommends -- \
-      dmidecode
+      dmidecode \
+      libopenssl1_1
+
+# SELinux policy and tools
+RUN ARCH=$(uname -m); \
+    [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
+    zypper --non-interactive install --no-recommends -- \
+      selinux-policy-targeted \
+      audit
 
 # Add system files
 COPY framework/files/ /
+
+# Enforce SELinux
+# RUN sed -i "s/enforcing=0/enforcing=1/g" /etc/elemental/bootargs.cfg
+
 # Add elemental-register
 COPY --from=register /usr/sbin/elemental-register /usr/sbin/elemental-register
 COPY --from=register /usr/sbin/elemental-support /usr/sbin/elemental-support
@@ -73,12 +84,26 @@ RUN systemctl enable NetworkManager.service sshd
 # This is for testing purposes, do not do this in production.
 RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
 
-# Generate initrd with required elemental services
-RUN elemental init --debug --force
+# Make sure trusted certificates are properly generated
+RUN /usr/sbin/update-ca-certificates
+
+# Ensure /tmp is mounted as tmpfs by default
+RUN if [ -e /usr/share/systemd/tmp.mount ]; then \
+      cp /usr/share/systemd/tmp.mount /etc/systemd/system; \
+    fi
+
+# Save some space
+RUN zypper clean --all && \
+    rm -rf /var/log/update* && \
+    >/var/log/lastlog && \
+    rm -rf /boot/vmlinux*
 
 # Update os-release file with some metadata
 RUN echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`" >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"Elemental Dev\" >> /etc/os-release
+
+# Rebuild initrd to setup dracut with the boot configurations
+RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
 
 # Good for validation after the build
 CMD /bin/bash
