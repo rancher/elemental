@@ -105,6 +105,12 @@ on:
         required: true
         type: string
 
+    # Job outputs to export for caller workflow
+    outputs:
+      steps_status:
+        description: Status of the executed test jobs
+        value: ${{ join(jobs.*.outputs.steps_status, ' ') }}
+
     # Secrets to set when calling this reusable workflow
     secrets:
       credentials:

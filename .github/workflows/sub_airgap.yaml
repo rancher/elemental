@@ -45,6 +45,12 @@ on:
         required: true
         type: string
 
+    # Job outputs to export for caller workflow
+    outputs:
+      step_status:
+        description: Status of the executed test jobs
+        value: ${{ jobs.airgap.outputs.steps_status }}
+
     # Variables to set when calling this reusable workflow
     secrets:
       credentials:

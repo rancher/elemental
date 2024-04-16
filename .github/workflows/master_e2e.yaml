@@ -140,6 +140,7 @@ jobs:
       zone: ${{ inputs.zone }}
 
   pre-qase:
+    needs: create-runner
     runs-on: ubuntu-latest
     env:
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
@@ -228,8 +229,8 @@ jobs:
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
 
   clean-and-delete-runner:
-    if: ${{ always() }}
     needs: [create-runner, e2e]
+    if: ${{ always() }}
     uses: ./.github/workflows/sub_clean-and-delete-runner.yaml
     secrets:
       credentials: ${{ secrets.credentials }}
@@ -238,13 +239,12 @@ jobs:
       create_runner_result: ${{ needs.create-runner.result }}
       destroy_runner: ${{ inputs.destroy_runner }}
       runner_hostname: ${{ needs.create-runner.outputs.runner_hostname }}
-      steps_status: ${{ needs.e2e.outputs.steps_status }}
       runner_label: ${{ needs.create-runner.outputs.runner_label }}
       zone: ${{ inputs.zone }}
 
   post-qase:
-    if: ${{ always() && needs.pre-qase.outputs.qase_run_id != '' }}
     needs: [pre-qase, e2e]
+    if: ${{ always() && needs.pre-qase.outputs.qase_run_id != '' }}
     runs-on: ubuntu-latest
     env:
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
@@ -263,7 +263,7 @@ jobs:
           go-version-file: tests/go.mod
 
       - name: Finalize Qase Run and publish Results
-        if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') && needs.e2e.result != 'cancelled' && needs.create-runner.result == 'success' }}
+        if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') }}
         run: |
           REPORT=$(cd tests && make publish-qase-run)
           echo "${REPORT}"
@@ -276,13 +276,13 @@ jobs:
           fi
 
       - name: Delete Qase Run if job has been cancelled
-        if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') || needs.e2e.result == 'cancelled' || needs.create-runner.result != 'success' }}
+        if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') }}
         run: cd tests && make delete-qase-run
 
   # Just to signify that something has been cancelled and it's not useful to check the test
   declare-cancelled:
-    if: ${{ always() && (contains(needs.e2e.outputs.steps_status, 'cancelled') || needs.e2e.result == 'cancelled' || needs.create-runner.result != 'success') }}
-    needs: [create-runner, e2e]
+    needs: e2e
+    if: ${{ always() && contains(needs.e2e.outputs.steps_status, 'cancelled') }}
     runs-on: ubuntu-latest
     steps:
       - name: Specify in summary if something has been cancelled
