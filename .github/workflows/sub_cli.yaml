@@ -90,6 +90,12 @@ on:
         required: true
         type: string
 
+    # Job outputs to export for caller workflow
+    outputs:
+      steps_status:
+        description: Status of the executed test jobs
+        value: ${{ jobs.cli.outputs.steps_status }}
+
     # Variables to set when calling this reusable workflow
     secrets:
       qase_api_token:

@@ -15,10 +15,6 @@ on:
       runner_hostname:
         required: true
         type: string
-      steps_status:
-        description: Status of all the steps from the previous job
-        required: true
-        type: string
       runner_label:
         required: true
         type: string
