@@ -164,8 +164,7 @@ jobs:
           if ${{ inputs.qase_run_id == 'auto' }}; then
             # Define and export URL of GH test run in Qase run description
             GH_RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            QASE_DESC="${{ inputs.test_description }} (${GH_RUN_URL})"
-            export QASE_RUN_DESCRIPTION="${QASE_DESC}"
+            export QASE_RUN_DESCRIPTION="${GH_RUN_URL}"
 
             # Define and export the Qase run name, as it cannot be done
             # in 'env:' because GITHUB_WORKFLOW is a shell variable
@@ -176,12 +175,12 @@ jobs:
             ID=$(cd tests && make create-qase-run)
             
             # Export outputs for future use
-            echo "qase_run_description=${QASE_DESC}" >> ${GITHUB_OUTPUT}
+            echo "qase_run_description=${QASE_RUN_DESCRIPTION}" >> ${GITHUB_OUTPUT}
             echo "qase_run_id=${ID}" >> ${GITHUB_OUTPUT}
-            echo "qase_run_name=${GITHUB_WORKFLOW}" >> ${GITHUB_OUTPUT}
+            echo "qase_run_name=${QASE_RUN_NAME}" >> ${GITHUB_OUTPUT}
 
             # Just an info for debugging purposes
-            echo -e "Exported values:\nQASE_RUN_ID=${ID}\nQASE_RUN_DESCRIPTION=${QASE_DESC}\nQASE_RUN_NAME=${GITHUB_WORKFLOW}"
+            echo -e "Exported values:\nQASE_RUN_ID=${ID}\nQASE_RUN_DESCRIPTION=${QASE_RUN_DESCRIPTION}\nQASE_RUN_NAME=${QASE_RUN_NAME}"
           elif ${{ inputs.qase_run_id != '' }}; then
             # If the run ID has been specified
             echo "qase_run_id=${{ inputs.qase_run_id }}" >> ${GITHUB_OUTPUT}
