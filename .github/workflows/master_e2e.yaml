@@ -263,7 +263,7 @@ jobs:
           go-version-file: tests/go.mod
 
       - name: Finalize Qase Run and publish Results
-        if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') }}
+        if: ${{ !contains(needs.e2e.outputs.steps_status, 'cancelled') && needs.e2e.result != 'cancelled' && needs.create-runner.result == 'success' }}
         run: |
           REPORT=$(cd tests && make publish-qase-run)
           echo "${REPORT}"
@@ -276,7 +276,7 @@ jobs:
           fi
 
       - name: Delete Qase Run if job has been cancelled
-        if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') }}
+        if: ${{ contains(needs.e2e.outputs.steps_status, 'cancelled') || needs.e2e.result == 'cancelled' || needs.create-runner.result != 'success' }}
         run: cd tests && make delete-qase-run
 
   # Just to signify that something has been cancelled and it's not useful to check the test
