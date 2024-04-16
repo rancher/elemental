@@ -4,9 +4,6 @@ name: CLI-RKE2-Manual-Upgrade-Workflow
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -22,6 +19,10 @@ on:
       operator_repo:
         description: Operator version to use for initial deployment
         default: oci://registry.suse.com/rancher
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to

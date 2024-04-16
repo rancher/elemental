@@ -4,9 +4,6 @@ name: CLI-RKE2-OBS_Staging
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        type: string
       cluster_type:
         description: Cluster type (empty if normal or hardened)
         type: string
@@ -21,6 +18,10 @@ on:
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
         default: v1.26.10+rke2r2
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation

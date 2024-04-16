@@ -4,10 +4,6 @@ name: UI-RKE2-IBS_Stable
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        default: auto
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -23,6 +19,10 @@ on:
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
         default: v1.26.10+rke2r2
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation

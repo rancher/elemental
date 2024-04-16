@@ -4,10 +4,6 @@ name: UI-K3s-Manual-Upgrade-Workflow
 on:
   workflow_dispatch:
     inputs:
-      qase_run_id:
-        description: Qase run ID where the results will be reported
-        default: auto
-        type: string
       destroy_runner:
         description: Destroy the auto-generated self-hosted runner
         default: true
@@ -27,6 +23,10 @@ on:
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        default: auto
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
