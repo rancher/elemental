@@ -105,7 +105,7 @@ Cypress.Commands.add('createMachReg', (
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
     
-    if (utils.isCypressTag('upgrade')) {
+    if (utils.isCypressTag('upgrade') || utils.isUIVersion('stable')) {
       cy.getBySel('select-os-version-build-media')
         .click();
     } else {
