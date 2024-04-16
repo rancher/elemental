@@ -66,8 +66,8 @@ RUN ARCH=$(uname -m); \
 # Add system files
 COPY framework/files/ /
 
-# Enforce SELinux
-# RUN sed -i "s/enforcing=0/enforcing=1/g" /etc/elemental/bootargs.cfg
+# Enforce SELinux (Note that Tumbleweed needs the explicit 'security' arg as well)
+# RUN sed -i "s/enforcing=0/security=selinux enforcing=1/g" /etc/elemental/bootargs.cfg
 
 # Add elemental-register
 COPY --from=register /usr/sbin/elemental-register /usr/sbin/elemental-register
