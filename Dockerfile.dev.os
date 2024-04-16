@@ -5,7 +5,7 @@ FROM ${ELEMENTAL_REGISTER} as register
 FROM ${ELEMENTAL_TOOLKIT} as toolkit
 
 # OS base image of our choice
-FROM registry.opensuse.org/opensuse/leap:15.5 as OS
+FROM registry.opensuse.org/opensuse/tumbleweed:latest as OS
 
 ARG RANCHER_SYSTEM_AGENT_VERSION
 
@@ -47,7 +47,8 @@ RUN ARCH=$(uname -m); \
       sed \
       btrfsprogs \
       btrfsmaintenance \
-      snapper
+      snapper \
+      libopenssl1_1
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
@@ -67,10 +68,10 @@ COPY --from=toolkit /usr/bin/elemental /usr/bin/elemental
 ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RANCHER_SYSTEM_AGENT_VERSION}/rancher-system-agent-amd64 /usr/sbin/elemental-system-agent
 
 # Enable essential services
-RUN systemctl enable NetworkManager.service
+RUN systemctl enable NetworkManager.service sshd
 
-# Enable /tmp to be on tmpfs
-RUN cp /usr/share/systemd/tmp.mount /etc/systemd/system
+# This is for automatic testing purposes, do not do this in production.
+RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
 
 # Generate initrd with required elemental services
 RUN elemental init --debug --force
