@@ -7,16 +7,23 @@
 #
 
 ARG SLEMICRO_VERSION
+
+FROM suse/sle-micro/$SLEMICRO_VERSION:latest AS os
+
+MAINTAINER SUSE LLC (https://www.suse.com/)
+
+ARG SLEMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
 ARG IMAGE_REPO=$BUILD_REPO/suse/sle-micro/rt-$SLEMICRO_VERSION
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
-FROM suse/sle-micro/$SLEMICRO_VERSION:latest AS os
-
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-SLE-Micro-for-Rancher elemental
 
-MAINTAINER SUSE LLC (https://www.suse.com/)
+# turn base image into a rt image
+RUN zypper in --no-recommends -y -- \
+  -kernel-default \
+  kernel-rt
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
 # labelprefix=com.suse.sle.micro.rancher
@@ -28,11 +35,6 @@ LABEL org.opencontainers.image.source="%SOURCEURL%"
 LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 # endlabelprefix
-
-# turn base image into a rt image
-RUN zypper in --no-recommends -y -- \
-  -kernel-default \
-  kernel-rt
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
 # values here should reflect the tag of the image being built
