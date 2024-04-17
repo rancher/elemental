@@ -1,24 +1,24 @@
 # Elemental
 
-![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg)
+[![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
 
 ## Daily CI
 
-![CLI-K3s](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml/badge.svg)
-![CLI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml/badge.svg)
-![CLI-RKE2](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml/badge.svg)
-![CLI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml/badge.svg)
+[![CLI-K3s](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml)
+[![CLI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml)
+[![CLI-RKE2](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml)
+[![CLI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml)
 
-![UI-K3s](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml/badge.svg)
-![UI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml/badge.svg)
-![UI-RKE2](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml/badge.svg)
-![UI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml/badge.svg)
+[![UI-K3s](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml)
+[![UI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml)
+[![UI-RKE2](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml)
+[![UI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml)
 
 ## Weekly CI
 
-![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix/badge.svg)
-![CLI-K3s-Scalability](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix/badge.svg)
-![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix/badge.svg)
+[![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
+[![CLI-K3s-Scalability](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml)
+[![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml)
 
 ## Goal
 
