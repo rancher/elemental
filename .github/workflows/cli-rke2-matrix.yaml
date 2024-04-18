@@ -52,15 +52,15 @@ jobs:
         include:
           - ca_type: selfsigned
             cluster_type: ""
-            k8s_downstream_version: v1.27.8+k3s2
-            k8s_upstream_version: v1.26.10+k3s2
+            k8s_downstream_version: v1.27.8+rke2r1
+            k8s_upstream_version: v1.26.10+rke2r2
             rancher_version: stable/latest
             reset: true
             sequential: true
           - ca_type: private
             cluster_type: hardened
-            k8s_downstream_version: v1.27.8+k3s2
-            k8s_upstream_version: v1.26.10+k3s2
+            k8s_downstream_version: v1.27.8+rke2r1
+            k8s_upstream_version: v1.26.10+rke2r2
             rancher_version: stable/latest
             reset: true
             sequential: false
