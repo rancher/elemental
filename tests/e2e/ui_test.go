@@ -96,6 +96,9 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 					Expect(err).To(Not(HaveOccurred()))
 
 					if rawBoot {
+						// Report to Qase that we boot from raw image
+						testCaseID = 75
+
 						// The VM will boot first on the recovery partition to create the normal partition
 						// No need to check the recovery process
 						// Only make sure the VM is up and running on the normal partition
@@ -120,6 +123,9 @@ var _ = Describe("E2E - Bootstrap node for UI", Label("ui"), func() {
 							out, _ := exec.Command("sudo", "virsh", "domstate", h).Output()
 							return strings.Trim(string(out), "\n\n")
 						}, tools.SetTimeout(5*time.Minute), 5*time.Second).Should(Equal("shut off"))
+					} else {
+						// Report to Qase that we boot from ISO
+						testCaseID = 9
 					}
 
 				})
