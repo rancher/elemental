@@ -108,6 +108,7 @@ runs:
         # Use PUBLIC_FQDN to avoid issue with parallel jobs, as it is unique
         name: support-logs-${{ inputs.public_fqdn }}-${{ steps.date.outputs.epoch }}
         path: tests/**/logs/*
+        retention-days: 7
         if-no-files-found: ignore
 
     - name: Add summary
