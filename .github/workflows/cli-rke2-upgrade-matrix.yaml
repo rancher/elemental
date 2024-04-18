@@ -25,8 +25,8 @@ on:
         default: '"latest/devel/2.8"'
         type: string
   schedule:
-    # From Monday to Saturday at 9am UTC (4am in us-central1)
-    - cron: '0 9 * * 1-6'
+    # From Monday to Saturday at 8am UTC (3am in us-central1)
+    - cron: '0 8 * * 1-6'
 
 jobs:
   cli:

@@ -25,8 +25,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # From Monday to Saturday at 5am UTC (0am in us-central1)
-    - cron: '0 5 * * 1-6'
+    # From Monday to Saturday at 2am UTC (9pm in us-central1)
+    - cron: '0 2 * * 1-6'
 
 jobs:
   ui:

@@ -33,8 +33,8 @@ on:
         default: false
         type: boolean
   schedule:
-    # From Monday to Saturday at 6am UTC (1am in us-central1)
-    - cron: '0 6 * * 1-6'
+    # From Monday to Saturday at 3am UTC (10pm in us-central1)
+    - cron: '0 3 * * 1-6'
 
 jobs:
   cli:
