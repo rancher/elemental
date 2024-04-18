@@ -1,0 +1,74 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-Rancher-Manager-Head-2.9
+
+on:
+  workflow_dispatch:
+    inputs:
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        default: '"selfsigned"'
+        type: string
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        default: '""'
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.8+k3s2"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.26.10+k3s2"'
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use
+        default: '"latest/devel/2.9"'
+        type: string
+      reset:
+        description: Allow reset test (mainly used on CLI tests)
+        default: false
+        type: boolean
+  schedule:
+    # Every Sunday at 8am UTC (3am in us-central1)
+    - cron: '0 8 * * 0'
+
+jobs:
+  cli:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        ca_type: ${{ fromJSON(format('[{0}]', inputs.ca_type || '"selfsigned","private"')) }}
+        cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '""')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.8+k3s2","v1.27.8+rke2r1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.26.10+k3s2","v1.27.10+rke2r2"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.9"')) }}
+        reset: ${{ fromJSON(format('[{0}]', inputs.reset || 'false')) }}
+        sequential: [ false ]
+        include:
+          - ca_type: selfsigned
+            cluster_type: ""
+            reset: true
+            sequential: true
+          - ca_type: private
+            cluster_type: hardened
+            reset: true
+            sequential: false
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+    with:
+      ca_type: ${{ matrix.ca_type }}
+      cluster_type: ${{ matrix.cluster_type }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      rancher_version: ${{ matrix.rancher_version }}
+      reset: ${{ matrix.reset }}
+      sequential: ${{ matrix.sequential }}
+      test_type: cli
