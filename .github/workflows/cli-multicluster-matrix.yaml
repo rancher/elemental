@@ -25,7 +25,7 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # Every Sunday at 8am UTC (3am in us-central1)
+    # Every Sunday at 5am UTC (0am in us-central1)
     - cron: '0 5 * * 0'
 
 jobs:
