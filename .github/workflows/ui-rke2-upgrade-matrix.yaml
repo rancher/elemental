@@ -42,7 +42,10 @@ jobs:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
     with:
-      boot_type: raw
+      # Should be raw for RKE2 but raw image feature is not in stable version.
+      # We will enable it back once the new elemental released
+      # boot_type: raw
+      boot_type: iso
       ca_type: private
       cypress_tags: upgrade
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
