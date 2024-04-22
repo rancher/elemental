@@ -1,7 +1,11 @@
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 
+// Check the boot type
+export const isBootType = (bootType: string) => {
+  return (new RegExp(bootType)).test(Cypress.env("boot_type"));
+}
+
 // Check the Cypress tags
-// Implemented but not used yet
 export const isCypressTag = (tag: string) => {
   return (new RegExp(tag)).test(Cypress.env("cypress_tags"));
 }

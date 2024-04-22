@@ -87,7 +87,7 @@ Cypress.Commands.add('createMachReg', (
     } else {
       cy.getBySel('select-media-type-build-media')
         .click();
-      if (Cypress.env('boot_type') == 'raw') {
+      if (utils.isBootType('raw')) {
         cy.contains('Raw')
           .click();
       } else {
@@ -129,10 +129,13 @@ Cypress.Commands.add('createMachReg', (
     })
     cy.getBySel(`download-media-btn`)
       .click()
-    if (Cypress.env('boot_type') == 'raw') {
-      cy.verifyDownload('.raw', { contains:true, timeout: 180000, interval: 5000 });
+    // RAW image not available in upgrade scenario because we start from stable
+    // and RAW feature is not already available in stable
+    // upgrade condition will be removed in next elemental stable version
+    if (utils.isBootType('raw') && !utils.isCypressTag('upgrade')) {
+      cy.verifyDownload('.raw', { contains:true, timeout: 300000, interval: 5000 });
     } else {
-      cy.verifyDownload('.iso', { contains:true, timeout: 180000, interval: 5000 });
+      cy.verifyDownload('.iso', { contains:true, timeout: 300000, interval: 5000 });
     }
   }
   
