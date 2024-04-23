@@ -17,8 +17,7 @@ RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 # replace default kernel with smaller one, sufficient to run kvm guests
 RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent
 
-RUN zypper in --no-recommends -y container-selinux selinux-policy selinux-policy-targeted \
-    selinux-tools k3s-selinux
+RUN zypper in --no-recommends -y patterns-microos-selinux k3s-selinux
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
