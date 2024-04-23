@@ -37,6 +37,7 @@ jobs:
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}

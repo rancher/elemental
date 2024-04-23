@@ -67,6 +67,7 @@ on:
         type: string
       qase_run_id:
         description: Case run ID where the results will be reported
+        default: auto
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
@@ -170,7 +171,7 @@ jobs:
             # Define and export the Qase run name, as it cannot be done
             # in 'env:' because GITHUB_WORKFLOW is a shell variable
             # Export them also to be used locally
-            export QASE_RUN_NAME="${GITHUB_WORKFLOW}"
+            export QASE_RUN_NAME="${GITHUB_WORKFLOW}-RM_${{inputs.rancher_version}}-UP_${{inputs.k8s_upstream_version}}-DOWN_${{inputs.k8s_downstream_version}}"
 
             # Create a Qase run, get its ID
             ID=$(cd tests && make create-qase-run)
