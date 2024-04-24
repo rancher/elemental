@@ -172,6 +172,7 @@ jobs:
 
       - name: Install Chartmuseum
         id: install_chartmuseum
+        if: ${{ inputs.operator_repo != 'marketplace' }}
         env: 
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         run: |

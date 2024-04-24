@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { isCypressTag } from '~/support/utils';
+import { isCypressTag, isOperatorVersion } from '~/support/utils';
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
@@ -54,7 +54,7 @@ export class Elemental {
     .click();
     cy.get('.nav').contains('Apps')
       .click();
-    if (isCypressTag('main')) {
+    if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
       cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
         .click();
     } else {

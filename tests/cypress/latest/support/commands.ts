@@ -108,7 +108,7 @@ Cypress.Commands.add('createMachReg', (
           cy.contains('ISO x86_64 v2.0.2')
           .click();
       }
-    } else if (utils.isOperatorVersion('registry.suse.com')) {
+    } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
       cy.contains('ISO x86_64 v2.0.2')
         .click();
     } else {
