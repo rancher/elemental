@@ -16,11 +16,11 @@
 
 ## Weekly CI
 
-[![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
-[![CLI-K3s-Scalability](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml)
-[![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml)
-[![CLI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix.yaml)
-[![UI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix.yaml)
+[![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
+[![CLI-K3s-Scalability](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml)
+[![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml)
+[![CLI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix.yaml)
+[![UI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix.yaml)
 
 ## Goal
 
