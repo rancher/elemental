@@ -23,7 +23,6 @@ import { slowCypressDown } from 'cypress-slow-down'
 // slow down each command by 500ms
 slowCypressDown(500)
 
-
 Cypress.config();
 describe('Elemental operator upgrade tests', () => {
   const elemental = new Elemental();
@@ -40,58 +39,65 @@ describe('Elemental operator upgrade tests', () => {
   filterTests(['upgrade'], () => {
     // Enable only with K3S because still too much flaky with RKE2
     if (utils.isK8sVersion('k3s') && !utils.isRancherManagerVersion('2.7')) {
-      it('Add elemental-operator dev repo', () => {
-        cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
-      });
+      if (!utils.isOperatorVersion('marketplace')) {
+        it('Add elemental-operator dev repo', () => {
+          cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
+        });
+      } else {
+        qase(55,
+          it('Upgrade Elemental operator', () => {
+            cy.contains('local')
+              .click();
+            cy.get('.nav').contains('Apps')
+              .click();
+            if (!utils.isOperatorVersion('marketplace')) {
+              cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
+                .click();
+            } else {
+              cy.contains('Elemental', {timeout:30000})
+                .click();
+            }
+            cy.contains('Charts: Elemental', {timeout:30000});
+            cy.clickButton('Upgrade');
+            cy.contains('.header > .title', 'elemental-operator');
+            cy.clickButton('Next');
+            cy.clickButton('Upgrade');
+            cy.contains('SUCCESS: helm', {timeout:120000});
+            cy.contains('Installed App: elemental-operator Pending-Upgrade', {timeout:120000});
+            cy.contains('Installed App: elemental-operator Deployed', {timeout:120000});
+          })
+        );
 
-      qase(55,
-        it('Upgrade Elemental operator', () => {
-          cy.contains('local')
-            .click();
-          cy.get('.nav').contains('Apps')
-            .click();
-          cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
-            .click();
-          cy.contains('Charts: Elemental', {timeout:30000});
-          cy.clickButton('Upgrade');
-          cy.contains('.header > .title', 'elemental-operator');
-          cy.clickButton('Next');
-          cy.clickButton('Upgrade');
-          cy.contains('SUCCESS: helm', {timeout:120000});
-          cy.contains('Installed App: elemental-operator Pending-Upgrade', {timeout:120000});
-          cy.contains('Installed App: elemental-operator Deployed', {timeout:120000});
-        })
-      );
+        qase(58,
+          it('Check Elemental UI after upgrade', () => {
+            cy.viewport(1920, 1080);
+            // Elemental's icon should appear in the side menu
+            cypressLib.checkNavIcon('elemental')
+              .should('exist');
 
-      qase(58,
-        it('Check Elemental UI after upgrade', () => {
-          cy.viewport(1920, 1080);
-          // Elemental's icon should appear in the side menu
-          cypressLib.checkNavIcon('elemental')
-            .should('exist');
+            // Click on the Elemental's icon
+            cypressLib.accesMenu('OS Management');
 
-          // Click on the Elemental's icon
-          cypressLib.accesMenu('OS Management');
+            // Check Elemental's side menu
+            elemental.checkElementalNav();
 
-          // Check Elemental's side menu
-          elemental.checkElementalNav();
-
-          // Check Elemental's main page
-          // TODO: Could be improve to check everything
-          cy.get('[data-testid="card-registration-endpoints"]')
-            .contains('1');
-          cy.get('[data-testid="card-inventory-of-machines"]')
-            .contains('1');
-          cy.get('[data-testid="card-clusters"]')
-            .contains('1');
-          cy.get('[data-testid="machine-reg-block"]')
-            .contains('machine-registration');
-          // Check OS Versions Channel
-          cy.clickNavMenu(["Advanced", "OS Version Channels"]);
-          cy.get('.main-row')
-            .contains('Active elemental-channel', {timeout: 60000});
-        })
-      );
+            // Check Elemental's main page
+            // TODO: Could be improve to check everything
+            cy.get('[data-testid="card-registration-endpoints"]')
+              .contains('1');
+            cy.get('[data-testid="card-inventory-of-machines"]')
+              .contains('1');
+            cy.get('[data-testid="card-clusters"]')
+              .contains('1');
+            cy.get('[data-testid="machine-reg-block"]')
+              .contains('machine-registration');
+            // Check OS Versions Channel
+            cy.clickNavMenu(["Advanced", "OS Version Channels"]);
+            cy.get('.main-row')
+              .contains('Active elemental-channel', {timeout: 60000});
+          })
+        );
+      };
     };
   });
 });

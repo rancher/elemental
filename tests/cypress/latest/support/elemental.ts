@@ -49,7 +49,7 @@ export class Elemental {
     })      
   }
 
-  installElementalOperator() {
+  installElementalOperator(upgrade_from_version: string) {
     cy.contains('local')
     .click();
     cy.get('.nav').contains('Apps')
@@ -62,6 +62,10 @@ export class Elemental {
         .click();
     }
     cy.contains('Charts: Elemental', {timeout:30000});
+    if (isCypressTag('upgrade') && isOperatorVersion('marketplace')) {
+      cy.contains(upgrade_from_version, {timeout:30000})
+        .click();
+    }
     cy.clickButton('Install');
     cy.contains('.outer-container > .header', 'Elemental');
     cy.clickButton('Next');

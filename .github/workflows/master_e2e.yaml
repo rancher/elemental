@@ -99,6 +99,9 @@ on:
       ui_account:
         description: Account used to test RBAC role in UI
         type: string
+      upgrade_from_version:
+        description: Elemental operator version to upgrade from
+        type: string
       upgrade_image:
         description: Image to use for the Elemental OS upgrade
         type: string
@@ -224,6 +227,7 @@ jobs:
       snap_type: ${{ inputs.snap_type }}
       test_type: ${{ inputs.test_type }}
       ui_account: ${{ inputs.ui_account }}
+      upgrade_from_version: ${{ inputs.upgrade_from_version }}
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       upgrade_type: ${{ inputs.upgrade_type }}

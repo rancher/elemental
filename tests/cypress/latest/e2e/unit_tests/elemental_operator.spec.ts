@@ -27,6 +27,7 @@ filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental Operator', () => {
     const elemental = new Elemental();
+    const upgrade_from_version = Cypress.env('upgrade_from_version');
   
     beforeEach(() => {
       cy.login();
@@ -40,13 +41,13 @@ filterTests(['main', 'upgrade'], () => {
       });
       qase(10,
         it('Install latest dev Elemental operator', () => {
-          elemental.installElementalOperator();
+          elemental.installElementalOperator(upgrade_from_version);
         })
       );
     } else if (!isRancherManagerVersion('2.7')) {
       qase(57,
         it('Install latest stable Elemental operator', () => {
-          elemental.installElementalOperator();
+          elemental.installElementalOperator(upgrade_from_version);
         })
       );
     };

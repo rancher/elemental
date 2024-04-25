@@ -104,6 +104,11 @@ Cypress.Commands.add('createMachReg', (
       if (utils.isOperatorVersion('staging')) {
         // In rare case, we might want to test upgrading from staging to dev
         utils.isUpgradeOsChannel('dev') ? cy.contains('(unstable)').click(): null;
+      } else if (utils.isOperatorVersion('marketplace')) {
+        // Hardcoded version for the OS version
+        // TODO: add it to upgrade_from_version inputs in the future
+        cy.contains('ISO x86_64 v1.2.2')
+          .click();
       } else {
           cy.contains('ISO x86_64 v2.0.2')
           .click();
