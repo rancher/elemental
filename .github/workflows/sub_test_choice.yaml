@@ -95,6 +95,9 @@ on:
       ui_account:
         required: true
         type: string
+      upgrade_from_version:
+        required: true
+        type: string
       upgrade_image:
         required: true
         type: string
@@ -223,6 +226,7 @@ jobs:
       rancher_version: ${{ inputs.rancher_version }}
       runner_label: ${{ inputs.runner_label }}
       ui_account: ${{ inputs.ui_account }}
+      upgrade_from_version: ${{ inputs.upgrade_from_version }}
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}

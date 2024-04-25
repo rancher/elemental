@@ -62,6 +62,9 @@ on:
       ui_account:
         required: true
         type: string
+      upgrade_from_version:
+        required: true
+        type: string
       upgrade_image:
         required: true
         type: string
@@ -210,6 +213,7 @@ jobs:
             /workdir/e2e/unit_tests/machine_registration.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
+          UPGRADE_FROM_VERSION: ${{ inputs.upgrade_from_version }}
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
         run: cd tests && make start-cypress-tests
 
