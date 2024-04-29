@@ -24,6 +24,9 @@ on:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental
         type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
         default: '"latest/devel/2.9"'
@@ -56,5 +59,6 @@ jobs:
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
       proxy: ${{ inputs.proxy || 'elemental' }}
+      qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
