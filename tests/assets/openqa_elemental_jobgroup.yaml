@@ -10,12 +10,13 @@
 
 ---
 .default_products: &default_products
-  distri: elemental
-  flavor: ISO
+  distri: sle-micro
+  version: '6.0'
 
 .default_settings: &default_settings
-  PASSWORD: ros
+  QEMUCPU: host
   QEMURAM: '2048'
+  PASSWORD: ros
   TEST_PASSWORD: Elemental@R00t
   YAML_SCHEDULE: schedule/elemental/iso.yaml
 
@@ -28,22 +29,62 @@ defaults:
     priority: 50
 
 products:
-  elemental-ISO-x86_64:
+  sl-micro-baremetal-x86_64:
     <<: *default_products
-    version: Teal
-  elemental-ISO-aarch64:
+    flavor: Elemental-baremetal
+  sl-micro-base-x86_64:
     <<: *default_products
-    version: Teal
+    flavor: Elemental-base
+  sl-micro-kvm-x86_64:
+    <<: *default_products
+    flavor: Elemental-kvm
+  sl-micro-rt-x86_64:
+    <<: *default_products
+    flavor: Elemental-rt
+  sl-micro-baremetal-aarch64:
+    <<: *default_products
+    flavor: Elemental-baremetal
+  sl-micro-base-aarch64:
+    <<: *default_products
+    flavor: Elemental-base
+  sl-micro-kvm-aarch64:
+    <<: *default_products
+    flavor: Elemental-kvm
 
 scenarios:
   x86_64:
-    elemental-ISO-x86_64:
+    sl-micro-baremetal-x86_64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+    sl-micro-base-x86_64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+    sl-micro-kvm-x86_64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+    sl-micro-rt-x86_64:
       - elemental_iso:
           testsuite: null
           settings:
             <<: *default_settings
   aarch64:
-    elemental-ISO-aarch64:
+    sl-micro-baremetal-aarch64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+    sl-micro-base-aarch64:
+      - elemental_iso:
+          testsuite: null
+          settings:
+            <<: *default_settings
+    sl-micro-kvm-aarch64:
       - elemental_iso:
           testsuite: null
           settings:
