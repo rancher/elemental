@@ -62,3 +62,9 @@ RUN rm -rf /var/log/update* && \
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
+
+# Set SELinux, this should be the default and not needed anymore as soon as SELinux
+# is fully supported. Manually set here in a hacky way for testing purposes only
+RUN sed -i "s| enforcing=0||g" /etc/elemental/bootargs.cfg && \
+    sed -i "s|selinux=0|enforcing=0|g" /etc/elemental/bootargs.cfg && \
+    sed -i "s| selinux=1||g" /etc/elemental/bootargs.cfg
