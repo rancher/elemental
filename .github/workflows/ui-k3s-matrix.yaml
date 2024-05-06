@@ -28,8 +28,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # From Monday to Saturday at 11pm UTC (6pm in us-central1)
-    - cron: '0 23 * * 1-6'
+    # From Monday to Saturday at 2am UTC (9pm in us-central1)
+    - cron: '0 2 * * 1-6'
 
 jobs:
   ui:
@@ -57,3 +57,4 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
+      zone: us-central1-a

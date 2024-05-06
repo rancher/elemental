@@ -28,8 +28,8 @@ on:
         default: '"latest/devel/2.8"'
         type: string
   schedule:
-    # From Monday to Saturday at 8am UTC (3am in us-central1)
-    - cron: '0 8 * * 1-6'
+    # From Monday to Saturday at 5am UTC (0am in us-central1)
+    - cron: '0 5 * * 1-6'
 
 jobs:
   cli:
@@ -61,3 +61,4 @@ jobs:
       test_type: cli
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
       upgrade_os_channel: dev
+      zone: us-central1-f

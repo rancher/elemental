@@ -28,8 +28,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # From Monday to Saturday at 0am UTC (7pm in us-central1)
-    - cron: '0 0 * * 1-6'
+    # From Monday to Saturday at 2am UTC (9pm in us-central1)
+    - cron: '0 2 * * 1-6'
 
 jobs:
   ui:
@@ -59,3 +59,4 @@ jobs:
       test_type: ui
       # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
       #ui_account: user
+      zone: us-central1-b

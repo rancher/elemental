@@ -48,3 +48,4 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: airgap
+      zone: us-central1-c
