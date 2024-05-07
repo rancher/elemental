@@ -21,32 +21,42 @@ stages:
   rootfs:
     - if: '[ ! -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration"
-      environment_file: /run/elemental/mount-layout.env
-      environment:
-        OVERLAY: "tmpfs:25%"
-        RW_PATHS: "/var /etc /srv"
-        PERSISTENT_STATE_PATHS: >-
-          /etc/systemd
-          /etc/rancher
-          /etc/ssh
-          /etc/iscsi
-          /etc/cni
-          /home
-          /opt
-          /root
-          /usr/libexec
-          /usr/local
-          /var/log
-          /var/lib/elemental
-          /var/lib/rancher
-          /var/lib/kubelet
-          /var/lib/NetworkManager
-          /var/lib/cni
-          /var/lib/calico
-        PERSISTENT_STATE_BIND: "true"
+      files: 
+      - path: /etc/elemental/config.d/layout.yaml
+        content: |
+          mount:
+            write-fstab: true
+            ephemeral:
+              type: tmpfs
+              size: 25%
+              paths: ['/etc', '/var', '/srv']
+            persistent:
+              mode: bind
+              paths:
+              - /etc/systemd
+              - /etc/rancher
+              - /etc/ssh
+              - /etc/iscsi
+              - /etc/cni
+              - /home
+              - /opt
+              - /root
+              - /usr/libexec
+              - /usr/local
+              - /var/log
+              - /var/lib/elemental
+              - /var/lib/rancher
+              - /var/lib/kubelet
+              - /var/lib/NetworkManager
+              - /var/lib/cni
+              - /var/calico
     - if: '[ -f "/run/elemental/recovery_mode" ]'
-      # omit the persistent partition on recovery mode
       name: "Layout configuration for recovery"
-      environment_file: /run/elemental/mount-layout.env
-      environment:
-        OVERLAY: "tmpfs:25%"
+      files: 
+      - path: /etc/elemental/config.d/layout.yaml
+        content: |
+          mount:
+            write-fstab: true
+            ephemeral:
+              type: tmpfs
+              size: 25%
