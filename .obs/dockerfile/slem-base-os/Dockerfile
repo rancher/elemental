@@ -22,7 +22,7 @@ RUN zypper --installroot /osimage in --no-recommends -y filesystem
 RUN zypper --installroot /osimage in --no-recommends -y grub2 shim dracut iputils kernel systemd bash
 
 #!ArchExclusiveLine: x86_64
-RUN if [ `uname -m` = "x86-64" ]; then zypper --installroot /osimage in --no-recommends -y syslinux grub2-i386-pc grub2-x86_64-efi; fi
+RUN if [ `uname -m` = "x86_64" ]; then zypper --installroot /osimage in --no-recommends -y syslinux grub2-i386-pc grub2-x86_64-efi; fi
 
 # make dracut happy
 RUN zypper --installroot /osimage in --no-recommends -y squashfs NetworkManager-branding-SLE NetworkManager device-mapper iproute2 tar curl ca-certificates ca-certificates-mozilla
