@@ -22,7 +22,7 @@ stages:
     - if: '[ ! -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration"
       files: 
-      - path: /etc/elemental/config.d/layout.yaml
+      - path: /run/elemental/config.d/layout.yaml
         content: |
           mount:
             write-fstab: true
@@ -53,7 +53,7 @@ stages:
     - if: '[ -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration for recovery"
       files: 
-      - path: /etc/elemental/config.d/layout.yaml
+      - path: /run/elemental/config.d/layout.yaml
         content: |
           mount:
             write-fstab: true
