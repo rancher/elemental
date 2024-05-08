@@ -49,7 +49,7 @@ stages:
               - /var/lib/kubelet
               - /var/lib/NetworkManager
               - /var/lib/cni
-              - /var/calico
+              - /var/lib/calico
     - if: '[ -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration for recovery"
       files: 
