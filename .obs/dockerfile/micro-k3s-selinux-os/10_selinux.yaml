@@ -16,7 +16,7 @@ stages:
            # Some extended attributes are lost on copy-up bsc#1210690.
            # Workaround visit children first, then parents
            mkdir -p /run/systemd/relabel-extra.d/
-           for path in /etc /srv /var /oem /home /root /opt /usr/libexec /usr/local; do
+           for path in /etc /srv /oem /home /root /opt /usr/libexec /usr/local; do
              if [ -d "${path}" ]; then
                find ${path} -depth -exec /sbin/setfiles -i -F -v "${contexts}" \{\} +
                echo "${path}" >> /run/systemd/relabel-extra.d/layout.relabel
