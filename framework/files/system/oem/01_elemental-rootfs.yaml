@@ -29,8 +29,10 @@ stages:
             ephemeral:
               type: tmpfs
               size: 25%
-              paths: ['/etc', '/var', '/srv']
+              paths: ['/etc', '/srv']
             persistent:
+              volume:
+                mountpoint: /var
               mode: bind
               paths:
               - /etc/systemd
@@ -43,13 +45,6 @@ stages:
               - /root
               - /usr/libexec
               - /usr/local
-              - /var/log
-              - /var/lib/elemental
-              - /var/lib/rancher
-              - /var/lib/kubelet
-              - /var/lib/NetworkManager
-              - /var/lib/cni
-              - /var/lib/calico
     - if: '[ -f "/run/elemental/recovery_mode" ]'
       name: "Layout configuration for recovery"
       files: 
