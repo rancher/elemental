@@ -69,6 +69,3 @@ RUN sed -i "s|SELINUX=.*|SELINUX=enforcing|g" /etc/selinux/config && \
     sed -i "s| enforcing=0||g" /etc/elemental/bootargs.cfg && \
     sed -i "s|selinux=0|enforcing=0|g" /etc/elemental/bootargs.cfg && \
     sed -i "s| selinux=1||g" /etc/elemental/bootargs.cfg
-
-# This won't be needed once rancher/elemental-tookit#1492
-ADD 10_selinux.yaml /system/oem/10_selinux.yaml
