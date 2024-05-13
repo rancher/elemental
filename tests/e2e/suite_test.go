@@ -64,6 +64,7 @@ var (
 	clusterYaml               string
 	elementalSupport          string
 	emulateTPM                bool
+	forceDowngrade            bool
 	isoBoot                   bool
 	k8sUpstreamVersion        string
 	k8sDownstreamVersion      string
@@ -398,6 +399,12 @@ func TestE2E(t *testing.T) {
 	RunSpecs(t, "Elemental End-To-End Test Suite")
 }
 
+// Use to modify yaml templates
+type YamlPattern struct {
+	key   string
+	value string
+}
+
 var _ = BeforeSuite(func() {
 	backupRestoreVersion = os.Getenv("BACKUP_RESTORE_VERSION")
 	bootTypeString := os.Getenv("BOOT_TYPE")
@@ -408,6 +415,7 @@ var _ = BeforeSuite(func() {
 	clusterType = os.Getenv("CLUSTER_TYPE")
 	elementalSupport = os.Getenv("ELEMENTAL_SUPPORT")
 	eTPM := os.Getenv("EMULATE_TPM")
+	forceDowngradeString := os.Getenv("FORCE_DOWNGRADE")
 	index := os.Getenv("VM_INDEX")
 	k8sDownstreamVersion = os.Getenv("K8S_DOWNSTREAM_VERSION")
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
@@ -456,7 +464,7 @@ var _ = BeforeSuite(func() {
 	// NOTE: could be the number added nodes or the number of nodes to use/upgrade
 	usedNodes = (numberOfVMs - vmIndex) + 1
 
-	// Force a correct value for emulateTPM
+	// Force correct value for emulateTPM
 	switch eTPM {
 	case "true":
 		emulateTPM = true
@@ -464,7 +472,7 @@ var _ = BeforeSuite(func() {
 		emulateTPM = false
 	}
 
-	// Same for sequential
+	// Force correct value for sequential
 	switch seqString {
 	case "true":
 		sequential = true
@@ -472,12 +480,20 @@ var _ = BeforeSuite(func() {
 		sequential = false
 	}
 
-	// Same for bootType
+	// Define boot type
 	switch bootTypeString {
 	case "iso":
 		isoBoot = true
 	case "raw":
 		rawBoot = true
+	}
+
+	// Force correct value for forceDowngrade
+	switch forceDowngradeString {
+	case "true":
+		forceDowngrade = true
+	default:
+		forceDowngrade = false
 	}
 
 	// Extract Rancher Manager channel/version to install

@@ -9,3 +9,7 @@ spec:
   %UPGRADE_TYPE%
   clusterTargets:
     - clusterName: %CLUSTER_NAME%
+  upgradeContainer:
+    envs:
+      - name: FORCE
+        value: "%FORCE_DOWNGRADE%"

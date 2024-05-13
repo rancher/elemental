@@ -33,13 +33,8 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 		// Report to Qase
 		testCaseID = 30
 
-		type pattern struct {
-			key   string
-			value string
-		}
-
 		// Patterns to replace
-		basePatterns := []pattern{
+		basePatterns := []YamlPattern{
 			{
 				key:   "%CLUSTER_NAME%",
 				value: clusterName,
@@ -73,7 +68,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
-				addPatterns := []pattern{
+				addPatterns := []YamlPattern{
 					{
 						key:   "%POOL_TYPE%",
 						value: pool,
@@ -108,7 +103,7 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 
 			for _, pool := range []string{"master", "worker"} {
 				// Patterns to replace
-				addPatterns := []pattern{
+				addPatterns := []YamlPattern{
 					{
 						key:   "%PASSWORD%",
 						value: userPassword,

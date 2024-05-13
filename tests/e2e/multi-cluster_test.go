@@ -34,13 +34,8 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 	const seedImageName = "seed-image-multi"
 	const machineRegName = "machine-registration-multi"
 
-	type pattern struct {
-		key   string
-		value string
-	}
-
 	var (
-		basePatterns []pattern
+		basePatterns []YamlPattern
 		globalNodeID int
 		wg           sync.WaitGroup
 	)
@@ -48,7 +43,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 	BeforeEach(func() {
 
 		// Patterns to replace
-		basePatterns = []pattern{
+		basePatterns = []YamlPattern{
 			{
 				key:   "%K8S_VERSION%",
 				value: k8sDownstreamVersion,
@@ -153,7 +148,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 			err = tools.CopyFile(seedImageYaml, seedImageTmp)
 			Expect(err).To(Not(HaveOccurred()))
 
-			seedImagePatterns := []pattern{
+			seedImagePatterns := []YamlPattern{
 				{
 					key:   "%BASE_IMAGE%",
 					value: baseImageURL,
@@ -189,7 +184,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 			createdClusterName := clusterName + "-" + strconv.Itoa(clusterIndex)
 
 			// Patterns to replace
-			addPatterns := []pattern{
+			addPatterns := []YamlPattern{
 				{
 					key:   "%CLUSTER_NAME%",
 					value: createdClusterName,

@@ -29,6 +29,9 @@ on:
       destroy_runner:
         required: true
         type: boolean
+      force_downgrade:
+        required: true
+        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -321,6 +324,7 @@ jobs:
         id: upgrade_node_1
         if: ${{ inputs.upgrade_image != '' }}
         env:
+          FORCE_DOWNGRADE: ${{ inputs.force_downgrade }}
           UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
@@ -334,6 +338,7 @@ jobs:
         id: upgrade_other_nodes
         if: ${{ inputs.upgrade_os_channel != '' }}
         env:
+          FORCE_DOWNGRADE: ${{ inputs.force_downgrade }}
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}
           UPGRADE_TYPE: managedOSVersionName
           VM_INDEX: 2
@@ -381,6 +386,7 @@ jobs:
 
       - name: Create ISO image for worker pool
         id: create_iso_worker
+        if: ${{ inputs.node_number > 3 }}
         env:
           BOOT_TYPE: iso
           OS_TO_TEST: ${{ inputs.os_to_test }}

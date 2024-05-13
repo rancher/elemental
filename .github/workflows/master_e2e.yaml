@@ -41,6 +41,10 @@ on:
         description: Version of the elemental ui which will be installed (dev/stable)
         default: dev
         type: string
+      force_downgrade:
+        description: Force OS downgrade
+        default: false
+        type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
         type: string
@@ -209,6 +213,7 @@ jobs:
       cypress_tags: ${{ inputs.cypress_tags }}
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
+      force_downgrade: ${{ inputs.force_downgrade }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}

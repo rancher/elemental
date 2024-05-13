@@ -38,6 +38,9 @@ on:
       elemental_ui_version:
         required: true
         type: string
+      force_downgrade:
+        required: true
+        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -155,6 +158,7 @@ jobs:
       cluster_namespace: ${{ inputs.cluster_namespace }}
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
+      force_downgrade: ${{ inputs.force_downgrade }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
