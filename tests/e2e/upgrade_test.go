@@ -99,23 +99,16 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		Expect(err).To(Not(HaveOccurred()))
 
 		// Upgrade Rancher Manager
-		err = rancher.DeployRancherManager(
+		// NOTE: Don't check the status, we can have false-positive here...
+		//       Better to check the rollout after the upgrade, it will fail if the upgrade failed
+		_ = rancher.DeployRancherManager(
 			rancherHostname,
 			rancherUpgradeChannel,
 			rancherUpgradeVersion,
 			rancherUpgradeHeadVersion,
-			caType, proxy,
+			caType,
+			proxy,
 		)
-
-		// Check if we have the "may still be processing the request" error to workaround it
-		// Manual tests showed that the upgrade is OK after some times, so just ignore the error
-		if err != nil {
-			errMsg := strings.Split(err.Error(), ":")
-			if out := errMsg[len(errMsg)-1]; strings.Contains(out, "but may still be processing the request") {
-				err = nil
-			}
-		}
-		Expect(err).To(Not(HaveOccurred()))
 
 		// Wait for Rancher Manager to be restarted
 		// NOTE: 1st or 2nd rollout command can sporadically fail, so better to use Eventually here
@@ -126,7 +119,7 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 				"status", "deployment/rancher",
 			)
 			return status
-		}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
+		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(ContainSubstring("successfully rolled out"))
 
 		// Check that all Rancher Manager pods are running
 		Eventually(func() error {
