@@ -57,6 +57,5 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
-      # Disable user account due to https://github.com/rancher/elemental-ui/issues/175
-      #ui_account: user
+      ui_account: user
       zone: us-central1-b
