@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -285,13 +286,31 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				Expect(err).To(Not(HaveOccurred()))
 			}
 
-			// Set values
-			err = tools.Sed("with-%UPGRADE_TYPE%", strings.ToLower(upgradeType), upgradeTmp)
-			Expect(err).To(Not(HaveOccurred()))
-			err = tools.Sed("%UPGRADE_TYPE%", upgradeType+": "+value, upgradeTmp)
-			Expect(err).To(Not(HaveOccurred()))
-			err = tools.Sed("%CLUSTER_NAME%", clusterName, upgradeTmp)
-			Expect(err).To(Not(HaveOccurred()))
+			// Patterns to replace
+			patterns := []YamlPattern{
+				{
+					key:   "with-%UPGRADE_TYPE%",
+					value: strings.ToLower(upgradeType),
+				},
+				{
+					key:   "%UPGRADE_TYPE%",
+					value: upgradeType + ": " + value,
+				},
+				{
+					key:   "%CLUSTER_NAME%",
+					value: clusterName,
+				},
+				{
+					key:   "%FORCE_DOWNGRADE%",
+					value: strconv.FormatBool(forceDowngrade),
+				},
+			}
+
+			// Create Yaml file
+			for _, p := range patterns {
+				err := tools.Sed(p.key, p.value, upgradeTmp)
+				Expect(err).To(Not(HaveOccurred()))
+			}
 
 			// Apply the generated file
 			err = kubectl.Apply(clusterNS, upgradeTmp)

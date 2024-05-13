@@ -1,0 +1,55 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-Downgrade
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        default: '""'
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.8+k3s2"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.26.10+k3s2"'
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
+  schedule:
+    # Every Sunday at 2pm UTC (9am in us-central1)
+    - cron: '0 14 * * 0'
+
+jobs:
+  cli:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '"", "hardened"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.8+k3s2"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.26.10+k3s2"')) }}
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
+    with:
+      cluster_type: ${{ matrix.cluster_type }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      force_downgrade: true
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      node_number: 3
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_version: stable/latest
+      test_type: cli
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.0/baremetal-os-container:latest
+      zone: us-central1-b

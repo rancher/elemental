@@ -42,11 +42,6 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 		testCaseID = 38
 
 		By("Adding SeedImage", func() {
-			type pattern struct {
-				key   string
-				value string
-			}
-
 			// Wait for list of OS versions to be populated
 			WaitForOSVersion(clusterNS)
 
@@ -92,7 +87,7 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			})
 
 			// Patterns to replace
-			patterns := []pattern{
+			patterns := []YamlPattern{
 				{
 					key:   "%CLUSTER_NAME%",
 					value: clusterName,
