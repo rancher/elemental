@@ -123,7 +123,7 @@ on:
         type: string
       zone:
         description: GCP zone to host the runner
-        default: us-central1
+        default: us-central1-f
         type: string
 
     # Secrets to set when calling this reusable workflow
