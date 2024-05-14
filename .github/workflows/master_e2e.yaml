@@ -66,6 +66,12 @@ on:
         description: OS repository to test (dev/staging/stable)
         type: string
         default: dev
+      os_version_install:
+        description: OS version to install
+        type: string
+      os_version_target:
+        description: OS version to target when upgrading
+        type: string
       proxy:
         description: Deploy a proxy
         type: string
@@ -219,6 +225,8 @@ jobs:
       operator_repo: ${{ inputs.operator_repo }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
       os_to_test: ${{ inputs.os_to_test }}
+      os_version_install: ${{ inputs.os_version_install }}
+      os_version_target: ${{ inputs.os_version_target }}
       proxy: ${{ inputs.proxy }}
       public_domain: ${{ needs.create-runner.outputs.public_domain }}
       public_fqdn: ${{ needs.create-runner.outputs.public_fqdn }}

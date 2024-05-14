@@ -79,6 +79,7 @@ describe('Upgrade tests', () => {
         /////////////////////////////////////////
         // K3s cluster upgraded with OS Image
         // RKE2 cluster upgraded with OS version channel
+        // Marketplace test uses OS version channel
         cy.clickNavMenu(["Advanced", "Update Groups"]);
         cy.getBySel('masthead-create')
         .contains('Create')
@@ -93,7 +94,7 @@ describe('Upgrade tests', () => {
         cy.get('.vs__dropdown-menu')
           .contains(clusterName)
           .click();
-        if (utils.isK8sVersion("k3s")) {
+        if (utils.isK8sVersion("k3s") && !utils.isOperatorVersion('marketplace')) {
           cy.getBySel('upgrade-choice-selector')
             .parent()
             .contains('Use image from registry')
@@ -107,10 +108,17 @@ describe('Upgrade tests', () => {
             .click();
           cy.getBySel('os-version-box')
             .click()
-          cy.getBySel('os-version-box')
-            .parents()
-            .contains('unstable')
-            .click();
+          if (utils.isOperatorVersion('marketplace')) {
+            cy.getBySel('os-version-box')
+              .parents()
+              .contains(Cypress.env('os_version_target'))
+              .click();
+          } else {
+            cy.getBySel('os-version-box')
+              .parents()
+              .contains('unstable')
+              .click();
+          }
         } 
 
         cy.getBySel('form-save')
