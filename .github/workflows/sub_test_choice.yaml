@@ -59,6 +59,12 @@ on:
       os_to_test:
         required: true
         type: string
+      os_version_install:
+        required: true
+        type: string
+      os_version_target:
+        required: true
+        type: string
       proxy:
         required: true
         type: string
@@ -222,6 +228,8 @@ jobs:
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
+      os_version_install: ${{ inputs.os_version_install }}
+      os_version_target: ${{ inputs.os_version_target }}
       proxy: ${{ inputs.proxy }}
       public_domain: ${{ inputs.public_domain }}
       public_fqdn: ${{ inputs.public_fqdn }}

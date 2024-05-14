@@ -38,6 +38,12 @@ on:
       operator_repo:
         required: true
         type: string
+      os_version_install:
+        required: true
+        type: string
+      os_version_target:
+        required: true
+        type: string
       proxy:
         required: true
         type: string
@@ -200,6 +206,7 @@ jobs:
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
+          OS_VERSION_INSTALL: ${{ inputs.os_version_install }}
           RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ inputs.public_fqdn }}/dashboard
@@ -272,6 +279,7 @@ jobs:
           ELEMENTAL_DEV_VERSION: ${{ steps.install_chartmuseum.outputs.operator_dev_version }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
+          OS_VERSION_TARGET: ${{ inputs.os_version_target }}
           PROXY: ${{ inputs.proxy }}
           RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
           RANCHER_PASSWORD: rancherpassword
