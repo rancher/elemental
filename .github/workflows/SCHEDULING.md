@@ -12,7 +12,7 @@ We try to spread the tests as best as we can to avoid SPOT issue as well as not 
 | CLI K3s Scalability | Sunday | 2am | us-central1-f |
 | CLI Multicluster | Sunday | 5am | us-central1-b |
 | CLI Rancher Manager Devel | Sunday | 8am | us-central1-c |
-| UI Rancher Manager Devel | Sunday | 12am | us-central1-a |
+| UI Rancher Manager Devel | Sunday | 12pm | us-central1-a |
 | UI K3s | Monday to Saturday | 2am | us-central1-a |
 | UI K3s Upgrade | Monday to Saturday | 4am | us-central1-a |
 | UI RKE2 | Monday to Saturday | 2am | us-central1-b |
