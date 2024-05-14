@@ -32,8 +32,8 @@ on:
         default: '"latest/devel/2.9"'
         type: string
   schedule:
-    # Every Sunday at 12am UTC (7am in us-central1)
-    - cron: '0 23 * * 1-6'
+    # Every Sunday at 12pm UTC (7am in us-central1)
+    - cron: '0 12 * * 0'
 
 jobs:
   ui:
