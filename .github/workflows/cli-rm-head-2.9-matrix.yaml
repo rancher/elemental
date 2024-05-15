@@ -73,6 +73,7 @@ jobs:
       pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
       qase_api_token: ${{ secrets.QASE_API_TOKEN }}
     with:
+      backup_restore_version: v5.0.0-rc.6
       ca_type: ${{ matrix.ca_type }}
       cluster_type: ${{ matrix.cluster_type }}
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
