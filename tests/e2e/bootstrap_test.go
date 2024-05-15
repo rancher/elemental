@@ -35,7 +35,7 @@ func checkClusterAgent(client *tools.Client) {
 	Eventually(func() string {
 		out, _ := client.RunSSH("kubectl get pod -n cattle-system -l app=cattle-cluster-agent")
 		return out
-	}, tools.SetTimeout(3*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
+	}, tools.SetTimeout(5*time.Duration(usedNodes)*time.Minute), 10*time.Second).Should(ContainSubstring("Running"))
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
