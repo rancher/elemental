@@ -10,6 +10,7 @@ export default defineConfig({
     'projectCode': 'ELEMENTAL',
     'logging': true,
   },
+  video: true,
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
