@@ -95,7 +95,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 			}
 		})
 
-		if proxy != "" {
+		if proxy == "elemental" || proxy == "rancher" {
 			By("Collecting proxy log and make sure traffic went through it", func() {
 				out, err := exec.Command("docker", "exec", "squid_proxy", "cat", "/var/log/squid/access.log").CombinedOutput()
 				checkRC(err)
