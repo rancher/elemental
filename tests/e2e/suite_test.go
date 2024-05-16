@@ -155,7 +155,7 @@ func WaitCluster(ns, cn string) {
 
 	// Check that the cluster is in Ready state (this means that it has been created)
 	Eventually(func() string {
-		status, _ := kubectl.RunWithoutErr("get", "cluster",
+		status, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
 			"--namespace", ns, cn,
 			"-o", "jsonpath={.status.ready}")
 		return status
@@ -166,7 +166,7 @@ func WaitCluster(ns, cn string) {
 		counter := 0
 
 		Eventually(func() string {
-			status, _ := kubectl.RunWithoutErr("get", "cluster",
+			status, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
 				"--namespace", ns, cn,
 				"-o", "jsonpath={.status.conditions[?(@.type==\""+s.conditionType+"\")].status}")
 
@@ -228,7 +228,7 @@ Check that Cluster resource has been correctly created
 func CheckCreatedCluster(ns, cn string) {
 	// Check that the cluster is correctly created
 	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "cluster",
+		out, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
 			"--namespace", ns,
 			cn, "-o", "jsonpath={.metadata.name}")
 		return out

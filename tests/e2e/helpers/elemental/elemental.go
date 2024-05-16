@@ -58,7 +58,7 @@ Get state of the cluster
   - @returns The YAML structure or an error
 */
 func GetClusterState(ns, cluster, condition string) (string, error) {
-	out, err := kubectl.RunWithoutErr("get", "cluster", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
+	out, err := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io", "--namespace", ns, cluster, "-o", "jsonpath="+condition)
 	if err != nil {
 		return "", err
 	}
