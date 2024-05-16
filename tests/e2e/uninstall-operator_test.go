@@ -37,7 +37,7 @@ func deleteFinalizers(ns, object, value string) {
 
 func testClusterAvailability(ns, cluster string) {
 	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "cluster",
+		out, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
 			"--namespace", ns, cluster,
 			"-o", "jsonpath={.metadata.name}")
 		return out
@@ -141,7 +141,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		wg.Wait()
 
 		By("Testing cluster resource unavailability", func() {
-			out, err := kubectl.Run("get", "cluster",
+			out, err := kubectl.Run("get", "cluster.v1.provisioning.cattle.io",
 				"--namespace", clusterNS, clusterName,
 				"-o", "jsonpath={.metadata.name}")
 			Expect(err).To(HaveOccurred(), out)

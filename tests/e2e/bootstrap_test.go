@@ -181,9 +181,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		By("Incrementing number of nodes in "+poolType+" pool", func() {
 			// Increase 'quantity' field
-			value, err := rancher.SetNodeQuantity(clusterNS,
-				clusterName,
-				"pool-"+poolType+"-"+clusterName, usedNodes)
+			poolName := "pool-" + poolType + "-" + clusterName
+			value, err := rancher.SetNodeQuantity(clusterNS, clusterName, poolName, usedNodes)
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(value).To(BeNumerically(">=", 1))
 
