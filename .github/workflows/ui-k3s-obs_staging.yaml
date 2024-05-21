@@ -10,11 +10,11 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: v1.27.8+k3s2
+        default: v1.27.13+k3s1
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: v1.26.10+k3s2
+        default: v1.27.13+k3s1
         type: string
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
