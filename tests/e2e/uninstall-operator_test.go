@@ -105,7 +105,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 			By("Deleting cluster resource", func() {
 				Eventually(func() error {
-					_, err := kubectl.RunWithoutErr("delete", "cluster",
+					_, err := kubectl.RunWithoutErr("delete", "cluster.v1.provisioning.cattle.io",
 						"--namespace", ns, name)
 					return err
 				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
