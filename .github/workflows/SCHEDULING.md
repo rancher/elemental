@@ -10,6 +10,7 @@ We try to spread the tests as best as we can to avoid SPOT issue as well as not 
 | CLI RKE2 Upgrade | Monday to Saturday | 5am | us-central1-f |
 | CLI K3s Airgap | Sunday | 1am | us-central1-c |
 | CLI K3s Scalability | Sunday | 2am | us-central1-f |
+| CLI K3s SELinux | Sunday | 2am | us-central1-c |
 | CLI Multicluster | Sunday | 5am | us-central1-b |
 | CLI Rancher Manager Devel | Sunday | 8am | us-central1-c |
 | UI Rancher Manager Devel | Sunday | 12pm | us-central1-a |

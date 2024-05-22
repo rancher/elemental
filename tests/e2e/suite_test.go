@@ -89,8 +89,10 @@ var (
 	registrationYaml          string
 	seedImageYaml             string
 	selectorYaml              string
+	selinux                   bool
 	sequential                bool
 	snapType                  string
+	sshdConfigFile            string
 	testCaseID                int64
 	testType                  string
 	upgradeImage              string
@@ -299,8 +301,8 @@ Download ISO built with SeedImage
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func DownloadBuiltISO(ns, seedName, filename string) {
-	// Set minimal ISO file to 500MB
-	const minimalISOSize = 500 * 1024 * 1024
+	// Set minimal ISO file to 250MB
+	const minimalISOSize = 250 * 1024 * 1024
 
 	// Check that the seed image is correctly created
 	Eventually(func() string {
@@ -430,12 +432,37 @@ var _ = BeforeSuite(func() {
 	rancherLogCollector = os.Getenv("RANCHER_LOG_COLLECTOR")
 	rancherVersion = os.Getenv("RANCHER_VERSION")
 	rancherUpgrade = os.Getenv("RANCHER_UPGRADE")
+	selinuxString := os.Getenv("SELINUX")
 	seqString := os.Getenv("SEQUENTIAL")
 	snapType = os.Getenv("SNAP_TYPE")
 	testType = os.Getenv("TEST_TYPE")
 	upgradeImage = os.Getenv("UPGRADE_IMAGE")
 	upgradeOSChannel = os.Getenv("UPGRADE_OS_CHANNEL")
 	upgradeType = os.Getenv("UPGRADE_TYPE")
+
+	// Define boot type
+	switch bootTypeString {
+	case "iso":
+		isoBoot = true
+	case "raw":
+		rawBoot = true
+	}
+
+	// Force correct value for emulateTPM
+	switch eTPM {
+	case "true":
+		emulateTPM = true
+	default:
+		emulateTPM = false
+	}
+
+	// Force correct value for forceDowngrade
+	switch forceDowngradeString {
+	case "true":
+		forceDowngrade = true
+	default:
+		forceDowngrade = false
+	}
 
 	// Only if VM_INDEX is set
 	if index != "" {
@@ -460,40 +487,19 @@ var _ = BeforeSuite(func() {
 		numberOfVMs = vmIndex
 	}
 
-	// Set number of "used" nodes
-	// NOTE: could be the number added nodes or the number of nodes to use/upgrade
-	usedNodes = (numberOfVMs - vmIndex) + 1
+	// Extract Rancher Manager channel/version to upgrade
+	if rancherUpgrade != "" {
+		// Split rancherUpgrade and reset it
+		s := strings.Split(rancherUpgrade, "/")
 
-	// Force correct value for emulateTPM
-	switch eTPM {
-	case "true":
-		emulateTPM = true
-	default:
-		emulateTPM = false
-	}
-
-	// Force correct value for sequential
-	switch seqString {
-	case "true":
-		sequential = true
-	default:
-		sequential = false
-	}
-
-	// Define boot type
-	switch bootTypeString {
-	case "iso":
-		isoBoot = true
-	case "raw":
-		rawBoot = true
-	}
-
-	// Force correct value for forceDowngrade
-	switch forceDowngradeString {
-	case "true":
-		forceDowngrade = true
-	default:
-		forceDowngrade = false
+		// Get needed informations
+		rancherUpgradeChannel = s[0]
+		if len(s) > 1 {
+			rancherUpgradeVersion = s[1]
+		}
+		if len(s) > 2 {
+			rancherUpgradeHeadVersion = s[2]
+		}
 	}
 
 	// Extract Rancher Manager channel/version to install
@@ -512,21 +518,31 @@ var _ = BeforeSuite(func() {
 		}
 	}
 
-	// Extract Rancher Manager channel/version to upgrade
-	if rancherUpgrade != "" {
-		// Split rancherUpgrade and reset it
-		s := strings.Split(rancherUpgrade, "/")
-
-		// Get needed informations
-		rancherUpgradeChannel = s[0]
-		if len(s) > 1 {
-			rancherUpgradeVersion = s[1]
-		}
-		if len(s) > 2 {
-			rancherUpgradeHeadVersion = s[2]
-		}
+	// Force correct value for selinux
+	switch selinuxString {
+	case "true":
+		selinux = true
+	default:
+		selinux = false
 	}
 
+	// Force correct value for sequential
+	switch seqString {
+	case "true":
+		sequential = true
+	default:
+		sequential = false
+	}
+
+	// Depending of the OS version, the SSH config file could be at different places
+	switch {
+	case strings.Contains(os2Test, "dev"):
+		sshdConfigFile = "/etc/ssh/sshd_config.d/root_access.conf"
+	default:
+		sshdConfigFile = "/etc/ssh/sshd_config"
+	}
+
+	// Define some variables depending on the type of test
 	switch testType {
 	case "airgap":
 		// Enable airgap support
@@ -557,7 +573,11 @@ var _ = BeforeSuite(func() {
 		selectorYaml = "../assets/selector.yaml"
 	}
 
-	// Start HTTP server
+	// Set number of "used" nodes
+	// NOTE: could be the number of added nodes or the number of nodes to use/upgrade
+	usedNodes = (numberOfVMs - vmIndex) + 1
+
+	// Final step: start local HTTP server
 	tools.HTTPShare("../..", ":8000")
 })
 

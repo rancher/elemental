@@ -1,0 +1,71 @@
+# This workflow calls the master E2E workflow with custom variables
+name: CLI-K3s-SELinux
+
+on:
+  workflow_dispatch:
+    inputs:
+      ca_type:
+        description: CA type to use (selfsigned or private)
+        default: '"selfsigned"'
+        type: string
+      cluster_type:
+        description: Cluster type (empty if normal or hardened)
+        default: '""'
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.13+k3s1"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.27.13+k3s1"'
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use
+        default: '"stable/latest"'
+        type: string
+      reset:
+        description: Allow reset test (mainly used on CLI tests)
+        default: false
+        type: boolean
+  schedule:
+    # Every Sunday at 2am UTC (9pm in us-central1)
+    - cron: '0 2 * * 0'
+
+jobs:
+  cli:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        ca_type: ${{ fromJSON(format('[{0}]', inputs.ca_type || '"selfsigned"')) }}
+        cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '"","hardened"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.13+k3s1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.13+k3s1"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest"')) }}
+        reset: ${{ fromJSON(format('[{0}]', inputs.reset || 'true')) }}
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
+    with:
+      ca_type: ${{ matrix.ca_type }}
+      cluster_type: ${{ matrix.cluster_type }}
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      os_to_test: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/k3s-selinux-iso-image:latest
+      qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_version: ${{ matrix.rancher_version }}
+      reset: ${{ matrix.reset }}
+      selinux: true
+      test_type: cli
+      zone: us-central1-c

@@ -5,6 +5,7 @@ config:
       passwd: r0s@pwd1
     write_files:
       - path: /etc/ssh/sshd_config
+        append: true
         content: |
           PermitRootLogin yes
         owner: root:root
