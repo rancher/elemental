@@ -42,17 +42,26 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 		testCaseID = 38
 
 		By("Adding SeedImage", func() {
-			// Wait for list of OS versions to be populated
-			WaitForOSVersion(clusterNS)
+			var baseImageURL string
 
-			// Get OSVersion name
-			OSVersion, err := exec.Command(getOSScript, os2Test, "true").Output()
-			Expect(err).To(Not(HaveOccurred()))
-			Expect(OSVersion).To(Not(BeEmpty()))
+			if selinux {
+				// For now SELinux images are only for testing purposes and not added to any channel, so we should force the value here
+				baseImageURL = os2Test
+			} else {
+				// Wait for list of OS versions to be populated
+				WaitForOSVersion(clusterNS)
 
-			// Extract container image URL
-			baseImageURL, err := elemental.GetImageURI(clusterNS, string(OSVersion))
-			Expect(err).To(Not(HaveOccurred()))
+				// Get OSVersion name
+				OSVersion, err := exec.Command(getOSScript, os2Test, "true").Output()
+				Expect(err).To(Not(HaveOccurred()))
+				Expect(OSVersion).To(Not(BeEmpty()))
+
+				// Extract container image URL
+				baseImageURL, err = elemental.GetImageURI(clusterNS, string(OSVersion))
+				Expect(err).To(Not(HaveOccurred()))
+			}
+
+			// We should be sure that we have an image to use
 			Expect(baseImageURL).To(Not(BeEmpty()))
 
 			// Set poweroff to false for master pool to have time to check SeedImage cloud-config
@@ -89,16 +98,20 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 			// Patterns to replace
 			patterns := []YamlPattern{
 				{
-					key:   "%CLUSTER_NAME%",
-					value: clusterName,
-				},
-				{
 					key:   "%BASE_IMAGE%",
 					value: baseImageURL,
 				},
 				{
+					key:   "%CLUSTER_NAME%",
+					value: clusterName,
+				},
+				{
 					key:   "%POOL_TYPE%",
 					value: poolType,
+				},
+				{
+					key:   "%SSHD_CONFIG_FILE%",
+					value: sshdConfigFile,
 				},
 			}
 

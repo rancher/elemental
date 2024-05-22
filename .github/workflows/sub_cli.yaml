@@ -74,6 +74,9 @@ on:
       runner_label:
         required: true
         type: string
+      selinux:
+        required: true
+        type: boolean
       sequential:
         required: true
         type: boolean
@@ -127,8 +130,10 @@ jobs:
       K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_DOWNSTREAM_VERSION: ${{ inputs.k8s_downstream_version }}
+      OS_TO_TEST: ${{ inputs.os_to_test }}
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}
+      SELINUX: ${{ inputs.selinux }}
       TEST_TYPE: ${{ inputs.test_type }}
       TIMEOUT_SCALE: 3
     steps:
@@ -218,7 +223,6 @@ jobs:
         id: create_iso_master
         env:
           EMULATE_TPM: true
-          OS_TO_TEST: ${{ inputs.os_to_test }}
           POOL: master
         run: |
           # Only use ISO boot if the upstream cluster is RKE2
@@ -389,7 +393,6 @@ jobs:
         if: ${{ inputs.node_number > 3 }}
         env:
           BOOT_TYPE: iso
-          OS_TO_TEST: ${{ inputs.os_to_test }}
           POOL: worker
         run: cd tests && make e2e-iso-image
 

@@ -14,7 +14,7 @@ spec:
         append: true
         content: |
           SeedImage cloud-config-test
-      - path: /etc/ssh/sshd_config
+      - path: %SSHD_CONFIG_FILE%
         append: true
         content: |
           PermitRootLogin yes

@@ -13,6 +13,11 @@ ifeq ($(TEST_TYPE),multi)
 	GINKGO_TIMEOUT=10800
 endif
 
+# Define SELinux command line
+ifeq ($(SELINUX),true)
+	SELINUX_CMDLINE?="security=selinux enforcing=0"
+endif
+
 extract_kernel_init_squash:
 	@./scripts/get-boot-files-for-pxe $(ISO)
 
@@ -26,8 +31,9 @@ ipxe:
 	echo "set rootfs $${VAR/\.iso/-squashfs}" >> $(IPXE); \
 	echo "# set config http://example.com/machine-config" >> $(IPXE); \
 	echo "# set cmdline cos.setup=/run/initramfs/live/cloud-config extra.values=1" >> $(IPXE); \
+	echo "set cmdline ip=dhcp rd.cos.disable $(SELINUX_CMDLINE) console=tty1 console=ttyS0" >> $(IPXE); \
 	echo "initrd \$${url}/\$${initrd}" >> $(IPXE); \
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} ip=dhcp rd.cos.disable root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" console=tty1 console=ttyS0 \$${cmdline}" >> $(IPXE)
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" \$${cmdline}" >> $(IPXE)
 
 deps: 
 	@go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo

@@ -92,6 +92,9 @@ on:
       runner_label:
         required: true
         type: string
+      selinux:
+        required: true
+        type: boolean
       sequential:
         required: true
         type: boolean
@@ -178,6 +181,7 @@ jobs:
       rancher_version: ${{ inputs.rancher_version }}
       reset: ${{ inputs.reset }}
       runner_label: ${{ inputs.runner_label }}
+      selinux: ${{ inputs.selinux }}
       sequential: ${{ inputs.sequential }}
       snap_type: ${{ inputs.snap_type }}
       test_type: ${{ inputs.test_type }}

@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,6 +43,10 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			{
 				key:   "%K8S_VERSION%",
 				value: k8sDownstreamVersion,
+			},
+			{
+				key:   "%SELINUX%",
+				value: strconv.FormatBool(selinux),
 			},
 		}
 
@@ -115,6 +120,10 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 					{
 						key:   "%SNAP_TYPE%",
 						value: snapType,
+					},
+					{
+						key:   "%SSHD_CONFIG_FILE%",
+						value: sshdConfigFile,
 					},
 					{
 						key:   "%USER%",
