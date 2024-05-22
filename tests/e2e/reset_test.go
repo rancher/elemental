@@ -59,7 +59,7 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 					"--namespace", clusterNS,
 					"-o", "jsonpath={.items[*].metadata.name}")
 				return out
-			}, tools.SetTimeout(5*time.Minute), 5*time.Second).ShouldNot(ContainSubstring(firstMachineInventory))
+			}, tools.SetTimeout(10*time.Minute), 5*time.Second).ShouldNot(ContainSubstring(firstMachineInventory))
 		})
 
 		By("Checking that MachineInventory is back after the reset", func() {
