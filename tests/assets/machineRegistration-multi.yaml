@@ -16,6 +16,17 @@ spec:
       users:
         - name: %USER%
           passwd: %PASSWORD%
+      write_files:
+        - path: /oem/99_disable_ipv6.yaml
+          owner: root:root
+          permissions: 644
+          content: |
+            name: Reboot to apply network config
+            stages:
+              network:
+                - if: '! grep -q ipv6.disable /oem/grubenv'
+                  commands:
+                    - grub2-editenv /oem/grubenv set extra_cmdline=ipv6.disable=1 && shutdown -r now
     elemental:
       install:
         reboot: false
