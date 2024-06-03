@@ -82,6 +82,11 @@ spec:
     productName: "${System Information/Product Name}"
     serialNumber: "${System Information/Serial Number}"
     machineUUID: "${System Information/UUID}"
+    elemental.cattle.io/TotalMemory: "${System Data/Memory/Total Physical Bytes}"
+    elemental.cattle.io/CpuTotalCores: "${System Data/CPU/Total Cores}"
+    elemental.cattle.io/CpuTotalThreads: "${System Data/CPU/Total Threads}"
+    elemental.cattle.io/NetIfacesNumber: "${System Data/Network/Number Interfaces}"
+    elemental.cattle.io/BlockDevicesNumber: "${System Data/Block Devices/Number Devices}"
 ---
 apiVersion: elemental.cattle.io/v1beta1
 kind: SeedImage
