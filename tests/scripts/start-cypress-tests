@@ -15,6 +15,9 @@ pushd cypress/latest
 # Needed to install Cypress plugins
 npm install
 
+# Check if we have to report to QASE
+[[ -n $QASE_RUN_ID ]] && QASE_REPORT=1
+
 # Start Cypress tests with docker
 docker run -v $PWD:/workdir -w /workdir               \
     -e BOOT_TYPE=$BOOT_TYPE                           \
