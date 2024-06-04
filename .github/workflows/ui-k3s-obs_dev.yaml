@@ -45,6 +45,6 @@ jobs:
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       proxy: ${{ inputs.proxy }}
-      qase_run_id: ${{ inputs.qase_run_id }}
+      qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui

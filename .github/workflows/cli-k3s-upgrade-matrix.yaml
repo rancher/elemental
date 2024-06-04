@@ -54,7 +54,7 @@ jobs:
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
-      qase_run_id: ${{ inputs.qase_run_id }}
+      qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_upgrade: ${{ matrix.rancher_upgrade }}
       rancher_version: stable/latest
       reset: true
