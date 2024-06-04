@@ -102,8 +102,6 @@ jobs:
       QASE_API_TOKEN: ${{ secrets.qase_api_token }}
       QASE_PROJECT_CODE: ${{ inputs.qase_project_code }}
       QASE_RUN_ID: ${{ inputs.qase_run_id }}
-      # NOTE: this REPORT var is needed for Cypress!
-      QASE_REPORT: 1
       # K3S / RKE2 flags to use for installation
       INSTALL_K3S_SKIP_ENABLE: true
       INSTALL_K3S_VERSION: ${{ inputs.k8s_upstream_version }}
