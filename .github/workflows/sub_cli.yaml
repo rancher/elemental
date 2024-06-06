@@ -267,7 +267,7 @@ jobs:
 
       - name: Install a simple application
         id: install_simple_app
-        if: ${{ contains(inputs.k8s_upstream_version, 'k3s') }}
+        if: ${{ contains(inputs.k8s_downstream_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
 
       - name: Reset a node in the cluster
@@ -275,9 +275,9 @@ jobs:
         if: ${{ inputs.reset == true }}
         run: cd tests && make e2e-reset
 
-      - name: Check app after reset
+      - name: Check application after reset
         id: check_app
-        if: ${{ inputs.reset == true && contains(inputs.k8s_upstream_version, 'k3s') }}
+        if: ${{ inputs.reset == true && contains(inputs.k8s_downstream_version, 'k3s') }}
         run: cd tests && make e2e-check-app
 
       - name: Upgrade Elemental Operator
@@ -287,7 +287,7 @@ jobs:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
           cd tests && make e2e-upgrade-operator
-          if ${{ contains(inputs.k8s_upstream_version, 'k3s') }}; then
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
             make e2e-check-app
           fi
 
@@ -311,7 +311,7 @@ jobs:
           RANCHER_UPGRADE: ${{ inputs.rancher_upgrade }}
         run: |
           cd tests && make e2e-upgrade-rancher-manager
-          if ${{ contains(inputs.k8s_upstream_version, 'k3s') }}; then
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
             make e2e-check-app
           fi
 
@@ -334,7 +334,7 @@ jobs:
           VM_INDEX: 1
         run: |
           cd tests && make e2e-upgrade-node
-          if ${{ contains(inputs.k8s_upstream_version, 'k3s') }}; then
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
             make e2e-check-app
           fi
 
@@ -349,7 +349,7 @@ jobs:
           VM_NUMBERS: 3
         run: |
           cd tests && make e2e-upgrade-node
-          if ${{ contains(inputs.k8s_upstream_version, 'k3s') }}; then
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
             make e2e-check-app
           fi
 
@@ -422,7 +422,7 @@ jobs:
           fi
 
           # Check the installed application
-          if ${{ contains(inputs.k8s_upstream_version, 'k3s') }}; then
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
             make e2e-check-app
           fi
 
