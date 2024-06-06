@@ -58,5 +58,6 @@ RUN zypper clean --all && \
     >/var/log/lastlog && \
     rm -rf /boot/vmlinux*
 
-# Rebuild initrd to setup dracut with the boot configurations
+# Rebuild initrd to setup dracut with the boot configurations and remove pre-existing initrd from baremetal image
+RUN rm -fv /boot/elemental.initrd*
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
