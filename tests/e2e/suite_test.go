@@ -238,7 +238,7 @@ func CheckCreatedCluster(ns, cn string) {
 }
 
 /*
-Check that Cluster resource has been correctly created
+Check that Registration resource has been correctly created
   - @param ns Namespace where the cluster is deployed
   - @param rn MachineRegistration resource name
   - @returns Nothing, the function will fail through Ginkgo in case of issue
@@ -246,7 +246,7 @@ Check that Cluster resource has been correctly created
 func CheckCreatedRegistration(ns, rn string) {
 	Eventually(func() string {
 		out, _ := kubectl.RunWithoutErr("get", "MachineRegistration",
-			"--namespace", clusterNS,
+			"--namespace", ns,
 			"-o", "jsonpath={.items[*].metadata.name}")
 		return out
 	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(rn))
