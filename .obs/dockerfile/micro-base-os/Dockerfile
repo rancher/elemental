@@ -49,7 +49,7 @@ RUN zypper --installroot /osimage in --no-recommends -y elemental
 # end of mandatory package installs for SUSE Linux Micro
 
 # make derived containers possible
-RUN zypper --installroot /osimage in --no-recommends -y zypper openssh openssh-server
+RUN zypper --installroot /osimage in --no-recommends -y zypper
 
 FROM scratch as osimage
 
