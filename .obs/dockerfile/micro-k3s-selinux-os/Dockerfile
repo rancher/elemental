@@ -9,14 +9,15 @@
 
 ARG SLMICRO_VERSION
 
-FROM suse/sl-micro/${SLMICRO_VERSION}/base-os-container:latest
+FROM suse/sl-micro/${SLMICRO_VERSION}/kvm-os-container:latest
 
 # dummy zypper call to get elemental into the build context and extract %VERSION% from it via _service
 RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 
-# replace default kernel with smaller one, sufficient to run kvm guests
-RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent
+# Add SSH tools to facilitate testing
+RUN zypper in --no-recommends -y openssh openssh-server
 
+# Add SELinux utilities and policies
 RUN zypper in --no-recommends -y patterns-microos-selinux k3s-selinux
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
