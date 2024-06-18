@@ -35,9 +35,10 @@ Requires:       elemental-toolkit < 2.2.0
 Requires:       elemental-register
 Requires:       elemental-system-agent
 Requires:       elemental-support
+Requires:       elemental-updater = %{version}-%{release}
 Requires:       NetworkManager
 Requires:       systemd-presets-branding-Elemental
-Requires:       elemental-updater = %{version}-%{release}
+Requires:       procps
 %{?systemd_requires}
 
 BuildArch:      noarch
