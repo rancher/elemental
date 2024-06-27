@@ -287,7 +287,7 @@
       -  **By:** Checking that Elemental resources are gone
       -  **By:** Checking that Elemental operator CRDs cannot be reinstalled
       -  **By:** Deleting cluster resource
-      -  **By:** Removing finalizers from MachineInventory/Machine
+      -  **By:** Removing finalizers from MachineInventory/Machine and ManagedOsVersion
       -  **By:** Testing cluster resource unavailability
     - **It:** Re-install Elemental Operator
       -  **By:** Installing Operator via Helm
