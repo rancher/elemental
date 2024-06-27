@@ -113,7 +113,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		}(clusterNS, clusterName)
 
 		// Removing finalizers from MachineInventory and Machine
-		By("Removing finalizers from MachineInventory/Machine", func() {
+		By("Removing finalizers from MachineInventory/Machine and ManagedOsVersion", func() {
 			// NOTE: wait a bit for the cluster deletion to be started (it's running in background)
 			time.Sleep(1 * time.Minute)
 
@@ -134,6 +134,16 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 					GinkgoWriter.Printf("Deleting Finalizers for Machine '%s'...\n", internalMachine)
 					deleteFinalizers(clusterNS, "Machine", internalMachine)
 				}
+			}
+
+			mOSList, err := kubectl.RunWithoutErr("get", "ManagedOSVersion",
+				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
+			Expect(err).To(Not(HaveOccurred()))
+
+			for _, mOS := range strings.Fields(mOSList) {
+				// Delete blocking Finalizers
+				GinkgoWriter.Printf("Deleting Finalizers for ManagedOSVersion '%s'...\n", mOS)
+				deleteFinalizers(clusterNS, "ManagedOSVersion", mOS)
 			}
 		})
 
