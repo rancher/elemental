@@ -136,9 +136,15 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				}
 			}
 
+			// On older versions managedOSVersions CRD might be already gone at this stage
+			// ignore error if the managedOSVersion type is unknown
 			mOSList, err := kubectl.RunWithoutErr("get", "ManagedOSVersion",
 				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
-			Expect(err).To(Not(HaveOccurred()))
+			if err != nil && strings.Contains(err.Error(), "doesn't have a resource type") {
+				mOSList = ""
+			} else {
+				Expect(err).ToNot((HaveOccurred()))
+			}
 
 			for _, mOS := range strings.Fields(mOSList) {
 				// Delete blocking Finalizers
