@@ -131,7 +131,7 @@ RANCHER_MANAGER_VERSION=${RANCHER_MANAGER_VERSION%.*}
 ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
 curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
-bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa ${ELEMENTAL_VERSION} || exit 1
+bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa -ac ${ELEMENTAL_VERSION} || exit 1
 rm -f ${ELEMENTAL_AIRGAP_SCRIPT}
 
 # Get container images
@@ -150,7 +150,7 @@ RunHelmCmdWithRetry template ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VER
 
 # Elemental image list
 ELEMENTAL_IMAGES_FILE=elemental-images.txt
-mv -f ${OPT_RANCHER}/helm/elemental-images.txt ${ELEMENTAL_IMAGES_FILE}
+mv -f ${OPT_RANCHER}/helm/${ELEMENTAL_IMAGES_FILE} .
 
 # Get images
 loop=0
