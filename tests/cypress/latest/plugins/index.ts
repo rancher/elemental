@@ -44,6 +44,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.proxy_ip               = process.env.PROXY_IP;
   config.env.proxy                  = process.env.PROXY;
   config.env.rancher_version        = process.env.RANCHER_VERSION;
+  config.env.stable_os_version      = process.env.STABLE_OS_VERSION;
   config.env.ui_account             = process.env.UI_ACCOUNT;
   config.env.upgrade_from_version   = process.env.UPGRADE_FROM_VERSION;
   config.env.upgrade_image          = process.env.UPGRADE_IMAGE;
