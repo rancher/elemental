@@ -138,8 +138,8 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 			err = client.GetFile(localKubeconfig, "/etc/rancher/k3s/k3s.yaml", 0644)
 			Expect(err).To(Not(HaveOccurred()))
-			// NOTE: not sure that this is need because we have the config file in ~/.kube/
 
+			// NOTE: not sure that this is need because we have the config file in ~/.kube/
 			err = os.Setenv("KUBECONFIG", localKubeconfig)
 			Expect(err).To(Not(HaveOccurred()))
 
