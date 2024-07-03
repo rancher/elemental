@@ -18,6 +18,19 @@ npm install
 # Check if we have to report to QASE
 [[ -n $QASE_RUN_ID ]] && QASE_REPORT=1
 
+# Install yq for parsing yaml files
+# TODO: yq will be added into the next OS image
+sudo zypper in -y yq
+
+# Get latest stable Elemental OS version mainly for upgrade test
+OS_IMAGE=$(helm template oci://registry.suse.com/rancher/elemental-operator-chart \
+  | yq 'select(.kind=="ManagedOSVersionChannel") .spec.options.image')
+
+STABLE_OS_VERSION=$(docker run --entrypoint busybox ${OS_IMAGE} cat channel.json \
+  | jq -r '.[].spec.version' \
+  | sort -V \
+  | tail -1)
+
 # Start Cypress tests with docker
 docker run -v $PWD:/workdir -w /workdir               \
     -e BOOT_TYPE=$BOOT_TYPE                           \
@@ -38,6 +51,7 @@ docker run -v $PWD:/workdir -w /workdir               \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD             \
     -e RANCHER_URL=$RANCHER_URL                       \
     -e RANCHER_USER=$RANCHER_USER                     \
+    -e STABLE_OS_VERSION=$STABLE_OS_VERSION           \
     -e UI_ACCOUNT=$UI_ACCOUNT                         \
     -e UPGRADE_FROM_VERSION=$UPGRADE_FROM_VERSION     \
     -e UPGRADE_IMAGE=$UPGRADE_IMAGE                   \
