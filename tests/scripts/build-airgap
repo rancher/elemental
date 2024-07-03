@@ -107,7 +107,7 @@ RunHelmCmdWithRetry repo add rancher-${RANCHER_CHANNEL} https://releases.rancher
 RunHelmCmdWithRetry repo update > /dev/null 2>&1
 
 # Get CertManager charts
-[[ "${CERT_MANAGER_VERSION}" != "latest" ]] && VER_OPT="--version ${CERT_MANAGER_VERSION}"
+[[ "${RANCHER_CHANNEL}" =~ (latest|alpha) ]] || VER_OPT="--version ${CERT_MANAGER_VERSION}"
 RunHelmCmdWithRetry pull jetstack/cert-manager ${VER_OPT} > /dev/null 2>&1
 
 # Get CertManager version
@@ -116,7 +116,7 @@ CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION#cert-manager-*}
 CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION%.*}
 
 # Get Rancher charts
-[[ "${RANCHER_CHANNEL}" == "latest" ]] && DEVEL="--devel"
+[[ "${RANCHER_CHANNEL}" =~ (latest|alpha) ]] && DEVEL="--devel"
 RunHelmCmdWithRetry pull rancher-${RANCHER_CHANNEL}/rancher ${DEVEL} > /dev/null 2>&1
 for i in elemental-operator-chart elemental-operator-crds-chart ; do
   RunHelmCmdWithRetry pull ${ELEMENTAL_REPO}/${i} > /dev/null 2>&1
