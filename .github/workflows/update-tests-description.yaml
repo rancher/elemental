@@ -21,6 +21,7 @@ jobs:
           # - if the account associated still exists
           # - if the person still has access to the repo
           token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+
       - name: Generate tests description file
         id: readme_generator
         run: |
@@ -35,10 +36,18 @@ jobs:
           NEW_CHK=$(sha512sum ${FILE} 2>/dev/null) || true
 
           # Compare checksum and set generate value if needed
-          [[ "${NEW_CHK}" != "${OLD_CHK}" ]] && echo "generate=needed" >> ${GITHUB_OUTPUT}
-      - uses: EndBug/add-and-commit@v9
+          [[ "${NEW_CHK}" != "${OLD_CHK}" ]] && echo "generate=needed" >> ${GITHUB_OUTPUT} || true
+
+      - name: Push modified file
         if: steps.readme_generator.outputs.generate == 'needed'
-        with:
-          default_author: github_actions
-          message: 'ci: update tests/README.md file'
-          add: 'tests/README.md'
+        env:
+          CI_COMMIT_AUTHOR: "github-actions"
+          CI_COMMIT_EMAIL: "github-actions@users.noreply.github.com"
+          CI_COMMIT_MESSAGE: "ci: update tests/README.md file"
+          CI_COMMIT_FILE: "tests/README.md"
+        run: |
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
+          git add ${{ env.CI_COMMIT_FILE }}
+          git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git push
