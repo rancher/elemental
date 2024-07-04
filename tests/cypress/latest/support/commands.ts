@@ -238,14 +238,27 @@ Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabel
   cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.key').type(labelName);
   cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.value').type(labelValue);
   if (useHardwareLabels) {
-    let nthChildIndex = 7;
-    for (const key in hwLabels) {
-      cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
-        .click();
-      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
-      cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
-        > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], {parseSpecialCharSequences: false});
-      nthChildIndex += 3;
+    // Some HTML select tags have changed in Rancher 2.9
+    if (!utils.isRancherManagerVersion('2.9')) {
+      let nthChildIndex = 7;
+      for (const key in hwLabels) {
+        cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
+          .click();
+        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
+        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
+          > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], {parseSpecialCharSequences: false});
+        nthChildIndex += 3;
+      };
+    } else {
+      let itemIndex = 1;
+      for (const key in hwLabels) {
+        cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
+          .click();
+        cy.get(`[data-testid="input-kv-item-key-${itemIndex}"]`).type(key);
+        cy.get(`[data-testid="kv-item-value-${itemIndex}"] > .value-container > [data-testid="value-multiline"]`)
+          .type(hwLabels[key], {parseSpecialCharSequences: false});
+        itemIndex += 1;
+      }
     };
   };
 });
