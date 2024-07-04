@@ -16,8 +16,8 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import * as utils from '~/support/utils';
 import { slowCypressDown } from 'cypress-slow-down'
+import { isRancherManagerVersion } from '../../support/utils';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -36,13 +36,19 @@ filterTests(['main'], () => {
     qase(31,
       it('Deploy Alerting Drivers application', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+        cypressLib.burgerMenuToggle()
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20000);
-        utils.isRancherManagerVersion('2.7') ? cypressLib.burgerMenuToggle(): null;
+        isRancherManagerVersion('2.8') ? cypressLib.burgerMenuToggle(): null;
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         // TODO: function to deploy app?
-        cy.contains(clusterName)
-          .click();
+        if (isRancherManagerVersion('2.9')) {
+          cy.get('.main-panel').contains(clusterName)
+            .click();
+        } else {
+          cy.contains(clusterName)
+            .click();
+        }
         cy.get('.nav').contains('Apps')
           .click();
         cy.contains('Charts')
@@ -63,8 +69,13 @@ filterTests(['main'], () => {
     qase(32,
       it('Remove Alerting Drivers application', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        cy.contains(clusterName)
-          .click();
+        if (isRancherManagerVersion('2.9')) {
+          cy.get('.main-panel').contains(clusterName)
+            .click();
+        } else {
+          cy.contains(clusterName)
+            .click();
+        }
         cy.get('.nav').contains('Apps')
           .click();
         cy.contains('Installed Apps')
