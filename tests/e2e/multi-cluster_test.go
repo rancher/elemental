@@ -41,16 +41,15 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 	)
 
 	BeforeEach(func() {
-
 		// Patterns to replace
 		basePatterns = []YamlPattern{
 			{
-				key:   "%K8S_VERSION%",
-				value: k8sDownstreamVersion,
-			},
-			{
 				key:   "%SNAP_TYPE%",
 				value: snapType,
+			},
+			{
+				key:   "%SSHD_CONFIG_FILE%",
+				value: sshdConfigFile,
 			},
 			{
 				key:   "%PASSWORD%",
@@ -188,6 +187,10 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 				{
 					key:   "%CLUSTER_NAME%",
 					value: createdClusterName,
+				},
+				{
+					key:   "%K8S_VERSION%",
+					value: k8sDownstreamVersion,
 				},
 			}
 			patterns := append(basePatterns, addPatterns...)
