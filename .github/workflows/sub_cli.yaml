@@ -356,7 +356,11 @@ jobs:
       - name: Test Backup/Restore Elemental resources with Rancher Manager
         id: test_backup_restore
         if: ${{ contains(inputs.k8s_upstream_version, 'k3s') }}
-        run: cd tests && make e2e-backup-restore && make e2e-check-app
+        run: |
+          cd tests && make e2e-backup-restore
+          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
+            make e2e-check-app
+          fi
 
       - name: Extract ISO version
         id: iso_version
