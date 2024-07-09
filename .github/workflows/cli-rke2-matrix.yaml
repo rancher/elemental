@@ -29,7 +29,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
-        default: '"stable/latest"'
+        default: '"prime/latest"'
         type: string
       reset:
         description: Allow reset test (mainly used on CLI tests)
@@ -49,7 +49,7 @@ jobs:
         cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '""')) }}
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.13+rke2r1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.13+rke2r1"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","latest/devel/2.7","latest/devel/2.8"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"prime/latest","latest/devel/2.7","latest/devel/2.8"')) }}
         reset: ${{ fromJSON(format('[{0}]', inputs.reset || 'false')) }}
         sequential: [ false ]
         include:
@@ -57,14 +57,14 @@ jobs:
             cluster_type: ""
             k8s_downstream_version: v1.27.13+rke2r1
             k8s_upstream_version: v1.27.13+rke2r1
-            rancher_version: stable/latest
+            rancher_version: prime/latest
             reset: true
             sequential: true
           - ca_type: private
             cluster_type: hardened
             k8s_downstream_version: v1.27.13+rke2r1
             k8s_upstream_version: v1.27.13+rke2r1
-            rancher_version: stable/latest
+            rancher_version: prime/latest
             reset: true
             sequential: false
     uses: ./.github/workflows/master_e2e.yaml

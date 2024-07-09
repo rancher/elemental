@@ -56,7 +56,7 @@ jobs:
       os_to_test: stable
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_upgrade: ${{ matrix.rancher_upgrade }}
-      rancher_version: stable/latest
+      rancher_version: prime/latest
       reset: true
       test_type: cli
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
