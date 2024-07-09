@@ -67,37 +67,23 @@ spec:
   config:
     network:
       ipAddresses:
-      - name: inventory-ip
-        ipPoolRef:
+        inventory-ip:
           apiGroup: ipam.cluster.x-k8s.io
           kind: InClusterIPPool
           name: elemental-inventory-pool
-      config:
-        dns-resolver:
-          config:
-            server:
-            - 192.168.122.1
-            search: []
-        routes:
-          config:
-          - destination: 0.0.0.0/0
-            next-hop-interface: enp1s0
-            next-hop-address: 192.168.122.1
-            metric: 150
-            table-id: 254
-        interfaces:
-          - name: enp1s0
-            type: ethernet
-            description: Main-NIC
-            state: up
-            ipv4:
-              enabled: true
-              dhcp: false
-              address:
-              - ip: "{inventory-ip}"
-                prefix-length: 24
-            ipv6:
-              enabled: false
+      connections:
+        enp1s0: |
+          [connection]
+          id=Wired connection 1
+          type=ethernet
+          interface-name=enp1s0
+          [ipv4]
+          address1={inventory-ip}/24,192.168.1.1
+          dns=192.168.122.1;
+          method=manual
+          route1=0.0.0.0/0,192.168.122.1
+          [ipv6]
+          method=disabled
     cloud-config:
       users:
         - name: root

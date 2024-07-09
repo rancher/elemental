@@ -59,13 +59,6 @@ RUN ARCH=$(uname -m); \
       dmidecode \
       libopenssl1_1
 
-# Install nmstatectl
-RUN wget https://github.com/nmstate/nmstate/releases/download/v2.2.33/nmstatectl-linux-x64.zip && \
-    unzip nmstatectl-linux-x64.zip && \
-    chmod +x nmstatectl && \
-    mv ./nmstatectl /usr/sbin/nmstatectl && \
-    rm nmstatectl-linux-x64.zip
-
 # SELinux policy and tools
 RUN ARCH=$(uname -m); \
     [[ "${ARCH}" == "aarch64" ]] && ARCH="arm64"; \
