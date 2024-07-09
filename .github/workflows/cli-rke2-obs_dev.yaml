@@ -25,7 +25,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest
+        default: prime/latest
         type: string
 
 jobs:
