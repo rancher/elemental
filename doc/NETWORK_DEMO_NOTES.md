@@ -68,6 +68,8 @@
     Note this manifest assumes a default libvirt network setup for the downstream Elemental nodes (192.168.122.1/24).  
     Please edit the manifest before application to match your needs.
 
+    From the `elemental` repository:
+
     ```bash
     kubectl apply -f tests/manifests/elemental-dev-example.yaml
 
