@@ -27,10 +27,12 @@ if (( NR_HUGEPAGES == 0 && USE_HUGEPAGES != 0 )); then
     && sudo bash -c "echo ${VALUE} > /proc/sys/vm/nr_hugepages"
 
   # Set memory config on command line
-  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes --memory ${VM_MEM:-4096},hugepages=yes"
+  INSTALL_FLAG+=" --memory ${VM_MEM:-4096},hugepages=yes"
+  INSTALL_FLAG+=" --memorybacking hugepages=yes,size=2,unit=M,locked=yes"
 else
   # Set memory config on command line
   INSTALL_FLAG+=" --memory ${VM_MEM:-4096}"
+  INSTALL_FLAG+=" --memorybacking access.mode=shared,source.type=memfd,allocation.mode=immediate"
 fi
 
 # Don't configure TPM if software emulation (EMULATE_TPM=true) is used
@@ -94,6 +96,9 @@ else
   INSTALL_FLAG+=" --pxe --noreboot"
 fi
 
+# Disk performance tuning
+DISK_TUNE="bus=scsi,driver.cache=none,driver.io=native,driver.discard=ignore"
+
 # VM variables
 LOG_FILE=logs/bootstrap_${VM_NAME}.log
 CMD="sudo virt-install \
@@ -105,7 +110,8 @@ CMD="sudo virt-install \
        --features smm.state=yes \
        --vcpus ${VM_CPU:-4} \
        --cpu host \
-       --disk path=${VM_NAME}/${VM_NAME}.img,bus=scsi,size=${HDD_SIZE} \
+       --disk path=${VM_NAME}/${VM_NAME}.img,size=${HDD_SIZE},${DISK_TUNE} \
+       --disk path=${VM_NAME}/${VM_NAME}-data.img,size=${HDD_SIZE},${DISK_TUNE} \
        --check disk_size=off \
        --graphics none \
        --serial pty \
