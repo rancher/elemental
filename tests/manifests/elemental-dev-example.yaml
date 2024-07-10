@@ -97,7 +97,7 @@ spec:
       install:
         snapshotter:
           type: btrfs
-        reboot: false
+        reboot: true
         device-selector:
         - key: Name
           operator: In
