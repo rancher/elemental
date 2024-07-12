@@ -369,10 +369,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 					misc.RandomSleep(sequential, i)
 
 					// Execute 'reboot' in background, to avoid SSH locking
-					Eventually(func() error {
-						_, err := cl.RunSSH("setsid -f reboot")
-						return err
-					}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+					_ = RunSSHWithRetry(cl, "setsid -f reboot")
 				})
 
 				if p != "worker" {
