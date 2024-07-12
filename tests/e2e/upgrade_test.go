@@ -326,6 +326,12 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
+			// Toggle Grub recovery entry test if only one node is upgraded
+			grubRecovery := false
+			if usedNodes == 1 {
+				grubRecovery = true
+			}
+
 			// Execute node deployment in parallel
 			wg.Add(1)
 			go func(h string, cl *tools.Client) {
@@ -347,6 +353,30 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					out := RunSSHWithRetry(cl, "cat /etc/os-release")
 					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
 				})
+
+				if grubRecovery {
+					By("Testing Grub Recovery entry on "+h+" after upgrade", func() {
+						_ = RunSSHWithRetry(cl, "grub2-editenv /oem/grubenv set next_entry=recovery")
+
+						// Check that the recovery entry is selected
+						out := RunSSHWithRetry(cl, "grub2-editenv /oem/grubenv list | grep next_entry")
+						Expect(out).To(ContainSubstring("recovery"))
+
+						// Reboot in recovery, execute 'reboot' in background, to avoid SSH locking
+						_ = RunSSHWithRetry(cl, "setsid -f reboot")
+
+						// Check the mode after reboot
+						out = RunSSHWithRetry(cl, "cat /run/cos/recovery_mode")
+						Expect(out).To(Not(BeEmpty()))
+
+						// Final reboot, in active mode as recovery mode is not persistent
+						_ = RunSSHWithRetry(cl, "setsid -f reboot")
+
+						// Check the mode after fnal reboot
+						out = RunSSHWithRetry(cl, "cat /run/cos/active_mode")
+						Expect(out).To(Not(BeEmpty()))
+					})
+				}
 			}(hostName, client)
 		}
 
