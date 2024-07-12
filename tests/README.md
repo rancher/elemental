@@ -196,6 +196,7 @@
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
       -  **By:** Checking VM upgrade on +h
       -  **By:** Checking OS version on +h+ after upgrade
+      -  **By:** Testing Grub Recovery entry on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
 
 # Tests description for cypress/latest/e2e/unit_tests
