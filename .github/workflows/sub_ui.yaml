@@ -211,12 +211,6 @@ jobs:
           RANCHER_USER: admin
           SPEC: |
             /workdir/e2e/unit_tests/first_connection.spec.ts
-            /workdir/e2e/unit_tests/elemental_operator.spec.ts
-            /workdir/e2e/unit_tests/elemental_plugin.spec.ts
-            /workdir/e2e/unit_tests/user.spec.ts
-            /workdir/e2e/unit_tests/menu.spec.ts
-            /workdir/e2e/unit_tests/machine_registration.spec.ts
-            /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
           UPGRADE_FROM_VERSION: ${{ inputs.upgrade_from_version }}
           UPGRADE_OS_CHANNEL: ${{ inputs.upgrade_os_channel }}

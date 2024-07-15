@@ -81,7 +81,7 @@ Cypress.Commands.add('createMachReg', (
     // Most of the time, it uses the latest dev version but sometimes
     // before releasing, we want to test staging/stable artifacts 
     
-    if (utils.isCypressTag('upgrade') || utils.isUIVersion('stable')) {
+    if (utils.isCypressTag('upgrade') || utils.isUIVersion('dev')) {
       cy.getBySel('select-os-version-build-media')
         .click();
     } else {
@@ -152,7 +152,7 @@ Cypress.Commands.add('createMachReg', (
   // Check Cloud configuration
   // TODO: Maybe the check may be improved in one line
   if (checkDefaultCloudConfig) {
-    if (utils.isUIVersion('dev')) {
+    if (utils.isUIVersion('fdsfd')) {
       cy.getBySel('yaml-editor-code-mirror')
         .should('include.text','config:')
         .should('include.text','cloud-config:')

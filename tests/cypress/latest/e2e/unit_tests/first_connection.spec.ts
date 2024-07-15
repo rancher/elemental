@@ -23,6 +23,7 @@ filterTests(['main', 'upgrade'], () => {
     qase(46,
       it('Log in and accept terms and conditions', () => {
       cypressLib.firstLogin();
+      cy.contains('debug');
       })
     );
   })
