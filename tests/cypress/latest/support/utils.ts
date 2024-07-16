@@ -16,6 +16,11 @@ export const isK8sVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("k8s_downstream_version"));
 }
 
+// Check if Rancher Prime is used
+export const isRancherPrime = () => {
+  return (new RegExp('prime')).test(Cypress.env("rancher_channel"));
+}
+
 // Check the Elemental operator version
 export const isOperatorVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("operator_repo"));
