@@ -34,7 +34,12 @@ filterTests(['main', 'upgrade'], () => {
   
     qase(11,
       it('Add elemental-ui repo', () => {
-        !isUIVersion('stable') ? cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages') : null;
+        // 1 - TODO: Remove rancher 2-9 condition later
+        // 2 - UI extension upgrade cannot be tested with rancher manager 2.9 yet
+        // because we have only one version so far
+        if (!isUIVersion('stable') || isRancherManagerVersion('2.9')) {
+          cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages');
+        }
       })
     );
 

@@ -25,7 +25,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
-        default: '"stable/latest"'
+        default: '"prime/latest"'
         type: string
   schedule:
     # From Monday to Saturday at 4am UTC (11pm in us-central1)
@@ -39,7 +39,7 @@ jobs:
       matrix:
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.13+rke2r1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.13+rke2r1"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","latest/devel/2.7","latest/devel/2.8"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"prime/latest","latest/devel/2.8","latest/devel/2.9"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}

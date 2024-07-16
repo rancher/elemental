@@ -159,7 +159,9 @@ describe('Upgrade tests', () => {
           .contains('Update Group: Create');
         cy.getBySel('cluster-target')
           .click();
-        cy.contains('Sorry, no matching options');
+        // As there is already an upgrade group targeting the cluster,
+        // the cluster should not be available in the dropdown
+        cy.get('#vs3__listbox').should('not.contain', clusterName);
       })
     );
 

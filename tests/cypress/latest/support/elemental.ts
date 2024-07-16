@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-import { isCypressTag, isOperatorVersion } from '~/support/utils';
+import { isCypressTag, isOperatorVersion, isRancherPrime } from '~/support/utils';
 export class Elemental {
   // Go into the cluster creation menu
   accessClusterMenu() {
@@ -68,6 +68,13 @@ export class Elemental {
     }
     cy.clickButton('Install');
     cy.contains('.outer-container > .header', 'Elemental');
+    if (isRancherPrime() && isCypressTag('main')) {
+      cy.byLabel('Container Registry')
+        .clear()
+      // Dev operator hardcoded, because this is the only one needed for now
+      cy.byLabel('Container Registry')
+        .type('registry.opensuse.org/isv/rancher/elemental/dev/containers');
+    }
     cy.clickButton('Next');
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', {timeout:120000});

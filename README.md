@@ -23,7 +23,6 @@
 [![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml)
 [![CLI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.9-matrix.yaml)
 [![CLI-Regression](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml)
-[![UI-Rancher-Manager-Head-2.9](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.9-matrix.yaml)
 
 ## Goal
 
