@@ -12,6 +12,7 @@ We try to spread the tests as best as we can to avoid SPOT issue as well as not 
 | CLI K3s Scalability | Sunday | 2am | us-central1-f |
 | CLI K3s SELinux | Sunday | 2am | us-central1-c |
 | CLI Multicluster | Sunday | 5am | us-central1-b |
+| CLI Regression | Saturday | 11am | us-central1-c |
 | CLI Rancher Manager Devel | Sunday | 8am | us-central1-c |
 | UI Rancher Manager Devel | Sunday | 12pm | us-central1-a |
 | CLI K3s Downgrade | Sunday | 2pm | us-central1-b |
