@@ -1,0 +1,65 @@
+# This workflow calls the master E2E workflow with custom variables
+name: UI-Rancher-Manager-Head-2.7
+
+on:
+  workflow_dispatch:
+    inputs:
+      boot_type:
+        description: Type of image used for bootstrapping the nodes
+        default: '"iso"'
+        type: string
+      destroy_runner:
+        description: Destroy the auto-generated self-hosted runner
+        default: true
+        type: boolean
+      k8s_downstream_version:
+        description: Rancher cluster downstream version to use
+        default: '"v1.27.13+k3s1"'
+        type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: '"v1.27.13+k3s1"'
+        type: string
+      proxy:
+        description: Deploy a proxy (none/rancher/elemental)
+        default: elemental
+        type: string
+      qase_run_id:
+        description: Qase run ID where the results will be reported
+        type: string
+      rancher_version:
+        description: Rancher Manager channel/version/head_version to use
+        default: '"latest/devel/2.7"'
+        type: string
+  schedule:
+    # Every Sunday at 12pm UTC (7am in us-central1)
+    - cron: '0 12 * * 0'
+
+jobs:
+  ui:
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        boot_type: ${{ fromJSON(format('[{0}]', inputs.boot_type || '"iso","raw"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.13+k3s1","v1.27.13+rke2r1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.13+k3s1"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.7"')) }}
+    uses: ./.github/workflows/master_e2e.yaml
+    secrets:
+      credentials: ${{ secrets.GCP_CREDENTIALS }}
+      pat_token: ${{ secrets.SELF_HOSTED_RUNNER_PAT_TOKEN }}
+      qase_api_token: ${{ secrets.QASE_API_TOKEN }}
+    with:
+      boot_type: ${{ matrix.boot_type }}
+      ca_type: selfsigned
+      cypress_tags: main
+      destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
+      elemental_ui_version: dev
+      k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
+      k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
+      proxy: ${{ inputs.proxy || 'elemental' }}
+      qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
+      rancher_version: ${{ matrix.rancher_version }}
+      test_type: ui
+      zone: us-central1-a
