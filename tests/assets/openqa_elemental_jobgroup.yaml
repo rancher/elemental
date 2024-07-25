@@ -9,6 +9,7 @@
 ##########################################################
 
 ---
+
 .default_products: &default_products
   distri: sle-micro
   version: '6.0'
@@ -27,6 +28,8 @@ defaults:
   x86_64:
     machine: uefi-virtio
     priority: 50
+    settings:
+      QEMUCPU: host
 
 products:
   sl-micro-baremetal-aarch64:

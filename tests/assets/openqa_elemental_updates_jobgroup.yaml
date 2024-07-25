@@ -1,0 +1,110 @@
+##########################################################
+#                        WARNING                         #
+#                                                        #
+#              This file is managed in GIT!              #
+# Any changes via the openQA WebUI could be overwritten! #
+#                                                        #
+# https://github.com/rancher/elemental/elemental         #
+# Maintainers: Elemental team <elemental@suse.de>        #
+##########################################################
+
+---
+
+.default_products: &default_products
+  distri: sle-micro
+  version: '6.0'
+
+.test_settings: &test_settings
+  HDDSIZEGB: '20'
+  QEMURAM: '2048'
+  PASSWORD: ros
+  TEST_PASSWORD: Elemental@R00t
+  YAML_SCHEDULE: schedule/elemental/test_image.yaml
+
+.generate_settings: &generate_settings
+  BOOT_HDD_IMAGE: "1"
+  CONTAINER_RUNTIMES: "podman"
+  DESKTOP: "textmode"
+  EXCLUDE_MODULES: "suseconnect_scc"
+  HDD_1: "SL-Micro.x86_64-6.0.0-Default-Updated.qcow2"
+  TEST_PASSWORD: Elemental@R00t
+  VIDEOMODE: "text"
+  YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
+
+defaults:
+  aarch64:
+    machine: aarch64-virtio
+    priority: 50
+  x86_64:
+    machine: uefi-virtio
+    priority: 50
+    settings:
+      QEMUCPU: host
+
+products:
+  sl-micro-elemental-image-aarch64:
+    <<: *default_products
+    flavor: Elemental-Image-Updates
+  sl-micro-elemental-iso-aarch64:
+    <<: *default_products
+    flavor: Elemental-Iso-Updates
+  sl-micro-elemental-image-x86_64:
+    <<: *default_products
+    flavor: Elemental-Image-Updates
+  sl-micro-elemental-iso-x86_64:
+    <<: *default_products
+    flavor: Elemental-Iso-Updates
+
+scenarios:
+  aarch64:
+    sl-micro-elemental-image-aarch64:
+      - generate_image:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            HDD_1: 'elemental-%FLAVOR%-%ARCH%.qcow2'
+            IMAGE_TYPE: disk
+            START_AFTER_TEST: generate_image
+    sl-micro-elemental-iso-x86_64:
+      - generate_iso:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            IMAGE_TYPE: iso
+            ISO: 'elemental-%FLAVOR%-%ARCH%.iso'
+            START_AFTER_TEST: generate_iso
+  x86_64:
+    sl-micro-elemental-image-x86_64:
+      - generate_image:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            HDD_1: 'elemental-%FLAVOR%-%ARCH%.qcow2'
+            IMAGE_TYPE: disk
+            START_AFTER_TEST: generate_image@64bit
+    sl-micro-elemental-iso-x86_64:
+      - generate_iso:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            IMAGE_TYPE: iso
+            ISO: 'elemental-%FLAVOR%-%ARCH%.iso'
+            START_AFTER_TEST: generate_iso@64bit
