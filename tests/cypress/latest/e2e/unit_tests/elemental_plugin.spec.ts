@@ -27,6 +27,7 @@ filterTests(['main', 'upgrade'], () => {
   describe('Install Elemental plugin', () => {
   
     beforeEach(() => {
+      cy.viewport(1920, 1080);
       cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
@@ -65,6 +66,15 @@ filterTests(['main', 'upgrade'], () => {
         cy.get('.plugin')
           .contains('Install')
           .click();
+        // Latest UI version is only compatible with 2.8
+        // Waiting on annotations inmplementation for 2.9
+        // We have to force the version to 1.3.1-rc7
+        if (isRancherManagerVersion('2.9') && isUIVersion('dev')) {
+          cy.getBySel('install-ext-modal-select-version')
+            .click();
+          cy.contains('1.3.1-rc7')
+            .click();
+        }
         cy.clickButton('Install');
         cy.contains('Installing');
         cy.contains('Extensions changed - reload required', {timeout: 40000});
