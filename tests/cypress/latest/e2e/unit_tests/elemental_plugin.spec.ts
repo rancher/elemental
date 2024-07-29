@@ -69,7 +69,7 @@ filterTests(['main', 'upgrade'], () => {
         // Latest UI version is only compatible with 2.8
         // Waiting on annotations inmplementation for 2.9
         // We have to force the version to 1.3.1-rc7
-        if (isRancherManagerVersion('2.9') && isUIVersion('dev')) {
+        if (isRancherManagerVersion('2.9')) {
           cy.getBySel('install-ext-modal-select-version')
             .click();
           cy.contains('1.3.1-rc7')
