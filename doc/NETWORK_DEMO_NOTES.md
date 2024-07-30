@@ -89,12 +89,10 @@
     ```
 
     ```yaml
-    apiVersion: v1
-    items:
-    - apiVersion: elemental.cattle.io/v1beta1
+    apiVersion: elemental.cattle.io/v1beta1
     kind: MachineInventory
     metadata:
-        annotations:
+    annotations:
         elemental.cattle.io/auth: tpm
         elemental.cattle.io/os.cpe-name: cpe:2.3:o:opensuse:tumbleweed:20240605:*:*:*:*:*:*:*
         elemental.cattle.io/os.id: opensuse-tumbleweed
@@ -104,11 +102,11 @@
         elemental.cattle.io/reg-version: v1.7.0-dev
         elemental.cattle.io/registration-ip: 192.168.122.98
         elemental.cattle.io/resettable: "true"
-        creationTimestamp: "2024-07-10T13:08:14Z"
-        finalizers:
-        - machineinventory.elemental.cattle.io
-        generation: 2
-        labels:
+    creationTimestamp: "2024-07-30T11:39:52Z"
+    finalizers:
+    - machineinventory.elemental.cattle.io
+    generation: 2
+    labels:
         element: fire
         elemental.cattle.io/BlockDevicesNumber: "3"
         elemental.cattle.io/CpuTotalCores: "2"
@@ -119,66 +117,76 @@
         manufacturer: QEMU
         productName: Standard-PC-Q35-ICH9-2009
         serialNumber: Not-Specified
-        name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c
-        namespace: fleet-default
-        resourceVersion: "8740"
-        uid: ad889e8f-c3ad-4d38-9e5f-144803f247c9
+    name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c
+    namespace: fleet-default
+    resourceVersion: "9216"
+    uid: e0f248fa-f8b9-408b-b8bb-74930d242171
     spec:
-        ipAddressClaims:
+    ipAddressClaims:
         inventory-ip:
-            apiVersion: ipam.cluster.x-k8s.io/v1beta1
-            kind: IPAddressClaim
-            name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c-inventory-ip
-            namespace: fleet-default
-            uid: 99f7967e-720a-4d03-bef1-5bea76a7b12e
-        ipAddressPools:
+        apiVersion: ipam.cluster.x-k8s.io/v1beta1
+        kind: IPAddressClaim
+        name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c-inventory-ip
+        namespace: fleet-default
+        uid: c8902d01-f4da-4ce7-8399-3100099fd773
+    ipAddressPools:
         inventory-ip:
-            apiGroup: ipam.cluster.x-k8s.io
-            kind: InClusterIPPool
-            name: elemental-inventory-pool
-        network:
-        connections:
-            enp1s0: |
-            [connection]
-            id=Wired connection 1
-            type=ethernet
-            interface-name=enp1s0
-            [ipv4]
-            address1={inventory-ip}/24,192.168.1.1
-            dns=192.168.122.1;
-            method=manual
-            route1=0.0.0.0/0,192.168.122.1
-            [ipv6]
-            method=disabled
+        apiGroup: ipam.cluster.x-k8s.io
+        kind: InClusterIPPool
+        name: elemental-inventory-pool
+    network:
+        config:
+        dns-resolver:
+            config:
+            search: []
+            server:
+            - 192.168.122.1
+        interfaces:
+        - description: Main-NIC
+            ipv4:
+            address:
+            - ip: '{inventory-ip}'
+                prefix-length: 24
+            dhcp: false
+            enabled: true
+            ipv6:
+            enabled: false
+            name: enp1s0
+            state: up
+            type: ethernet
+        routes:
+            config:
+            - destination: 0.0.0.0/0
+            metric: 150
+            next-hop-address: 192.168.122.1
+            next-hop-interface: enp1s0
+            table-id: 254
         ipAddresses:
-            inventory-ip: 192.168.122.150
-        tpmHash: bee315a598cdf3a0c41497b811744a15386fb3b25714dbf61feb034ece5a7668
+        inventory-ip: 192.168.122.150
+    tpmHash: bee315a598cdf3a0c41497b811744a15386fb3b25714dbf61feb034ece5a7668
     status:
-        conditions:
-        - lastTransitionTime: "2024-07-10T13:09:14Z"
+    conditions:
+    - lastTransitionTime: "2024-07-30T11:42:41Z"
         message: plan successfully applied
         reason: PlanSuccessfullyApplied
         status: "True"
         type: Ready
-        - lastTransitionTime: "2024-07-10T13:08:15Z"
+    - lastTransitionTime: "2024-07-30T11:39:52Z"
         message: NetworkConfig is ready
         reason: ReconcilingNetworkConfig
         status: "True"
         type: NetworkConfigReady
-        - lastTransitionTime: "2024-07-10T13:08:15Z"
+    - lastTransitionTime: "2024-07-30T11:39:52Z"
         message: Waiting to be adopted
         reason: WaitingToBeAdopted
         status: "False"
         type: AdoptionReady
-        plan:
+    plan:
         checksum: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
         secretRef:
-            name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c
-            namespace: fleet-default
+        name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c
+        namespace: fleet-default
         state: Applied
-    kind: List
-    metadata:
-    resourceVersion: ""
     ```
 
 1. Verify the MachineInventory is owning the associated IPAddressClaim
@@ -193,7 +201,7 @@
     - apiVersion: ipam.cluster.x-k8s.io/v1beta1
     kind: IPAddressClaim
     metadata:
-        creationTimestamp: "2024-07-10T13:08:14Z"
+        creationTimestamp: "2024-07-30T11:39:52Z"
         finalizers:
         - ipam.cluster.x-k8s.io/ReleaseAddress
         generation: 1
@@ -204,9 +212,9 @@
         controller: true
         kind: MachineInventory
         name: test-btrfs-e5331e3b-1e1b-4ce7-b080-235ed9a6d07c
-        uid: ad889e8f-c3ad-4d38-9e5f-144803f247c9
-        resourceVersion: "8354"
-        uid: 99f7967e-720a-4d03-bef1-5bea76a7b12e
+        uid: e0f248fa-f8b9-408b-b8bb-74930d242171
+        resourceVersion: "8109"
+        uid: c8902d01-f4da-4ce7-8399-3100099fd773
     spec:
         poolRef:
         apiGroup: ipam.cluster.x-k8s.io
@@ -236,30 +244,47 @@
         valid_lft forever preferred_lft forever
     ```
 
-1. Verify the NetworkConfig yip applicator is writing the expected nmconnection file
+1. Verify the NetworkConfig yip applicator is writing the expected nmconnection file (`/oem/94_custom.yaml`)
 
-    ```bash
-    rancher-15100:~ # cat /oem/94_custom.yaml 
+    ```yaml
     name: Apply network config
     stages:
         initramfs:
             - files:
-                - path: /etc/NetworkManager/system-connections/enp1s0.nmconnection
+                - path: /etc/NetworkManager/system-connections/Wired connection 1.nmconnection
                 permissions: 384
                 owner: 0
                 group: 0
                 content: |
                     [connection]
                     id=Wired connection 1
+                    uuid=d26b4ae4-d525-3cbf-a557-33feb60343c0
                     type=ethernet
+                    autoconnect-priority=-999
                     interface-name=enp1s0
+                    timestamp=1722339542
+
+                    [ethernet]
+
                     [ipv4]
-                    address1=192.168.122.150/24,192.168.1.1
+                    address1=192.168.122.150/24
+                    dhcp-timeout=2147483647
                     dns=192.168.122.1;
+                    dns-options=
+                    dns-priority=40
                     method=manual
-                    route1=0.0.0.0/0,192.168.122.1
+                    route1=0.0.0.0/0,192.168.122.1,150
+                    route1_options=table=254
+
                     [ipv6]
+                    addr-gen-mode=eui64
+                    dhcp-timeout=2147483647
                     method=disabled
+
+                    [proxy]
+
+                    [user]
+                    nmstate.interface.description=Main-NIC
                 encoding: ""
                 ownerstring: ""
             if: '[ -f /run/elemental/active_mode ]'
@@ -272,7 +297,7 @@
     ```
 
     You can suppress the scheduled shutdown on the machine with `shutdown -c` if you want to inspect the state.
-    At this stage you will notice that: 
+    At this stage you will notice that:
 
     1. The MachineInventory and all associated IPAddressClaims have been deleted on the Rancher cluster.
     2. The machine reverted to the initial network configuration (dhcp):  
