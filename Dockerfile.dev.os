@@ -48,7 +48,9 @@ RUN ARCH=$(uname -m); \
       btrfsprogs \
       btrfsmaintenance \
       snapper \
-      glibc-gconv-modules-extra
+      glibc-gconv-modules-extra \
+      wget \
+      unzip
 
 # elemental-register dependencies
 RUN ARCH=$(uname -m); \
