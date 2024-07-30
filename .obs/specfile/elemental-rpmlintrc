@@ -1,5 +1,2 @@
-# ignore complaints due to not compressed source. Sources are really small anyway.
-addFilter("W: source-not-compressed");
-
 # ignore fhs complaints
 addFilter("E: filelist-forbidden-fhs23");
