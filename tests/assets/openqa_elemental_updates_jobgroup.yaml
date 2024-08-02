@@ -36,7 +36,7 @@ defaults:
     machine: aarch64-virtio
     priority: 50
   x86_64:
-    machine: uefi-virtio
+    machine: uefi-virtio-vga
     priority: 50
     settings:
       QEMUCPU: host
