@@ -69,11 +69,17 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('.outer-container > .header', 'Elemental');
     if (isRancherPrime() && isCypressTag('main')) {
-      cy.byLabel('Container Registry')
-        .clear()
-      // Dev operator hardcoded, because this is the only one needed for now
-      cy.byLabel('Container Registry')
-        .type('registry.opensuse.org/isv/rancher/elemental/dev/containers');
+      if (isOperatorVersion('staging')) {
+        cy.byLabel('Container Registry')
+          .clear()
+        cy.byLabel('Container Registry')
+          .type('registry.opensuse.org/isv/rancher/elemental/staging/containers');
+      } else if (isOperatorVersion('dev')) {
+        cy.byLabel('Container Registry')
+          .clear()
+        cy.byLabel('Container Registry')
+          .type('registry.opensuse.org/isv/rancher/elemental/dev/containers');
+      }
     }
     cy.clickButton('Next');
     cy.clickButton('Install');
