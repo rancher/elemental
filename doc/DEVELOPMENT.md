@@ -26,7 +26,7 @@ Clone the following repositories in your development environment:
     Using the `elemental-operator` repo:  
 
     ```bash
-    make setup-full-cluster 
+    LOCAL_BUILD=true make setup-full-cluster 
     ```
 
     If everything succeeded, you should be able to login into Rancher at: <https://172.18.0.2.sslip.io>
