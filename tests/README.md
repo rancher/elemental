@@ -272,6 +272,12 @@
     - **It:** Check Elemental logo
     - **It:** Check Elemental menu
 
+## `os_version.spec.ts`
+
+- **Describe:** OS versions testing
+    - **It:** Check In Sync column status
+    - **It:** Out of sync OS version should appear deprecated
+
 ## `reset.spec.ts`
 
 - **Describe:** Reset testing
