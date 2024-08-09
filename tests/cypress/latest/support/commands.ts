@@ -151,6 +151,7 @@ Cypress.Commands.add('createMachReg', (
 
   // Check Cloud configuration
   // TODO: Maybe the check may be improved in one line
+  // Should be removed once 1.6 released (only keep what is in the if)
   if (checkDefaultCloudConfig) {
     if (utils.isUIVersion('dev')) {
       cy.getBySel('yaml-editor-code-mirror')
