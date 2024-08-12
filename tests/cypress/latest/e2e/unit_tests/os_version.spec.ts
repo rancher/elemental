@@ -16,6 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { slowCypressDown } from 'cypress-slow-down'
+import { isRancherManagerVersion } from '~/support/utils';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -26,6 +27,7 @@ filterTests(['main'], () => {
     const elementalUser        = "elemental-user"
     const uiAccount            = Cypress.env('ui_account');
     const uiPassword           = "rancherpassword"
+    let htmlSelector;
   
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -36,9 +38,10 @@ filterTests(['main'], () => {
 
     it('Check In Sync column status', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      cy.getBySel('cluster-list-container')
+      (isRancherManagerVersion('2.9')) ? htmlSelector = 'sortable-table-list-container' : htmlSelector = 'cluster-list-container';
+      cy.getBySel(htmlSelector)
         .should('not.contain', 'Unavailable');
-      cy.getBySel('cluster-list-container')
+      cy.getBySel(htmlSelector)
         .contains('Type')
         .click();
       cy.getBySel('sortable-table-0-action-button')
@@ -51,7 +54,7 @@ filterTests(['main'], () => {
       cy.getBySel('action-button-async-button')
         .contains('Save')
         .click();
-      cy.getBySel('cluster-list-container')
+      cy.getBySel(htmlSelector)
         .contains('Type')
         .click();
       cy.getBySel('sortable-cell-0-4')
