@@ -100,13 +100,6 @@ Clone the following repositories in your development environment:
     wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img -o jsonpath="{.status.downloadURL}"` -O elemental-dev.x86_64.iso
     ```
 
-    The default example also creates a seed image using the `loopdevice` snapshotter.  
-    Beware that the loopdevice images are registered to a different `MachineRegistration`.  
-
-    ```bash
-    wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img-loopdevice -o jsonpath="{.status.downloadURL}"` -O elemental-dev-loopdevice.x86_64.iso
-    ```
-
     You can now use this ISO to provision Elemental machines, for example using an hypervisor on your dev environment.  
     The machines must be able to connect to the test Rancher environment `172.18.0.2:443`, and to the test registry when testing upgrade/downgrade scenarios `172.18.0.2:30000`.  
 

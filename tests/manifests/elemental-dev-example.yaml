@@ -63,7 +63,7 @@ metadata:
   name: fire-nodes
   namespace: fleet-default
 spec:
-  machineName: test-btrfs-${System Information/UUID}
+  machineName: test-${System Information/UUID}
   config:
     network:
       ipAddresses:
@@ -143,55 +143,4 @@ spec:
     apiVersion: elemental.cattle.io/v1beta1
     kind: MachineRegistration
     name: fire-nodes
-    namespace: fleet-default
----
-apiVersion: elemental.cattle.io/v1beta1
-kind: MachineRegistration
-metadata:
-  name: fire-nodes-loopdevice
-  namespace: fleet-default
-spec:
-  machineName: test-loopdev-${System Information/UUID}
-  config:
-    cloud-config:
-      users:
-        - name: root
-          passwd: root
-    elemental:
-      reset:
-        debug: true
-        enabled: true
-        reset-persistent: true
-        reset-oem: true
-      install:
-        snapshotter:
-          type: loopdevice
-        reboot: true
-        device-selector:
-        - key: Name
-          operator: In
-          values:
-          - /dev/sda
-          - /dev/vda
-          - /dev/nvme0
-        debug: true
-  machineInventoryLabels:
-    element: fire
-    manufacturer: "${System Information/Manufacturer}"
-    productName: "${System Information/Product Name}"
-    serialNumber: "${System Information/Serial Number}"
-    machineUUID: "${System Information/UUID}"
----
-apiVersion: elemental.cattle.io/v1beta1
-kind: SeedImage
-metadata:
-  name: fire-img-loopdevice
-  namespace: fleet-default
-spec:
-  type: iso
-  baseImage: docker.io/local/elemental-iso:dev
-  registrationRef:
-    apiVersion: elemental.cattle.io/v1beta1
-    kind: MachineRegistration
-    name: fire-nodes-loopdevice
     namespace: fleet-default
