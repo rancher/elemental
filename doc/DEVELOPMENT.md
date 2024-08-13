@@ -26,7 +26,7 @@ Clone the following repositories in your development environment:
     Using the `elemental-operator` repo:  
 
     ```bash
-    make setup-full-cluster 
+    LOCAL_BUILD=true make setup-full-cluster 
     ```
 
     If everything succeeded, you should be able to login into Rancher at: <https://172.18.0.2.sslip.io>
@@ -98,13 +98,6 @@ Clone the following repositories in your development environment:
 
     ```bash
     wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img -o jsonpath="{.status.downloadURL}"` -O elemental-dev.x86_64.iso
-    ```
-
-    The default example also creates a seed image using the `loopdevice` snapshotter.  
-    Beware that the loopdevice images are registered to a different `MachineRegistration`.  
-
-    ```bash
-    wget --no-check-certificate `kubectl get seedimage -n fleet-default fire-img-loopdevice -o jsonpath="{.status.downloadURL}"` -O elemental-dev-loopdevice.x86_64.iso
     ```
 
     You can now use this ISO to provision Elemental machines, for example using an hypervisor on your dev environment.  
