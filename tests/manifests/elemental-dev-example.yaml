@@ -46,17 +46,6 @@ spec:
           insecureSkipVerify: true    
   kubernetesVersion: v1.27.8+k3s2
 ---
-apiVersion: ipam.cluster.x-k8s.io/v1alpha2
-kind: InClusterIPPool
-metadata:
-  name: elemental-inventory-pool
-  namespace: fleet-default
-spec:
-  addresses:
-    - 192.168.122.150-192.168.122.200
-  prefix: 24
-  gateway: 192.168.122.1
----
 apiVersion: elemental.cattle.io/v1beta1
 kind: MachineRegistration
 metadata:
@@ -65,38 +54,6 @@ metadata:
 spec:
   machineName: test-${System Information/UUID}
   config:
-    network:
-      ipAddresses:
-        inventory-ip:
-          apiGroup: ipam.cluster.x-k8s.io
-          kind: InClusterIPPool
-          name: elemental-inventory-pool
-      config:
-        dns-resolver:
-          config:
-            server:
-            - 192.168.122.1
-            search: []
-        routes:
-          config:
-          - destination: 0.0.0.0/0
-            next-hop-interface: enp1s0
-            next-hop-address: 192.168.122.1
-            metric: 150
-            table-id: 254
-        interfaces:
-          - name: enp1s0
-            type: ethernet
-            description: Main-NIC
-            state: up
-            ipv4:
-              enabled: true
-              dhcp: false
-              address:
-              - ip: "{inventory-ip}"
-                prefix-length: 24
-            ipv6:
-              enabled: false
     cloud-config:
       users:
         - name: root
