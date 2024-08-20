@@ -245,6 +245,8 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 				"--create-namespace",
 				"--set", "image.repository=" + repoServer + rancherPath + "elemental-operator",
 				"--set", "seedImage.repository=" + repoServer + rancherPath + "seedimage-builder",
+				"--set", "channel.name=airgap-os-channel",
+				"--set", "channel.tag=latest",
 				"--set", "channel.image=" + repoServer + rancherPath + "elemental-channel-" + rancherManager,
 				"--set", "registryUrl=",
 				"--wait", "--wait-for-jobs",
