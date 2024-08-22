@@ -12,7 +12,6 @@
 
 .default_products: &default_products
   distri: sle-micro
-  version: '6.0'
 
 .test_settings: &test_settings
   HDDSIZEGB: '20'
@@ -31,6 +30,16 @@
   VIDEOMODE: "text"
   YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
 
+.image_test_settings: &image_test_settings
+  HDD_1: 'elemental-%VERSION%-%FLAVOR%-%ARCH%.qcow2'
+  IMAGE_TYPE: disk
+  START_AFTER_TEST: generate_image
+
+.iso_test_settings: &iso_test_settings
+  IMAGE_TYPE: iso
+  ISO: 'elemental-%VERSION%-%FLAVOR%-%ARCH%.iso'
+  START_AFTER_TEST: generate_iso
+
 defaults:
   aarch64:
     machine: aarch64-virtio
@@ -42,34 +51,47 @@ defaults:
       QEMUCPU: host
 
 products:
-  sl-micro-elemental-image-aarch64:
+  sle-micro-elemental-image-5.5-aarch64:
     <<: *default_products
     flavor: Elemental-Image-Updates
-  sl-micro-elemental-iso-aarch64:
+    version: '5.5'
+  sle-micro-elemental-iso-5.5-aarch64:
     <<: *default_products
     flavor: Elemental-Iso-Updates
-  sl-micro-elemental-image-x86_64:
+    version: '5.5'
+  sle-micro-elemental-image-5.5-x86_64:
     <<: *default_products
     flavor: Elemental-Image-Updates
-  sl-micro-elemental-iso-x86_64:
+    version: '5.5'
+  sle-micro-elemental-iso-5.5-x86_64:
     <<: *default_products
     flavor: Elemental-Iso-Updates
+    version: '5.5'
+  sl-micro-elemental-image-6.0-aarch64:
+    <<: *default_products
+    flavor: Elemental-Image-Updates
+    version: '6.0'
+  sl-micro-elemental-iso-6.0-aarch64:
+    <<: *default_products
+    flavor: Elemental-Iso-Updates
+    version: '6.0'
+  sl-micro-elemental-image-6.0-x86_64:
+    <<: *default_products
+    flavor: Elemental-Image-Updates
+    version: '6.0'
+  sl-micro-elemental-iso-6.0-x86_64:
+    <<: *default_products
+    flavor: Elemental-Iso-Updates
+    version: '6.0'
 
 scenarios:
   aarch64:
-    sl-micro-elemental-image-aarch64:
+    sle-micro-elemental-image-5.5-aarch64:
       - generate_image:
           testsuite: null
           settings:
             <<: *generate_settings
-      - test_image:
-          testsuite: null
-          settings:
-            <<: *test_settings
-            HDD_1: 'elemental-%FLAVOR%-%ARCH%.qcow2'
-            IMAGE_TYPE: disk
-            START_AFTER_TEST: generate_image
-    sl-micro-elemental-iso-x86_64:
+    sle-micro-elemental-iso-5.5-aarch64:
       - generate_iso:
           testsuite: null
           settings:
@@ -78,24 +100,35 @@ scenarios:
           testsuite: null
           settings:
             <<: *test_settings
-            IMAGE_TYPE: iso
-            ISO: 'elemental-%FLAVOR%-%ARCH%.iso'
-            START_AFTER_TEST: generate_iso
+            <<: *iso_test_settings
+    sl-micro-elemental-image-6.0-aarch64:
+      - generate_image:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *image_test_settings
+    sl-micro-elemental-iso-6.0-aarch64:
+      - generate_iso:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *iso_test_settings
   x86_64:
-    sl-micro-elemental-image-x86_64:
+    sle-micro-elemental-image-5.5-x86_64:
       - generate_image:
           machine: 64bit
           testsuite: null
           settings:
             <<: *generate_settings
-      - test_image:
-          testsuite: null
-          settings:
-            <<: *test_settings
-            HDD_1: 'elemental-%FLAVOR%-%ARCH%.qcow2'
-            IMAGE_TYPE: disk
-            START_AFTER_TEST: generate_image@64bit
-    sl-micro-elemental-iso-x86_64:
+    sle-micro-elemental-iso-5.5-x86_64:
       - generate_iso:
           machine: 64bit
           testsuite: null
@@ -105,6 +138,29 @@ scenarios:
           testsuite: null
           settings:
             <<: *test_settings
-            IMAGE_TYPE: iso
-            ISO: 'elemental-%FLAVOR%-%ARCH%.iso'
+            <<: *iso_test_settings
+            START_AFTER_TEST: generate_iso@64bit
+    sl-micro-elemental-image-6.0-x86_64:
+      - generate_image:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *image_test_settings
+            START_AFTER_TEST: generate_image@64bit
+    sl-micro-elemental-iso-6.0-x86_64:
+      - generate_iso:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *iso_test_settings
             START_AFTER_TEST: generate_iso@64bit
