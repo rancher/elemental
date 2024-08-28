@@ -136,7 +136,7 @@ Cypress.Commands.add('createMachReg', (
     // and RAW feature is not already available in stable
     // upgrade condition will be removed in next elemental stable version
     if (utils.isBootType('raw') && !utils.isCypressTag('upgrade')) {
-      cy.verifyDownload('.raw', { contains:true, timeout: 300000, interval: 5000 });
+      cy.verifyDownload('.img', { contains: true, timeout: 300000, interval: 5000 });
     } else {
       cy.verifyDownload('.iso', { contains:true, timeout: 300000, interval: 5000 });
     }
