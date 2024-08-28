@@ -69,8 +69,10 @@ docker run -v $PWD:/workdir -w /workdir               \
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos
 
 if [[ ! -f ${ELEMENTAL_MEDIA_PATH} ]]; then
-  # Move elemental.iso into the expected folder
-  mv downloads/*.${BOOT_TYPE} ${ELEMENTAL_MEDIA_PATH} 2>/dev/null; true
+  # Move elemental image into the expected folder
+  for EXT in iso img; do
+    mv downloads/*.${EXT} ${ELEMENTAL_MEDIA_PATH} 2>/dev/null || true
+  done
 fi
 popd
 
