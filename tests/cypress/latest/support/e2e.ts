@@ -20,16 +20,16 @@ declare global {
   namespace Cypress {
     interface Chainable {
       // Functions declared in commands.ts
-      addMachInvAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
-      addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels?: boolean):Chainable<Element>;
-      addMachRegAnnotation(annotationName: string, annotationValue: string):Chainable<Element>;
-      addMachRegLabel(labelName: string, labelValue: string):Chainable<Element>;
+      addMachInvAnnotation(annotationName: string, annotationValue: string): Chainable<Element>;
+      addMachInvLabel(labelName: string, labelValue: string, useHardwareLabels?: boolean): Chainable<Element>;
+      addMachRegAnnotation(annotationName: string, annotationValue: string): Chainable<Element>;
+      addMachRegLabel(labelName: string, labelValue: string): Chainable<Element>;
       addOsVersionChannel(channelVersion: string): Chainable<Element>;
       checkFilter(filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean): Chainable<Element>;
       checkLabelSize(sizeToCheck: string): Chainable<Element>;
-      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string, afterBoot: boolean, useHardwareLabels?: boolean):Chainable<Element>;
-      checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string):Chainable<Element>;
-      checkMachRegLabel(machRegName: string, labelName: string, labelValue: string):Chainable<Element>;
+      checkMachInvLabel(machRegName: string, labelName: string, labelValue: string, afterBoot: boolean, useHardwareLabels?: boolean): Chainable<Element>;
+      checkMachRegAnnotation(machRegName: string, annotationName: string, annotationValue: string): Chainable<Element>;
+      checkMachRegLabel(machRegName: string, labelName: string, labelValue: string): Chainable<Element>;
       clickElementalMenu(label: string,): Chainable<Element>;
       createMachReg(machRegName: string, namespace?: string, checkLabels?: boolean, checkAnnotations?: boolean, checkInventoryLabels?: boolean,
         checkInventoryAnnotations?: boolean, checkIsoBuilding?: boolean, customCloudConfig?: string, checkDefaultCloudConfig?: boolean): Chainable<Element>;

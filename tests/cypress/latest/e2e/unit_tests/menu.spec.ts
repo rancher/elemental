@@ -21,17 +21,17 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 filterTests(['main'], () => {
   Cypress.config();
   describe('Menu testing', () => {
-    const elemental     = new Elemental();
+    const elemental = new Elemental();
     const elementalUser = "elemental-user"
-    const uiAccount     = Cypress.env('ui_account');
-    const uiPassword    = "rancherpassword"
-  
+    const uiAccount = Cypress.env('ui_account');
+    const uiPassword = "rancherpassword"
+
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
     });
-  
+
     qase(2,
       it('Check Elemental logo', () => {
         // Elemental's icon should appear in the side menu
@@ -39,16 +39,16 @@ filterTests(['main'], () => {
           .should('exist');
       })
     );
-    
+
     qase(3,
       it('Check Elemental menu', () => {
         // Elemental's icon should appear in the side menu
         cypressLib.checkNavIcon('elemental')
           .should('exist');
-  
+
         // Click on the Elemental's icon
         cypressLib.accesMenu('OS Management');
-  
+
         // Check Elemental's side menu
         elemental.checkElementalNav();
       })

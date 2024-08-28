@@ -38,32 +38,32 @@ export class Elemental {
     // Check all listed options once accordion is opened
     cy.get('li.child.nav-type')
       .should(($lis) => {
-    expect($lis).to.have.length(7);
-    expect($lis.eq(0)).to.contain('Dashboard');
-    expect($lis.eq(1)).to.contain('Registration Endpoints');
-    expect($lis.eq(2)).to.contain('Inventory of Machines');
-    expect($lis.eq(3)).to.contain('Update Groups');
-    expect($lis.eq(4)).to.contain('OS Versions');
-    expect($lis.eq(5)).to.contain('OS Version Channels');
-    expect($lis.eq(6)).to.contain('Seed Images');
-    })      
+        expect($lis).to.have.length(7);
+        expect($lis.eq(0)).to.contain('Dashboard');
+        expect($lis.eq(1)).to.contain('Registration Endpoints');
+        expect($lis.eq(2)).to.contain('Inventory of Machines');
+        expect($lis.eq(3)).to.contain('Update Groups');
+        expect($lis.eq(4)).to.contain('OS Versions');
+        expect($lis.eq(5)).to.contain('OS Version Channels');
+        expect($lis.eq(6)).to.contain('Seed Images');
+      })
   }
 
   installElementalOperator(upgrade_from_version: string) {
     cy.contains('local')
-    .click();
+      .click();
     cy.get('.nav').contains('Apps')
       .click();
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
+      cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 })
         .click();
     } else {
-      cy.contains('Elemental', {timeout:30000})
+      cy.contains('Elemental', { timeout: 30000 })
         .click();
     }
-    cy.contains('Charts: Elemental', {timeout:30000});
+    cy.contains('Charts: Elemental', { timeout: 30000 });
     if (isCypressTag('upgrade') && isOperatorVersion('marketplace')) {
-      cy.contains(upgrade_from_version, {timeout:30000})
+      cy.contains(upgrade_from_version, { timeout: 30000 })
         .click();
     }
     cy.clickButton('Install');
@@ -83,11 +83,11 @@ export class Elemental {
     }
     cy.clickButton('Next');
     cy.clickButton('Install');
-    cy.contains('SUCCESS: helm', {timeout:120000});
+    cy.contains('SUCCESS: helm', { timeout: 120000 });
     cy.reload;
     cy.contains('Only User Namespaces') // eslint-disable-line cypress/unsafe-to-chain-command
       .click()
       .type('cattle-elemental-system{enter}{esc}');
-    cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', {timeout: 120000});
+    cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', { timeout: 120000 });
   }
 }

@@ -22,7 +22,7 @@ filterTests(['main', 'upgrade'], () => {
   describe('First login on Rancher', () => {
     qase(46,
       it('Log in and accept terms and conditions', () => {
-      cypressLib.firstLogin();
+        cypressLib.firstLogin();
       })
     );
   })

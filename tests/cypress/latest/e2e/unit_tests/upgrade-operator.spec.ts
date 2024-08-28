@@ -18,7 +18,7 @@ import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import * as utils from "~/support/utils";
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -41,7 +41,7 @@ describe('Elemental operator upgrade tests', () => {
     if (utils.isK8sVersion('k3s') && !utils.isRancherManagerVersion('2.7')) {
       if (!utils.isOperatorVersion('marketplace')) {
         it('Add elemental-operator dev repo', () => {
-          cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo')+':8080', 'helm', 'none');
+          cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo') + ':8080', 'helm', 'none');
         });
       } else {
         qase(55,
@@ -51,20 +51,20 @@ describe('Elemental operator upgrade tests', () => {
             cy.get('.nav').contains('Apps')
               .click();
             if (!utils.isOperatorVersion('marketplace')) {
-              cy.contains('.item.has-description.color1', 'Elemental', {timeout:30000})
+              cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 })
                 .click();
             } else {
-              cy.contains('Elemental', {timeout:30000})
+              cy.contains('Elemental', { timeout: 30000 })
                 .click();
             }
-            cy.contains('Charts: Elemental', {timeout:30000});
+            cy.contains('Charts: Elemental', { timeout: 30000 });
             cy.clickButton('Upgrade');
             cy.contains('.header > .title', 'elemental-operator');
             cy.clickButton('Next');
             cy.clickButton('Upgrade');
-            cy.contains('SUCCESS: helm', {timeout:120000});
-            cy.contains('Installed App: elemental-operator Pending-Upgrade', {timeout:120000});
-            cy.contains('Installed App: elemental-operator Deployed', {timeout:120000});
+            cy.contains('SUCCESS: helm', { timeout: 120000 });
+            cy.contains('Installed App: elemental-operator Pending-Upgrade', { timeout: 120000 });
+            cy.contains('Installed App: elemental-operator Deployed', { timeout: 120000 });
           })
         );
 
@@ -94,7 +94,7 @@ describe('Elemental operator upgrade tests', () => {
             // Check OS Versions Channel
             cy.clickNavMenu(["Advanced", "OS Version Channels"]);
             cy.get('.main-row')
-              .contains('Active elemental-channel', {timeout: 60000});
+              .contains('Active elemental-channel', { timeout: 60000 });
           })
         );
       };

@@ -17,7 +17,7 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -25,8 +25,8 @@ slowCypressDown(500)
 Cypress.config();
 describe('Machine registration testing', () => {
   const elementalUser = "elemental-user"
-  const uiAccount     = Cypress.env('ui_account');
-  const uiPassword    = "rancherpassword"
+  const uiAccount = Cypress.env('ui_account');
+  const uiPassword = "rancherpassword"
 
   before(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -61,9 +61,9 @@ describe('Machine registration testing', () => {
 
     // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
-    
+
     // Delete all files previously downloaded
-    cy.exec('rm cypress/downloads/*', {failOnNonZeroExit: false});
+    cy.exec('rm cypress/downloads/*', { failOnNonZeroExit: false });
 
     // Delete all existing machine registrations
     cy.getBySel('manage-reg-btn')
@@ -140,9 +140,9 @@ describe('Machine registration testing', () => {
           .click();
         cy.contains('.masthead', 'Registration Endpoint: cloned-machine-regActive')
           .should('exist');
-      
+
         // Check that we got the same label and annotation in both machine registration
-        cy.checkMachRegLabel('cloned-machine-reg','myLabel1', 'myLabelValue1');
+        cy.checkMachRegLabel('cloned-machine-reg', 'myLabel1', 'myLabelValue1');
         cy.contains('cloned-machine-reg')
           .click();
         cy.checkMachRegAnnotation('cloned-machine-reg', 'myAnnotation1', 'myAnnotationValue1');
@@ -176,9 +176,9 @@ describe('Machine registration testing', () => {
       })
     );
 
-  // This test must stay the last one because we use this machine registration when we test adding a node.
-  // It also tests using a custom cloud config by using read from file button.
-    qase([8,20,5],
+    // This test must stay the last one because we use this machine registration when we test adding a node.
+    // It also tests using a custom cloud config by using read from file button.
+    qase([8, 20, 5],
       it('Create Machine registration we will use to test adding a node', () => {
         cy.createMachReg('machine-registration',
           'fleet-default',
@@ -205,23 +205,23 @@ describe('Machine registration testing', () => {
   // only select stable ISO for now.
   // We will move the test to the standard scenario later
   filterTests(['upgrade'], () => {
-    qase([8,20,5],
+    qase([8, 20, 5],
       it('Create Machine registration we will use to test adding a node', () => {
         cy.createMachReg('machine-registration',
-        'fleet-default',
-        //checkLabels
-        false,
-        //checkAnnotations
-        false,
-        //checkInventoryLabels
-        true,
-        //checkInventoryAnnotations
-        true,
-        //checkIsoBuilding
-        true,
-        'custom_cloud-config_upgrade.yaml',
-        //checkDefaultCloudConfig
-        false);
+          'fleet-default',
+          //checkLabels
+          false,
+          //checkAnnotations
+          false,
+          //checkInventoryLabels
+          true,
+          //checkInventoryAnnotations
+          true,
+          //checkIsoBuilding
+          true,
+          'custom_cloud-config_upgrade.yaml',
+          //checkDefaultCloudConfig
+          false);
         cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);
       })
     );
