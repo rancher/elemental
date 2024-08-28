@@ -17,24 +17,24 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
 
 Cypress.config();
 describe('Machine inventory testing', () => {
-  const clusterName          = "mycluster"
-  const elementalUser        = "elemental-user"
-  const hwLabels             = ["TotalCPUThread", "TotalMemory", "CPUModel",
-                               "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
-                               "CPUVendorTotalCPUCores"]
+  const clusterName = "mycluster"
+  const elementalUser = "elemental-user"
+  const hwLabels = ["TotalCPUThread", "TotalMemory", "CPUModel",
+    "CPUVendor", "NumberBlockDevices", "NumberNetInterface",
+    "CPUVendorTotalCPUCores"]
   const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
-  const proxy                = "http://172.17.0.1:3128"
-  const uiAccount            = Cypress.env('ui_account');
-  const uiPassword           = "rancherpassword"
-  const vmNumber             = 3;
-  
+  const proxy = "http://172.17.0.1:3128"
+  const uiAccount = Cypress.env('ui_account');
+  const uiPassword = "rancherpassword"
+  const vmNumber = 3;
+
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
     cy.visit('/');
@@ -78,13 +78,13 @@ describe('Machine inventory testing', () => {
             .parent()
             .parent()
             .contains(hwLabels[key])
-            .click({force: true})
+            .click({ force: true })
           cy.contains(hwLabels[key]);
         }
       })
     );
   });
-  
+
   filterTests(['main', 'upgrade'], () => {
     qase(30,
       it('Create Elemental cluster', () => {
@@ -92,7 +92,7 @@ describe('Machine inventory testing', () => {
       })
     );
   });
-  
+
   filterTests(['main', 'upgrade'], () => {
     it('Check Elemental cluster status', () => {
       cypressLib.burgerMenuToggle();

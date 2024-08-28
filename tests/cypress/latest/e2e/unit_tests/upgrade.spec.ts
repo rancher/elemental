@@ -17,20 +17,19 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
 
-
 Cypress.config();
 describe('Upgrade tests', () => {
-  const channelName      = "mychannel"
-  const clusterName      = "mycluster"
-  const elementalUser    = "elemental-user"
-  const uiAccount        = Cypress.env('ui_account');
-  const uiPassword       = "rancherpassword"
-  const upgradeImage     = Cypress.env('upgrade_image')
+  const channelName = "mychannel"
+  const clusterName = "mycluster"
+  const elementalUser = "elemental-user"
+  const uiAccount = Cypress.env('ui_account');
+  const uiPassword = "rancherpassword"
+  const upgradeImage = Cypress.env('upgrade_image')
 
   beforeEach(() => {
     (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
@@ -65,7 +64,7 @@ describe('Upgrade tests', () => {
       qase(33,
         it('Check OS Versions', () => {
           cy.clickNavMenu(["Advanced", "OS Versions"]);
-          cy.contains(new RegExp('Active.*-iso-unstable'), {timeout: 120000})
+          cy.contains(new RegExp('Active.*-iso-unstable'), { timeout: 120000 })
         })
       );
     };
@@ -82,7 +81,7 @@ describe('Upgrade tests', () => {
         // Marketplace test uses OS version channel
         cy.clickNavMenu(["Advanced", "Update Groups"]);
         cy.getBySel('masthead-create')
-        .contains('Create')
+          .contains('Create')
           .click();
         cy.get('.primaryheader')
           .contains('Update Group: Create');
@@ -119,10 +118,10 @@ describe('Upgrade tests', () => {
               .contains('unstable')
               .click();
           }
-        } 
+        }
 
         cy.getBySel('form-save')
-        .contains('Create')
+          .contains('Create')
           .click();
         // Status changes a lot right after the creation so let's wait 10 secondes
         // before checking
@@ -143,9 +142,9 @@ describe('Upgrade tests', () => {
           .contains(clusterName)
           .click();
         cy.get('.primaryheader')
-          .contains('Updating', {timeout: 420000});
+          .contains('Updating', { timeout: 420000 });
         cy.get('.primaryheader')
-          .contains('Active', {timeout: 720000});
+          .contains('Active', { timeout: 720000 });
       })
     );
 
@@ -153,7 +152,7 @@ describe('Upgrade tests', () => {
       it('Cannot create two upgrade groups targeting the same cluster', () => {
         cy.clickNavMenu(["Advanced", "Update Groups"]);
         cy.getBySel('masthead-create')
-        .contains('Create')
+          .contains('Create')
           .click();
         cy.get('.primaryheader')
           .contains('Update Group: Create');

@@ -16,7 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -25,20 +25,20 @@ filterTests(['main'], () => {
   Cypress.config();
   describe('Advanced filtering testing', () => {
     const elementalUser = "elemental-user"
-    const uiAccount     = Cypress.env('ui_account');
-    const uiPassword    = "rancherpassword"
-  
+    const uiAccount = Cypress.env('ui_account');
+    const uiPassword = "rancherpassword"
+
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
-  
+
       // Open the navigation menu
       cypressLib.burgerMenuToggle();
-  
+
       // Click on the Elemental's icon
       cypressLib.accesMenu('OS Management');
     });
-  
+
     qase(21,
       it('Create fake machine inventories', () => {
         const machineInventoryMap = new Map([
@@ -48,18 +48,18 @@ filterTests(['main'], () => {
         ]);
 
         machineInventoryMap.forEach((value, key) => {
-          cy.importMachineInventory(key +'.yaml', value);
+          cy.importMachineInventory(key + '.yaml', value);
         });
       })
     );
-  
+
     qase(22,
       it('Two machine inventories should appear by filtering on test-filter', () => {
         // Only test-filter-one and test-filter-two should appear with test-filter as filter
         cy.checkFilter('test-filter', true, true, false);
       })
     );
-  
+
     qase(22,
       it('One machine inventory should appear by filtering on test-filter-one', () => {
         // Only test-filter-one should appear with test-filter-one and Test-Filter_One as filter
@@ -69,7 +69,7 @@ filterTests(['main'], () => {
         });
       })
     );
-  
+
     qase(23,
       it('No machine inventory should appear by filtering on test-bad-filter', () => {
         // This test will also serve as no regression test for https://github.com/rancher/elemental-ui/issues/41
@@ -77,7 +77,7 @@ filterTests(['main'], () => {
         cy.contains('There are no rows which match your search query.')
       })
     );
-  
+
     qase(24,
       it('Delete all fake machine inventories', () => {
         cy.clickNavMenu(["Inventory of Machines"]);

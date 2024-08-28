@@ -17,7 +17,7 @@ import filterTests from '~/support/filterTests.js';
 import { isRancherManagerVersion, isUIVersion } from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -25,14 +25,14 @@ slowCypressDown(500)
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('Install Elemental plugin', () => {
-  
+
     beforeEach(() => {
       cy.viewport(1920, 1080);
       cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
     });
-  
+
     qase(11,
       it('Add elemental-ui repo', () => {
         // 1 - TODO: Remove rancher 2-9 condition later
@@ -48,7 +48,7 @@ filterTests(['main', 'upgrade'], () => {
     it('Add rancher-ui-plugin-charts repo', () => {
       isRancherManagerVersion('2.8') || isRancherManagerVersion('2.9') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
     });
-    
+
     qase(12,
       it('Enable extension support', () => {
         if (!isRancherManagerVersion('2.9')) {
@@ -56,7 +56,7 @@ filterTests(['main', 'upgrade'], () => {
         }
       })
     );
-  
+
     qase(13,
       it('Install Elemental plugin', () => {
         // TODO: create a function to install any plugin and not elemental only
@@ -68,7 +68,7 @@ filterTests(['main', 'upgrade'], () => {
           .click();
         cy.clickButton('Install');
         cy.contains('Installing');
-        cy.contains('Extensions changed - reload required', {timeout: 40000});
+        cy.contains('Extensions changed - reload required', { timeout: 40000 });
         cy.clickButton('Reload');
         cy.get('.plugins')
           .children()

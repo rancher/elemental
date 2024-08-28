@@ -17,7 +17,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -25,33 +25,33 @@ slowCypressDown(500)
 filterTests(['main'], () => {
   Cypress.config();
   describe('Machine selector testing', () => {
-    const elemental     = new Elemental();
+    const elemental = new Elemental();
     const elementalUser = "elemental-user"
-    const uiAccount     = Cypress.env('ui_account');
-    const uiPassword    = "rancherpassword"
-    const vmNumber      = 3;
-  
+    const uiAccount = Cypress.env('ui_account');
+    const uiPassword = "rancherpassword"
+    const vmNumber = 3;
+
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
-  
+
       // Open the navigation menu
       cypressLib.burgerMenuToggle();
-  
+
       // Click on the Elemental's icon
       cypressLib.accesMenu('OS Management');
-  
+
       // Go to the cluster creation page
-      elemental.accessClusterMenu(); 
+      elemental.accessClusterMenu();
     });
-  
+
     qase(25,
       it('Testing selector without any rule', () => {
         cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`)
           .should('exist');
       })
     );
-  
+
     qase(26,
       it('Testing selector with unmatching rule', () => {
         //cy.clickButton('Add Rule');
@@ -66,7 +66,7 @@ filterTests(['main'], () => {
           .should('exist');
       })
     );
-  
+
     qase(27,
       it('Testing selector with matching rule', () => {
         //cy.clickButton('Add Rule');

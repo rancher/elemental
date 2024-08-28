@@ -88,7 +88,7 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
       .type('NO_PROXY');
     cy.getBySel('kv-item-value-2')
       .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
-    }
+  }
   cy.clickButton('Create');
   // This wait can be replaced by something cleaner
   // eslint-disable-next-line cypress/no-unnecessary-waiting

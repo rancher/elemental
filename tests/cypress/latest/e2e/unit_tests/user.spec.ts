@@ -20,10 +20,10 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 Cypress.config();
 describe('User role testing', () => {
-  const elemental     = new Elemental();
+  const elemental = new Elemental();
   const elementalUser = "elemental-user"
-  const stdUser       = "std-user"
-  const uiPassword    = "rancherpassword"
+  const stdUser = "std-user"
+  const uiPassword = "rancherpassword"
 
   beforeEach(() => {
     cy.visit('/');

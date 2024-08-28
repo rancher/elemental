@@ -17,7 +17,7 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from "~/support/utils";
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 
 // slow down each command by 500ms
 slowCypressDown(500)
@@ -25,21 +25,21 @@ slowCypressDown(500)
 filterTests(['main'], () => {
   Cypress.config();
   describe('Reset testing', () => {
-    const clusterName          = "mycluster"
-    const elementalUser        = "elemental-user"
+    const clusterName = "mycluster"
+    const elementalUser = "elemental-user"
     const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
-    const proxy                = "http://172.17.0.1:3128" 
-    const uiAccount            = Cypress.env('ui_account');
-    const uiPassword           = "rancherpassword"
-    const vmNumber             = 3;
-  
+    const proxy = "http://172.17.0.1:3128"
+    const uiAccount = Cypress.env('ui_account');
+    const uiPassword = "rancherpassword"
+    const vmNumber = 3;
+
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
       cypressLib.accesMenu('OS Management');
     });
-    
+
     if (utils.isK8sVersion('rke')) {
       qase(54,
         it('Enable reset in machine inventory', () => {
@@ -48,13 +48,13 @@ filterTests(['main'], () => {
             cy.getBySel(`sortable-table-${i}-action-button`).click();
             cy.contains('Edit YAML').click();
             cy.contains('annotations').as('anno')
-            cy.get('@anno').click(0,0)
+            cy.get('@anno').click(0, 0)
             cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
             cy.getBySel('action-button-async-button')
               .contains('Save')
               .click();
           }
-      }));
+        }));
     };
 
     qase(['54', '55'],
@@ -74,7 +74,7 @@ filterTests(['main'], () => {
           cy.getBySel(`sortable-table-${i}-row`, { timeout: 180000 })
             .contains('Active', { timeout: 180000 });
         }
-    }));
+      }));
 
     qase(30,
       it('Create Elemental cluster', () => {

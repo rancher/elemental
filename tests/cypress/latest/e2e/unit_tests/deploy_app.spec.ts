@@ -16,7 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 import { isRancherManagerVersion } from '../../support/utils';
 
 // slow down each command by 500ms
@@ -25,21 +25,21 @@ slowCypressDown(500)
 filterTests(['main'], () => {
   Cypress.config();
   describe('Deploy application in fresh Elemental Cluster', () => {
-    const clusterName  = "mycluster"
+    const clusterName = "mycluster"
     beforeEach(() => {
       cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
       cy.viewport(1920, 1080);
     });
-    
+
     qase(31,
       it('Deploy Alerting Drivers application', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle()
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20000);
-        isRancherManagerVersion('2.8') ? cypressLib.burgerMenuToggle(): null;
+        isRancherManagerVersion('2.8') ? cypressLib.burgerMenuToggle() : null;
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         // TODO: function to deploy app?
         if (isRancherManagerVersion('2.9')) {
@@ -53,19 +53,19 @@ filterTests(['main'], () => {
           .click();
         cy.contains('Charts')
           .click();
-        cy.contains('Alerting Drivers', {timeout:30000})
+        cy.contains('Alerting Drivers', { timeout: 30000 })
           .click();
-        cy.contains('.name-logo-install', 'Alerting Drivers', {timeout:30000});
+        cy.contains('.name-logo-install', 'Alerting Drivers', { timeout: 30000 });
         cy.clickButton('Install');
         cy.contains('.outer-container > .header', 'Alerting Drivers');
         cy.clickButton('Next');
         cy.clickButton('Install');
-        cy.contains('SUCCESS: helm install', {timeout:120000});
+        cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload;
         cy.contains('Deployed rancher-alerting-drivers');
       })
     );
-  
+
     qase(32,
       it('Remove Alerting Drivers application', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
@@ -80,7 +80,7 @@ filterTests(['main'], () => {
           .click();
         cy.contains('Installed Apps')
           .click();
-        cy.contains('.title', 'Installed Apps', {timeout:20000});
+        cy.contains('.title', 'Installed Apps', { timeout: 20000 });
         cy.contains('rancher-alerting-drivers');
         cy.get('[width="30"] > .checkbox-outer-container')
           .click();
@@ -88,7 +88,7 @@ filterTests(['main'], () => {
           .getBySel('sortable-table-promptRemove')
           .click();
         cy.confirmDelete();
-        cy.contains('SUCCESS: helm uninstall', {timeout:60000});
+        cy.contains('SUCCESS: helm uninstall', { timeout: 60000 });
         cy.contains('.apps', 'rancher-alerting-drivers')
           .should('not.exist');
       })

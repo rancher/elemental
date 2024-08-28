@@ -15,7 +15,7 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
-import { slowCypressDown } from 'cypress-slow-down'
+import { slowCypressDown } from 'cypress-slow-down';
 import { isRancherManagerVersion } from '~/support/utils';
 
 // slow down each command by 500ms
@@ -24,11 +24,11 @@ slowCypressDown(500)
 filterTests(['main'], () => {
   Cypress.config();
   describe('OS versions testing', () => {
-    const elementalUser        = "elemental-user"
-    const uiAccount            = Cypress.env('ui_account');
-    const uiPassword           = "rancherpassword"
+    const elementalUser = "elemental-user"
+    const uiAccount = Cypress.env('ui_account');
+    const uiPassword = "rancherpassword"
     let htmlSelector;
-  
+
     beforeEach(() => {
       (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
       cy.visit('/');
@@ -49,7 +49,7 @@ filterTests(['main'], () => {
       cy.contains('Edit YAML')
         .click();
       cy.contains('annotations').as('anno')
-      cy.get('@anno').click(0,0)
+      cy.get('@anno').click(0, 0)
       cy.get('@anno').type('{end}{enter}  elemental.cattle.io/channel-no-longer-in-sync: \'true\'');
       cy.getBySel('action-button-async-button')
         .contains('Save')
