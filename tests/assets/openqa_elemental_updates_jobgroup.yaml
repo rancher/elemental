@@ -31,13 +31,13 @@
   YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
 
 .image_test_settings: &image_test_settings
-  HDD_1: 'elemental-%VERSION%-%FLAVOR%-%ARCH%.qcow2'
+  HDD_1: 'elemental-%BUILD%-%ARCH%.qcow2'
   IMAGE_TYPE: disk
   START_AFTER_TEST: generate_image
 
 .iso_test_settings: &iso_test_settings
   IMAGE_TYPE: iso
-  ISO: 'elemental-%VERSION%-%FLAVOR%-%ARCH%.iso'
+  ISO: 'elemental-%BUILD%-%ARCH%.iso'
   START_AFTER_TEST: generate_iso
 
 defaults:
