@@ -16,6 +16,7 @@ package e2e_test
 
 import (
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"testing"
@@ -304,29 +305,52 @@ func DownloadBuiltISO(ns, seedName, filename string) {
 	// Set minimal ISO file to 250MB
 	const minimalISOSize = 250 * 1024 * 1024
 
-	// Check that the seed image is correctly created
-	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "SeedImage",
+	By("Waiting for image to be generated", func() {
+		// Check that the seed image is correctly created
+		Eventually(func() string {
+			out, _ := kubectl.RunWithoutErr("get", "SeedImage",
+				"--namespace", ns,
+				seedName,
+				"-o", "jsonpath={.status}")
+			return out
+		}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+	})
+
+	By("Downloading image", func() {
+		// Get URL
+		seedImageURL, err := kubectl.RunWithoutErr("get", "SeedImage",
 			"--namespace", ns,
 			seedName,
-			"-o", "jsonpath={.status}")
-		return out
-	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+			"-o", "jsonpath={.status.downloadURL}")
+		Expect(err).To(Not(HaveOccurred()))
 
-	// Get URL
-	seedImageURL, err := kubectl.RunWithoutErr("get", "SeedImage",
-		"--namespace", ns,
-		seedName,
-		"-o", "jsonpath={.status.downloadURL}")
-	Expect(err).To(Not(HaveOccurred()))
+		// ISO file size should be greater than 500MB
+		Eventually(func() int64 {
+			// No need to check download status, file size at the end is enough
+			_ = tools.GetFileFromURL(seedImageURL, filename, false)
+			file, _ := os.Stat(filename)
+			return file.Size()
+		}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
+	})
 
-	// ISO file size should be greater than 500MB
-	Eventually(func() int64 {
-		// No need to check download status, file size at the end is enough
-		_ = tools.GetFileFromURL(seedImageURL, filename, false)
-		file, _ := os.Stat(filename)
-		return file.Size()
-	}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
+	By("Checking checksum", func() {
+		// Get checksum URL
+		checksumURL, err := kubectl.RunWithoutErr("get", "SeedImage",
+			"--namespace", ns,
+			seedName,
+			"-o", "jsonpath={.status.checksumURL}")
+		Expect(err).To(Not(HaveOccurred()))
+
+		// Download checksum file
+		checksumFile := filename + ".sha256"
+		_ = tools.GetFileFromURL(checksumURL, checksumFile, false)
+
+		// Check the checksum of downloaded image
+		err = exec.Command("bash", "-c", "sed -i 's; .*\\.iso; "+filename+";' "+checksumFile).Run()
+		Expect(err).To(Not(HaveOccurred()))
+		err = exec.Command("sha256sum", "--check", checksumFile).Run()
+		Expect(err).To(Not(HaveOccurred()))
+	})
 }
 
 /*
