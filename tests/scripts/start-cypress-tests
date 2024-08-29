@@ -2,7 +2,7 @@
 
 set -evx
 
-ELEMENTAL_MEDIA_PATH="/home/gh-runner/actions-runner/_work/elemental/elemental/elemental-from-cypress.$BOOT_TYPE"
+ELEMENTAL_MEDIA_PATH="/home/gh-runner/actions-runner/_work/elemental/elemental/elemental-from-cypress.${BOOT_TYPE}"
 
 # Start a simple HTTP server for sharing some config files
 HTTP_SRV_CMD="python3 -m http.server"
@@ -16,11 +16,15 @@ pushd cypress/latest
 npm install
 
 # Check if we have to report to QASE
-[[ -n $QASE_RUN_ID ]] && QASE_REPORT=1
+[[ -n "${QASE_RUN_ID}" ]] && QASE_REPORT=1
 
 # Install yq for parsing yaml files
+# Force 'true' in case of error, as zypper can return code greater than 0 for other reasons (see zypper doc)
 # TODO: yq will be added into the next OS image
-sudo zypper in -y yq
+sudo zypper -n in -l yq || true
+
+# Check if yq is available
+which yq >/dev/null 2>&1
 
 # Get latest stable Elemental OS version mainly for upgrade test
 OS_IMAGE=$(helm template oci://registry.suse.com/rancher/elemental-operator-chart \
