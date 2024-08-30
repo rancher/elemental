@@ -149,7 +149,9 @@
 
 ## `suite_test.go`
 
-*No test defined!*
+      -  **By:** Waiting for image to be generated
+      -  **By:** Downloading image
+      -  **By:** Checking checksum
 
 ## `ui_test.go`
 
