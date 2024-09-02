@@ -267,18 +267,12 @@ jobs:
 
       - name: Install a simple application
         id: install_simple_app
-        if: ${{ contains(inputs.k8s_downstream_version, 'k3s') }}
         run: cd tests && make e2e-install-app && make e2e-check-app
 
       - name: Reset a node in the cluster
         id: reset_node
         if: ${{ inputs.reset == true }}
-        run: cd tests && make e2e-reset
-
-      - name: Check application after reset
-        id: check_app
-        if: ${{ inputs.reset == true && contains(inputs.k8s_downstream_version, 'k3s') }}
-        run: cd tests && make e2e-check-app
+        run: cd tests && make e2e-reset && make e2e-check-app
 
       - name: Upgrade Elemental Operator
         id: operator_upgrade
@@ -286,10 +280,7 @@ jobs:
         env:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
-          cd tests && make e2e-upgrade-operator
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          cd tests && make e2e-upgrade-operator && make e2e-check-app
 
           # Extract elemental-operator version
           OPERATOR_VERSION=$(kubectl get pod \
@@ -310,10 +301,7 @@ jobs:
           PUBLIC_DOMAIN: ${{ inputs.public_domain }}
           RANCHER_UPGRADE: ${{ inputs.rancher_upgrade }}
         run: |
-          cd tests && make e2e-upgrade-rancher-manager
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          cd tests && make e2e-upgrade-rancher-manager && make e2e-check-app
 
           # Extract Rancher Manager version
           RANCHER_VERSION=$(kubectl get pod \
@@ -333,10 +321,7 @@ jobs:
           UPGRADE_TYPE: osImage
           VM_INDEX: 1
         run: |
-          cd tests && make e2e-upgrade-node
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          cd tests && make e2e-upgrade-node && make e2e-check-app
 
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
         id: upgrade_other_nodes
@@ -348,19 +333,13 @@ jobs:
           VM_INDEX: 2
           VM_NUMBERS: 3
         run: |
-          cd tests && make e2e-upgrade-node
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          cd tests && make e2e-upgrade-node && make e2e-check-app
 
       - name: Test Backup/Restore Elemental resources with Rancher Manager
         id: test_backup_restore
         if: ${{ contains(inputs.k8s_upstream_version, 'k3s') }}
         run: |
-          cd tests && make e2e-backup-restore
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          cd tests && make e2e-backup-restore && make e2e-check-app
 
       - name: Extract ISO version
         id: iso_version
@@ -415,20 +394,18 @@ jobs:
             export VM_CPU=6
           fi
 
+          cd tests
           if ${{ inputs.sequential == true }}; then
             # Force node bootstrapping in sequential instead of parallel
-            cd tests
             for ((i = VM_START ; i <= VM_END ; i++)); do
               VM_INDEX=${i} make e2e-bootstrap-node
             done
           else
-            cd tests && VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
+            VM_INDEX=${VM_START} VM_NUMBERS=${VM_END} make e2e-bootstrap-node
           fi
 
           # Check the installed application
-          if ${{ contains(inputs.k8s_downstream_version, 'k3s') }}; then
-            make e2e-check-app
-          fi
+          make e2e-check-app
 
       - name: Uninstall Elemental Operator
         id: uninstall_elemental_operator
