@@ -1,0 +1,12 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: ip-adrs-pool
+spec:
+  addresses:
+  - 192.168.122.192/28
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2-advert

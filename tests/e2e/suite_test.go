@@ -46,6 +46,8 @@ const (
 	installHardenedScript = "../scripts/config-hardened"
 	installVMScript       = "../scripts/install-vm"
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
+	localStorageYaml      = "../assets/local-storage.yaml"
+	metallbRscYaml        = "../assets/metallb_rsc.yaml"
 	numberOfNodesMax      = 30
 	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"

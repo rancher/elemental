@@ -36,6 +36,100 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
+		Expect(kubeConfig).To(Not(BeEmpty()))
+
+		if strings.Contains(k8sDownstreamVersion, "rke2") {
+			// Create kubectl context
+			// Default timeout is too small, so New() cannot be used
+			k := &kubectl.Kubectl{
+				Namespace:    "",
+				PollTimeout:  tools.SetTimeout(300 * time.Second),
+				PollInterval: 500 * time.Millisecond,
+			}
+
+			By("Installing local-path-provisionner", func() {
+				localPathNS := "kube-system"
+				kubectl.Apply(localPathNS, localStorageYaml)
+
+				// Wait for all pods to be started
+				checkList := [][]string{
+					{localPathNS, "app=local-path-provisioner"},
+				}
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
+			})
+
+			By("Installing MetalLB", func() {
+				metallbNS := "metallb-system"
+
+				RunHelmCmdWithRetry("repo", "add", "metallb", "https://metallb.github.io/metallb")
+				RunHelmCmdWithRetry("repo", "update")
+
+				flags := []string{
+					"upgrade", "--install", "metallb", "metallb/metallb",
+					"--namespace", metallbNS,
+					"--create-namespace",
+					"--wait", "--wait-for-jobs",
+				}
+				RunHelmCmdWithRetry(flags...)
+
+				// Wait for all pods to be started
+				checkList := [][]string{
+					{metallbNS, "app.kubernetes.io/component=speaker"},
+					{metallbNS, "app.kubernetes.io/component=controller"},
+					{metallbNS, "app.kubernetes.io/instance=metallb"},
+					{metallbNS, "app.kubernetes.io/name=metallb"},
+				}
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+
+				err := kubectl.Apply(metallbNS, metallbRscYaml)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			By("Installing Traefik", func() {
+				traefikNS := "traefik-system"
+
+				RunHelmCmdWithRetry("repo", "add", "traefik", "https://traefik.github.io/charts")
+				RunHelmCmdWithRetry("repo", "update")
+
+				flags := []string{
+					"upgrade", "--install", "traefik", "traefik/traefik",
+					"--namespace", traefikNS,
+					"--create-namespace",
+					"--set", "ports.web.redirectTo.port=websecure",
+					"--set", "ingressClass.enabled=true",
+					"--set", "ingressClass.isDefaultClass=true",
+					"--wait", "--wait-for-jobs",
+				}
+				RunHelmCmdWithRetry(flags...)
+
+				// Wait for all pods to be started
+				checkList := [][]string{
+					{traefikNS, "app.kubernetes.io/name=traefik"},
+				}
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+			})
+
+			By("Checking LoadBalancer IP", func() {
+				traefikNS := "traefik-system"
+
+				// Ensure that Traefik LB is not in Pending state anymore, could take time
+				Eventually(func() string {
+					out, _ := kubectl.RunWithoutErr("get", "svc", "--namespace", traefikNS, "traefik")
+					return out
+				}, tools.SetTimeout(4*time.Minute), 4*time.Second).Should(Not(ContainSubstring("<pending>")))
+
+				// Check that an IP address for LB is configured
+				lbIP, err := kubectl.Run("get", "svc", "--namespace", traefikNS, "traefik", "-o", "jsonpath={.status.loadBalancer.ingress[0].ip}")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(lbIP).To(Not(BeEmpty()))
+			})
+		}
 
 		By("Installing application", func() {
 			err := kubectl.Apply("default", appYaml)
@@ -55,6 +149,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
+		Expect(kubeConfig).To(Not(BeEmpty()))
 
 		By("Scaling the deployment to the number of nodes", func() {
 			var nodeList string
@@ -81,13 +176,19 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		})
 
 		By("Checking application", func() {
+			// Ensure that LB is not in Pending state anymore, could take time
+			Eventually(func() string {
+				out, _ := kubectl.RunWithoutErr("get", "svc", appName+"-loadbalancer")
+				return out
+			}, tools.SetTimeout(4*time.Minute), 4*time.Second).Should(Not(ContainSubstring("<pending>")))
+
+			// Wait until at least an IP address is returned
 			cmd := []string{
 				"get", "svc",
 				appName + "-loadbalancer",
 				"-o", "jsonpath={.status.loadBalancer.ingress[*].ip}",
 			}
 
-			// Wait until at least an IP address is returned
 			Eventually(func() bool {
 				ip, _ := kubectl.RunWithoutErr(cmd...)
 				return tools.IsIPv4(strings.Fields(ip)[0])
