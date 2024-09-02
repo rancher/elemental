@@ -47,7 +47,7 @@ on:
 
     # Job outputs to export for caller workflow
     outputs:
-      step_status:
+      steps_status:
         description: Status of the executed test jobs
         value: ${{ jobs.airgap.outputs.steps_status }}
 

@@ -463,6 +463,7 @@ jobs:
           rancher_version: ${{ inputs.rancher_version }}
           sequential: ${{ inputs.sequential }}
           snap_type: ${{ inputs.snap_type }}
+          steps_status: ${{ join(steps.*.conclusion, ' ') }}
           test_type: ${{ inputs.test_type }}
           upgrade_image: ${{ inputs.upgrade_image }}
           upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
