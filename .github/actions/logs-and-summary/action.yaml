@@ -67,6 +67,9 @@ inputs:
   snap_type:
     default: "btrfs"
     type: string
+  steps_status:
+    # NOTE: 'steps_status' var cannot be configured with a default value!
+    type: string
   test_type:
     default: "Unknown"
     type: string
@@ -118,6 +121,15 @@ runs:
         # Define some variable(s)
         ${{ inputs.sequential == true }} && BOOTSTRAP_METHOD="Sequential" || BOOTSTRAP_METHOD="Parallel"
 
+        # Define test status
+        if ${{ contains(inputs.steps_status, 'cancelled') }}; then
+          TEST_STATUS="CANCELLED"
+        elif ${{ contains(inputs.steps_status, 'failure') }}; then
+          TEST_STATUS="FAILED"
+        else
+          TEST_STATUS="OK"
+        fi
+
         # Get nodes configuration (use the first one, they are all identical)
         NODE=$(sudo virsh list --name | head -1)
         if [[ -n "${NODE}" ]]; then
@@ -127,7 +139,7 @@ runs:
         fi
 
         # Add summary: General informations
-        echo "## General informations" >> ${GITHUB_STEP_SUMMARY}
+        echo "## General informations - TEST ${TEST_STATUS}" >> ${GITHUB_STEP_SUMMARY}
         echo "Bootstrap method: ${BOOTSTRAP_METHOD}" >> ${GITHUB_STEP_SUMMARY}
         if ${{ inputs.test_type == 'cli' }}; then
           echo "Number of nodes in the cluster: ${{ inputs.node_number }}" >> ${GITHUB_STEP_SUMMARY}
