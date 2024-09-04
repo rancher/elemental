@@ -21,6 +21,10 @@
 
 - **Describe:** E2E - Install a simple application
     - **It:** Install HelloWorld application
+      -  **By:** Installing local-path-provisionner
+      -  **By:** Installing MetalLB
+      -  **By:** Installing Traefik
+      -  **By:** Checking LoadBalancer IP
       -  **By:** Installing application
 - **Describe:** E2E - Checking a simple application
     - **It:** Check HelloWorld application
