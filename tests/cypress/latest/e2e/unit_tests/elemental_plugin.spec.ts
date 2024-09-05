@@ -19,7 +19,7 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
+// Slow down each command by 500ms
 slowCypressDown(500)
 
 filterTests(['main', 'upgrade'], () => {

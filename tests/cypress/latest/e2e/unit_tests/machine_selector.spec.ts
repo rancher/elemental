@@ -19,71 +19,49 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 filterTests(['main'], () => {
-  Cypress.config();
   describe('Machine selector testing', () => {
     const elemental = new Elemental();
-    const elementalUser = "elemental-user"
+    const elementalUser = 'elemental-user';
     const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword"
+    const uiPassword = 'rancherpassword';
     const vmNumber = 3;
+    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
 
     beforeEach(() => {
-      (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+      login();
       cy.visit('/');
-
-      // Open the navigation menu
       cypressLib.burgerMenuToggle();
-
-      // Click on the Elemental's icon
       cypressLib.accesMenu('OS Management');
-
-      // Go to the cluster creation page
       elemental.accessClusterMenu();
     });
 
     qase(25,
       it('Testing selector without any rule', () => {
-        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`)
-          .should('exist');
-      })
-    );
+        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`).should('exist');
+    }));
 
     qase(26,
       it('Testing selector with unmatching rule', () => {
-        //cy.clickButton('Add Rule');
-        // TODO: Cannot use the clickButton here, I do not know why yet 
-        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
-          .contains('Add Rule')
-          .click();
-        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
-        cy.get('@match-value').click()
-        cy.get('@match-value').type('wrong');
-        cy.contains('.banner', 'Matches no existing Inventory of Machines')
-          .should('exist');
-      })
-    );
+        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]').contains('Add Rule').click();
+        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value');
+        // eslint-disable-next-line cypress/unsafe-to-chain-command
+        cy.get('@match-value').click().type('wrong');
+        cy.contains('.banner', 'Matches no existing Inventory of Machines').should('exist');
+    }));
 
     qase(27,
       it('Testing selector with matching rule', () => {
-        //cy.clickButton('Add Rule');
-        // TODO: Cannot use the clickButton here, I do not know why yet 
-        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]')
-          .contains('Add Rule')
-          .click();
-        cy.get('[data-testid="input-match-expression-key-0"]')
-          .click()
-        cy.contains('myInvLabel1')
-          .click();
-        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value')
-        cy.get('@match-value').click()
-        cy.get('@match-value').type('myInvLabelValue1');
-        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`)
-          .should('exist');
-      })
-    );
+        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]').contains('Add Rule').click();
+        cy.get('[data-testid="input-match-expression-key-0"]').click();
+        cy.contains('myInvLabel1').click();
+        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value');
+        // eslint-disable-next-line cypress/unsafe-to-chain-command
+        cy.get('@match-value').click().type('myInvLabelValue1');
+        cy.contains('.banner', `Matches all ${vmNumber} existing Inventory of Machines`).should('exist');
+    }));
   });
-}); 
+});

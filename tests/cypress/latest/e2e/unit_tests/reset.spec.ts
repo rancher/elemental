@@ -14,27 +14,27 @@ limitations under the License.
 
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
-import * as utils from "~/support/utils";
+import * as utils from '~/support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 filterTests(['main'], () => {
-  Cypress.config();
   describe('Reset testing', () => {
-    const clusterName = "mycluster"
-    const elementalUser = "elemental-user"
+    const clusterName = 'mycluster';
+    const elementalUser = 'elemental-user';
     const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
-    const proxy = "http://172.17.0.1:3128"
+    const proxy = 'http://172.17.0.1:3128';
     const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword"
+    const uiPassword = 'rancherpassword';
     const vmNumber = 3;
+    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
 
     beforeEach(() => {
-      (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+      login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
       cypressLib.accesMenu('OS Management');
@@ -43,19 +43,17 @@ filterTests(['main'], () => {
     if (utils.isK8sVersion('rke')) {
       qase(54,
         it('Enable reset in machine inventory', () => {
-          cy.clickNavMenu(["Inventory of Machines"]);
+          cy.clickNavMenu(['Inventory of Machines']);
           for (let i = 0; i < vmNumber; i++) {
             cy.getBySel(`sortable-table-${i}-action-button`).click();
             cy.contains('Edit YAML').click();
-            cy.contains('annotations').as('anno')
-            cy.get('@anno').click(0, 0)
+            cy.contains('annotations').as('anno');
+            cy.get('@anno').click(0, 0);
             cy.get('@anno').type('{end}{enter}  elemental.cattle.io/resettable: \'true\'');
-            cy.getBySel('action-button-async-button')
-              .contains('Save')
-              .click();
+            cy.getBySel('action-button-async-button').contains('Save').click();
           }
-        }));
-    };
+      }));
+    }
 
     qase(['54', '55'],
       it('Reset node by deleting the cluster', () => {
@@ -63,22 +61,20 @@ filterTests(['main'], () => {
         cy.getBySel('button-manage-elemental-clusters').click();
         cy.getBySel('sortable-cell-0-0').click();
         cy.clickButton('Delete');
-        cy.getBySel('prompt-remove-input')
-          .type('mycluster');
+        cy.getBySel('prompt-remove-input').type('mycluster');
         cy.getBySel('prompt-remove-confirm-button').click();
         cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
-        cy.clickNavMenu(["Inventory of Machines"]);
+        cy.clickNavMenu(['Inventory of Machines']);
         cy.contains('There are no rows to show.');
         for (let i = 0; i < vmNumber; i++) {
-          cy.getBySel(`sortable-table-${i}-row`, { timeout: 180000 })
-            .contains('Active', { timeout: 180000 });
+          cy.getBySel(`sortable-table-${i}-row`, { timeout: 180000 }).contains('Active', { timeout: 180000 });
         }
-      }));
+    }));
 
     qase(30,
       it('Create Elemental cluster', () => {
         utils.createCluster(clusterName, k8sDownstreamVersion, proxy);
-      }));
+    }));
   });
 });

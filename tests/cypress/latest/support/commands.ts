@@ -15,11 +15,11 @@ import 'cypress-file-upload';
 import * as utils from "~/support/utils";
 
 // Global
-interface hardwareLabels {
+interface HardwareLabels {
   [key: string]: string;
-};
+}
 
-const hwLabels: hardwareLabels = {
+const hwLabels: HardwareLabels = {
   'CPUModel': '${System Data/CPU/Model}',
   'CPUVendor': '${System Data/CPU/Vendor}',
   'NumberBlockDevices': '${System Data/Block Devices/Number Devices}',
@@ -29,50 +29,78 @@ const hwLabels: hardwareLabels = {
   'TotalMemory': '${System Data/Memory/Total Physical Bytes}'
 };
 
+// Selectors
+const selectors = {
+  createButton: 'button-create-registration-endpoint',
+  nameNsDescription: 'name-ns-description-name',
+  formSave: 'form-save',
+  registrationUrl: 'registration-url',
+  selectOsVersionBuildMedia: 'select-os-version-build-media',
+  selectMediaTypeBuildMedia: 'select-media-type-build-media',
+  buildMediaBtn: 'build-media-btn',
+  downloadMediaBtn: 'download-media-btn',
+  yamlEditor: 'yaml-editor-code-mirror',
+  labelsAndAnnotationsBlock: 'labels-and-annotations-block',
+  addLabelMachReg: '[data-testid="add-label-mach-reg"]',
+  addAnnotationMachReg: '[data-testid="add-annotation-mach-reg"]',
+  addLabelMachInv: '[data-testid="add-label-mach-inv"]',
+  addAnnotationMachInv: '[data-testid="add-annotation-mach-inv"]',
+  downloadBtn: 'download-btn',
+  mastheadCreateYaml: 'masthead-create-yaml',
+  actionButtonAsync: 'action-button-async-button',
+  bannerContent: 'banner-content',
+  osVersionChannelPath: 'os-version-channel-path',
+  mastheadCreate: 'masthead-create',
+  nameNsDescriptionName: 'name-ns-description-name',
+  sortableTablePromptRemove: 'sortable-table-promptRemove',
+  inputKvItemKey: (index: number) => `[data-testid="input-kv-item-key-${index}"]`,
+  kvItemValue: (index: number) => `[data-testid="kv-item-value-${index}"] > .value-container > [data-testid="value-multiline"]`,
+  kvContainer: '[data-testid="add-label-mach-inv"] > .kv-container > :nth-child',
+  textAreaAutoGrow: '[data-testid="text-area-auto-grow"]',
+  //osVersionChannelActiveText: (channelVersion: string) => `Active ${channelVersion}-channel`,
+};
+
 // Machine registration commands
 // ///////////////////////////// 
 
 // Create a machine registration
 Cypress.Commands.add('createMachReg', (
-  machRegName,
-  namespace = 'fleet-default',
-  checkLabels = false,
-  checkAnnotations = false,
-  checkInventoryLabels = false,
-  checkInventoryAnnotations = false,
-  checkIsoBuilding = false,
-  customCloudConfig = '',
-  checkDefaultCloudConfig = true) => {
+  machRegName: string,
+  namespace: string = 'fleet-default',
+  checkLabels: boolean = false,
+  checkAnnotations: boolean = false,
+  checkInventoryLabels: boolean = false,
+  checkInventoryAnnotations: boolean = false,
+  checkIsoBuilding: boolean = false,
+  customCloudConfig: string = '',
+  checkDefaultCloudConfig: boolean = true
+) => {
   cy.clickNavMenu(["Dashboard"]);
-  cy.getBySel('button-create-registration-endpoint')
-    .click();
-  cy.getBySel('name-ns-description-name')
-    .type(machRegName);
+  cy.getBySel(selectors.createButton).click();
+  cy.getBySel(selectors.nameNsDescription).type(machRegName);
 
-  if (customCloudConfig != '') {
-    cy.get('input[type="file"]')
-      .attachFile({ filePath: customCloudConfig });
+  if (customCloudConfig) {
+    cy.get('input[type="file"]').attachFile({ filePath: customCloudConfig });
   }
 
-  checkLabels ? cy.addMachRegLabel('myLabel1', 'myLabelValue1') : null;
-  checkAnnotations ? cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1') : null;
-  checkInventoryLabels ? cy.addMachInvLabel('myInvLabel1', 'myInvLabelValue1') : null;
-  checkInventoryAnnotations ? cy.addMachInvAnnotation('myInvAnnotation1', 'myInvAnnotationValue1') : null;
+  checkLabels && cy.addMachRegLabel('myLabel1', 'myLabelValue1');
+  checkAnnotations && cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1');
+  checkInventoryLabels && cy.addMachInvLabel('myInvLabel1', 'myInvLabelValue1');
+  checkInventoryAnnotations && cy.addMachInvAnnotation('myInvAnnotation1', 'myInvAnnotationValue1');
 
-  cy.getBySel('form-save')
+  cy.getBySel(selectors.formSave)
     .contains('Create')
     .click();
 
   // Make sure the machine registration is created and active
   cy.contains('.masthead', 'Registration Endpoint: ' + machRegName + 'Active')
     .should('exist');
-
   // Check the namespace
   cy.contains('.masthead', 'Namespace: ' + namespace)
-    .should('exist');
+  .should('exist');
 
-  // Make sure there is an URL registration in the Registration URL block
-  cy.getBySel('registration-url')
+  // Make sure there is a URL registration in the Registration URL block
+  cy.getBySel(selectors.registrationUrl)
     .contains(/https:\/\/.*elemental\/registration/);
 
   // Test ISO building feature
@@ -82,56 +110,41 @@ Cypress.Commands.add('createMachReg', (
     // before releasing, we want to test staging/stable artifacts 
 
     if (utils.isCypressTag('upgrade') || utils.isUIVersion('stable')) {
-      cy.getBySel('select-os-version-build-media')
-        .click();
+      cy.getBySel(selectors.selectOsVersionBuildMedia).click();
     } else {
-      cy.getBySel('select-media-type-build-media')
-        .click();
-      if (utils.isBootType('raw')) {
-        cy.contains('Raw')
-          .click();
-      } else {
-        cy.contains('Iso')
-          .click();
-      }
-      cy.getBySel('select-os-version-build-media')
-        .click();
+      cy.getBySel(selectors.selectMediaTypeBuildMedia).click();
+      cy.contains(utils.isBootType('raw') ? 'Raw' : 'Iso').click();
+      cy.getBySel(selectors.selectOsVersionBuildMedia).click();
     }
+
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
       // Will try to improve it in next version
       if (utils.isOperatorVersion('staging')) {
         // In rare case, we might want to test upgrading from staging to dev
-        utils.isUpgradeOsChannel('dev') ? cy.contains('(unstable)').click() : null;
+        if (utils.isUpgradeOsChannel('dev')) {
+          cy.contains('(unstable)').click();
+        }
       } else if (utils.isOperatorVersion('marketplace')) {
-        cy.contains(Cypress.env('os_version_install'))
-          .click();
+        cy.contains(Cypress.env('os_version_install')).click();
       } else {
-        cy.contains(new RegExp('ISO.*' + Cypress.env('stable_os_version')))
-          .click();
+        cy.contains(new RegExp(`ISO.*${Cypress.env('stable_os_version')}`)).click();
       }
     } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
-      cy.contains(Cypress.env('os_version_install'))
-        .click();
+      cy.contains(Cypress.env('os_version_install')).click();
     } else {
-      cy.contains('(unstable)')
-        .click();
+      cy.contains('(unstable)').click();
     }
-    cy.getBySel(`build-media-btn`)
-      .click();
-    cy.getBySel(`build-media-btn`)
-      .get('.icon-spin');
+
+    cy.getBySel(selectors.buildMediaBtn).click();
+    cy.getBySel(selectors.buildMediaBtn).get('.icon-spin');
     // Download button is disabled while ISO is building
-    cy.getBySel(`download-media-btn`).should(($input) => {
-      expect($input).to.have.attr('disabled')
-    })
+    cy.getBySel(selectors.downloadMediaBtn).should('have.attr', 'disabled');
     // Download button is enabled once ISO building done
-    cy.getBySel(`download-media-btn`, { timeout: 600000 }).should(($input) => {
-      expect($input).to.not.have.attr('disabled')
-    })
-    cy.getBySel(`download-media-btn`)
-      .click()
+    cy.getBySel(selectors.downloadMediaBtn, { timeout: 600000 }).should('not.have.attr', 'disabled');
+    cy.getBySel(selectors.downloadMediaBtn).click();
+
     // RAW image not available in upgrade scenario because we start from stable
     // and RAW feature is not already available in stable
     // upgrade condition will be removed in next elemental stable version
@@ -143,300 +156,219 @@ Cypress.Commands.add('createMachReg', (
   }
 
   // Try to download the registration file and check it
-  cy.getBySel('download-btn')
-    .click();
-  cy.verifyDownload(machRegName + '_registrationURL.yaml');
-  cy.contains('Saving')
-    .should('not.exist');
+  cy.getBySel(selectors.downloadBtn).click();
+  cy.verifyDownload(`${machRegName}_registrationURL.yaml`);
+  cy.contains('Saving').should('not.exist');
 
   // Check Cloud configuration
-  // TODO: Maybe the check may be improved in one line
-  // Should be removed once 1.6 released (only keep what is in the if)
   if (checkDefaultCloudConfig) {
+    const cloudConfigChecks = [
+      'config:', 'cloud-config:', 'users:', '- name: root', 'passwd: root',
+      'elemental:', 'install:', 'device-selector:', '- key: Name', 'operator: In',
+      'values:', '- /dev/sda', '- /dev/vda', '- /dev/nvme0', '- key: Size',
+      'operator: Gt', 'values:', '- 25Gi', 'reboot: true', 'snapshotter:',
+      'type: btrfs', 'reset:', 'reboot: true', 'reset-oem: true', 'reset-persistent: true'
+    ];
+
     if (utils.isUIVersion('dev')) {
-      cy.getBySel('yaml-editor-code-mirror')
-        .should('include.text', 'config:')
-        .should('include.text', 'cloud-config:')
-        .should('include.text', 'users:')
-        .should('include.text', '- name: root')
-        .should('include.text', 'passwd: root')
-        .should('include.text', 'elemental:')
-        .should('include.text', 'install:')
-        .should('include.text', 'device-selector:')
-        .should('include.text', '- key: Name')
-        .should('include.text', 'operator: In')
-        .should('include.text', 'values:')
-        .should('include.text', '- /dev/sda')
-        .should('include.text', '- /dev/vda')
-        .should('include.text', '- /dev/nvme0')
-        .should('include.text', '- key: Size')
-        .should('include.text', 'operator: Gt')
-        .should('include.text', 'values:')
-        .should('include.text', '- 25Gi')
-        .should('include.text', 'reboot: true')
-        .should('include.text', 'snapshotter:')
-        .should('include.text', 'type: btrfs')
-        .should('include.text', 'reset:')
-        .should('include.text', 'reboot: true')
-        .should('include.text', 'reset-oem: true')
-        .should('include.text', 'reset-persistent: true');
+      cloudConfigChecks.forEach(text => cy.getBySel(selectors.yamlEditor).should('include.text', text));
     } else {
-      cy.getBySel('yaml-editor-code-mirror')
-        .should('include.text', 'config:')
-        .should('include.text', 'cloud-config:')
-        .should('include.text', 'users:')
-        .should('include.text', '- name: root')
-        .should('include.text', 'passwd: root')
-        .should('include.text', 'elemental:')
-        .should('include.text', 'install:')
-        .should('include.text', 'device: /dev/nvme0n1')
-        .should('include.text', 'poweroff: true');
+      const stableConfigChecks = [
+        'config:', 'cloud-config:', 'users:', '- name: root', 'passwd: root',
+        'elemental:', 'install:', 'device: /dev/nvme0n1', 'poweroff: true'
+      ];
+      stableConfigChecks.forEach(text => cy.getBySel(selectors.yamlEditor).should('include.text', text));
     }
   }
 
   // Check label and annotation in YAML
-  // For now, we can only check in YAML because the fields are disabled and we cannot check their content
-  // It looks like we can use shadow DOM to catch it but too complicated for now
-  cy.contains('Registration Endpoint')
-    .click();
-  checkLabels ? cy.checkMachRegLabel(machRegName, 'myLabel1', 'myLabelValue1') : null;
-  checkAnnotations ? cy.checkMachRegAnnotation(machRegName, 'myAnnotation1', 'myAnnotationValue1') : null;
+  cy.contains('Registration Endpoint').click();
+  checkLabels && cy.checkMachRegLabel(machRegName, 'myLabel1', 'myLabelValue1');
+  checkAnnotations && cy.checkMachRegAnnotation(machRegName, 'myAnnotation1', 'myAnnotationValue1');
 });
 
 // Add Label to machine registration
-Cypress.Commands.add('addMachRegLabel', (labelName, labelValue) => {
-  cy.getBySel('labels-and-annotations-block')
+Cypress.Commands.add('addMachRegLabel', (labelName: string, labelValue: string) => {
+  cy.getBySel(selectors.labelsAndAnnotationsBlock)
     .contains('Registration Endpoint')
     .click();
-  cy.get('[data-testid="add-label-mach-reg"] > .footer > .btn')
-    .click();
-  cy.get('[data-testid="add-label-mach-reg"] > .kv-container > .kv-item.key')
-    .type(labelName);
-  cy.get('[data-testid="add-label-mach-reg"] > .kv-container > .kv-item.value')
-    .type(labelValue);
+  cy.get(`${selectors.addLabelMachReg} > .footer > .btn`).click();
+  cy.get(`${selectors.addLabelMachReg} > .kv-container > .kv-item.key`).type(labelName);
+  cy.get(`${selectors.addLabelMachReg} > .kv-container > .kv-item.value`).type(labelValue);
 });
 
 // Add Annotation to machine registration
-Cypress.Commands.add('addMachRegAnnotation', (annotationName, annotationValue) => {
-  cy.getBySel('labels-and-annotations-block')
+Cypress.Commands.add('addMachRegAnnotation', (annotationName: string, annotationValue: string) => {
+  cy.getBySel(selectors.labelsAndAnnotationsBlock)
     .contains('Registration Endpoint')
     .click();
-  cy.get('[data-testid="add-annotation-mach-reg"] > .footer > .btn')
-    .click();
-  cy.get('[data-testid="add-annotation-mach-reg"] > .kv-container > .kv-item.key')
-    .type(annotationName);
-  cy.get('[data-testid="add-annotation-mach-reg"] > .kv-container > .kv-item.value')
-    .type(annotationValue);
+  cy.get(`${selectors.addAnnotationMachReg} > .footer > .btn`).click();
+  cy.get(`${selectors.addAnnotationMachReg} > .kv-container > .kv-item.key`).type(annotationName);
+  cy.get(`${selectors.addAnnotationMachReg} > .kv-container > .kv-item.value`).type(annotationValue);
 });
 
 // Add Label to machine inventory
-Cypress.Commands.add('addMachInvLabel', (labelName, labelValue, useHardwareLabels = true) => {
-  cy.getBySel('labels-and-annotations-block')
+Cypress.Commands.add('addMachInvLabel', (labelName: string, labelValue: string, useHardwareLabels: boolean = true) => {
+  cy.getBySel(selectors.labelsAndAnnotationsBlock)
     .contains('Inventory of Machines')
     .click();
-  cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
-    .click();
-  cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.key').type(labelName);
-  cy.get('[data-testid="add-label-mach-inv"] > .kv-container > .kv-item.value').type(labelValue);
+  cy.get(`${selectors.addLabelMachInv} > .footer > .btn`).click();
+  cy.get(`${selectors.addLabelMachInv} > .kv-container > .kv-item.key`).type(labelName);
+  cy.get(`${selectors.addLabelMachInv} > .kv-container > .kv-item.value`).type(labelValue);
+
   if (useHardwareLabels) {
-    // Some HTML select tags have changed in Rancher 2.9
-    if (!utils.isRancherManagerVersion('2.9')) {
-      let nthChildIndex = 7;
-      for (const key in hwLabels) {
-        cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
-          .click();
-        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex}) > input`).type(key);
-        cy.get(`[data-testid="add-label-mach-inv"] > .kv-container > :nth-child(${nthChildIndex + 1}) 
-          > .value-container > [data-testid="text-area-auto-grow"]`).type(hwLabels[key], { parseSpecialCharSequences: false });
-        nthChildIndex += 3;
-      };
-    } else {
-      let itemIndex = 1;
-      for (const key in hwLabels) {
-        cy.get('[data-testid="add-label-mach-inv"] > .footer > .btn')
-          .click();
-        cy.get(`[data-testid="input-kv-item-key-${itemIndex}"]`).type(key);
-        cy.get(`[data-testid="kv-item-value-${itemIndex}"] > .value-container > [data-testid="value-multiline"]`)
-          .type(hwLabels[key], { parseSpecialCharSequences: false });
-        itemIndex += 1;
-      }
-    };
-  };
+    const isRancher29 = utils.isRancherManagerVersion('2.9');
+    let index = isRancher29 ? 1 : 7;
+
+    for (const key in hwLabels) {
+      cy.get(`${selectors.addLabelMachInv} > .footer > .btn`).click();
+      const keySelector = isRancher29 ? selectors.inputKvItemKey(index) : `${selectors.kvContainer}(${index}) > input`;
+      const valueSelector = isRancher29 ? selectors.kvItemValue(index) : `${selectors.kvContainer}(${index + 1}) > .value-container > ${selectors.textAreaAutoGrow}`;
+
+      cy.get(keySelector).type(key);
+      cy.get(valueSelector).type(hwLabels[key], { parseSpecialCharSequences: false });
+
+      index += isRancher29 ? 1 : 3;
+    }
+  }
 });
 
 // Add Annotation to machine inventory
-Cypress.Commands.add('addMachInvAnnotation', (annotationName, annotationValue) => {
-  cy.getBySel('labels-and-annotations-block')
+Cypress.Commands.add('addMachInvAnnotation', (annotationName: string, annotationValue: string) => {
+  cy.getBySel(selectors.labelsAndAnnotationsBlock)
     .contains('Inventory of Machines')
     .click();
   cy.clickButton('Add Annotation');
-  cy.get('[data-testid="add-annotation-mach-inv"] > .kv-container > .kv-item.key')
-    .type(annotationName);
-  cy.get('[data-testid="add-annotation-mach-inv"] > .kv-container > .kv-item.value')
-    .type(annotationValue);
+  cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.key`).type(annotationName);
+  cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.value`).type(annotationValue);
 });
 
 // Check machine inventory label in YAML
-Cypress.Commands.add('checkMachInvLabel', (machRegName, labelName, labelValue, afterBoot = false, userHardwareLabels = true) => {
-  if (afterBoot == false) {
-    cy.contains(machRegName)
-      .click();
-    cy.get('div.actions > .role-multi-action')
-      .click()
-    cy.contains('li', 'Edit YAML')
-      .click();
-    cy.contains('Registration Endpoint: ' + machRegName)
-      .should('exist');
-    cy.getBySel('yaml-editor-code-mirror')
-      .contains(labelName + ': ' + labelValue);
-    if (userHardwareLabels) {
+Cypress.Commands.add('checkMachInvLabel', (machRegName: string, labelName: string, labelValue: string, afterBoot: boolean = false, useHardwareLabels: boolean = true) => {
+  if (!afterBoot) {
+    cy.contains(machRegName).click();
+    cy.get('div.actions > .role-multi-action').click();
+    cy.contains('li', 'Edit YAML').click();
+    cy.contains(`Registration Endpoint: ${machRegName}`).should('exist');
+    cy.getBySel(selectors.yamlEditor).contains(`${labelName}: ${labelValue}`);
+
+    if (useHardwareLabels) {
       for (const key in hwLabels) {
-        cy.getBySel('yaml-editor-code-mirror')
-          .contains(key + ': ' + hwLabels[key]);
-      };
-    };
+        cy.getBySel(selectors.yamlEditor).contains(`${key}: ${hwLabels[key]}`);
+      }
+    }
+
     cy.clickButton('Cancel');
   } else {
-    cy.getBySel('yaml-editor-code-mirror')
-      .contains(labelName + ': ' + labelValue);
-    if (userHardwareLabels) {
+    cy.getBySel(selectors.yamlEditor).contains(`${labelName}: ${labelValue}`);
+
+    if (useHardwareLabels) {
       for (const key in hwLabels) {
-        cy.getBySel('yaml-editor-code-mirror')
-          .contains(key + ': ');
-      };
-    };
+        cy.getBySel(selectors.yamlEditor).contains(`${key}: `);
+      }
+    }
   }
 });
 
 // Check machine registration label in YAML
-Cypress.Commands.add('checkMachRegLabel', (machRegName, labelName, labelValue) => {
-  cy.contains(machRegName)
-    .click();
-  cy.get('div.actions > .role-multi-action')
-    .click()
-  cy.contains('li', 'Edit YAML')
-    .click();
-  cy.contains('Registration Endpoint: ' + machRegName)
-    .should('exist');
-  cy.getBySel('yaml-editor-code-mirror')
-    .contains(labelName + ': ' + labelValue);
+Cypress.Commands.add('checkMachRegLabel', (machRegName: string, labelName: string, labelValue: string) => {
+  cy.contains(machRegName).click();
+  cy.get('div.actions > .role-multi-action').click();
+  cy.contains('li', 'Edit YAML').click();
+  cy.contains('Registration Endpoint: ' + machRegName).should('exist');
+  cy.getBySel(selectors.yamlEditor).contains(`${labelName}: ${labelValue}`);
   cy.clickButton('Cancel');
 });
 
 // Check machine registration annotation in YAML
-Cypress.Commands.add('checkMachRegAnnotation', (machRegName, annotationName, annotationValue) => {
-  cy.contains(machRegName)
-    .click();
-  cy.get('div.actions > .role-multi-action')
-    .click()
-  cy.contains('li', 'Edit YAML')
-    .click();
-  cy.contains('Registration Endpoint: ' + machRegName)
-    .should('exist');
-  cy.getBySel('yaml-editor-code-mirror')
-    .contains(annotationName + ': ' + annotationValue);
+Cypress.Commands.add('checkMachRegAnnotation', (machRegName: string, annotationName: string, annotationValue: string) => {
+  cy.contains(machRegName).click();
+  cy.get('div.actions > .role-multi-action').click();
+  cy.contains('li', 'Edit YAML').click();
+  cy.contains('Registration Endpoint: ' + machRegName).should('exist');
+  cy.getBySel(selectors.yamlEditor).contains(`${annotationName}: ${annotationValue}`);
   cy.clickButton('Cancel');
 });
 
 // Edit a machine registration
-Cypress.Commands.add('editMachReg', (machRegName, addLabel = false, addAnnotation = false, withYAML = false) => {
-  cy.contains(machRegName)
-    .click();
-  // Select the 3dots button and edit configuration
-  cy.get('div.actions > .role-multi-action')
-    .click()
+Cypress.Commands.add('editMachReg', (machRegName: string, addLabel: boolean = false, addAnnotation: boolean = false, withYAML: boolean = false) => {
+  cy.contains(machRegName).click();
+  cy.get('div.actions > .role-multi-action').click();
+
   if (withYAML) {
-    cy.contains('li', 'Edit YAML')
-      .click();
-    cy.contains('metadata').as('meta')
-    cy.get('@meta').click(0, 0)
+    cy.contains('li', 'Edit YAML').click();
+    cy.contains('metadata').as('meta');
+    cy.get('@meta').click(0, 0);
     cy.get('@meta').type('{end}{enter}  labels:{enter}  myLabel1: myLabelValue1');
-    cy.contains('metadata').as('meta')
-    cy.get('@meta').click(0, 0)
+    cy.contains('metadata').as('meta');
+    cy.get('@meta').click(0, 0);
     cy.get('@meta').type('{end}{enter}  annotations:{enter}  myAnnotation1: myAnnotationValue1');
   } else {
-    cy.contains('li', 'Edit Config')
-      .click();
-    addLabel ? cy.addMachRegLabel('myLabel1', 'myLabelValue1') : null;
-    addAnnotation ? cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1') : null;
+    cy.contains('li', 'Edit Config').click();
+    addLabel && cy.addMachRegLabel('myLabel1', 'myLabelValue1');
+    addAnnotation && cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1');
   }
 });
 
 // Delete a machine registration
-Cypress.Commands.add('deleteMachReg', (machRegName) => {
-  cy.contains('Registration Endpoint')
-    .click();
-  /*  This code cannot be used anymore for now because of
-      https://github.com/rancher/elemental/issues/714
-      As it is not a blocker, we need to bypass it.
-      Instead of selecting resource to delete by name
-      we select all resources.
-  cy.contains(machRegName)
-    .parent()
-    .parent()
-    .click();
-  */
-  cy.get('[width="30"] > .checkbox-outer-container')
-    .click();
-  cy.getBySel('sortable-table-promptRemove')
-    .contains('Delete')
-    .click();
+Cypress.Commands.add('deleteMachReg', (machRegName: string) => {
+  cy.contains('Registration Endpoint').click();
+  cy.get('[width="30"] > .checkbox-outer-container').click();
+  cy.getBySel(selectors.sortableTablePromptRemove).contains('Delete').click();
   cy.confirmDelete();
-  // Timeout should fix this issue https://github.com/rancher/elemental/issues/643
-  cy.contains(machRegName, { timeout: 20000 })
-    .should('not.exist')
+  cy.contains(machRegName, { timeout: 20000 }).should('not.exist');
 });
 
 // Machine Inventory commands
 // /////////////////////////
 
 // Import machine inventory
-Cypress.Commands.add('importMachineInventory', (machineInventoryFile, machineInventoryName) => {
+Cypress.Commands.add('importMachineInventory', (machineInventoryFile: string, machineInventoryName: string) => {
   cy.clickNavMenu(["Inventory of Machines"]);
-  cy.getBySel('masthead-create-yaml')
-    .click();
+  cy.getBySel(selectors.mastheadCreateYaml).click();
   cy.clickButton('Read from File');
-  cy.get('input[type="file"]')
-    .attachFile({ filePath: machineInventoryFile });
-  cy.getBySel('action-button-async-button')
-    .contains('Create')
-    .click();
-  cy.contains('Creating')
-    .should('not.exist');
-  cy.contains(machineInventoryName)
-    .should('exist');
+  cy.get('input[type="file"]').attachFile({ filePath: machineInventoryFile });
+  cy.getBySel(selectors.actionButtonAsync).contains('Create').click();
+  cy.contains('Creating').should('not.exist');
+  cy.contains(machineInventoryName).should('exist');
 });
 
-Cypress.Commands.add('checkFilter', (filterName, testFilterOne, testFilterTwo, shouldNotMatch) => {
+Cypress.Commands.add('checkFilter', (filterName: string, testFilterOne: boolean, testFilterTwo: boolean, shouldNotMatch: boolean) => {
   cy.clickNavMenu(["Inventory of Machines"]);
-  cy.clickButton("Add Filter");
+  cy.clickButton('Add Filter');
   cy.get('.advanced-search-box').type(filterName);
   cy.get('.bottom-block > .role-primary').click();
-  (testFilterOne) ? cy.contains('test-filter-one').should('exist') : cy.contains('test-filter-one').should('not.exist');
-  (testFilterTwo) ? cy.contains('test-filter-two').should('exist') : cy.contains('test-filter-two').should('not.exist');
-  (shouldNotMatch) ? cy.contains('shouldnotmatch').should('exist') : cy.contains('shouldnotmatch').should('not.exist');
+  testFilterOne ? cy.contains('test-filter-one').should('exist') : cy.contains('test-filter-one').should('not.exist');
+  testFilterTwo ? cy.contains('test-filter-two').should('exist') : cy.contains('test-filter-two').should('not.exist');
+  shouldNotMatch ? cy.contains('shouldnotmatch').should('exist') : cy.contains('shouldnotmatch').should('not.exist');
 });
 
-Cypress.Commands.add('checkLabelSize', (sizeToCheck) => {
+// Check label size
+Cypress.Commands.add('checkLabelSize', (sizeToCheck: string) => {
   cy.clickNavMenu(["Dashboard"]);
-  cy.getBySel('button-create-registration-endpoint')
-    .click();
-  sizeToCheck == "name" ? cy.addMachInvLabel('labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', 'mylabelvalue', false) : null;
-  sizeToCheck == "value" ? cy.addMachInvLabel('mylabelname', 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', false) : null;
+  cy.getBySel(selectors.createButton).click();
+
+  if (sizeToCheck === "name") {
+    cy.addMachInvLabel('labeltoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', 'mylabelvalue', false);
+  } else if (sizeToCheck === "value") {
+    cy.addMachInvLabel('mylabelname', 'valuetoolonggggggggggggggggggggggggggggggggggggggggggggggggggggg', false);
+  }
+
   // A banner should appear alerting you about the size exceeded
-  cy.get('[data-testid="banner-content"]')
+  //cy.get(selectors.bannerContent);
+  cy.getBySel(selectors.bannerContent);
+
   // Create button should be disabled
-  cy.getBySel('form-save').should(($input) => {
-    expect($input).to.have.attr('disabled')
-  })
+  cy.getBySel(selectors.formSave).should('have.attr', 'disabled');
 });
 
 // OS Versions commands
 // ////////////////////
 
 // Add an OS version channel
-Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
+Cypress.Commands.add('addOsVersionChannel', (channelVersion: string) => {
   let channelRepo = "";
+
   switch (channelVersion) {
     case "stable":
       channelRepo = 'registry.suse.com/rancher/elemental-channel:latest';
@@ -446,22 +378,20 @@ Cypress.Commands.add('addOsVersionChannel', (channelVersion) => {
       break;
     default:
       cy.log("Channel not found");
+      return;
   }
+
   cy.clickNavMenu(["Advanced", "OS Version Channels"]);
-  cy.getBySel('masthead-create')
-    .contains('Create')
-    .click();
-  cy.getBySel('name-ns-description-name')
-    .type(channelVersion + "-channel");
-  cy.getBySel('os-version-channel-path')
-    .type(channelRepo);
-  cy.getBySel('form-save')
-    .contains('Create')
-    .click();
-  // Status changes a lot right after the creation so let's wait 10 secondes
+  cy.getBySel(selectors.mastheadCreate).contains('Create').click();
+  cy.getBySel(selectors.nameNsDescriptionName).type(`${channelVersion}-channel`);
+  cy.getBySel(selectors.osVersionChannelPath).type(channelRepo);
+  cy.getBySel(selectors.formSave).contains('Create').click();
+
+  // Status changes a lot right after the creation so let's wait 10 seconds
   // before checking
   // eslint-disable-next-line cypress/no-unnecessary-waiting
   cy.wait(10000);
+
   // Make sure the new channel is in Active state
   cy.contains("Active " + channelVersion + "-channel", { timeout: 50000 });
 });

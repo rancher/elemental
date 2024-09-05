@@ -53,32 +53,23 @@ describe('User role testing', () => {
     qase(47,
       it('Elemental user should access the OS management menu', () => {
         cy.login(elementalUser, uiPassword);
-        cy.getBySel('banner-title')
-          .contains('Welcome to Rancher');
+        cy.getBySel('banner-title').contains('Welcome to Rancher');
         cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');
         cypressLib.accesMenu('OS Management');
         elemental.checkElementalNav();
-      })
-    );
+    }));
 
     qase(48,
       it('Standard user should not access the OS management menu', () => {
         cy.login(stdUser, uiPassword);
-        cy.getBySel('banner-title')
-          .contains('Welcome to Rancher');
+        cy.getBySel('banner-title').contains('Welcome to Rancher');
         cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');
         cypressLib.accesMenu('OS Management');
-        // User without appropriate role will get a specific page
-        cy.getBySel('elemental-icon')
-          .should('exist');
-        cy.getBySel('elemental-description-text')
-          .contains('Elemental is a software stack')
-          .should('exist');
-        cy.getBySel('warning-not-install-or-no-schema')
-          .should('exist');
-      })
-    );
+        cy.getBySel('elemental-icon').should('exist');
+        cy.getBySel('elemental-description-text').contains('Elemental is a software stack').should('exist');
+        cy.getBySel('warning-not-install-or-no-schema').should('exist');
+    }));
   });
 });

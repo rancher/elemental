@@ -20,36 +20,36 @@ import { isCypressTag, isOperatorVersion, isRancherManagerVersion } from '~/supp
 import { Elemental } from '~/support/elemental';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 filterTests(['main', 'upgrade'], () => {
-  Cypress.config();
   describe('Install Elemental Operator', () => {
     const elemental = new Elemental();
-    const upgrade_from_version = Cypress.env('upgrade_from_version');
+    const upgradeFromVersion = Cypress.env('upgrade_from_version');
+    const chartmuseumRepo = Cypress.env('chartmuseum_repo') + ':8080';
 
     beforeEach(() => {
       cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
     });
-    // Add dev repo for main test or if the test runs on rancher 2.7 (because operator is not in the 2.7 marketplace)
-    if (!isOperatorVersion('marketplace') && isCypressTag('main') || isRancherManagerVersion('2.7')) {
+
+    // Add dev repo for main test or if the test runs on Rancher 2.7 (because operator is not in the 2.7 marketplace)
+    if ((!isOperatorVersion('marketplace') && isCypressTag('main')) || isRancherManagerVersion('2.7')) {
       it('Add local chartmuseum repo', () => {
-        cypressLib.addRepository('elemental-operator', Cypress.env('chartmuseum_repo') + ':8080', 'helm', 'none');
+        cypressLib.addRepository('elemental-operator', chartmuseumRepo, 'helm', 'none');
       });
+
       qase(10,
         it('Install latest dev Elemental operator', () => {
-          elemental.installElementalOperator(upgrade_from_version);
-        })
-      );
+          elemental.installElementalOperator(upgradeFromVersion);
+      }));
     } else if (!isRancherManagerVersion('2.7')) {
       qase(57,
         it('Install latest stable Elemental operator', () => {
-          elemental.installElementalOperator(upgrade_from_version);
-        })
-      );
-    };
+          elemental.installElementalOperator(upgradeFromVersion);
+      }));
+    }
   });
 });

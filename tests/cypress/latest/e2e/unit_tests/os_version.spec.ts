@@ -18,19 +18,29 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { slowCypressDown } from 'cypress-slow-down';
 import { isRancherManagerVersion } from '~/support/utils';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 filterTests(['main'], () => {
   Cypress.config();
+  
   describe('OS versions testing', () => {
-    const elementalUser = "elemental-user"
+    const elementalUser = "elemental-user";
     const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword"
-    let htmlSelector;
+    const uiPassword = "rancherpassword";
+    const selectors = {
+      sortableTableList: 'sortable-table-list-container',
+      clusterList: 'cluster-list-container',
+      sortableTableActionButton: 'sortable-table-0-action-button',
+      actionButtonAsync: 'action-button-async-button',
+      sortableCell: 'sortable-cell-0-4',
+      mediaTypeBuildMedia: 'select-media-type-build-media',
+      osVersionBuildMedia: 'select-os-version-build-media'
+    };
+    const login = uiAccount === "user" ? () => cy.login(elementalUser, uiPassword) : () => cy.login();
 
     beforeEach(() => {
-      (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+      login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
       cypressLib.accesMenu('OS Management');
@@ -38,26 +48,26 @@ filterTests(['main'], () => {
 
     it('Check In Sync column status', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      (isRancherManagerVersion('2.9')) ? htmlSelector = 'sortable-table-list-container' : htmlSelector = 'cluster-list-container';
+      const htmlSelector = isRancherManagerVersion('2.9') ? selectors.sortableTableList : selectors.clusterList;
       cy.getBySel(htmlSelector)
         .should('not.contain', 'Unavailable');
       cy.getBySel(htmlSelector)
         .contains('Type')
         .click();
-      cy.getBySel('sortable-table-0-action-button')
+      cy.getBySel(selectors.sortableTableActionButton)
         .click();
       cy.contains('Edit YAML')
         .click();
-      cy.contains('annotations').as('anno')
-      cy.get('@anno').click(0, 0)
+      cy.contains('annotations').as('anno');
+      cy.get('@anno').click(0, 0);
       cy.get('@anno').type('{end}{enter}  elemental.cattle.io/channel-no-longer-in-sync: \'true\'');
-      cy.getBySel('action-button-async-button')
+      cy.getBySel(selectors.actionButtonAsync)
         .contains('Save')
         .click();
       cy.getBySel(htmlSelector)
         .contains('Type')
         .click();
-      cy.getBySel('sortable-cell-0-4')
+      cy.getBySel(selectors.sortableCell)
         .should('contain', 'Out of sync');
     });
 
@@ -65,14 +75,13 @@ filterTests(['main'], () => {
       cy.createMachReg('sample-machine-reg');
       cy.contains('sample-machine-reg')
         .click();
-      cy.getBySel('select-media-type-build-media')
+      cy.getBySel(selectors.mediaTypeBuildMedia)
         .click();
       cy.contains('Raw')
         .click();
-      cy.getBySel('select-os-version-build-media')
+      cy.getBySel(selectors.osVersionBuildMedia)
         .click();
-      cy.contains(new RegExp('OS.*deprecated'))
+      cy.contains(new RegExp('OS.*deprecated'));
     });
-
   });
 });
