@@ -19,39 +19,29 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 filterTests(['main'], () => {
-  Cypress.config();
   describe('Menu testing', () => {
     const elemental = new Elemental();
-    const elementalUser = "elemental-user"
+    const elementalUser = "elemental-user";
     const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword"
+    const uiPassword = "rancherpassword";
+    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
 
     beforeEach(() => {
-      (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+      login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
     });
 
-    qase(2,
+    qase(2, 
       it('Check Elemental logo', () => {
-        // Elemental's icon should appear in the side menu
-        cypressLib.checkNavIcon('elemental')
-          .should('exist');
-      })
-    );
+        cypressLib.checkNavIcon('elemental').should('exist');
+    }));
 
-    qase(3,
+    qase(3, 
       it('Check Elemental menu', () => {
-        // Elemental's icon should appear in the side menu
-        cypressLib.checkNavIcon('elemental')
-          .should('exist');
-
-        // Click on the Elemental's icon
+        cypressLib.checkNavIcon('elemental').should('exist');
         cypressLib.accesMenu('OS Management');
-
-        // Check Elemental's side menu
         elemental.checkElementalNav();
-      })
-    );
+    }));
   });
-}); 
+});

@@ -1,5 +1,6 @@
 /*
 Copyright © 2022 - 2024 SUSE LLC
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -14,32 +15,28 @@ limitations under the License.
 import '~/support/commands';
 import 'cypress-file-upload';
 import filterTests from '~/support/filterTests.js';
-import * as utils from "~/support/utils";
+import * as utils from '~/support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
-Cypress.config();
 describe('Upgrade tests', () => {
-  const channelName = "mychannel"
-  const clusterName = "mycluster"
-  const elementalUser = "elemental-user"
+  const channelName = 'mychannel';
+  const clusterName = 'mycluster';
+  const elementalUser = 'elemental-user';
   const uiAccount = Cypress.env('ui_account');
-  const uiPassword = "rancherpassword"
-  const upgradeImage = Cypress.env('upgrade_image')
+  const uiPassword = 'rancherpassword';
+  const upgradeImage = Cypress.env('upgrade_image');
+  const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
 
   beforeEach(() => {
-    (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+    login();
     cy.visit('/');
     cy.viewport(1920, 1080);
-
-    // Open the navigation menu
     cypressLib.burgerMenuToggle();
-
-    // Click on the Elemental's icon
     cypressLib.accesMenu('OS Management');
   });
 
@@ -47,27 +44,24 @@ describe('Upgrade tests', () => {
     // Add dev OS Version Channel if stable operator is installed
     // because we do not update the operator in RKE2 UI test so far
     // Only RKE2 tests use os version channel
-    if (utils.isK8sVersion("rke2") && !utils.isRancherManagerVersion('2.7')) {
-      // With operator 1.4.2, dev and stable cannot live together
-      // Let's delete the stable channel first
+    if (utils.isK8sVersion('rke2') && !utils.isRancherManagerVersion('2.7')) {
       it('Delete stable channel for RKE2 upgrade', () => {
-        cy.clickNavMenu(["Advanced", "OS Version Channels"]);
+        cy.clickNavMenu(['Advanced', 'OS Version Channels']);
         cy.deleteAllResources();
-      })
+      });
 
       it('Add dev channel for RKE2 upgrade', () => {
         cy.addOsVersionChannel('dev');
-      })
+      });
     }
 
-    if (utils.isK8sVersion("rke2")) {
+    if (utils.isK8sVersion('rke2')) {
       qase(33,
         it('Check OS Versions', () => {
-          cy.clickNavMenu(["Advanced", "OS Versions"]);
-          cy.contains(new RegExp('Active.*-iso-unstable'), { timeout: 120000 })
-        })
-      );
-    };
+          cy.clickNavMenu(['Advanced', 'OS Versions']);
+          cy.contains(new RegExp('Active.*-iso-unstable'), { timeout: 120000 });
+      }));
+    }
 
     qase(34,
       it('Upgrade one node (different methods if rke2 or k3s)', () => {
@@ -75,102 +69,63 @@ describe('Upgrade tests', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
-        /////////////////////////////////////////
         // K3s cluster upgraded with OS Image
         // RKE2 cluster upgraded with OS version channel
         // Marketplace test uses OS version channel
-        cy.clickNavMenu(["Advanced", "Update Groups"]);
-        cy.getBySel('masthead-create')
-          .contains('Create')
-          .click();
-        cy.get('.primaryheader')
-          .contains('Update Group: Create');
-        cy.getBySel('name-ns-description-name')
-          .type(channelName);
-        cy.contains('Target Cluster')
-        cy.getBySel('cluster-target')
-          .click();
-        cy.get('.vs__dropdown-menu')
-          .contains(clusterName)
-          .click();
-        if (utils.isK8sVersion("k3s") && !utils.isOperatorVersion('marketplace')) {
-          cy.getBySel('upgrade-choice-selector')
-            .parent()
-            .contains('Use image from registry')
-            .click();
-          cy.getBySel('os-image-box')
-            .type(upgradeImage)
+        cy.clickNavMenu(['Advanced', 'Update Groups']);
+        cy.getBySel('masthead-create').contains('Create').click();
+        cy.get('.primaryheader').contains('Update Group: Create');
+        cy.getBySel('name-ns-description-name').type(channelName);
+        cy.contains('Target Cluster');
+        cy.getBySel('cluster-target').click();
+        cy.get('.vs__dropdown-menu').contains(clusterName).click();
+
+        if (utils.isK8sVersion('k3s') && !utils.isOperatorVersion('marketplace')) {
+          cy.getBySel('upgrade-choice-selector').parent().contains('Use image from registry').click();
+          cy.getBySel('os-image-box').type(upgradeImage);
         } else {
-          cy.getBySel('upgrade-choice-selector')
-            .parent()
-            .contains('Use Managed OS Version')
-            .click();
-          cy.getBySel('os-version-box')
-            .click()
+          cy.getBySel('upgrade-choice-selector').parent().contains('Use Managed OS Version').click();
+          cy.getBySel('os-version-box').click();
           if (utils.isOperatorVersion('marketplace')) {
-            cy.getBySel('os-version-box')
-              .parents()
-              .contains(Cypress.env('os_version_target'))
-              .click();
+            cy.getBySel('os-version-box').parents().contains(Cypress.env('os_version_target')).click();
           } else {
-            cy.getBySel('os-version-box')
-              .parents()
-              .contains('unstable')
-              .click();
+            cy.getBySel('os-version-box').parents().contains('unstable').click();
           }
         }
 
-        cy.getBySel('form-save')
-          .contains('Create')
-          .click();
+        cy.getBySel('form-save').contains('Create').click();
         // Status changes a lot right after the creation so let's wait 10 secondes
         // before checking
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(10000);
-        cy.getBySel('sortable-cell-0-0')
-          .contains('Active');
+        cy.wait(10000); // eslint-disable-line cypress/no-unnecessary-waiting
+        cy.getBySel('sortable-cell-0-0').contains('Active');
         // Check if the node reboots to apply the upgrade
         cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
-        cy.clickNavMenu(["Dashboard"]);
-        cy.getBySel('card-clusters')
-          .contains('Manage Elemental Clusters')
-          .click()
-        cy.get('.title')
-          .contains('Clusters');
-        cy.get('.outlet')
-          .contains(clusterName)
-          .click();
-        cy.get('.primaryheader')
-          .contains('Updating', { timeout: 420000 });
-        cy.get('.primaryheader')
-          .contains('Active', { timeout: 720000 });
-      })
-    );
+        cy.clickNavMenu(['Dashboard']);
+        cy.getBySel('card-clusters').contains('Manage Elemental Clusters').click();
+        cy.get('.title').contains('Clusters');
+        cy.get('.outlet').contains(clusterName).click();
+        cy.get('.primaryheader').contains('Updating', { timeout: 420000 });
+        cy.get('.primaryheader').contains('Active', { timeout: 720000 });
+    }));
 
     qase(35,
       it('Cannot create two upgrade groups targeting the same cluster', () => {
-        cy.clickNavMenu(["Advanced", "Update Groups"]);
-        cy.getBySel('masthead-create')
-          .contains('Create')
-          .click();
-        cy.get('.primaryheader')
-          .contains('Update Group: Create');
-        cy.getBySel('cluster-target')
-          .click();
+        cy.clickNavMenu(['Advanced', 'Update Groups']);
+        cy.getBySel('masthead-create').contains('Create').click();
+        cy.get('.primaryheader').contains('Update Group: Create');
+        cy.getBySel('cluster-target').click();
         // As there is already an upgrade group targeting the cluster,
         // the cluster should not be available in the dropdown
         cy.get('#vs3__listbox').should('not.contain', clusterName);
-      })
-    );
+    }));
 
     qase(37,
       it('Delete OS Versions Channels', () => {
-        cy.clickNavMenu(["Advanced", "OS Version Channels"]);
+        cy.clickNavMenu(['Advanced', 'OS Version Channels']);
         cy.deleteAllResources();
-        cy.clickNavMenu(["Advanced", "OS Versions"]);
+        cy.clickNavMenu(['Advanced', 'OS Versions']);
         cy.contains('There are no rows to show');
-      })
-    );
-  })
-})
+    }));
+  });
+});

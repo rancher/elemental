@@ -18,24 +18,20 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { slowCypressDown } from 'cypress-slow-down';
 
-// slow down each command by 500ms
-slowCypressDown(500)
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 filterTests(['main'], () => {
-  Cypress.config();
   describe('Advanced filtering testing', () => {
-    const elementalUser = "elemental-user"
+    const elementalUser = 'elemental-user';
     const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword"
+    const uiPassword = 'rancherpassword';
+    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
 
     beforeEach(() => {
-      (uiAccount == "user") ? cy.login(elementalUser, uiPassword) : cy.login();
+      login();
       cy.visit('/');
-
-      // Open the navigation menu
       cypressLib.burgerMenuToggle();
-
-      // Click on the Elemental's icon
       cypressLib.accesMenu('OS Management');
     });
 
@@ -48,46 +44,35 @@ filterTests(['main'], () => {
         ]);
 
         machineInventoryMap.forEach((value, key) => {
-          cy.importMachineInventory(key + '.yaml', value);
+          cy.importMachineInventory(`${key}.yaml`, value);
         });
-      })
-    );
+    }));
 
     qase(22,
       it('Two machine inventories should appear by filtering on test-filter', () => {
-        // Only test-filter-one and test-filter-two should appear with test-filter as filter
         cy.checkFilter('test-filter', true, true, false);
-      })
-    );
+    }));
 
     qase(22,
       it('One machine inventory should appear by filtering on test-filter-one', () => {
-        // Only test-filter-one should appear with test-filter-one and Test-Filter_One as filter
-        // Checking with lower and upper case make sure we are not hitting https://github.com/rancher/elemental/issues/627
         ['test-filter-one', 'Test-Filter-One'].forEach(filter => {
           cy.checkFilter(filter, true, false, false);
         });
-      })
-    );
+    }));
 
     qase(23,
       it('No machine inventory should appear by filtering on test-bad-filter', () => {
-        // This test will also serve as no regression test for https://github.com/rancher/elemental-ui/issues/41
         cy.checkFilter('test-bad-filter', false, false, false);
-        cy.contains('There are no rows which match your search query.')
-      })
-    );
+        cy.contains('There are no rows which match your search query.');
+    }));
 
     qase(24,
       it('Delete all fake machine inventories', () => {
-        cy.clickNavMenu(["Inventory of Machines"]);
-        cy.get('[width="30"] > .checkbox-outer-container > .checkbox-container > .checkbox-custom')
-          .click();
+        cy.clickNavMenu(['Inventory of Machines']);
+        cy.get('[width="30"] > .checkbox-outer-container > .checkbox-container > .checkbox-custom').click();
         cy.clickButton('Actions');
-        cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)')
-          .click();
+        cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)').click();
         cy.confirmDelete();
-      })
-    );
+    }));
   });
 });
