@@ -13,6 +13,10 @@ limitations under the License.
 */
 
 import './commands';
+import { slowCypressDown } from 'cypress-slow-down';
+
+// Slow down each command by 500ms
+slowCypressDown(500);
 
 declare global {
   // In Cypress functions should be declared with 'namespace'

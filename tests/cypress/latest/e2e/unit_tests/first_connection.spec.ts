@@ -16,7 +16,6 @@ import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
-
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
   describe('First login on Rancher', () => {

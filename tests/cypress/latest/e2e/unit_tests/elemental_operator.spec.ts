@@ -18,10 +18,6 @@ import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import { isCypressTag, isOperatorVersion, isRancherManagerVersion } from '~/support/utils';
 import { Elemental } from '~/support/elemental';
-import { slowCypressDown } from 'cypress-slow-down';
-
-// Slow down each command by 500ms
-slowCypressDown(500);
 
 filterTests(['main', 'upgrade'], () => {
   describe('Install Elemental Operator', () => {

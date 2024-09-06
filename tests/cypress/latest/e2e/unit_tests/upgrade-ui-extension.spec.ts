@@ -19,10 +19,6 @@ import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 import * as utils from '~/support/utils';
-import { slowCypressDown } from 'cypress-slow-down';
-
-// Slow down each command by 500ms
-slowCypressDown(500);
 
 describe('UI extension upgrade tests', () => {
   const elemental = new Elemental();
