@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"maps"
 	"os"
 	"os/exec"
 	"strconv"
@@ -28,7 +29,28 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"gopkg.in/yaml.v3"
 )
+
+func getAnnotations(cl *tools.Client) map[string]string {
+	annotationsStr, err := kubectl.RunWithoutErr(
+		"get", "machineinventory",
+		"--namespace", clusterNS,
+		"-o", "jsonpath={.items[?(@.metadata.annotations.elemental\\.cattle\\.io/registration-ip==\""+strings.Replace(cl.Host, ":22", "", -1)+"\")].metadata.annotations}",
+	)
+	Expect(err).To(Not(HaveOccurred()))
+
+	annotations := make(map[string]string)
+	err = yaml.Unmarshal([]byte(annotationsStr), &annotations)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// For debugging purposes
+	for a, b := range annotations {
+		GinkgoWriter.Printf("%s: %s\n", a, b)
+	}
+
+	return annotations
+}
 
 var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator"), func() {
 	// Create kubectl context
@@ -151,9 +173,11 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 
 var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 	var (
-		value        string
-		valueToCheck string
-		wg           sync.WaitGroup
+		annotationsAfter  map[string]string
+		annotationsBefore map[string]string
+		value             string
+		valueToCheck      string
+		wg                sync.WaitGroup
 	)
 
 	It("Upgrade node", func() {
@@ -179,9 +203,8 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				defer wg.Done()
 				defer GinkgoRecover()
 
-				By("Checking OS version on "+h+" before upgrade", func() {
-					out := RunSSHWithRetry(cl, "cat /etc/os-release")
-					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
+				By("Getting annotations for "+h+" before upgrade", func() {
+					annotationsBefore = getAnnotations(cl)
 				})
 			}(hostName, client)
 		}
@@ -349,9 +372,17 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					}, tools.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
 				})
 
-				By("Checking OS version on "+h+" after upgrade", func() {
-					out := RunSSHWithRetry(cl, "cat /etc/os-release")
-					GinkgoWriter.Printf("OS Version on %s:\n%s\n", h, out)
+				By("Getting annotations for "+h+" after upgrade", func() {
+					annotationsAfter = getAnnotations(cl)
+				})
+
+				By("Checking that annotations have been updated after upgrade", func() {
+					// Maps should not be equal after an upgrade
+					status := maps.Equal(annotationsBefore, annotationsAfter)
+					if status {
+						GinkgoWriter.Println("Annotations have not been updated!")
+					}
+					Expect(status).To(BeFalse())
 				})
 
 				if grubRecovery {
