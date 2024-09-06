@@ -15,11 +15,7 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
-import { slowCypressDown } from 'cypress-slow-down';
 import { isRancherManagerVersion } from '~/support/utils';
-
-// Slow down each command by 500ms
-slowCypressDown(500);
 
 filterTests(['main'], () => {
   Cypress.config();

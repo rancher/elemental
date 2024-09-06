@@ -18,10 +18,6 @@ import filterTests from '~/support/filterTests.js';
 import * as utils from '~/support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { slowCypressDown } from 'cypress-slow-down';
-
-// Slow down each command by 500ms
-slowCypressDown(500);
 
 describe('Upgrade tests', () => {
   const channelName = 'mychannel';
