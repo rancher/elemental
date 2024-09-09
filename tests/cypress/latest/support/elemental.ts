@@ -39,6 +39,18 @@ export class Elemental {
     });
   }
 
+  // Get elemental operator version
+  getOperatorVersion(): void {
+    cy.contains('local').click();
+    cy.contains('Workloads').click();
+    cy.contains('Deployments').click();
+    cy.contains('elemental-operator').click()
+    cy.get('[data-testid="sortable-cell-0-2"] > .formatter-pod-images > span').invoke('text').then((version:string) => {
+      Cypress.env('elemental_operator_version', version);
+      cy.log(`Elemental operator version: ${version}`);
+    });
+  }
+
   installElementalOperator(upgrade_from_version: string): void {
     cy.contains('local').click();
     cy.get('.nav').contains('Apps').click();
