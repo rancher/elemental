@@ -160,12 +160,6 @@ jobs:
                                    -l app=cert-manager \
                                    -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
 
-          # Extract elemental-operator version
-          OPERATOR_VERSION=$(kubectl get pod \
-                               --namespace cattle-elemental-system \
-                               -l app=elemental-operator \
-                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-
           # Extract Rancher Manager version
           RANCHER_VERSION=$(kubectl get pod \
                               --namespace cattle-system \
@@ -174,7 +168,6 @@ jobs:
 
           # Export values
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
 
       - name: Install Chartmuseum
@@ -245,6 +238,17 @@ jobs:
           name: cypress-videos-basics-${{ inputs.public_fqdn }}-${{ steps.date.outputs.epoch }}
           path: tests/cypress/latest/videos
           retention-days: 7
+
+      - name: Extract Elemental version
+        id: elemental_version
+        run: |
+          # Extract elemental-operator version
+          OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          # Export value
+          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
 
       - name: Deploy nodes to join Rancher manager
         id: deploy_node_ui
@@ -358,7 +362,7 @@ jobs:
           k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
           k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
           node_number: ${{ inputs.node_number }}
-          operator_version: ${{ steps.component.outputs.operator_version }}
+          operator_version: ${{ steps.elemental_version.outputs.operator_version }}
           os_version: ${{ steps.iso_version.outputs.os_version }}
           proxy: ${{ inputs.proxy }}
           public_fqdn: ${{ inputs.public_fqdn }}
