@@ -335,24 +335,27 @@ func DownloadBuiltISO(ns, seedName, filename string) {
 		}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
 	})
 
-	By("Checking checksum", func() {
-		// Get checksum URL
-		checksumURL, err := kubectl.RunWithoutErr("get", "SeedImage",
-			"--namespace", ns,
-			seedName,
-			"-o", "jsonpath={.status.checksumURL}")
-		Expect(err).To(Not(HaveOccurred()))
+	// Only supported in Dev version for now, not Stable (1.5.x) and Staging (1.6.4)
+	if strings.Contains(os2Test, "dev") {
+		By("Checking checksum", func() {
+			// Get checksum URL
+			checksumURL, err := kubectl.RunWithoutErr("get", "SeedImage",
+				"--namespace", ns,
+				seedName,
+				"-o", "jsonpath={.status.checksumURL}")
+			Expect(err).To(Not(HaveOccurred()))
 
-		// Download checksum file
-		checksumFile := filename + ".sha256"
-		_ = tools.GetFileFromURL(checksumURL, checksumFile, false)
+			// Download checksum file
+			checksumFile := filename + ".sha256"
+			_ = tools.GetFileFromURL(checksumURL, checksumFile, false)
 
-		// Check the checksum of downloaded image
-		err = exec.Command("bash", "-c", "sed -i 's; .*\\.iso; "+filename+";' "+checksumFile).Run()
-		Expect(err).To(Not(HaveOccurred()))
-		err = exec.Command("sha256sum", "--check", checksumFile).Run()
-		Expect(err).To(Not(HaveOccurred()))
-	})
+			// Check the checksum of downloaded image
+			err = exec.Command("bash", "-c", "sed -i 's; .*\\.iso; "+filename+";' "+checksumFile).Run()
+			Expect(err).To(Not(HaveOccurred()))
+			err = exec.Command("sha256sum", "--check", checksumFile).Run()
+			Expect(err).To(Not(HaveOccurred()))
+		})
+	}
 }
 
 /*
