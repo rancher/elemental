@@ -198,10 +198,11 @@
 - **Describe:** E2E - Upgrading node
     - **It:** Upgrade node
       -  **By:** Checking if upgrade type is set
-      -  **By:** Checking OS version on +h+ before upgrade
+      -  **By:** Getting annotations for +h+ before upgrade
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
       -  **By:** Checking VM upgrade on +h
-      -  **By:** Checking OS version on +h+ after upgrade
+      -  **By:** Getting annotations for +h+ after upgrade
+      -  **By:** Checking that annotations have been updated after upgrade
       -  **By:** Testing Grub Recovery entry on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
 
