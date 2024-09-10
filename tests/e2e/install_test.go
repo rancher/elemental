@@ -100,15 +100,15 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				// Delay few seconds before checking
 				time.Sleep(tools.SetTimeout(20 * time.Second))
 
+				// Set kubectl command and KUBECONFIG variable
 				err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
+				Expect(err).To(Not(HaveOccurred()))
+				err = os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 				Expect(err).To(Not(HaveOccurred()))
 			})
 
 			By("Waiting for RKE2 to be started", func() {
 				// Wait for all pods to be started
-				err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
-				Expect(err).To(Not(HaveOccurred()))
-
 				checkList := [][]string{
 					{"kube-system", "k8s-app=kube-dns"},
 					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
@@ -117,8 +117,21 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 					return rancher.CheckPod(k, checkList)
 				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 
-				err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
+				err := k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 				Expect(err).To(Not(HaveOccurred()))
+			})
+
+			By("Installing local-path-provisionner", func() {
+				localPathNS := "kube-system"
+				kubectl.Apply(localPathNS, localStorageYaml)
+
+				// Wait for all pods to be started
+				checkList := [][]string{
+					{localPathNS, "app=local-path-provisioner"},
+				}
+				Eventually(func() error {
+					return rancher.CheckPod(k, checkList)
+				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
 			})
 		} else {
 			// Report to Qase
