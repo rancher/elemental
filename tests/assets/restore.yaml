@@ -7,4 +7,4 @@ metadata:
 spec:
   backupFilename: %BACKUP_FILE%
   deleteTimeoutSeconds: 10
-  prune: true
+  prune: %PRUNE%

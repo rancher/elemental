@@ -61,14 +61,14 @@ e2e-airgap-rancher: deps
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
 
-e2e-backup-restore: deps
-	ginkgo --label-filter test-backup-restore -r -v ./e2e
-
 e2e-check-app: deps
 	ginkgo --label-filter check-app -r -v ./e2e
 
 e2e-configure-rancher: deps
 	ginkgo --label-filter configure -r -v ./e2e
+
+e2e-full-backup-restore: deps
+	ginkgo --label-filter test-full-backup-restore -r -v ./e2e
 
 e2e-get-logs: deps
 	ginkgo --label-filter logs -r -v ./e2e
@@ -91,11 +91,14 @@ e2e-iso-image: deps
 e2e-multi-cluster: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter multi-cluster -r -v ./e2e
 
+e2e-prepare-archive: deps
+	ginkgo --label-filter prepare-archive -r -v ./e2e
+
 e2e-reset: deps
 	ginkgo --label-filter reset -r -v ./e2e
 
-e2e-prepare-archive: deps
-	ginkgo --label-filter prepare-archive -r -v ./e2e
+e2e-simple-backup-restore: deps
+	ginkgo --label-filter test-simple-backup-restore -r -v ./e2e
 	
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e

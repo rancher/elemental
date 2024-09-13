@@ -23,7 +23,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 )
 
@@ -61,21 +60,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			testCaseID = 60
 
 			By("Installing RKE2", func() {
-				// Get RKE2 installation script
-				fileName := "rke2-install.sh"
-				Eventually(func() error {
-					return tools.GetFileFromURL("https://get.rke2.io", fileName, true)
-				}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
-
-				// Retry in case of (sporadic) failure...
-				count := 1
-				Eventually(func() error {
-					// Execute RKE2 installation
-					out, err := exec.Command("sudo", "--preserve-env=INSTALL_RKE2_VERSION", "sh", fileName).CombinedOutput()
-					GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
-					count++
-					return err
-				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+				InstallRKE2()
 			})
 
 			if clusterType == "hardened" {
@@ -86,77 +71,22 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			}
 
 			By("Starting RKE2", func() {
-				// Copy config file, this allows custom configuration for RKE2 installation
-				// NOTE: CopyFile cannot be used, as we need root permissions for this file
-				err := exec.Command("sudo", "mkdir", "-p", "/etc/rancher/rke2").Run()
-				Expect(err).To(Not(HaveOccurred()))
-				err = exec.Command("sudo", "cp", configRKE2Yaml, "/etc/rancher/rke2/config.yaml").Run()
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Activate and start RKE2
-				err = exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Delay few seconds before checking
-				time.Sleep(tools.SetTimeout(20 * time.Second))
-
-				// Set kubectl command and KUBECONFIG variable
-				err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
-				Expect(err).To(Not(HaveOccurred()))
-				err = os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
-				Expect(err).To(Not(HaveOccurred()))
+				StartRKE2()
 			})
 
 			By("Waiting for RKE2 to be started", func() {
-				// Wait for all pods to be started
-				checkList := [][]string{
-					{"kube-system", "k8s-app=kube-dns"},
-					{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
-
-				err := k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
-				Expect(err).To(Not(HaveOccurred()))
+				WaitForRKE2(k)
 			})
 
 			By("Installing local-path-provisionner", func() {
-				localPathNS := "kube-system"
-				kubectl.Apply(localPathNS, localStorageYaml)
-
-				// Wait for all pods to be started
-				checkList := [][]string{
-					{localPathNS, "app=local-path-provisioner"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
+				InstallLocalStorage(k)
 			})
 		} else {
 			// Report to Qase
 			testCaseID = 59
 
 			By("Installing K3s", func() {
-				// Get K3s installation script
-				fileName := "k3s-install.sh"
-				Eventually(func() error {
-					return tools.GetFileFromURL("https://get.k3s.io", fileName, true)
-				}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
-
-				// Set command and arguments
-				installCmd := exec.Command("sh", fileName)
-				installCmd.Env = append(os.Environ(), "INSTALL_K3S_EXEC=--disable metrics-server")
-
-				// Retry in case of (sporadic) failure...
-				count := 1
-				Eventually(func() error {
-					// Execute K3s installation
-					out, err := installCmd.CombinedOutput()
-					GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
-					count++
-					return err
-				}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+				InstallK3s()
 			})
 
 			if clusterType == "hardened" {
@@ -167,24 +97,11 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			}
 
 			By("Starting K3s", func() {
-				err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
-				Expect(err).To(Not(HaveOccurred()))
-
-				// Delay few seconds before checking
-				time.Sleep(tools.SetTimeout(20 * time.Second))
+				StartK3s()
 			})
 
 			By("Waiting for K3s to be started", func() {
-				// Wait for all pods to be started
-				checkList := [][]string{
-					{"kube-system", "app=local-path-provisioner"},
-					{"kube-system", "k8s-app=kube-dns"},
-					{"kube-system", "app.kubernetes.io/name=traefik"},
-					{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+				WaitForK3s(k)
 			})
 		}
 
@@ -208,32 +125,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			})
 		} else {
 			By("Installing CertManager", func() {
-				RunHelmCmdWithRetry("repo", "add", "jetstack", "https://charts.jetstack.io")
-				RunHelmCmdWithRetry("repo", "update")
-
-				// Set flags for cert-manager installation
-				flags := []string{
-					"upgrade", "--install", "cert-manager", "jetstack/cert-manager",
-					"--namespace", "cert-manager",
-					"--create-namespace",
-					"--set", "installCRDs=true",
-					"--wait", "--wait-for-jobs",
-				}
-
-				if clusterType == "hardened" {
-					flags = append(flags, "--version", certManagerVersion)
-				}
-
-				RunHelmCmdWithRetry(flags...)
-
-				checkList := [][]string{
-					{"cert-manager", "app.kubernetes.io/component=controller"},
-					{"cert-manager", "app.kubernetes.io/component=webhook"},
-					{"cert-manager", "app.kubernetes.io/component=cainjector"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+				InstallCertManager(k)
 			})
 		}
 	})
@@ -264,19 +156,7 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 		}
 
-		err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
-		Expect(err).To(Not(HaveOccurred()))
-
-		// Wait for all pods to be started
-		checkList := [][]string{
-			{"cattle-system", "app=rancher"},
-			{"cattle-system", "app=rancher-webhook"},
-			{"cattle-fleet-local-system", "app=fleet-agent"},
-			{"cattle-provisioning-capi-system", "control-plane=controller-manager"},
-		}
-		Eventually(func() error {
-			return rancher.CheckPod(k, checkList)
-		}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(BeNil())
+		InstallRancher(k)
 
 		// Check issuer for Private CA
 		if caType == "private" {
@@ -354,29 +234,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				// Report to Qase
 				testCaseID = 62
 
-				for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-					// Set flags for installation
-					flags := []string{"upgrade", "--install", chart,
-						operatorRepo + "/" + chart + "-chart",
-						"--namespace", "cattle-elemental-system",
-						"--create-namespace",
-						"--wait", "--wait-for-jobs",
-					}
-
-					// TODO: maybe adding a dedicated variable for operator version instead?
-					// of using os2Test (this one should be kept for the OS image version)
-					// Variable operator_repo exists but does not exactly reflect operator's version
-					if strings.Contains(os2Test, "dev") {
-						flags = append(flags, "--devel")
-					}
-
-					RunHelmCmdWithRetry(flags...)
-				}
-
-				// Wait for pod to be started
-				Eventually(func() error {
-					return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+				installOrder := []string{"elemental-operator-crds", "elemental-operator"}
+				InstallElementalOperator(k, installOrder, operatorRepo)
 			})
 		}
 	})

@@ -106,6 +106,445 @@ var (
 	vmName                    string
 )
 
+func CheckBackupRestore(v string) {
+	Eventually(func() string {
+		out, _ := kubectl.RunWithoutErr("logs", "-l app.kubernetes.io/name=rancher-backup",
+			"--tail=-1", "--since=5m",
+			"--namespace", "cattle-resources-system")
+		return out
+	}, tools.SetTimeout(5*time.Minute), 10*time.Second).Should(ContainSubstring(v))
+}
+
+/*
+Check that Cluster resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param cn Cluster resource name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func CheckCreatedCluster(ns, cn string) {
+	// Check that the cluster is correctly created
+	Eventually(func() string {
+		out, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
+			"--namespace", ns,
+			cn, "-o", "jsonpath={.metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(cn))
+}
+
+/*
+Check that Registration resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param rn MachineRegistration resource name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func CheckCreatedRegistration(ns, rn string) {
+	Eventually(func() string {
+		out, _ := kubectl.RunWithoutErr("get", "MachineRegistration",
+			"--namespace", ns,
+			"-o", "jsonpath={.items[*].metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(rn))
+}
+
+/*
+Check that a SelectorTemplate resource has been correctly created
+  - @param ns Namespace where the cluster is deployed
+  - @param sn Selector name
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func CheckCreatedSelectorTemplate(ns, sn string) {
+	Eventually(func() string {
+		out, _ := kubectl.RunWithoutErr("get", "MachineInventorySelectorTemplate",
+			"--namespace", ns,
+			"-o", "jsonpath={.items[*].metadata.name}")
+		return out
+	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(sn))
+}
+
+/*
+Check SSH connection
+  - @param cl Client (node) informations
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func CheckSSH(cl *tools.Client) {
+	Eventually(func() string {
+		out, _ := cl.RunSSH("echo SSH_OK")
+		return strings.Trim(out, "\n")
+	}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
+}
+
+/*
+Download ISO built with SeedImage
+  - @param ns Namespace where the cluster is deployed
+  - @param seedName Name of the used SeedImage resource
+  - @param filename Path and name of the file where to store the ISO
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func DownloadBuiltISO(ns, seedName, filename string) {
+	// Set minimal ISO file to 250MB
+	const minimalISOSize = 250 * 1024 * 1024
+
+	By("Waiting for image to be generated", func() {
+		// Check that the seed image is correctly created
+		Eventually(func() string {
+			out, _ := kubectl.RunWithoutErr("get", "SeedImage",
+				"--namespace", ns,
+				seedName,
+				"-o", "jsonpath={.status}")
+			return out
+		}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
+	})
+
+	By("Downloading image", func() {
+		// Get URL
+		seedImageURL, err := kubectl.RunWithoutErr("get", "SeedImage",
+			"--namespace", ns,
+			seedName,
+			"-o", "jsonpath={.status.downloadURL}")
+		Expect(err).To(Not(HaveOccurred()))
+
+		// ISO file size should be greater than 500MB
+		Eventually(func() int64 {
+			// No need to check download status, file size at the end is enough
+			_ = tools.GetFileFromURL(seedImageURL, filename, false)
+			file, _ := os.Stat(filename)
+			return file.Size()
+		}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
+	})
+
+	// Only supported in Dev version for now, not Stable (1.5.x) and Staging (1.6.4)
+	if strings.Contains(os2Test, "dev") {
+		By("Checking checksum", func() {
+			// Get checksum URL
+			checksumURL, err := kubectl.RunWithoutErr("get", "SeedImage",
+				"--namespace", ns,
+				seedName,
+				"-o", "jsonpath={.status.checksumURL}")
+			Expect(err).To(Not(HaveOccurred()))
+
+			// Download checksum file
+			checksumFile := filename + ".sha256"
+			_ = tools.GetFileFromURL(checksumURL, checksumFile, false)
+
+			// Check the checksum of downloaded image
+			err = exec.Command("bash", "-c", "sed -i 's; .*\\.iso; "+filename+";' "+checksumFile).Run()
+			Expect(err).To(Not(HaveOccurred()))
+			err = exec.Command("sha256sum", "--check", checksumFile).Run()
+			Expect(err).To(Not(HaveOccurred()))
+		})
+	}
+}
+
+/*
+Get configured backup directory
+  - @returns Configured backup directory
+*/
+func GetBackupDir() string {
+	claimName, err := kubectl.RunWithoutErr("get", "pod", "-l", "app.kubernetes.io/name=rancher-backup",
+		"--namespace", "cattle-resources-system",
+		"-o", "jsonpath={.items[*].spec.volumes[?(@.name==\"pv-storage\")].persistentVolumeClaim.claimName}")
+	Expect(err).To(Not(HaveOccurred()))
+
+	out, err := kubectl.RunWithoutErr("get", "pv",
+		"--namespace", "cattle-resources-system",
+		"-o", "jsonpath={.items[?(@.spec.claimRef.name==\""+claimName+"\")].spec.local.path}")
+	Expect(err).To(Not(HaveOccurred()))
+
+	return out
+}
+
+/*
+Get Elemental node information
+  - @param hn Node hostname
+  - @returns Client structure and MAC address
+*/
+func GetNodeInfo(hn string) (*tools.Client, string) {
+	// Get network data
+	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Set 'client' to be able to access the node through SSH
+	c := &tools.Client{
+		Host:     string(data.IP) + ":22",
+		Username: userName,
+		Password: userPassword,
+	}
+
+	return c, data.Mac
+}
+
+/*
+Get Elemental node IP address
+  - @param hn Node hostname
+  - @returns IP address
+*/
+func GetNodeIP(hn string) string {
+	// Get network data
+	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
+	Expect(err).To(Not(HaveOccurred()))
+
+	return data.IP
+}
+
+/*
+Install rancher-backup operator
+  - @param k kubectl structure
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallBackupOperator(k *kubectl.Kubectl) {
+	// Default chart
+	chartRepo := "rancher-chart"
+
+	// Set specific operator version if defined
+	if backupRestoreVersion != "" {
+		chartRepo = "https://github.com/rancher/backup-restore-operator/releases/download/" + backupRestoreVersion
+	} else {
+		RunHelmCmdWithRetry("repo", "add", chartRepo, "https://charts.rancher.io")
+		RunHelmCmdWithRetry("repo", "update")
+	}
+
+	for _, chart := range []string{"rancher-backup-crd", "rancher-backup"} {
+		// Set the filename in chart if a custom version is defined
+		chartName := chart
+		if backupRestoreVersion != "" {
+			chartName = chart + "-" + strings.Trim(backupRestoreVersion, "v") + ".tgz"
+		}
+
+		// Global installation flags
+		flags := []string{
+			"upgrade", "--install", chart, chartRepo + "/" + chartName,
+			"--namespace", "cattle-resources-system",
+			"--create-namespace",
+			"--wait", "--wait-for-jobs",
+		}
+
+		// Add specific options for the rancher-backup chart
+		if chart == "rancher-backup" {
+			flags = append(flags,
+				"--set", "persistence.enabled=true",
+				"--set", "persistence.storageClass=local-path",
+			)
+		}
+
+		RunHelmCmdWithRetry(flags...)
+
+		Eventually(func() error {
+			return rancher.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
+		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+	}
+}
+
+/*
+Install CertManager
+  - @param k kubectl structure
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallCertManager(k *kubectl.Kubectl) {
+	RunHelmCmdWithRetry("repo", "add", "jetstack", "https://charts.jetstack.io")
+	RunHelmCmdWithRetry("repo", "update")
+
+	// Set flags for cert-manager installation
+	flags := []string{
+		"upgrade", "--install", "cert-manager", "jetstack/cert-manager",
+		"--namespace", "cert-manager",
+		"--create-namespace",
+		"--set", "installCRDs=true",
+		"--wait", "--wait-for-jobs",
+	}
+
+	if clusterType == "hardened" {
+		flags = append(flags, "--version", certManagerVersion)
+	}
+
+	RunHelmCmdWithRetry(flags...)
+
+	checkList := [][]string{
+		{"cert-manager", "app.kubernetes.io/component=controller"},
+		{"cert-manager", "app.kubernetes.io/component=webhook"},
+		{"cert-manager", "app.kubernetes.io/component=cainjector"},
+	}
+	Eventually(func() error {
+		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+}
+
+/*
+Install Elemental operator
+  - @param k kubectl structure
+  - @param order Order of the chart installation, mainly useful for older versions
+  - @param repo Chart repository to use
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string) {
+	for _, chart := range order {
+		// Set flags for installation
+		flags := []string{"upgrade", "--install", chart,
+			repo + "/" + chart + "-chart",
+			"--namespace", "cattle-elemental-system",
+			"--create-namespace",
+			"--wait", "--wait-for-jobs",
+		}
+
+		// TODO: maybe adding a dedicated variable for operator version instead?
+		// of using os2Test (this one should be kept for the OS image version)
+		// Variable operator_repo exists but does not exactly reflect operator's version
+		if strings.Contains(repo, "dev") {
+			flags = append(flags, "--devel")
+		}
+
+		RunHelmCmdWithRetry(flags...)
+	}
+
+	// Wait for pod to be started
+	Eventually(func() error {
+		return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+}
+
+/*
+Install local storage
+  - @param k kubectl structure
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallLocalStorage(k *kubectl.Kubectl) {
+	localPathNS := "kube-system"
+	kubectl.Apply(localPathNS, localStorageYaml)
+
+	// Wait for all pods to be started
+	checkList := [][]string{
+		{localPathNS, "app=local-path-provisioner"},
+	}
+	Eventually(func() error {
+		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
+}
+
+/*
+Install K3s
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallK3s() {
+	// Get K3s installation script
+	fileName := "k3s-install.sh"
+	Eventually(func() error {
+		return tools.GetFileFromURL("https://get.k3s.io", fileName, true)
+	}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
+
+	// Set command and arguments
+	installCmd := exec.Command("sh", fileName)
+	installCmd.Env = append(os.Environ(), "INSTALL_K3S_EXEC=--disable metrics-server")
+
+	// Retry in case of (sporadic) failure...
+	count := 1
+	Eventually(func() error {
+		// Execute K3s installation
+		out, err := installCmd.CombinedOutput()
+		GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
+		count++
+		return err
+	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+}
+
+/*
+Install Rancher Manager
+  - @param k kubectl structure
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallRancher(k *kubectl.Kubectl) {
+	err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
+	Expect(err).To(Not(HaveOccurred()))
+
+	checkList := [][]string{
+		{"cattle-system", "app=rancher"},
+		{"cattle-system", "app=rancher-webhook"},
+		{"cattle-fleet-local-system", "app=fleet-agent"},
+		{"cattle-provisioning-capi-system", "control-plane=controller-manager"},
+	}
+	Eventually(func() error {
+		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(BeNil())
+}
+
+/*
+Install RKE2
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func InstallRKE2() {
+	// Get RKE2 installation script
+	fileName := "rke2-install.sh"
+	Eventually(func() error {
+		return tools.GetFileFromURL("https://get.rke2.io", fileName, true)
+	}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
+
+	// Retry in case of (sporadic) failure...
+	count := 1
+	Eventually(func() error {
+		// Execute RKE2 installation
+		out, err := exec.Command("sudo", "--preserve-env=INSTALL_RKE2_VERSION", "sh", fileName).CombinedOutput()
+		GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
+		count++
+		return err
+	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+}
+
+/*
+Execute RunHelmBinaryWithCustomErr within a loop with timeout
+  - @param s options to pass to RunHelmBinaryWithCustomErr command
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func RunHelmCmdWithRetry(s ...string) {
+	Eventually(func() error {
+		return kubectl.RunHelmBinaryWithCustomErr(s...)
+	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
+}
+
+/*
+Execute SSH command with retry
+  - @param cl Client (node) informations
+  - @param cmd Command to execute
+  - @returns result of the executed command
+*/
+func RunSSHWithRetry(cl *tools.Client, cmd string) string {
+	var err error
+	var out string
+
+	Eventually(func() error {
+		out, err = cl.RunSSH(cmd)
+		return err
+	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
+
+	return out
+}
+
+/*
+Start K3s
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func StartK3s() {
+	err := exec.Command("sudo", "systemctl", "start", "k3s").Run()
+	Expect(err).To(Not(HaveOccurred()))
+}
+
+/*
+Start RKE2
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func StartRKE2() {
+	// Copy config file, this allows custom configuration for RKE2 installation
+	// NOTE: CopyFile cannot be used, as we need root permissions for this file
+	err := exec.Command("sudo", "mkdir", "-p", "/etc/rancher/rke2").Run()
+	Expect(err).To(Not(HaveOccurred()))
+	err = exec.Command("sudo", "cp", configRKE2Yaml, "/etc/rancher/rke2/config.yaml").Run()
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Activate and start RKE2
+	err = exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
+	Expect(err).To(Not(HaveOccurred()))
+
+	err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
+	Expect(err).To(Not(HaveOccurred()))
+}
+
 /*
 Wait for cluster to be in a stable state
   - @param ns Namespace where the cluster is deployed
@@ -225,49 +664,51 @@ func WaitCluster(ns, cn string) {
 }
 
 /*
-Check that Cluster resource has been correctly created
-  - @param ns Namespace where the cluster is deployed
-  - @param cn Cluster resource name
+Wait for K3s to start
+  - @param k kubectl structure
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
-func CheckCreatedCluster(ns, cn string) {
-	// Check that the cluster is correctly created
-	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
-			"--namespace", ns,
-			cn, "-o", "jsonpath={.metadata.name}")
-		return out
-	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(Equal(cn))
+func WaitForK3s(k *kubectl.Kubectl) {
+	// Delay before checking
+	// TODO: create and use a function that checks the real Status
+	//       of the pod as well as the Ready field
+	time.Sleep(1 * time.Minute)
+
+	checkList := [][]string{
+		{"kube-system", "app=local-path-provisioner"},
+		{"kube-system", "k8s-app=kube-dns"},
+		{"kube-system", "app.kubernetes.io/name=traefik"},
+		{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
+	}
+	Eventually(func() error {
+		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
 }
 
 /*
-Check that Registration resource has been correctly created
-  - @param ns Namespace where the cluster is deployed
-  - @param rn MachineRegistration resource name
+Wait for RKE2 to start
+  - @param k kubectl structure
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
-func CheckCreatedRegistration(ns, rn string) {
-	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "MachineRegistration",
-			"--namespace", ns,
-			"-o", "jsonpath={.items[*].metadata.name}")
-		return out
-	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(rn))
-}
+func WaitForRKE2(k *kubectl.Kubectl) {
+	err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
+	Expect(err).To(Not(HaveOccurred()))
 
-/*
-Check that a SelectorTemplate resource has been correctly created
-  - @param ns Namespace where the cluster is deployed
-  - @param sn Selector name
-  - @returns Nothing, the function will fail through Ginkgo in case of issue
-*/
-func CheckCreatedSelectorTemplate(ns, sn string) {
-	Eventually(func() string {
-		out, _ := kubectl.RunWithoutErr("get", "MachineInventorySelectorTemplate",
-			"--namespace", ns,
-			"-o", "jsonpath={.items[*].metadata.name}")
-		return out
-	}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring(sn))
+	// Delay before checking
+	// TODO: create and use a function that checks the real Status
+	//       of the pod as well as the Ready field
+	time.Sleep(1 * time.Minute)
+
+	checkList := [][]string{
+		{"kube-system", "k8s-app=kube-dns"},
+		{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
+	}
+	Eventually(func() error {
+		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+
+	err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
+	Expect(err).To(Not(HaveOccurred()))
 }
 
 /*
@@ -282,142 +723,6 @@ func WaitForOSVersion(ns string) {
 			"-o", "jsonpath={.items[*].metadata.name}")
 		return out
 	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(BeEmpty()))
-}
-
-/*
-Check SSH connection
-  - @param cl Client (node) informations
-  - @returns Nothing, the function will fail through Ginkgo in case of issue
-*/
-func CheckSSH(cl *tools.Client) {
-	Eventually(func() string {
-		out, _ := cl.RunSSH("echo SSH_OK")
-		return strings.Trim(out, "\n")
-	}, tools.SetTimeout(10*time.Minute), 5*time.Second).Should(Equal("SSH_OK"))
-}
-
-/*
-Download ISO built with SeedImage
-  - @param ns Namespace where the cluster is deployed
-  - @param seedName Name of the used SeedImage resource
-  - @param filename Path and name of the file where to store the ISO
-  - @returns Nothing, the function will fail through Ginkgo in case of issue
-*/
-func DownloadBuiltISO(ns, seedName, filename string) {
-	// Set minimal ISO file to 250MB
-	const minimalISOSize = 250 * 1024 * 1024
-
-	By("Waiting for image to be generated", func() {
-		// Check that the seed image is correctly created
-		Eventually(func() string {
-			out, _ := kubectl.RunWithoutErr("get", "SeedImage",
-				"--namespace", ns,
-				seedName,
-				"-o", "jsonpath={.status}")
-			return out
-		}, tools.SetTimeout(3*time.Minute), 5*time.Second).Should(ContainSubstring("downloadURL"))
-	})
-
-	By("Downloading image", func() {
-		// Get URL
-		seedImageURL, err := kubectl.RunWithoutErr("get", "SeedImage",
-			"--namespace", ns,
-			seedName,
-			"-o", "jsonpath={.status.downloadURL}")
-		Expect(err).To(Not(HaveOccurred()))
-
-		// ISO file size should be greater than 500MB
-		Eventually(func() int64 {
-			// No need to check download status, file size at the end is enough
-			_ = tools.GetFileFromURL(seedImageURL, filename, false)
-			file, _ := os.Stat(filename)
-			return file.Size()
-		}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(BeNumerically(">", minimalISOSize))
-	})
-
-	// Only supported in Dev version for now, not Stable (1.5.x) and Staging (1.6.4)
-	if strings.Contains(os2Test, "dev") {
-		By("Checking checksum", func() {
-			// Get checksum URL
-			checksumURL, err := kubectl.RunWithoutErr("get", "SeedImage",
-				"--namespace", ns,
-				seedName,
-				"-o", "jsonpath={.status.checksumURL}")
-			Expect(err).To(Not(HaveOccurred()))
-
-			// Download checksum file
-			checksumFile := filename + ".sha256"
-			_ = tools.GetFileFromURL(checksumURL, checksumFile, false)
-
-			// Check the checksum of downloaded image
-			err = exec.Command("bash", "-c", "sed -i 's; .*\\.iso; "+filename+";' "+checksumFile).Run()
-			Expect(err).To(Not(HaveOccurred()))
-			err = exec.Command("sha256sum", "--check", checksumFile).Run()
-			Expect(err).To(Not(HaveOccurred()))
-		})
-	}
-}
-
-/*
-Get Elemental node information
-  - @param hn Node hostname
-  - @returns Client structure and MAC address
-*/
-func GetNodeInfo(hn string) (*tools.Client, string) {
-	// Get network data
-	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
-	Expect(err).To(Not(HaveOccurred()))
-
-	// Set 'client' to be able to access the node through SSH
-	c := &tools.Client{
-		Host:     string(data.IP) + ":22",
-		Username: userName,
-		Password: userPassword,
-	}
-
-	return c, data.Mac
-}
-
-/*
-Get Elemental node IP address
-  - @param hn Node hostname
-  - @returns IP address
-*/
-func GetNodeIP(hn string) string {
-	// Get network data
-	data, err := rancher.GetHostNetConfig(".*name=\""+hn+"\".*", netDefaultFileName)
-	Expect(err).To(Not(HaveOccurred()))
-
-	return data.IP
-}
-
-/*
-Execute RunHelmBinaryWithCustomErr within a loop with timeout
-  - @param s options to pass to RunHelmBinaryWithCustomErr command
-  - @returns Nothing, the function will fail through Ginkgo in case of issue
-*/
-func RunHelmCmdWithRetry(s ...string) {
-	Eventually(func() error {
-		return kubectl.RunHelmBinaryWithCustomErr(s...)
-	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
-}
-
-/*
-Execute SSH command with retry
-  - @param cl Client (node) informations
-  - @param cmd Command to execute
-  - @returns result of the executed command
-*/
-func RunSSHWithRetry(cl *tools.Client, cmd string) string {
-	var err error
-	var out string
-
-	Eventually(func() error {
-		out, err = cl.RunSSH(cmd)
-		return err
-	}, tools.SetTimeout(2*time.Minute), 20*time.Second).Should(Not(HaveOccurred()))
-
-	return out
 }
 
 func FailWithReport(message string, callerSkip ...int) {

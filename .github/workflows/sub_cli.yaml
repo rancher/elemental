@@ -32,6 +32,9 @@ on:
       force_downgrade:
         required: true
         type: boolean
+      full_backup_restore:
+        required: true
+        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -350,10 +353,25 @@ jobs:
         run: |
           cd tests && make e2e-upgrade-node && make e2e-check-app
 
-      - name: Test Backup/Restore Elemental resources with Rancher Manager
+      - name: Test Backup/Restore Rancher Manager/Elemental resources
         id: test_backup_restore
+        env:
+          CA_TYPE: ${{ inputs.ca_type }}
+          OPERATOR_REPO: ${{ inputs.operator_repo }}
+          PUBLIC_FQDN: ${{ inputs.public_fqdn }}
+          PUBLIC_DOMAIN: ${{ inputs.public_domain }}
         run: |
-          cd tests && make e2e-backup-restore && make e2e-check-app
+          cd tests
+
+          # Run simple or full backup/restore test
+          if ${{ inputs.full_backup_restore == true }}; then
+            make e2e-full-backup-restore
+          else
+            make e2e-simple-backup-restore
+          fi
+
+          # Check the installed application
+          make e2e-check-app
 
       - name: Extract ISO version
         id: iso_version
@@ -426,8 +444,8 @@ jobs:
         env:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
-        if: ${{ inputs.destroy_runner == true }}
-        run: cd tests && make e2e-uninstall-operator
+        if: ${{ inputs.destroy_runner == true && inputs.full_backup_restore == false }}
+        run: cd tests && make e2e-uninstall-operator && make e2e-check-app
 
       # This step must be called in each worklow that wants a summary!
       - name: Get logs and add summary
