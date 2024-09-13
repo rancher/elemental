@@ -45,6 +45,10 @@ on:
         description: Force OS downgrade
         default: false
         type: boolean
+      full_backup_restore:
+         description: Test migration-like backup/restore functionality
+         default: false
+         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
         type: string
@@ -228,6 +232,7 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       force_downgrade: ${{ inputs.force_downgrade }}
+      full_backup_restore: ${{ inputs.full_backup_restore }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}

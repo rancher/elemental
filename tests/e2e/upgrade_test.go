@@ -78,27 +78,7 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 			upgradeOrder = []string{"elemental-operator", "elemental-operator-crds"}
 		}
 
-		for _, chart := range upgradeOrder {
-			// Set flags for installation
-			flags := []string{"upgrade", "--install", chart,
-				operatorUpgrade + "/" + chart + "-chart",
-				"--namespace", "cattle-elemental-system",
-				"--create-namespace",
-				"--wait", "--wait-for-jobs",
-			}
-
-			// TODO: maybe adding a dedicated variable for operator version instead?
-			if strings.Contains(operatorUpgrade, "dev") {
-				flags = append(flags, "--devel")
-			}
-
-			RunHelmCmdWithRetry(flags...)
-		}
-
-		// Wait for all pods to be started
-		Eventually(func() error {
-			return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+		InstallElementalOperator(k, upgradeOrder, operatorUpgrade)
 	})
 })
 

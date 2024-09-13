@@ -41,6 +41,9 @@ on:
       force_downgrade:
         required: true
         type: boolean
+      full_backup_restore:
+        required: true
+        type: boolean
       k8s_downstream_version:
         required: true
         type: string
@@ -171,6 +174,7 @@ jobs:
       cluster_type: ${{ inputs.cluster_type }}
       destroy_runner: ${{ inputs.destroy_runner }}
       force_downgrade: ${{ inputs.force_downgrade }}
+      full_backup_restore: ${{ inputs.full_backup_restore }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
       operator_repo: ${{ inputs.operator_repo }}
