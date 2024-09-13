@@ -1,0 +1,14 @@
+<services>
+  <service name="kiwi_metainfo_helper" mode="buildtime"/>
+  <service name="docker_label_helper" mode="buildtime"/>
+  <service name="replace_using_env" mode="buildtime">
+    <param name="file">Dockerfile</param>
+    <param name="eval">SLMICRO_VERSION=$(rpm --macros=/root/.rpmmacros -E %slmicro_version)</param>
+    <param name="var">SLMICRO_VERSION</param>
+  </service>
+  <service name="replace_using_env" mode="buildtime">
+    <param name="file">Dockerfile</param>
+    <param name="eval">IMG_REPO=$(rpm --macros=/root/.rpmmacros -E %img_repo)</param>
+    <param name="var">IMG_REPO</param>
+  </service>
+</services>
