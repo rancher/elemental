@@ -93,6 +93,7 @@
       -  **By:** Configuring hardened cluster
       -  **By:** Starting RKE2
       -  **By:** Waiting for RKE2 to be started
+      -  **By:** Installing local-path-provisionner
       -  **By:** Installing K3s
       -  **By:** Configuring hardened cluster
       -  **By:** Starting K3s
