@@ -52,6 +52,7 @@ docker run -v $PWD:/workdir -w /workdir               \
     -e QASE_REPORT=$QASE_REPORT                       \
     -e QASE_RUN_ID=$QASE_RUN_ID                       \
     -e RANCHER_CHANNEL=$RANCHER_CHANNEL               \
+    -e RANCHER_GIT_CHART=$RANCHER_GIT_CHART           \
     -e RANCHER_VERSION=$RANCHER_VERSION               \
     -e RANCHER_PASSWORD=$RANCHER_PASSWORD             \
     -e RANCHER_URL=$RANCHER_URL                       \

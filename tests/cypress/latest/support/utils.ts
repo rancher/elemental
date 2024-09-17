@@ -10,6 +10,11 @@ export const isCypressTag = (tag: string) => {
   return (new RegExp(tag)).test(Cypress.env("cypress_tags"));
 }
 
+// Check the Git repo to pull charts from
+export const isGitRepo = (repo: string) => {
+  return (new RegExp(repo)).test(Cypress.env("rancher_git_chart"));
+}
+
 // Check the K8s version
 export const isK8sVersion = (version: string) => {
   version = version.toLowerCase();

@@ -170,15 +170,7 @@ Cypress.Commands.add('createMachReg', (
       'type: btrfs', 'reset:', 'reboot: true', 'reset-oem: true', 'reset-persistent: true'
     ];
 
-    if (utils.isUIVersion('dev')) {
-      cloudConfigChecks.forEach(text => cy.getBySel(selectors.yamlEditor).should('include.text', text));
-    } else {
-      const stableConfigChecks = [
-        'config:', 'cloud-config:', 'users:', '- name: root', 'passwd: root',
-        'elemental:', 'install:', 'device: /dev/nvme0n1', 'poweroff: true'
-      ];
-      stableConfigChecks.forEach(text => cy.getBySel(selectors.yamlEditor).should('include.text', text));
-    }
+    cloudConfigChecks.forEach(text => cy.getBySel(selectors.yamlEditor).should('include.text', text));
   }
 
   // Check label and annotation in YAML

@@ -80,6 +80,9 @@ on:
       qase_run_id:
         required: true
         type: string
+      rancher_git_chart:
+        required: true
+        type: string
       rancher_upgrade:
         required: true
         type: string
@@ -240,6 +243,7 @@ jobs:
       public_fqdn: ${{ inputs.public_fqdn }}
       qase_project_code: ${{ inputs.qase_project_code }}
       qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_git_chart: ${{ inputs.rancher_git_chart }}
       rancher_version: ${{ inputs.rancher_version }}
       runner_label: ${{ inputs.runner_label }}
       ui_account: ${{ inputs.ui_account }}

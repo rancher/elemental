@@ -62,6 +62,9 @@ on:
       qase_run_id:
         required: true
         type: string
+      rancher_git_chart:
+        required: true
+        type: string
       rancher_version:
         required: true
         type: string
@@ -203,6 +206,7 @@ jobs:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           OS_VERSION_INSTALL: ${{ inputs.os_version_install }}
           RANCHER_CHANNEL: ${{ inputs.rancher_version }}
+          RANCHER_GIT_CHART: ${{ inputs.rancher_git_chart }}
           RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}
           RANCHER_PASSWORD: rancherpassword
           RANCHER_URL: https://${{ inputs.public_fqdn }}/dashboard
