@@ -79,6 +79,10 @@ on:
         description: Case run ID where the results will be reported
         default: auto
         type: string
+      rancher_git_chart:
+        description: Point to github or rancher git for chart installation
+        default: rancher
+        type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
         type: string
@@ -236,6 +240,7 @@ jobs:
       public_fqdn: ${{ needs.create-runner.outputs.public_fqdn }}
       qase_project_code: ELEMENTAL
       qase_run_id: ${{ needs.pre-qase.outputs.qase_run_id }}
+      rancher_git_chart: ${{ inputs.rancher_git_chart }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
       reset: ${{ inputs.reset }}

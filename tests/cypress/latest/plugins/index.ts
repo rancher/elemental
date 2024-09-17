@@ -43,6 +43,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.password = process.env.RANCHER_PASSWORD;
   config.env.proxy_ip = process.env.PROXY_IP;
   config.env.proxy = process.env.PROXY;
+  config.env.rancher_git_chart = process.env.RANCHER_GIT_CHART;
   config.env.rancher_channel = process.env.RANCHER_CHANNEL;
   config.env.rancher_version = process.env.RANCHER_VERSION;
   config.env.stable_os_version = process.env.STABLE_OS_VERSION;

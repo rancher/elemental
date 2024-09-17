@@ -32,12 +32,12 @@ on:
       os_version_install:
         description: OS version to install
         type: string
-      proxy:
-        description: Deploy a proxy (none/rancher/elemental)
-        default: elemental
-        type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
+        type: string
+      rancher_git_chart:
+        description: Point to github or rancher git for chart installation
+        default: rancher
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
@@ -61,7 +61,8 @@ jobs:
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       operator_repo: ${{ inputs.operator_repo }}
       os_version_install: ${{ inputs.os_version_install }}
-      proxy: ${{ inputs.proxy }}
+      proxy: elemental
       qase_run_id: ${{ inputs.qase_run_id }}
+      rancher_git_chart: ${{ inputs.rancher_git_chart }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui

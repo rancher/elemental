@@ -16,7 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { isCypressTag, isOperatorVersion, isRancherManagerVersion } from '~/support/utils';
+import { isCypressTag, isGitRepo, isOperatorVersion, isRancherManagerVersion } from '~/support/utils';
 import { Elemental } from '~/support/elemental';
 
 filterTests(['main', 'upgrade'], () => {
@@ -26,11 +26,17 @@ filterTests(['main', 'upgrade'], () => {
     const chartmuseumRepo = Cypress.env('chartmuseum_repo') + ':8080';
 
     beforeEach(() => {
+      cy.viewport(1920, 1080);
       cy.login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();
     });
 
+    if (isOperatorVersion('marketplace') && isGitRepo('github')) {
+      it('Configure from which git repo charts are pulled from', () => {
+        cypressLib.addRepository('rancher-dev', 'https://github.com/rancher/charts.git', 'git', isRancherManagerVersion('2.9') ? 'dev-v2.9' : 'dev-v2.8');
+      });
+    }
     // Add dev repo for main test or if the test runs on Rancher 2.7 (because operator is not in the 2.7 marketplace)
     if ((!isOperatorVersion('marketplace') && isCypressTag('main')) || isRancherManagerVersion('2.7')) {
       it('Add local chartmuseum repo', () => {

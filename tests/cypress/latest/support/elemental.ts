@@ -10,7 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { isCypressTag, isOperatorVersion, isRancherPrime } from '~/support/utils';
+import { isCypressTag, isGitRepo, isOperatorVersion, isRancherPrime } from '~/support/utils';
 
 export class Elemental {
   // Go into the cluster creation menu
@@ -58,6 +58,11 @@ export class Elemental {
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
       cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
     } else {
+        // Uncheck Rancher (rancher.io) repo if it's checked
+        if (isGitRepo('github')) {
+          cy.get('#vs1__combobox > .vs__selected-options').click();
+          cy.get('#vs1__option-1 > .checkbox-outer-container > .checkbox-container').click();
+        }
       cy.contains('Elemental', { timeout: 30000 }).click();
     }
 
@@ -71,6 +76,7 @@ export class Elemental {
     cy.contains('.outer-container > .header', 'Elemental');
 
     if (isRancherPrime() && isCypressTag('main')) {
+      cy.contains('Container Registry').click();
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();
       if (isOperatorVersion('staging')) {
