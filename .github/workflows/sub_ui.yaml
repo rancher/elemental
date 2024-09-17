@@ -38,6 +38,9 @@ on:
       operator_repo:
         required: true
         type: string
+      os_to_test:
+        required: true
+        type: string
       os_version_install:
         required: true
         type: string
@@ -175,10 +178,11 @@ jobs:
         if: ${{ inputs.operator_repo != 'marketplace' }}
         env: 
           OPERATOR_REPO: ${{ inputs.operator_repo }}
+          OS_TO_TEST: ${{ inputs.os_to_test }}
         run: |
           cd tests && make e2e-install-chartmuseum
           # Extract latest dev operator version
-          OPERATOR_CHART=$(ls elemental-operator-chart*)
+          OPERATOR_CHART=$(ls elemental-operator-chart* 2>/dev/null)
           i=${OPERATOR_CHART##*-}
           OPERATOR_VERSION=${i%.tgz}
 

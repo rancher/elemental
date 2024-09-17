@@ -85,13 +85,23 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 		// NOTE: the operator cannot be reinstall now because there are still CRDs pending to be removed
 		By("Checking that Elemental operator CRDs cannot be reinstalled", func() {
+			// Set flags for installation
 			chart := "elemental-operator-crds"
-			out, err := kubectl.RunHelmBinaryWithOutput("upgrade", "--install", chart,
-				operatorRepo+"/"+chart+"-chart",
+			flags := []string{"upgrade", "--install", chart,
+				operatorRepo + "/" + chart + "-chart",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 				"--wait", "--wait-for-jobs",
-			)
+			}
+
+			// TODO: maybe adding a dedicated variable for operator version instead
+			// of using os2Test (this one should be kept for the OS image version)
+			// Variable operator_repo extists but does not exactly reflect operator's version
+			if strings.Contains(os2Test, "dev") {
+				flags = append(flags, "--devel")
+			}
+
+			out, err := kubectl.RunHelmBinaryWithOutput(flags...)
 			Expect(err).To(HaveOccurred(), out)
 			Expect(out).To(ContainSubstring("CRDs from previous installations are pending to be removed"))
 		})
@@ -171,12 +181,22 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 
 		By("Installing Operator via Helm", func() {
 			for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-				RunHelmCmdWithRetry("upgrade", "--install", chart,
-					operatorRepo+"/"+chart+"-chart",
+				// Set flags for installation
+				flags := []string{"upgrade", "--install", chart,
+					operatorRepo + "/" + chart + "-chart",
 					"--namespace", "cattle-elemental-system",
 					"--create-namespace",
 					"--wait", "--wait-for-jobs",
-				)
+				}
+
+				// TODO: maybe adding a dedicated variable for operator version instead
+				// of using os2Test (this one should be kept for the OS image version)
+				// Variable operator_repo extists but does not exactly reflect operator's version
+				if strings.Contains(os2Test, "dev") {
+					flags = append(flags, "--devel")
+				}
+
+				RunHelmCmdWithRetry(flags...)
 			}
 
 			// Wait for pod to be started
