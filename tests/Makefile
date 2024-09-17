@@ -80,7 +80,7 @@ e2e-install-backup-restore: deps
 	ginkgo --label-filter install-backup-restore -r -v ./e2e
 
 e2e-install-chartmuseum:
-	sudo ./scripts/deploy-chartmuseum $(OPERATOR_REPO)
+	sudo ./scripts/deploy-chartmuseum $(OPERATOR_REPO) $(OS_TO_TEST)
 
 e2e-install-rancher: deps
 	ginkgo --label-filter install -r -v ./e2e

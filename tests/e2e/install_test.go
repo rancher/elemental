@@ -355,15 +355,22 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 				testCaseID = 62
 
 				for _, chart := range []string{"elemental-operator-crds", "elemental-operator"} {
-					RunHelmCmdWithRetry("upgrade", "--install", chart,
-						operatorRepo+"/"+chart+"-chart",
+					// Set flags for installation
+					flags := []string{"upgrade", "--install", chart,
+						operatorRepo + "/" + chart + "-chart",
 						"--namespace", "cattle-elemental-system",
 						"--create-namespace",
 						"--wait", "--wait-for-jobs",
-					)
+					}
 
-					// Delay few seconds for all to be installed
-					time.Sleep(tools.SetTimeout(20 * time.Second))
+					// TODO: maybe adding a dedicated variable for operator version instead
+					// of using os2Test (this one should be kept for the OS image version)
+					// Variable operator_repo extists but does not exactly reflect operator's version
+					if strings.Contains(os2Test, "dev") {
+						flags = append(flags, "--devel")
+					}
+
+					RunHelmCmdWithRetry(flags...)
 				}
 
 				// Wait for pod to be started
