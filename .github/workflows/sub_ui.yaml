@@ -373,6 +373,7 @@ jobs:
           rancher_image_version: ${{ steps.component.outputs.rancher_image_version }}
           rancher_version: ${{ inputs.rancher_version }}
           sequential: ${{ inputs.sequential }}
+          steps_status: ${{ join(steps.*.conclusion, ' ') }}
           test_type: ${{ inputs.test_type }}
           ui_account: ${{ inputs.ui_account }}
           upgrade_image: ${{ inputs.upgrade_image }}
