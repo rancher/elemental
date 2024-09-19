@@ -79,16 +79,20 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		}
 
 		for _, chart := range upgradeOrder {
-			RunHelmCmdWithRetry(
-				"upgrade", "--install", chart,
-				operatorUpgrade+"/"+chart+"-chart",
+			// Set flags for installation
+			flags := []string{"upgrade", "--install", chart,
+				operatorUpgrade + "/" + chart + "-chart",
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 				"--wait", "--wait-for-jobs",
-			)
+			}
 
-			// Delay few seconds for all to be installed
-			time.Sleep(tools.SetTimeout(20 * time.Second))
+			// TODO: maybe adding a dedicated variable for operator version instead?
+			if strings.Contains(operatorUpgrade, "dev") {
+				flags = append(flags, "--devel")
+			}
+
+			RunHelmCmdWithRetry(flags...)
 		}
 
 		// Wait for all pods to be started
@@ -226,7 +230,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 				// In case of sync failure OSVersion can be empty,
 				// so try to force the sync before aborting
 				if string(OSVersion) == "" {
-					const channel = "elemental-channel"
+					const channel = "unstable-testing-channel"
 
 					// Log the workaround, could be useful
 					GinkgoWriter.Printf("!! ManagedOSVersionChannel not synced !! Triggering a re-sync!\n")
