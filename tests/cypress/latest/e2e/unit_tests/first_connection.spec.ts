@@ -24,5 +24,15 @@ filterTests(['main', 'upgrade'], () => {
         cypressLib.firstLogin();
       })
     );
+    // We need to enable prerelease versions to install the elemental dev operator
+    it('Enable Helm Chart Prerelease versions', () => {
+      cy.login();
+      cy.visit('/');
+      cy.getBySel('nav_header_showUserMenu').click();
+      cy.getBySel('user-menu-dropdown').contains('Preferences').click();
+      cy.clickButton('Include Prerelease Versions');
+      cypressLib.burgerMenuToggle();
+      cy.getBySel('side-menu').contains('Home').click();
+    });
   })
 });
