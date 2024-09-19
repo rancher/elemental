@@ -18,6 +18,7 @@
 ## `elemental_operator.spec.ts`
 
 - **Describe:** Install Elemental Operator
+    - **It:** Configure from which git repo charts are pulled from
     - **It:** Add local chartmuseum repo
     - **It:** Install latest dev Elemental operator
     - **It:** Install latest stable Elemental operator
@@ -34,6 +35,7 @@
 
 - **Describe:** First login on Rancher
     - **It:** Log in and accept terms and conditions
+    - **It:** Enable Helm Chart Prerelease versions
 
 ## `machine_inventory.spec.ts`
 
