@@ -363,9 +363,9 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 						"--wait", "--wait-for-jobs",
 					}
 
-					// TODO: maybe adding a dedicated variable for operator version instead
+					// TODO: maybe adding a dedicated variable for operator version instead?
 					// of using os2Test (this one should be kept for the OS image version)
-					// Variable operator_repo extists but does not exactly reflect operator's version
+					// Variable operator_repo exists but does not exactly reflect operator's version
 					if strings.Contains(os2Test, "dev") {
 						flags = append(flags, "--devel")
 					}

@@ -279,17 +279,25 @@ jobs:
         env:
           OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
         run: |
-          cd tests && make e2e-upgrade-operator && make e2e-check-app
+          cd tests
 
-          # Extract elemental-operator version
-          OPERATOR_VERSION=$(kubectl get pod \
-                             --namespace cattle-elemental-system \
-                             -l app=elemental-operator \
-                             -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          if make e2e-upgrade-operator; then
+            # Extract elemental-operator version
+            OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
 
-          # Export values
-          echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
-          echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+            # Export values
+            echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
+            echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+
+            # Check application
+            make e2e-check-app
+          else
+            # Needed to be sure that Github Action will see the failure
+            false
+          fi
 
       - name: Upgrade Rancher Manager
         id: rancher_upgrade
@@ -300,16 +308,24 @@ jobs:
           PUBLIC_DOMAIN: ${{ inputs.public_domain }}
           RANCHER_UPGRADE: ${{ inputs.rancher_upgrade }}
         run: |
-          cd tests && make e2e-upgrade-rancher-manager && make e2e-check-app
+          cd tests
 
-          # Extract Rancher Manager version
-          RANCHER_VERSION=$(kubectl get pod \
-                              --namespace cattle-system \
-                              -l app=rancher \
-                              -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+          if make e2e-upgrade-rancher-manager; then
+            # Extract Rancher Manager version
+            RANCHER_VERSION=$(kubectl get pod \
+                                --namespace cattle-system \
+                                -l app=rancher \
+                                -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
 
-          # Export values
-          echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+            # Export values
+            echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+            # Check application
+            make e2e-check-app
+          else
+            # Needed to be sure that Github Action will see the failure
+            false
+          fi
 
       - name: Upgrade node 1 to specified OS version with osImage
         id: upgrade_node_1
