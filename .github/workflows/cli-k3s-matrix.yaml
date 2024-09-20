@@ -18,11 +18,11 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: '"v1.27.13+k3s1"'
+        default: '"v1.30.4+k3s1"'
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: '"v1.27.13+k3s1"'
+        default: '"v1.30.4+k3s1"'
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
@@ -47,23 +47,23 @@ jobs:
       matrix:
         ca_type: ${{ fromJSON(format('[{0}]', inputs.ca_type || '"selfsigned","private"')) }}
         cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '""')) }}
-        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.13+k3s1"')) }}
-        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.13+k3s1"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.30.4+k3s1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.30.4+k3s1"')) }}
         rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","latest/devel/2.8","latest/devel/2.9"')) }}
         reset: ${{ fromJSON(format('[{0}]', inputs.reset || 'false')) }}
         sequential: [ false ]
         include:
           - ca_type: selfsigned
             cluster_type: ""
-            k8s_downstream_version: v1.27.13+k3s1
-            k8s_upstream_version: v1.27.13+k3s1
+            k8s_downstream_version: v1.30.4+k3s1
+            k8s_upstream_version: v1.30.4+k3s1
             rancher_version: stable/latest
             reset: true
             sequential: true
           - ca_type: private
             cluster_type: hardened
-            k8s_downstream_version: v1.27.13+k3s1
-            k8s_upstream_version: v1.27.13+k3s1
+            k8s_downstream_version: v1.30.4+k3s1
+            k8s_upstream_version: v1.30.4+k3s1
             rancher_version: stable/latest
             reset: true
             sequential: false
