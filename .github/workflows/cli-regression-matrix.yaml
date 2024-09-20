@@ -14,7 +14,7 @@ on:
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: '"v1.28.11+k3s2"'
+        default: '"v1.30.4+k3s1"'
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
@@ -29,8 +29,8 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.25.16+k3s4","v1.26.15+k3s1","v1.27.14+k3s1","v1.28.10+k3s1","v1.25.16+rke2r1","v1.26.15+rke2r1","v1.27.14+rke2r1","v1.28.10+rke2r1"')) }}
-        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.28.11+k3s2"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.16+k3s1","v1.28.13+k3s1","v1.29.8+k3s1","v1.30.4+k3s1","v1.27.16+rke2r2","v1.28.13+rke2r1","v1.29.8+rke2r1","v1.30.4+rke2r1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.30.4+k3s1"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
