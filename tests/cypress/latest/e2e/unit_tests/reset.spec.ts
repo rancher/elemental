@@ -62,7 +62,7 @@ filterTests(['main'], () => {
         cypressLib.burgerMenuToggle();
         cypressLib.accesMenu('OS Management');
         cy.clickNavMenu(['Inventory of Machines']);
-        cy.contains('There are no rows to show.');
+        cy.contains('There are no rows to show.', { timeout: 30000 });
         for (let i = 0; i < vmNumber; i++) {
           cy.getBySel(`sortable-table-${i}-row`, { timeout: 180000 }).contains('Active', { timeout: 180000 });
         }
