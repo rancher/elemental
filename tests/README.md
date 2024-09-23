@@ -156,10 +156,28 @@
 
 - **Describe:** E2E - Install Backup/Restore Operator
     - **It:** Install Backup/Restore Operator
-      -  **By:** Configuring Chart repository
       -  **By:** Installing rancher-backup-operator
-      -  **By:** Waiting for rancher-backup-operator pod
-- **Describe:** E2E - Test Backup/Restore
+- **Describe:** E2E - Test full Backup/Restore
+    - **It:** Do a full backup/restore test
+      -  **By:** Adding a backup resource
+      -  **By:** Checking that the backup has been done
+      -  **By:** Copying the backup file
+      -  **By:** Uninstalling K8s
+      -  **By:** Installing RKE2
+      -  **By:** Starting RKE2
+      -  **By:** Waiting for RKE2 to be started
+      -  **By:** Installing local-path-provisionner
+      -  **By:** Installing K3s
+      -  **By:** Starting K3s
+      -  **By:** Waiting for K3s to be started
+      -  **By:** Installing rancher-backup-operator
+      -  **By:** Copying backup file to restore
+      -  **By:** Adding a restore resource
+      -  **By:** Checking that the restore has been done
+      -  **By:** Installing CertManager
+      -  **By:** Installing Rancher Manager
+      -  **By:** Checking cluster state after restore
+- **Describe:** E2E - Test simple Backup/Restore
     - **It:** Do a backup
       -  **By:** Adding a backup resource
       -  **By:** Checking that the backup has been done
