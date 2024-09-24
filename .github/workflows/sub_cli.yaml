@@ -44,6 +44,9 @@ on:
       node_number:
         required: true
         type: string
+      operator_install_type:
+        required: true
+        type: string
       operator_repo:
         required: true
         type: string
@@ -133,6 +136,7 @@ jobs:
       K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
       # For K8s cluster to provision with Rancher Manager
       K8S_DOWNSTREAM_VERSION: ${{ inputs.k8s_downstream_version }}
+      OPERATOR_INSTALL_TYPE: ${{ inputs.operator_install_type }}
       OS_TO_TEST: ${{ inputs.os_to_test }}
       # For Rancher Manager
       RANCHER_VERSION: ${{ inputs.rancher_version }}

@@ -129,7 +129,11 @@ Cypress.Commands.add('createMachReg', (
       } else if (utils.isOperatorVersion('marketplace')) {
         cy.contains(Cypress.env('os_version_install')).click();
       } else {
-        cy.contains(new RegExp(`ISO.*${Cypress.env('stable_os_version')}`)).click();
+          if (utils.isBootType('raw')) {
+            cy.contains(new RegExp(`OS.*${Cypress.env('container_stable_os_version')}`)).click();
+          } else {
+            cy.contains(new RegExp(`ISO.*${Cypress.env('iso_stable_os_version')}`)).click();
+          }
       }
     } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
       cy.contains(Cypress.env('os_version_install')).click();

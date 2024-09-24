@@ -74,8 +74,9 @@ var (
 	netDefaultFileName        string
 	numberOfClusters          int
 	numberOfVMs               int
-	operatorUpgrade           string
+	operatorInstallType       string
 	operatorRepo              string
+	operatorUpgrade           string
 	os2Test                   string
 	poolType                  string
 	proxy                     string
@@ -757,8 +758,9 @@ var _ = BeforeSuite(func() {
 	k8sUpstreamVersion = os.Getenv("K8S_UPSTREAM_VERSION")
 	number := os.Getenv("VM_NUMBERS")
 	clusterNumber := os.Getenv("CLUSTER_NUMBER")
-	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
+	operatorInstallType = os.Getenv("OPERATOR_INSTALL_TYPE")
 	operatorRepo = os.Getenv("OPERATOR_REPO")
+	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
 	os2Test = os.Getenv("OS_TO_TEST")
 	poolType = os.Getenv("POOL")
 	proxy = os.Getenv("PROXY")
