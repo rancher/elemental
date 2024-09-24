@@ -16,7 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
-import { isCypressTag, isGitRepo, isOperatorVersion, isRancherManagerVersion } from '~/support/utils';
+import { isCypressTag, isGitRepo, isOperatorInstallType, isOperatorVersion, isRancherManagerVersion } from '~/support/utils';
 import { Elemental } from '~/support/elemental';
 
 filterTests(['main', 'upgrade'], () => {
@@ -47,7 +47,7 @@ filterTests(['main', 'upgrade'], () => {
         it('Install latest dev Elemental operator', () => {
           elemental.installElementalOperator(upgradeFromVersion);
       }));
-    } else if (!isRancherManagerVersion('2.7')) {
+    } else if (!isRancherManagerVersion('2.7') && !isOperatorInstallType('cli')) {
       qase(57,
         it('Install latest stable Elemental operator', () => {
           elemental.installElementalOperator(upgradeFromVersion);

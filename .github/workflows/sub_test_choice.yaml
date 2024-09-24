@@ -53,6 +53,9 @@ on:
       node_number:
         required: true
         type: string
+      operator_install_type:
+        required: true
+        type: string
       operator_repo:
         required: true
         type: string
@@ -177,6 +180,7 @@ jobs:
       full_backup_restore: ${{ inputs.full_backup_restore }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       node_number: ${{ inputs.node_number }}
+      operator_install_type: ${{ inputs.operator_install_type }}
       operator_repo: ${{ inputs.operator_repo }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
       os_to_test: ${{ inputs.os_to_test }}
@@ -211,6 +215,7 @@ jobs:
       cluster_number: ${{ inputs.cluster_number }}
       cluster_type: ${{ inputs.cluster_type }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      operator_install_type: ${{ inputs.operator_install_type }}
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}
       public_domain: ${{ inputs.public_domain }}
@@ -238,6 +243,7 @@ jobs:
       cypress_tags: ${{ inputs.cypress_tags }}
       elemental_ui_version: ${{ inputs.elemental_ui_version }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
+      operator_install_type: ${{ inputs.operator_install_type }}
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}
       os_version_install: ${{ inputs.os_version_install }}

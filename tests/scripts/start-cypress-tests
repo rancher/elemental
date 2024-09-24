@@ -30,41 +30,48 @@ which yq >/dev/null 2>&1
 OS_IMAGE=$(helm template oci://registry.suse.com/rancher/elemental-operator-chart \
   | yq 'select(.kind=="ManagedOSVersionChannel") .spec.options.image')
 
-STABLE_OS_VERSION=$(docker run --entrypoint busybox ${OS_IMAGE} cat channel.json \
-  | jq -r '.[].spec.version' \
+ISO_STABLE_OS_VERSION=$(docker run --entrypoint busybox ${OS_IMAGE} cat channel.json \
+  | jq -r '.[].spec |select(.type=="iso").version' \
+  | sort -V \
+  | tail -1)
+
+CONTAINER_STABLE_OS_VERSION=$(docker run --entrypoint busybox ${OS_IMAGE} cat channel.json \
+  | jq -r '.[].spec |select(.type=="container").version' \
   | sort -V \
   | tail -1)
 
 # Start Cypress tests with docker
-docker run -v $PWD:/workdir -w /workdir               \
-    -e BOOT_TYPE=$BOOT_TYPE                           \
-    -e CYPRESS_TAGS=$CYPRESS_TAGS                     \
-    -e ELEMENTAL_DEV_VERSION=$ELEMENTAL_DEV_VERSION   \
-    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION     \
-    -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO             \
-    -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION     \
-    -e K8S_DOWNSTREAM_VERSION=$K8S_DOWNSTREAM_VERSION \
-    -e OPERATOR_REPO=$OPERATOR_REPO                   \
-    -e OS_VERSION_INSTALL=$OS_VERSION_INSTALL         \
-    -e OS_VERSION_TARGET=$OS_VERSION_TARGET           \
-    -e PROXY=$PROXY                                   \
-    -e QASE_API_TOKEN=$QASE_API_TOKEN                 \
-    -e QASE_REPORT=$QASE_REPORT                       \
-    -e QASE_RUN_ID=$QASE_RUN_ID                       \
-    -e RANCHER_CHANNEL=$RANCHER_CHANNEL               \
-    -e RANCHER_GIT_CHART=$RANCHER_GIT_CHART           \
-    -e RANCHER_VERSION=$RANCHER_VERSION               \
-    -e RANCHER_PASSWORD=$RANCHER_PASSWORD             \
-    -e RANCHER_URL=$RANCHER_URL                       \
-    -e RANCHER_USER=$RANCHER_USER                     \
-    -e STABLE_OS_VERSION=$STABLE_OS_VERSION           \
-    -e UI_ACCOUNT=$UI_ACCOUNT                         \
-    -e UPGRADE_FROM_VERSION=$UPGRADE_FROM_VERSION     \
-    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                   \
-    -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL         \
-    --add-host host.docker.internal:host-gateway      \
-    --ipc=host                                        \
-    $CYPRESS_DOCKER                                   \
+docker run -v $PWD:/workdir -w /workdir                         \
+    -e BOOT_TYPE=$BOOT_TYPE                                     \
+    -e CYPRESS_TAGS=$CYPRESS_TAGS                               \
+    -e ELEMENTAL_DEV_VERSION=$ELEMENTAL_DEV_VERSION             \
+    -e ELEMENTAL_UI_VERSION=$ELEMENTAL_UI_VERSION               \
+    -e CHARTMUSEUM_REPO=$CHARTMUSEUM_REPO                       \
+    -e CONTAINER_STABLE_OS_VERSION=$CONTAINER_STABLE_OS_VERSION \
+    -e K8S_UPSTREAM_VERSION=$K8S_UPSTREAM_VERSION               \
+    -e K8S_DOWNSTREAM_VERSION=$K8S_DOWNSTREAM_VERSION           \
+    -e OPERATOR_INSTALL_TYPE=$OPERATOR_INSTALL_TYPE             \
+    -e OPERATOR_REPO=$OPERATOR_REPO                             \
+    -e OS_VERSION_INSTALL=$OS_VERSION_INSTALL                   \
+    -e OS_VERSION_TARGET=$OS_VERSION_TARGET                     \
+    -e PROXY=$PROXY                                             \
+    -e QASE_API_TOKEN=$QASE_API_TOKEN                           \
+    -e QASE_REPORT=$QASE_REPORT                                 \
+    -e QASE_RUN_ID=$QASE_RUN_ID                                 \
+    -e RANCHER_CHANNEL=$RANCHER_CHANNEL                         \
+    -e RANCHER_GIT_CHART=$RANCHER_GIT_CHART                     \
+    -e RANCHER_VERSION=$RANCHER_VERSION                         \
+    -e RANCHER_PASSWORD=$RANCHER_PASSWORD                       \
+    -e RANCHER_URL=$RANCHER_URL                                 \
+    -e RANCHER_USER=$RANCHER_USER                               \
+    -e ISO_STABLE_OS_VERSION=$ISO_STABLE_OS_VERSION             \
+    -e UI_ACCOUNT=$UI_ACCOUNT                                   \
+    -e UPGRADE_FROM_VERSION=$UPGRADE_FROM_VERSION               \
+    -e UPGRADE_IMAGE=$UPGRADE_IMAGE                             \
+    -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL                   \
+    --add-host host.docker.internal:host-gateway                \
+    --ipc=host                                                  \
+    $CYPRESS_DOCKER                                             \
     -s $SPEC
 
 [[ -d downloads ]] && sudo chown -R gh-runner:users downloads videos

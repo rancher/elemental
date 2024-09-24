@@ -229,8 +229,8 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 
 	// Deploy operator in CLI test
 	It("Install Elemental Operator if needed", func() {
-		if testType == "cli" || testType == "multi" {
-			By("Installing Operator for CLI tests", func() {
+		if operatorInstallType == "cli" {
+			By("Installing Operator with CLI", func() {
 				// Report to Qase
 				testCaseID = 62
 

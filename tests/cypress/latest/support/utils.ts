@@ -26,6 +26,11 @@ export const isRancherPrime = () => {
   return (new RegExp('prime')).test(Cypress.env("rancher_channel"));
 }
 
+// Check how to install the operator
+export const isOperatorInstallType = (type: string) => {
+  return (new RegExp(type)).test(Cypress.env("operator_install_type"));
+}
+
 // Check the Elemental operator version
 export const isOperatorVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("operator_repo"));
