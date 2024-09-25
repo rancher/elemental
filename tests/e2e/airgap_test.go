@@ -231,9 +231,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			}
-
 			RunHelmCmdWithRetry(flags...)
-			time.Sleep(20 * time.Second)
 
 			// Set flags for Elemental Operator installation
 			elementalChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz").Output()

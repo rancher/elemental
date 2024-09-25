@@ -9,7 +9,7 @@ replace go.qase.io/client => github.com/rancher/qase-go/client v0.0.0-2023111420
 require (
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
-	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20240911133917-d4312809d5eb
+	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20240926104948-8ac88aebed21
 	github.com/rancher-sandbox/qase-ginkgo v1.0.1
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/mod v0.21.0
@@ -22,7 +22,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	github.com/google/pprof v0.0.0-20240910150728-a0b0bb1d4134 // indirect
+	github.com/google/pprof v0.0.0-20240925223930-fa3061bff0bc // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	go.qase.io/client v0.0.0-20231114201952-65195ec001fa // indirect
 	go.uber.org/multierr v1.11.0 // indirect

@@ -138,9 +138,6 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 			return rancher.CheckPod(k, checkList)
 		}, tools.SetTimeout(3*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
-		// A bit dirty be better to wait a little here for all to be correctly started
-		time.Sleep(2 * time.Minute)
-
 		// Check that all pods are using the same version
 		Eventually(func() int {
 			out, _ := kubectl.RunWithoutErr(getImageVersion...)
