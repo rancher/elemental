@@ -243,7 +243,7 @@
       -  **By:** Configuring kubectl to use Rancher admin user
       -  **By:** Workaround for upgrade test, restart Fleet controller and agent
     - **It:** Install Elemental Operator if needed
-      -  **By:** Installing Operator for CLI tests
+      -  **By:** Installing Operator with CLI
 
 ## `logs_test.go`
 
