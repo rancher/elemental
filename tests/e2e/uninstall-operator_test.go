@@ -94,10 +94,8 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				"--wait", "--wait-for-jobs",
 			}
 
-			// TODO: maybe adding a dedicated variable for operator version instead?
-			// of using os2Test (this one should be kept for the OS image version)
-			// Variable operator_repo exists but does not exactly reflect operator's version
-			if strings.Contains(os2Test, "dev") {
+			// Dev and Staging versions need a specific treatment
+			if strings.Contains(os2Test, "dev") || strings.Contains(os2Test, "staging") {
 				flags = append(flags, "--devel")
 			}
 
@@ -195,10 +193,8 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 					"--wait", "--wait-for-jobs",
 				}
 
-				// TODO: maybe adding a dedicated variable for operator version instead?
-				// of using os2Test (this one should be kept for the OS image version)
-				// Variable operator_repo exists but does not exactly reflect operator's version
-				if strings.Contains(os2Test, "dev") {
+				// Dev and Staging versions need a specific treatment
+				if strings.Contains(os2Test, "dev") || strings.Contains(os2Test, "staging") {
 					flags = append(flags, "--devel")
 				}
 
