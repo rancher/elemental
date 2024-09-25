@@ -1,5 +1,5 @@
 # This workflow calls the master E2E workflow with custom variables
-name: CLI-Rancher-Manager-Head-2.7
+name: CLI-Rancher-Manager-Head-2.8
 
 on:
   workflow_dispatch:
@@ -18,26 +18,26 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: '"v1.27.16+k3s1"'
+        default: '"v1.28.13+k3s1"'
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: '"v1.27.16+k3s1"'
+        default: '"v1.28.13+k3s1"'
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
-        default: '"latest/devel/2.7"'
+        default: '"latest/devel/2.8"'
         type: string
       reset:
         description: Allow reset test (mainly used on CLI tests)
         default: false
         type: boolean
   schedule:
-    # Every Saturday at 4pm UTC (11am in us-central1)
-    - cron: '0 16 * * 0'
+    # Every Sunday at 8am UTC (3am in us-central1)
+    - cron: '0 8 * * 0'
 
 jobs:
   cli:
@@ -47,24 +47,24 @@ jobs:
       matrix:
         ca_type: ${{ fromJSON(format('[{0}]', inputs.ca_type || '"selfsigned","private"')) }}
         cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '""')) }}
-        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.27.16+k3s1","v1.27.16+rke2r2"')) }}
-        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.27.16+k3s1","v1.27.16+rke2r2"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.7"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.28.13+k3s1","v1.28.13+rke2r1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.28.13+k3s1","v1.28.13+rke2r1"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.8"')) }}
         reset: ${{ fromJSON(format('[{0}]', inputs.reset || 'false')) }}
         sequential: [ false ]
         include:
           - ca_type: selfsigned
             cluster_type: ""
-            k8s_downstream_version: v1.27.16+k3s1
-            k8s_upstream_version: v1.27.16+k3s1
+            k8s_downstream_version: v1.28.13+k3s1
+            k8s_upstream_version: v1.28.13+k3s1
             rancher_version: latest/devel/2.7
             reset: true
             sequential: true
           - ca_type: private
             cluster_type: hardened
-            k8s_downstream_version: v1.27.16+k3s1
-            k8s_upstream_version: v1.27.16+k3s1
-            rancher_version: latest/devel/2.7
+            k8s_downstream_version: v1.28.13+k3s1
+            k8s_upstream_version: v1.28.13+k3s1
+            rancher_version: latest/devel/2.8
             reset: true
             sequential: false
     uses: ./.github/workflows/master_e2e.yaml
