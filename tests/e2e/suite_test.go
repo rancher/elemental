@@ -386,10 +386,8 @@ func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string) {
 			"--wait", "--wait-for-jobs",
 		}
 
-		// TODO: maybe adding a dedicated variable for operator version instead?
-		// of using os2Test (this one should be kept for the OS image version)
-		// Variable operator_repo exists but does not exactly reflect operator's version
-		if strings.Contains(repo, "dev") {
+		// Dev and Staging versions need a specific treatment
+		if strings.Contains(repo, "/dev/") || strings.Contains(repo, "/staging/") {
 			flags = append(flags, "--devel")
 		}
 

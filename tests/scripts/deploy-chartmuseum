@@ -47,7 +47,7 @@ helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add chartmuseum http://localhost:8080
 
 # Check if we want to use Development version of Elemental
-[[ "${OS2TEST}" =~ dev ]] && DEVEL="--devel"
+[[ "${OS2TEST}" =~ (dev|staging) ]] && DEVEL="--devel"
 
 # Download needed helm charts
 helm pull ${DEVEL} ${REPO}/elemental-operator-crds-chart

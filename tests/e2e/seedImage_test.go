@@ -18,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -42,7 +43,11 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 		testCaseID = 38
 
 		By("Adding SeedImage", func() {
-			var baseImageURL string
+			var (
+				baseImageURL string
+				err          error
+				OSVersion    []byte
+			)
 
 			if selinux {
 				// For now SELinux images are only for testing purposes and not added to any channel, so we should force the value here
@@ -52,8 +57,10 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 				WaitForOSVersion(clusterNS)
 
 				// Get OSVersion name
-				OSVersion, err := exec.Command(getOSScript, os2Test, "true").Output()
-				Expect(err).To(Not(HaveOccurred()))
+				Eventually(func() error {
+					OSVersion, err = exec.Command(getOSScript, os2Test, "true").Output()
+					return err
+				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
 				Expect(OSVersion).To(Not(BeEmpty()))
 
 				// Extract container image URL
