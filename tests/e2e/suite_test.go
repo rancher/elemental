@@ -670,11 +670,6 @@ Wait for K3s to start
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func WaitForK3s(k *kubectl.Kubectl) {
-	// Delay before checking
-	// TODO: create and use a function that checks the real Status
-	//       of the pod as well as the Ready field
-	time.Sleep(1 * time.Minute)
-
 	checkList := [][]string{
 		{"kube-system", "app=local-path-provisioner"},
 		{"kube-system", "k8s-app=kube-dns"},
@@ -694,11 +689,6 @@ Wait for RKE2 to start
 func WaitForRKE2(k *kubectl.Kubectl) {
 	err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 	Expect(err).To(Not(HaveOccurred()))
-
-	// Delay before checking
-	// TODO: create and use a function that checks the real Status
-	//       of the pod as well as the Ready field
-	time.Sleep(1 * time.Minute)
 
 	checkList := [][]string{
 		{"kube-system", "k8s-app=kube-dns"},
