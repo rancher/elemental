@@ -4,7 +4,7 @@ config:
     - name: root
       passwd: r0s@pwd1
     write_files:
-      - path: /etc/ssh/sshd_config
+      - path: /etc/ssh/sshd_config.d/root_access.conf
         append: true
         content: |
           PermitRootLogin yes

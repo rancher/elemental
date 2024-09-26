@@ -3,9 +3,34 @@ config:
     users:
     - name: root
       passwd: r0s@pwd1
+    write_files:
+      - path: /etc/ssh/sshd_config.d/root_access.conf
+        append: true
+        content: |
+          PermitRootLogin yes
+        owner: root:root
+        permissions: 644
   elemental:
     install:
       poweroff: true
-      device: /dev/sda
       debug: true
+      device-selector:
+      - key: Name
+        operator: In
+        values:
+          - /dev/sda
+          - /dev/vda
+          - /dev/nvme0n1
+      - key: Size
+        operator: Gt
+        values:
+          - 25Gi
+      snapshotter:
+        type: btrfs
+    reset:
+      debug: true
+      enabled: true
+      reset-persistent: true
+      reset-oem: true
+      power-off: true
 machineName: my-machine
