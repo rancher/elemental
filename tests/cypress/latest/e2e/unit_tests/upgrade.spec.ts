@@ -113,7 +113,7 @@ describe('Upgrade tests', () => {
         cy.getBySel('cluster-target').click();
         // As there is already an upgrade group targeting the cluster,
         // the cluster should not be available in the dropdown
-        cy.get('#vs3__listbox').should('not.contain', clusterName);
+        cy.get('#vs4__listbox').should('not.contain', clusterName);
     }));
 
     qase(37,
