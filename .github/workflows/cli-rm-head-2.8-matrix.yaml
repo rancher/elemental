@@ -57,7 +57,7 @@ jobs:
             cluster_type: ""
             k8s_downstream_version: v1.28.13+k3s1
             k8s_upstream_version: v1.28.13+k3s1
-            rancher_version: latest/devel/2.7
+            rancher_version: latest/devel/2.8
             reset: true
             sequential: true
           - ca_type: private
