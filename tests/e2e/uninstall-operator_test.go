@@ -132,8 +132,14 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			Expect(err).To(Not(HaveOccurred()))
 
 			for _, machine := range strings.Fields(machineList) {
-				internalMachine, err := elemental.GetInternalMachine(clusterNS, machine)
-				Expect(err).To(Not(HaveOccurred()))
+				var internalMachine string
+
+				// Sporadic timeouts can occur sometimes
+				Eventually(func() error {
+					var err error
+					internalMachine, err = elemental.GetInternalMachine(clusterNS, machine)
+					return err
+				}, tools.SetTimeout(1*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
 				// Delete blocking Finalizers
 				GinkgoWriter.Printf("Deleting Finalizers for MachineInventory '%s'...\n", machine)
