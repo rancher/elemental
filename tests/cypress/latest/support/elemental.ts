@@ -76,7 +76,6 @@ export class Elemental {
     cy.contains('.outer-container > .header', 'Elemental');
 
     if (isRancherPrime() && isCypressTag('main')) {
-      cy.contains('Container Registry').click();
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();
       if (isOperatorVersion('staging')) {
