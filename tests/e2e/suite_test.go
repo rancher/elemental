@@ -331,7 +331,7 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 
 		Eventually(func() error {
 			return rancher.CheckPod(k, [][]string{{"cattle-resources-system", "app.kubernetes.io/name=rancher-backup"}})
-		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+		}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 	}
 }
 
@@ -366,7 +366,7 @@ func InstallCertManager(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
-	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -397,7 +397,7 @@ func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string) {
 	// Wait for pod to be started
 	Eventually(func() error {
 		return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -415,7 +415,7 @@ func InstallLocalStorage(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
-	}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -441,7 +441,7 @@ func InstallK3s() {
 		GinkgoWriter.Printf("K3s installation loop %d:\n%s\n", count, out)
 		count++
 		return err
-	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -461,7 +461,7 @@ func InstallRancher(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
-	}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -483,7 +483,7 @@ func InstallRKE2() {
 		GinkgoWriter.Printf("RKE2 installation loop %d:\n%s\n", count, out)
 		count++
 		return err
-	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeNil())
+	}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -676,7 +676,7 @@ func WaitForK3s(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
-	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*
@@ -694,7 +694,7 @@ func WaitForRKE2(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
-	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 
 	err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
 	Expect(err).To(Not(HaveOccurred()))

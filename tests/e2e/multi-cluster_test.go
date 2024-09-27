@@ -250,7 +250,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 
 				// Set node hostname
 				hostName := elemental.SetHostname(vmNameRoot+"-"+createdClusterName, nodeIndex)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				// Add node in network configuration
 				err := rancher.AddNode(netDefaultFileName, hostName, globalNodeID)
@@ -258,7 +258,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 
 				// Get generated MAC address
 				_, macAdrs := GetNodeInfo(hostName)
-				Expect(macAdrs).To(Not(BeNil()))
+				Expect(macAdrs).To(Not(BeEmpty()))
 
 				wg.Add(1)
 				go func(s, h, m string) {
@@ -280,7 +280,7 @@ var _ = Describe("E2E - Bootstrapping nodes", Label("multi-cluster"), func() {
 			for nodeIndex := 1; nodeIndex <= 3; nodeIndex++ {
 				// Set node hostname
 				hostName := elemental.SetHostname(vmNameRoot+"-"+createdClusterName, nodeIndex)
-				Expect(hostName).To(Not(BeNil()))
+				Expect(hostName).To(Not(BeEmpty()))
 
 				// Get node's IP
 				ip := GetNodeIP(hostName)
