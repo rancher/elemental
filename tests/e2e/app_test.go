@@ -57,7 +57,7 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				}
 				Eventually(func() error {
 					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
+				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 			})
 
 			By("Installing MetalLB", func() {
@@ -83,7 +83,7 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				}
 				Eventually(func() error {
 					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 
 				err := kubectl.Apply(metallbNS, metallbRscYaml)
 				Expect(err).NotTo(HaveOccurred())
@@ -112,7 +112,7 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				}
 				Eventually(func() error {
 					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 			})
 
 			By("Checking LoadBalancer IP", func() {
@@ -159,7 +159,7 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 			}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(Not(BeEmpty()))
 
 			nodeNumber := len(strings.Fields(nodeList))
-			Expect(nodeNumber).To(Not(BeNil()))
+			Expect(nodeNumber).To(Not(BeZero()))
 
 			out, err := kubectl.RunWithoutErr("scale", "--replicas="+fmt.Sprint(nodeNumber), "deployment/"+appName)
 			Expect(err).To(Not(HaveOccurred()), out)

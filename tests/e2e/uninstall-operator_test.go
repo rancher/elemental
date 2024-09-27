@@ -204,7 +204,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			// Wait for pod to be started
 			Eventually(func() error {
 				return rancher.CheckPod(k, [][]string{{"cattle-elemental-system", "app=elemental-operator"}})
-			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeNil())
+			}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 		})
 
 		By("Creating a dumb MachineRegistration", func() {
