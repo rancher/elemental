@@ -9,7 +9,7 @@ replace go.qase.io/client => github.com/rancher/qase-go/client v0.0.0-2023111420
 require (
 	github.com/onsi/ginkgo/v2 v2.20.2
 	github.com/onsi/gomega v1.34.2
-	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20240926104948-8ac88aebed21
+	github.com/rancher-sandbox/ele-testhelpers v0.0.0-20240930072321-44f66a46e109
 	github.com/rancher-sandbox/qase-ginkgo v1.0.1
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/mod v0.21.0
