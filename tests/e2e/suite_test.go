@@ -450,8 +450,9 @@ Install Rancher Manager
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func InstallRancher(k *kubectl.Kubectl) {
-	err := rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
-	Expect(err).To(Not(HaveOccurred()))
+	Eventually(func() error {
+		return rancher.DeployRancherManager(rancherHostname, rancherChannel, rancherVersion, rancherHeadVersion, caType, proxy)
+	}, tools.SetTimeout(5*time.Minute), 1*time.Minute).Should(Not(HaveOccurred()))
 
 	checkList := [][]string{
 		{"cattle-system", "app=rancher"},
@@ -668,6 +669,7 @@ Wait for K3s to start
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func WaitForK3s(k *kubectl.Kubectl) {
+	// Check Pod(s)
 	checkList := [][]string{
 		{"kube-system", "app=local-path-provisioner"},
 		{"kube-system", "k8s-app=kube-dns"},
@@ -676,6 +678,14 @@ func WaitForK3s(k *kubectl.Kubectl) {
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
+
+	// Check DaemonSet(s)
+	checkList = [][]string{
+		{"kube-system", "svccontroller.k3s.cattle.io/svcname=traefik"},
+	}
+	Eventually(func() error {
+		return rancher.CheckDaemonSet(k, checkList)
 	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
@@ -688,6 +698,7 @@ func WaitForRKE2(k *kubectl.Kubectl) {
 	err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 	Expect(err).To(Not(HaveOccurred()))
 
+	// Check Pod(s)
 	checkList := [][]string{
 		{"kube-system", "k8s-app=kube-dns"},
 		{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
@@ -696,8 +707,14 @@ func WaitForRKE2(k *kubectl.Kubectl) {
 		return rancher.CheckPod(k, checkList)
 	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 
-	err = k.WaitLabelFilter("kube-system", "Ready", "rke2-ingress-nginx-controller", "app.kubernetes.io/name=rke2-ingress-nginx")
-	Expect(err).To(Not(HaveOccurred()))
+	// Check DaemonSet(s)
+	checkList = [][]string{
+		{"kube-system", "k8s-app=canal"},
+		{"kube-system", "app.kubernetes.io/instance=rke2-ingress-nginx"},
+	}
+	Eventually(func() error {
+		return rancher.CheckDaemonSet(k, checkList)
+	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
 }
 
 /*

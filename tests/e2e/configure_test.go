@@ -58,8 +58,9 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			}
 
 			// Apply to k8s
-			err := kubectl.Apply(clusterNS, clusterYaml)
-			Expect(err).To(Not(HaveOccurred()))
+			Eventually(func() error {
+				return kubectl.Apply(clusterNS, clusterYaml)
+			}, tools.SetTimeout(1*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
 
 			// Check that the cluster is correctly created
 			CheckCreatedCluster(clusterNS, clusterName)
