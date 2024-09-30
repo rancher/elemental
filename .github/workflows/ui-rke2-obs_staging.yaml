@@ -16,6 +16,10 @@ on:
         description: Rancher cluster downstream version to use
         default: v1.30.4+rke2r1
         type: string
+      k8s_upstream_version:
+        description: Rancher cluster upstream version to use
+        default: v1.30.4+rke2r1
+        type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
         default: auto
