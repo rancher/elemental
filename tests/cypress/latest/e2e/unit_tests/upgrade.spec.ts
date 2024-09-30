@@ -55,7 +55,7 @@ describe('Upgrade tests', () => {
       qase(33,
         it('Check OS Versions', () => {
           cy.clickNavMenu(['Advanced', 'OS Versions']);
-          cy.contains(new RegExp('Active.*-iso-unstable'), { timeout: 120000 });
+          cy.contains(new RegExp('Active.*-unstable-iso'), { timeout: 120000 });
       }));
     }
 
