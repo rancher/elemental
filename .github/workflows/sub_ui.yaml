@@ -223,6 +223,7 @@ jobs:
             /workdir/e2e/unit_tests/menu.spec.ts
             /workdir/e2e/unit_tests/os_version.spec.ts
             /workdir/e2e/unit_tests/machine_registration.spec.ts
+            /workdir/e2e/unit_tests/seed_image.spec.ts
             /workdir/e2e/unit_tests/advanced_filtering.spec.ts
           UI_ACCOUNT: ${{ inputs.ui_account }}
           UPGRADE_FROM_VERSION: ${{ inputs.upgrade_from_version }}
