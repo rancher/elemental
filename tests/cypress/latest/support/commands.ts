@@ -137,6 +137,9 @@ Cypress.Commands.add('createMachReg', (
       }
     } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
       cy.contains(Cypress.env('os_version_install')).click();
+    // Sometimes we want to test dev/staging operator version with stable OS version
+    } else if ( utils.isOsVersion('stable') && utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
+      cy.contains(Cypress.env('iso_stable_os_version')).click();
     } else {
       cy.contains('(unstable)').click();
     }
@@ -367,7 +370,7 @@ Cypress.Commands.add('addOsVersionChannel', (channelVersion: string) => {
 
   switch (channelVersion) {
     case "stable":
-      channelRepo = 'registry.suse.com/rancher/elemental-channel:latest';
+      channelRepo = 'registry.suse.com/rancher/elemental-channel/sl-micro:6.0-baremetal';
       break;
     case "dev":
       channelRepo = 'registry.opensuse.org/isv/rancher/elemental/dev/containers/rancher/elemental-unstable-channel:latest';

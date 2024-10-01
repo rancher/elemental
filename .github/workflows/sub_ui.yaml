@@ -209,6 +209,7 @@ jobs:
           K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           OS_VERSION_INSTALL: ${{ inputs.os_version_install }}
+          OS_VERSION_TO_TEST: ${{ inputs.os_to_test }}
           RANCHER_CHANNEL: ${{ inputs.rancher_version }}
           RANCHER_GIT_CHART: ${{ inputs.rancher_git_chart }}
           RANCHER_VERSION: ${{ steps.component.outputs.rancher_image_version }}

@@ -10,8 +10,6 @@ PATH+=:/usr/local/bin
 
 # Variables
 typeset REPO=$1
-shift
-typeset -l OS2TEST=$1
 
 # Create a systemctl file for chartmuseum
 cat > /etc/systemd/system/chartmuseum.service << EOF
@@ -47,7 +45,7 @@ helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add chartmuseum http://localhost:8080
 
 # Check if we want to use Development version of Elemental
-[[ "${OS2TEST}" =~ (dev|staging) ]] && DEVEL="--devel"
+[[ "${REPO}" =~ (dev|staging) ]] && DEVEL="--devel"
 
 # Download needed helm charts
 helm pull ${DEVEL} ${REPO}/elemental-operator-crds-chart
