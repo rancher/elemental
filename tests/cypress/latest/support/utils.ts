@@ -36,6 +36,11 @@ export const isOperatorVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("operator_repo"));
 }
 
+// Check OS version to test
+export const isOsVersion = (version: string) => {
+  return (new RegExp(version)).test(Cypress.env("os_version_to_test"));
+}
+
 // Check rancher manager version
 export const isRancherManagerVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("rancher_version"));

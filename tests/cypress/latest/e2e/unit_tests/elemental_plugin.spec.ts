@@ -14,7 +14,7 @@ limitations under the License.
 
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
-import { isRancherManagerVersion, isUIVersion } from '../../support/utils';
+import { isRancherManagerVersion, isUIVersion , isOsVersion, isOperatorVersion} from '../../support/utils';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
 
@@ -72,5 +72,11 @@ filterTests(['main', 'upgrade'], () => {
           .and('contain', 'Uninstall');
       })
     );
+    it('Add additional channel', () => {
+      // Sometimes we want to test dev/staging operator version with stable OS version
+      if ( isOsVersion('stable') && isOperatorVersion('dev') || isOperatorVersion('staging')) {
+        cypressLib.accesMenu('OS Management');
+        cy.addOsVersionChannel('stable');
+      }});
   });
 });

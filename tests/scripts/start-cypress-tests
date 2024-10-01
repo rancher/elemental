@@ -54,6 +54,7 @@ docker run -v $PWD:/workdir -w /workdir                         \
     -e OPERATOR_REPO=$OPERATOR_REPO                             \
     -e OS_VERSION_INSTALL=$OS_VERSION_INSTALL                   \
     -e OS_VERSION_TARGET=$OS_VERSION_TARGET                     \
+    -e OS_VERSION_TO_TEST=$OS_VERSION_TO_TEST                   \
     -e PROXY=$PROXY                                             \
     -e QASE_API_TOKEN=$QASE_API_TOKEN                           \
     -e QASE_REPORT=$QASE_REPORT                                 \

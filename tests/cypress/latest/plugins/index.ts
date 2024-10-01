@@ -42,6 +42,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.operator_repo = process.env.OPERATOR_REPO;
   config.env.os_version_install = process.env.OS_VERSION_INSTALL;
   config.env.os_version_target = process.env.OS_VERSION_TARGET;
+  config.env.os_version_to_test = process.env.OS_VERSION_TO_TEST;
   config.env.password = process.env.RANCHER_PASSWORD;
   config.env.proxy_ip = process.env.PROXY_IP;
   config.env.proxy = process.env.PROXY;
