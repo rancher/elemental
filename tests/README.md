@@ -86,6 +86,11 @@
     - **It:** Reset node by deleting the cluster
     - **It:** Create Elemental cluster
 
+## `seed_image.spec.ts`
+
+- **Describe:** Seed images menu testing
+    - **It:** Download from seed images menu
+
 ## `upgrade-operator.spec.ts`
 
 - **Describe:** Elemental operator upgrade tests
