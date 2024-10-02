@@ -116,6 +116,13 @@ describe('Upgrade tests', () => {
         cy.get('#vs4__listbox').should('not.contain', clusterName);
     }));
 
+    qase(76,
+      it('Delete Upgrade Group', () => {
+        cy.clickNavMenu(['Advanced', 'Update Groups']);
+        cy.deleteAllResources();
+        cy.contains('There are no rows to show');
+    }));
+
     qase(37,
       it('Delete OS Versions Channels', () => {
         cy.clickNavMenu(['Advanced', 'OS Version Channels']);
