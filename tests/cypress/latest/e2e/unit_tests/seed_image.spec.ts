@@ -15,6 +15,7 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
+import { isBootType } from '~/support/utils';
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -40,7 +41,7 @@ filterTests(['main'], () => {
       cy.exec('rm -f cypress/downloads/*', { failOnNonZeroExit: false });
       cy.clickNavMenu(["Advanced", "Seed Images"]);
       cy.getBySel(selectors.sortableTableRow).contains('Download').click();
-      cy.verifyDownload('.iso', { contains: true, timeout: 300000, interval: 5000 });
+      cy.verifyDownload(isBootType('iso') ? '.iso' : '.img', { contains: true, timeout: 300000, interval: 5000 });
     });
   });
 });
