@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Define the names/tags of the container
-#!BuildName: SL-Micro-container
+#!BuildName: SL-Micro-baremetal-container
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:latest
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:%VERSION%
 #!BuildTag: suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container:%VERSION%-%RELEASE%
