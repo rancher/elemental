@@ -12,14 +12,35 @@
 
 .default_products: &default_products
   distri: sle-micro
-  version: '6.0'
+  version: '6.1'
 
-.default_settings: &default_settings
+.test_settings: &test_settings
   HDDSIZEGB: '20'
-  PASSWORD: ros
   QEMURAM: '2048'
+  PASSWORD: ros
   TEST_PASSWORD: Elemental@R00t
-  YAML_SCHEDULE: schedule/elemental/iso.yaml
+  YAML_SCHEDULE: schedule/elemental/test_image.yaml
+
+.generate_settings: &generate_settings
+  BOOT_HDD_IMAGE: "1"
+  CONTAINER_RUNTIMES: "podman"
+  DESKTOP: "textmode"
+  EXCLUDE_MODULES: "suseconnect_scc"
+  HDD_1: "SL-Micro.%ARCH%-6.0.0-Default-Updated.qcow2"
+  KEEP_GRUB_TIMEOUT: "0"
+  TEST_PASSWORD: Elemental@R00t
+  VIDEOMODE: "text"
+  YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
+
+.image_test_settings: &image_test_settings
+  HDD_1: 'elemental-%BUILD%-%ARCH%.qcow2'
+  IMAGE_TYPE: disk
+  START_AFTER_TEST: generate_image
+
+.iso_test_settings: &iso_test_settings
+  IMAGE_TYPE: iso
+  ISO: 'elemental-%BUILD%-%ARCH%.iso'
+  START_AFTER_TEST: generate_iso
 
 defaults:
   aarch64:
@@ -32,63 +53,63 @@ defaults:
       QEMUCPU: host
 
 products:
-  sl-micro-baremetal-aarch64:
+  sl-micro-elemental-image-6.1-aarch64:
     <<: *default_products
-    flavor: Elemental-baremetal
-  sl-micro-base-aarch64:
+    flavor: Elemental-Image
+  sl-micro-elemental-iso-6.1-aarch64:
     <<: *default_products
-    flavor: Elemental-base
-  sl-micro-kvm-aarch64:
+    flavor: Elemental-Iso
+  sl-micro-elemental-image-6.1-x86_64:
     <<: *default_products
-    flavor: Elemental-kvm
-  sl-micro-baremetal-x86_64:
+    flavor: Elemental-Image
+  sl-micro-elemental-iso-6.1-x86_64:
     <<: *default_products
-    flavor: Elemental-baremetal
-  sl-micro-base-x86_64:
-    <<: *default_products
-    flavor: Elemental-base
-  sl-micro-kvm-x86_64:
-    <<: *default_products
-    flavor: Elemental-kvm
-  sl-micro-rt-x86_64:
-    <<: *default_products
-    flavor: Elemental-rt
+    flavor: Elemental-Iso
 
 scenarios:
   aarch64:
-    sl-micro-baremetal-aarch64:
-      - elemental_iso:
+    sl-micro-elemental-image-6.1-aarch64:
+      - generate_image:
           testsuite: null
           settings:
-            <<: *default_settings
-    sl-micro-base-aarch64:
-      - elemental_iso:
+            <<: *generate_settings
+      - test_image:
           testsuite: null
           settings:
-            <<: *default_settings
-    sl-micro-kvm-aarch64:
-      - elemental_iso:
+            <<: *test_settings
+            <<: *image_test_settings
+    sl-micro-elemental-iso-6.1-aarch64:
+      - generate_iso:
           testsuite: null
           settings:
-            <<: *default_settings
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *iso_test_settings
   x86_64:
-    sl-micro-baremetal-x86_64:
-      - elemental_iso:
+    sl-micro-elemental-image-6.1-x86_64:
+      - generate_image:
+          machine: 64bit
           testsuite: null
           settings:
-            <<: *default_settings
-    sl-micro-base-x86_64:
-      - elemental_iso:
+            <<: *generate_settings
+      - test_image:
           testsuite: null
           settings:
-            <<: *default_settings
-    sl-micro-kvm-x86_64:
-      - elemental_iso:
+            <<: *test_settings
+            <<: *image_test_settings
+            START_AFTER_TEST: generate_image@64bit
+    sl-micro-elemental-iso-6.1-x86_64:
+      - generate_iso:
+          machine: 64bit
           testsuite: null
           settings:
-            <<: *default_settings
-    sl-micro-rt-x86_64:
-      - elemental_iso:
+            <<: *generate_settings
+      - test_iso:
           testsuite: null
           settings:
-            <<: *default_settings
+            <<: *test_settings
+            <<: *iso_test_settings
+            START_AFTER_TEST: generate_iso@64bit
