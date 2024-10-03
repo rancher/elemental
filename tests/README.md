@@ -113,6 +113,7 @@
     - **It:** Check OS Versions
     - **It:** Upgrade one node different methods if rke2 or k3s
     - **It:** Cannot create two upgrade groups targeting the same cluster
+    - **It:** Delete Upgrade Group
     - **It:** Delete OS Versions Channels
 
 ## `user.spec.ts`
