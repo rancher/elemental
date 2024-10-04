@@ -26,6 +26,7 @@
   DESKTOP: "textmode"
   EXCLUDE_MODULES: "suseconnect_scc"
   HDD_1: "SL-Micro.%ARCH%-6.0.0-Default-Updated.qcow2"
+  KEEP_GRUB_TIMEOUT: "0"
   TEST_PASSWORD: Elemental@R00t
   VIDEOMODE: "text"
   YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
