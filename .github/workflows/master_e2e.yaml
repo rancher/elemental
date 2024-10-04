@@ -272,7 +272,6 @@ jobs:
     uses: ./.github/workflows/sub_clean-and-delete-runner.yaml
     secrets:
       credentials: ${{ secrets.credentials }}
-      pat_token: ${{ secrets.pat_token }}
     with:
       create_runner_result: ${{ needs.create-runner.result }}
       destroy_runner: ${{ inputs.destroy_runner }}

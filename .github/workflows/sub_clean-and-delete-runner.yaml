@@ -26,8 +26,6 @@ on:
     secrets:
       credentials:
         required: true
-      pat_token:
-        required: true
 
 jobs:
   clean-delete:
@@ -43,12 +41,6 @@ jobs:
 
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
-
-      - name: Delete GCP secrets
-        run: |
-          for SECRET in PAT_TOKEN GH_REPO; do
-            gcloud --quiet secrets delete ${SECRET}_${{ inputs.runner_label }} || true
-          done
 
       - name: Delete runner
         if: ${{ inputs.create_runner_result == 'success' && inputs.destroy_runner == true }}
