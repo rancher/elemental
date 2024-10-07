@@ -7,6 +7,7 @@ After=time-sync.target
 ConditionPathExists=!/run/elemental/live_mode
 
 [Service]
+EnvironmentFile=-/etc/rancher/elemental/agent/envs
 EnvironmentFile=-/etc/default/elemental
 EnvironmentFile=-/etc/sysconfig/proxy
 Type=simple
