@@ -30,6 +30,7 @@
     - **It:** Add rancher-ui-plugin-charts repo
     - **It:** Enable extension support
     - **It:** Install Elemental plugin
+    - **It:** Add additional channel
 
 ## `first_connection.spec.ts`
 
