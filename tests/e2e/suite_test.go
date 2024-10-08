@@ -541,6 +541,11 @@ func StartRKE2() {
 	err = exec.Command("sudo", "systemctl", "enable", "--now", "rke2-server.service").Run()
 	Expect(err).To(Not(HaveOccurred()))
 
+	// Be sure that any previous kubectl command has been removed before linking the new one
+	err = exec.Command("sudo", "rm", "-f", "/usr/local/bin/kubectl").Run()
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Create kubectl link
 	err = exec.Command("sudo", "ln", "-s", "/var/lib/rancher/rke2/bin/kubectl", "/usr/local/bin/kubectl").Run()
 	Expect(err).To(Not(HaveOccurred()))
 }
