@@ -248,7 +248,6 @@
       -  **By:** Installing CertManager
     - **It:** Install Rancher Manager
       -  **By:** Configuring kubectl to use Rancher admin user
-      -  **By:** Workaround for upgrade test, restart Fleet controller and agent
     - **It:** Install Elemental Operator if needed
       -  **By:** Installing Operator with CLI
 
