@@ -214,17 +214,6 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Also don't check the returned error, as it will always not equal 0
 			_ = exec.Command("bash", "-c", "sudo mv -f /etc/rancher/{k3s,rke2}/{k3s,rke2}.yaml ~/").Run()
 		})
-
-		if testType == "ui" {
-			By("Workaround for upgrade test, restart Fleet controller and agent", func() {
-				for _, d := range [][]string{
-					{"cattle-fleet-local-system", "fleet-agent"},
-					{"cattle-fleet-system", "fleet-controller"},
-				} {
-					rolloutDeployment(d[0], d[1])
-				}
-			})
-		}
 	})
 
 	// Deploy operator in CLI test
