@@ -13,7 +13,6 @@ We try to spread the tests as best as we can to avoid SPOT issue as well as not 
 | CLI K3s SELinux | Sunday | 2am | us-central1-c |
 | CLI Multicluster | Sunday | 5am | us-central1-b |
 | CLI Regression | Saturday | 11am | us-central1-c |
-| CLI Rancher Manager 2.7-head | Saturday | 4pm | us-central1-c |
 | CLI Rancher Manager 2.8-head | Sunday | 8am | us-central1-c |
 | CLI K3s Downgrade | Sunday | 2pm | us-central1-b |
 | CLI Full backup/restore (migration) | Sunday | 4pm | us-central1-c |

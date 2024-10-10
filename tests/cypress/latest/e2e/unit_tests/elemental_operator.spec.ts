@@ -37,8 +37,7 @@ filterTests(['main', 'upgrade'], () => {
         cypressLib.addRepository('rancher-dev', 'https://github.com/rancher/charts.git', 'git', isRancherManagerVersion('2.9') ? 'dev-v2.9' : 'dev-v2.8');
       });
     }
-    // Add dev repo for main test or if the test runs on Rancher 2.7 (because operator is not in the 2.7 marketplace)
-    if ((!isOperatorVersion('marketplace') && isCypressTag('main')) || isRancherManagerVersion('2.7')) {
+    if (!isOperatorVersion('marketplace') && isCypressTag('main')) {
       it('Add local chartmuseum repo', () => {
         cypressLib.addRepository('elemental-operator', chartmuseumRepo, 'helm', 'none');
       });
@@ -47,7 +46,7 @@ filterTests(['main', 'upgrade'], () => {
         it('Install latest dev Elemental operator', () => {
           elemental.installElementalOperator(upgradeFromVersion);
       }));
-    } else if (!isRancherManagerVersion('2.7') && !isOperatorInstallType('cli')) {
+    } else if (!isOperatorInstallType('cli')) {
       qase(57,
         it('Install latest stable Elemental operator', () => {
           elemental.installElementalOperator(upgradeFromVersion);

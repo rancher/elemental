@@ -31,7 +31,7 @@ describe('Elemental operator upgrade tests', () => {
   });
 
   filterTests(['upgrade'], () => {
-    if (utils.isK8sVersion('k3s') && !utils.isRancherManagerVersion('2.7')) {
+    if (utils.isK8sVersion('k3s')) {
       if (!utils.isOperatorVersion('marketplace')) {
         it('Add elemental-operator dev repo', () => {
           cypressLib.addRepository('elemental-operator', `${Cypress.env('chartmuseum_repo')}:8080`, 'helm', 'none');

@@ -40,7 +40,7 @@ describe('Upgrade tests', () => {
     // Add dev OS Version Channel if stable operator is installed
     // because we do not update the operator in RKE2 UI test so far
     // Only RKE2 tests use os version channel
-    if (utils.isK8sVersion('rke2') && !utils.isRancherManagerVersion('2.7')) {
+    if (utils.isK8sVersion('rke2')) {
       it('Delete stable channel for RKE2 upgrade', () => {
         cy.clickNavMenu(['Advanced', 'OS Version Channels']);
         cy.deleteAllResources();
