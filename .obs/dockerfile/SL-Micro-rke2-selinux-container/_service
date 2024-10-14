@@ -11,4 +11,14 @@
     <param name="eval">IMG_REPO=$(rpm --macros=/root/.rpmmacros -E %img_repo)</param>
     <param name="var">IMG_REPO</param>
   </service>
+  <service name="replace_using_env" mode="buildtime">
+    <param name="file">Dockerfile.iso</param>
+    <param name="eval">SLMICRO_VERSION=$(rpm --macros=/root/.rpmmacros -E %slmicro_version)</param>
+    <param name="var">SLMICRO_VERSION</param>
+  </service>
+  <service name="replace_using_env" mode="buildtime">
+    <param name="file">Dockerfile.iso</param>
+    <param name="eval">IMG_REPO=$(rpm --macros=/root/.rpmmacros -E %img_repo)</param>
+    <param name="var">IMG_REPO</param>
+  </service>
 </services>
