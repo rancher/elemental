@@ -41,7 +41,8 @@ describe('Elemental operator upgrade tests', () => {
           it('Upgrade Elemental operator', () => {
             cy.contains('local').click();
             cy.get('.nav').contains('Apps').click();
-            cy.contains('Elemental', { timeout: 30000 }).click();
+            cy.getBySel('chart-selection-grid').contains('Elemental', { timeout: 30000 }).click();
+            //cy.contains('Elemental', { timeout: 30000 }).click();
             cy.contains('Charts: Elemental', { timeout: 30000 });
             cy.clickButton('Upgrade');
             cy.contains('.header > .title', 'elemental-operator');

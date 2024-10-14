@@ -170,7 +170,7 @@ describe('Machine registration testing', () => {
           true,  // checkInventoryLabels
           true,  // checkInventoryAnnotations
           true,  // checkIsoBuilding
-          'custom_cloud-config_upgrade.yaml',
+          utils.isUpgradeFromVersion('1.5.4') ? 'custom_cloud_config_1-5-4.yaml' : 'custom_cloud-config_upgrade.yaml',
           false  // checkDefaultCloudConfig
         );
         cy.checkMachInvLabel('machine-registration', 'myInvLabel1', 'myInvLabelValue1', false);

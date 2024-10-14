@@ -51,6 +51,11 @@ export const isUIVersion = (version: string) => {
   return (new RegExp(version)).test(Cypress.env("elemental_ui_version"));
 }
 
+// Check the upgrade from version
+export const isUpgradeFromVersion = (version: string) => {
+  return (new RegExp(version)).test(Cypress.env("upgrade_from_version"));
+}
+
 // Check the upgrade target
 export const isUpgradeOsChannel = (channel: string) => {
   return (new RegExp(channel)).test(Cypress.env("upgrade_os_channel"));
