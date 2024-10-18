@@ -268,15 +268,12 @@ jobs:
 
   clean-and-delete-runner:
     needs: [create-runner, e2e]
-    if: ${{ always() }}
+    if: ${{ always() && needs.create-runner.result == 'success' && inputs.destroy_runner == true }}
     uses: ./.github/workflows/sub_clean-and-delete-runner.yaml
     secrets:
       credentials: ${{ secrets.credentials }}
     with:
-      create_runner_result: ${{ needs.create-runner.result }}
-      destroy_runner: ${{ inputs.destroy_runner }}
       runner_hostname: ${{ needs.create-runner.outputs.runner_hostname }}
-      runner_label: ${{ needs.create-runner.outputs.runner_label }}
       zone: ${{ inputs.zone }}
 
   post-qase:
