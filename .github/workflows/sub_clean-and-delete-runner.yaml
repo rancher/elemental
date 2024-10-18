@@ -5,17 +5,7 @@ on:
   workflow_call:
     # Variables to set when calling this reusable workflow
     inputs:
-      create_runner_result:
-        description: Status of the create-runner job
-        required: true
-        type: string
-      destroy_runner:
-        required: true
-        type: boolean
       runner_hostname:
-        required: true
-        type: string
-      runner_label:
         required: true
         type: string
       zone:
@@ -43,7 +33,6 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Delete runner
-        if: ${{ inputs.create_runner_result == 'success' && inputs.destroy_runner == true }}
         run: |
           # Disable failure on first error, needed for the "delete" check
           set +e
