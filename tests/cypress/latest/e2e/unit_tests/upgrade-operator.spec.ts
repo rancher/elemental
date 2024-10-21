@@ -36,36 +36,35 @@ describe('Elemental operator upgrade tests', () => {
         it('Add elemental-operator dev repo', () => {
           cypressLib.addRepository('elemental-operator', `${Cypress.env('chartmuseum_repo')}:8080`, 'helm', 'none');
         });
-      } else {
-        qase(55,
-          it('Upgrade Elemental operator', () => {
-            cy.contains('local').click();
-            cy.get('.nav').contains('Apps').click();
-            cy.contains('Elemental', { timeout: 30000 }).click();
-            cy.contains('Charts: Elemental', { timeout: 30000 });
-            cy.clickButton('Upgrade');
-            cy.contains('.header > .title', 'elemental-operator');
-            cy.clickButton('Next');
-            cy.clickButton('Upgrade');
-            cy.contains('SUCCESS: helm', { timeout: 120000 });
-            cy.contains('Installed App: elemental-operator Pending-Upgrade', { timeout: 120000 });
-            cy.contains('Installed App: elemental-operator Deployed', { timeout: 120000 });
-        }));
-
-        qase(58,
-          it('Check Elemental UI after upgrade', () => {
-            cy.viewport(1920, 1080);
-            cypressLib.checkNavIcon('elemental').should('exist');
-            cypressLib.accesMenu('OS Management');
-            elemental.checkElementalNav();
-            cy.get('[data-testid="card-registration-endpoints"]').contains('1');
-            cy.get('[data-testid="card-inventory-of-machines"]').contains('1');
-            cy.get('[data-testid="card-clusters"]').contains('1');
-            cy.get('[data-testid="machine-reg-block"]').contains('machine-registration');
-            cy.clickNavMenu(['Advanced', 'OS Version Channels']);
-            cy.get('.main-row').contains('Active elemental-channel', { timeout: 60000 });
-        }));
       }
+      qase(55,
+        it('Upgrade Elemental operator', () => {
+          cy.contains('local').click();
+          cy.get('.nav').contains('Apps').click();
+          cy.getBySel('chart-selection-grid').contains('Elemental', { timeout: 30000 }).click();
+          cy.contains('Charts: Elemental', { timeout: 30000 });
+          cy.clickButton('Upgrade');
+          cy.contains('.header > .title', 'elemental-operator');
+          cy.clickButton('Next');
+          cy.clickButton('Upgrade');
+          cy.contains('SUCCESS: helm', { timeout: 120000 });
+          cy.contains('Installed App: elemental-operator Pending-Upgrade', { timeout: 120000 });
+          cy.contains('Installed App: elemental-operator Deployed', { timeout: 120000 });
+      }));
+
+      qase(58,
+        it('Check Elemental UI after upgrade', () => {
+          cy.viewport(1920, 1080);
+          cypressLib.checkNavIcon('elemental').should('exist');
+          cypressLib.accesMenu('OS Management');
+          elemental.checkElementalNav();
+          cy.get('[data-testid="card-registration-endpoints"]').contains('1');
+          cy.get('[data-testid="card-inventory-of-machines"]').contains('1');
+          cy.get('[data-testid="card-clusters"]').contains('1');
+          cy.get('[data-testid="machine-reg-block"]').contains('machine-registration');
+          cy.clickNavMenu(['Advanced', 'OS Version Channels']);
+          cy.get('.main-row').contains('Active', { timeout: 60000 });
+      }));
     }
   });
 });
