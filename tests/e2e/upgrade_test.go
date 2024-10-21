@@ -378,14 +378,14 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 						_ = RunSSHWithRetry(cl, "setsid -f reboot")
 
 						// Check the mode after reboot
-						out = RunSSHWithRetry(cl, "cat /run/cos/recovery_mode")
+						out = RunSSHWithRetry(cl, "cat /run/elemental/recovery_mode")
 						Expect(out).To(Not(BeEmpty()))
 
 						// Final reboot, in active mode as recovery mode is not persistent
 						_ = RunSSHWithRetry(cl, "setsid -f reboot")
 
 						// Check the mode after fnal reboot
-						out = RunSSHWithRetry(cl, "cat /run/cos/active_mode")
+						out = RunSSHWithRetry(cl, "cat /run/elemental/active_mode")
 						Expect(out).To(Not(BeEmpty()))
 					})
 				}
