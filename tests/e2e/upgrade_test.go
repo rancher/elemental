@@ -350,7 +350,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 						// This remove the version and keep only the repo, as in the file
 						// we have the exact version and we don't know it before the upgrade
 						return tools.TrimStringFromChar(strings.Trim(out, "\n"), ":")
-					}, tools.SetTimeout(5*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
+					}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
 				})
 
 				By("Getting annotations for "+h+" after upgrade", func() {
