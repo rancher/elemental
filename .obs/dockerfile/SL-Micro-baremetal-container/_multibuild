@@ -1,0 +1,4 @@
+<multibuild>
+  <flavor>iso</flavor>
+  <flavor>disk</flavor>
+</multibuild>
