@@ -11,4 +11,4 @@ fi
 
 echo "Applying upgrade: ${ELEMENTAL_REGISTER_UPGRADE_CORRELATION_ID}"
 
-elemental-register --debug upgrade
+elemental-register upgrade --debug
