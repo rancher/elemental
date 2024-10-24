@@ -56,7 +56,6 @@ jobs:
       destroy_runner: ${{ inputs.destroy_runner }}
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
-      operator_install_type: ui
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: ${{ inputs.os_to_test }}
       qase_run_id: ${{ inputs.qase_run_id }}
