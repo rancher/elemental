@@ -31,23 +31,23 @@ filterTests(['main', 'upgrade'], () => {
 
     qase(11,
       it('Add elemental-ui repo', () => {
-        // 1 - TODO: Remove rancher 2-9 condition later
-        // 2 - UI extension upgrade cannot be tested with rancher manager 2.9 yet
+        // 1 - TODO: Remove rancher 2-10 condition later
+        // 2 - UI extension upgrade cannot be tested with rancher manager 2.10 yet
         // because we have only one version so far
-        if (!isUIVersion('stable') || isRancherManagerVersion('2.9')) {
+        if (!isUIVersion('stable') || isRancherManagerVersion('2.10')) {
           cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages');
         }
       })
     );
 
-    // Add rancher-ui-plugin-charts repo because its part of Rancher Prime in 2.8 and 2.9-head
+    // Add rancher-ui-plugin-charts repo except for rancher manager 2.7
     it('Add rancher-ui-plugin-charts repo', () => {
-      isRancherManagerVersion('2.8') || isRancherManagerVersion('2.9') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
+      !isRancherManagerVersion('2.7') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
     });
 
     qase(12,
       it('Enable extension support', () => {
-        if (!isRancherManagerVersion('2.9')) {
+        if (isRancherManagerVersion('2.8')) {
           isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
         }
       })

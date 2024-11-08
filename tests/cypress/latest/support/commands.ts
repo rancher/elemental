@@ -163,9 +163,13 @@ Cypress.Commands.add('createMachReg', (
   }
 
   // Try to download the registration file and check it
-  cy.getBySel(selectors.downloadBtn).click();
-  cy.verifyDownload(`${machRegName}_registrationURL.yaml`);
-  cy.contains('Saving').should('not.exist');
+  // The button is broken in rancher 2.10, bug opened here
+  // https://github.com/rancher/elemental-ui/issues/229
+  if (!utils.isRancherManagerVersion('2.10')) {
+    cy.getBySel(selectors.downloadBtn).click();
+    cy.verifyDownload(`${machRegName}_registrationURL.yaml`);
+    cy.contains('Saving').should('not.exist');
+  }
 
   // Check Cloud configuration
   if (checkDefaultCloudConfig) {
@@ -216,18 +220,18 @@ Cypress.Commands.add('addMachInvLabel', (labelName: string, labelValue: string, 
   cy.get(`${selectors.addLabelMachInv} > .kv-container > .kv-item.value`).type(labelValue);
 
   if (useHardwareLabels) {
-    const isRancher29 = utils.isRancherManagerVersion('2.9');
-    let index = isRancher29 ? 1 : 7;
+    const isRancher28 = utils.isRancherManagerVersion('2.8');
+    let index = isRancher28 ? 7 : 1;
 
     for (const key in hwLabels) {
       cy.get(`${selectors.addLabelMachInv} > .footer > .btn`).click();
-      const keySelector = isRancher29 ? selectors.inputKvItemKey(index) : `${selectors.kvContainer}(${index}) > input`;
-      const valueSelector = isRancher29 ? selectors.kvItemValue(index) : `${selectors.kvContainer}(${index + 1}) > .value-container > ${selectors.textAreaAutoGrow}`;
+      const keySelector = isRancher28 ? `${selectors.kvContainer}(${index}) > input` : selectors.inputKvItemKey(index);
+      const valueSelector = isRancher28 ? `${selectors.kvContainer}(${index + 1}) > .value-container > ${selectors.textAreaAutoGrow}` : selectors.kvItemValue(index);
 
       cy.get(keySelector).type(key);
       cy.get(valueSelector).type(hwLabels[key], { parseSpecialCharSequences: false });
 
-      index += isRancher29 ? 1 : 3;
+      index += isRancher28 ? 3 : 1;
     }
   }
 });
