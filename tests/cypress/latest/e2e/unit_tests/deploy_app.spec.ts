@@ -37,7 +37,7 @@ filterTests(['main'], () => {
         cy.wait(20000);
         isRancherManagerVersion('2.8') && cypressLib.burgerMenuToggle();
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        if (isRancherManagerVersion('2.9')) {
+        if (!isRancherManagerVersion('2.8')) {
           cy.get('.main-panel').contains(clusterName).click();
         } else {
           cy.contains(clusterName).click();
@@ -52,13 +52,13 @@ filterTests(['main'], () => {
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload();
-        cy.contains('Deployed rancher-alerting-drivers');
+        cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
       }));
 
     qase(32,
       it('Remove Alerting Drivers application', () => {
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        if (isRancherManagerVersion('2.9')) {
+        if (!isRancherManagerVersion('2.8')) {
           cy.get('.main-panel').contains(clusterName).click();
         } else {
           cy.contains(clusterName).click();

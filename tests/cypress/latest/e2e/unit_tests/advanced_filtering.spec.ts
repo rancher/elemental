@@ -16,6 +16,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { isRancherManagerVersion } from '~/support/utils';
 
 filterTests(['main'], () => {
   describe('Advanced filtering testing', () => {
@@ -67,7 +68,11 @@ filterTests(['main'], () => {
         cy.clickNavMenu(['Inventory of Machines']);
         cy.get('[width="30"] > .checkbox-outer-container > .checkbox-container > .checkbox-custom').click();
         cy.clickButton('Actions');
-        cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)').click();
+        if (!isRancherManagerVersion('2.10')) {
+          cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)').click();
+        } else {
+          cy.get('.v-popper__inner').contains('Delete').click();
+        }
         cy.confirmDelete();
     }));
   });

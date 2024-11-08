@@ -44,7 +44,7 @@ filterTests(['main'], () => {
 
     it('Check In Sync column status', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      const htmlSelector = isRancherManagerVersion('2.9') ? selectors.sortableTableList : selectors.clusterList;
+      const htmlSelector = isRancherManagerVersion('2.8') ? selectors.clusterList : selectors.sortableTableList;
       cy.getBySel(htmlSelector)
         .should('not.contain', 'Unavailable');
       cy.getBySel(htmlSelector)
