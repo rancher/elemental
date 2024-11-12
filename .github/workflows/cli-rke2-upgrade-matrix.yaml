@@ -40,7 +40,7 @@ jobs:
         cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '"", "hardened"')) }}
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.28.13+rke2r1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.28.13+rke2r1"')) }}
-        rancher_upgrade: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.8"')) }}
+        rancher_upgrade: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/2.10"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
