@@ -183,6 +183,7 @@
       -  **By:** Checking that the restore has been done
       -  **By:** Installing CertManager
       -  **By:** Installing Rancher Manager
+      -  **By:** Upgrading/re-installing Elemental Operator
       -  **By:** Checking cluster state after restore
 - **Describe:** E2E - Test simple Backup/Restore
     - **It:** Do a backup
