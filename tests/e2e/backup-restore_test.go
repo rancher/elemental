@@ -192,6 +192,11 @@ var _ = Describe("E2E - Test full Backup/Restore", Label("test-full-backup-resto
 			InstallRancher(k)
 		})
 
+		By("Upgrading/re-installing Elemental Operator", func() {
+			installOrder := []string{"elemental-operator-crds", "elemental-operator"}
+			InstallElementalOperator(k, installOrder, operatorRepo)
+		})
+
 		By("Checking cluster state after restore", func() {
 			WaitCluster(clusterNS, clusterName)
 		})
