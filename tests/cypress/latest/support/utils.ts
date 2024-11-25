@@ -66,6 +66,13 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
     .type('My Elemental testing cluster');
   cy.contains('.labeled-input.create', 'Machine Count')
     .clear()
+  // Do not use Calico for RKE2 2.10, there is a bug
+  if (isK8sVersion('rke2') && isRancherManagerVersion('2.10')) {
+    cy.getBySel('cluster-rke2-cni-select')
+      .click();
+    cy.contains('canal')
+      .click();
+  }
   if (isCypressTag('main')) {
     cy.contains('.labeled-input.create', 'Machine Count')
       .type('3');

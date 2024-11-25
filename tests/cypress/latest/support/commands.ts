@@ -392,5 +392,5 @@ Cypress.Commands.add('addOsVersionChannel', (channelVersion: string) => {
   cy.wait(10000);
 
   // Make sure the new channel is in Active state
-  cy.contains("Active " + channelVersion + "-channel", { timeout: 50000 });
+  cy.contains(new RegExp('Active.*'+channelVersion+'-channel'), { timeout: 50000 });
 });
