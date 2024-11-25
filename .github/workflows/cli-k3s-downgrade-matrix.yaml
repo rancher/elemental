@@ -51,5 +51,5 @@ jobs:
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: stable/latest
       test_type: cli
-      upgrade_image: registry.suse.com/suse/sl-micro/6.0/baremetal-os-container:latest
+      upgrade_image: registry.suse.com/suse/sl-micro/6.1/baremetal-os-container:latest
       zone: us-central1-b

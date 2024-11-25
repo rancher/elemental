@@ -62,5 +62,5 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
       ui_account: user
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.0/baremetal-os-container:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.1/baremetal-os-container:latest
       zone: us-central1-b
