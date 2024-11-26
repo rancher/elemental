@@ -163,13 +163,9 @@ Cypress.Commands.add('createMachReg', (
   }
 
   // Try to download the registration file and check it
-  // The button is broken in rancher 2.10, bug opened here
-  // https://github.com/rancher/elemental-ui/issues/229
-  if (!utils.isRancherManagerVersion('2.10')) {
-    cy.getBySel(selectors.downloadBtn).click();
-    cy.verifyDownload(`${machRegName}_registrationURL.yaml`);
-    cy.contains('Saving').should('not.exist');
-  }
+  cy.getBySel(selectors.downloadBtn).click();
+  cy.verifyDownload(`${machRegName}_registrationURL.yaml`);
+  cy.contains('Saving').should('not.exist');
 
   // Check Cloud configuration
   if (checkDefaultCloudConfig) {
