@@ -96,7 +96,7 @@ COPY --from=toolkit /usr/bin/elemental /usr/bin/elemental
 ADD --chmod=0755 https://github.com/rancher/system-agent/releases/download/${RANCHER_SYSTEM_AGENT_VERSION}/rancher-system-agent-amd64 /usr/sbin/elemental-system-agent
 
 # Enable essential services
-RUN systemctl enable NetworkManager.service sshd
+RUN systemctl enable NetworkManager.service sshd elemental-register.timer
 
 # This is for testing purposes, do not do this in production.
 RUN echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/rootlogin.conf
