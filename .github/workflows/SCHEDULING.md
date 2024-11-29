@@ -21,6 +21,7 @@ We try to spread the tests as best as we can to avoid SPOT issue as well as not 
 | UI RKE2 | Monday to Saturday | 2am | us-central1-b |
 | UI RKE2 Upgrade | Monday to Saturday | 4am | us-central1-b |
 | UI Rancher Manager Devel | Sunday | 12pm | us-central1-a |
+| UI Rancher Manager 2.8-head | Sunday | 12pm | us-central1-a |
 | Update tests description | All days | 11pm | us-central1 |
 
 **NOTE:** please note that the GitHub scheduler uses UTC and our GCP runners are deployed in `us-central1`, so UTC-5.
