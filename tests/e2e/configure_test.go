@@ -50,6 +50,22 @@ var _ = Describe("E2E - Configure test", Label("configure"), func() {
 			},
 		}
 
+		By("Configuring SSH client", func() {
+			home := os.Getenv("HOME")
+
+			err := exec.Command("mkdir", "-p", home+"/.ssh").Run()
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = exec.Command("chmod", "700", home+"/.ssh").Run()
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = exec.Command("cp", sshConfigFile, home+"/.ssh/config").Run()
+			Expect(err).To(Not(HaveOccurred()))
+
+			err = exec.Command("chmod", "600", home+"/.ssh/config").Run()
+			Expect(err).To(Not(HaveOccurred()))
+		})
+
 		By("Creating a cluster", func() {
 			// Create Yaml file
 			for _, p := range basePatterns {
