@@ -51,6 +51,7 @@ const (
 	numberOfNodesMax      = 30
 	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"
+	sshConfigFile         = "../assets/ssh_config"
 	upgradeSkelYaml       = "../assets/upgrade_skel.yaml"
 	userName              = "root"
 	userPassword          = "r0s@pwd1"

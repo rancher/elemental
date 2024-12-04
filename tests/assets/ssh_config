@@ -1,0 +1,7 @@
+RequestTTY auto
+BatchMode no
+HostbasedAuthentication no
+CheckHostIP no
+StrictHostKeyChecking no
+TCPKeepAlive yes
+LogLevel QUIET
