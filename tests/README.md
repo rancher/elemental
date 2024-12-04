@@ -225,6 +225,7 @@
 
 - **Describe:** E2E - Configure test
     - **It:** Deploy a new cluster
+      -  **By:** Configuring SSH client
       -  **By:** Creating a cluster
       -  **By:** Creating cluster selectors
       -  **By:** Adding MachineRegistration
