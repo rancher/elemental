@@ -62,6 +62,12 @@ filterTests(['main', 'upgrade'], () => {
         cy.get('.plugin')
           .contains('Install')
           .click();
+        if (isRancherManagerVersion('2.8')) {
+          cy.getBySel('install-ext-modal-select-version')
+            .click();
+          cy.contains('1.3.1')
+            .click();
+        }
         cy.clickButton('Install');
         cy.contains('Installing');
         cy.contains('Extensions changed - reload required', { timeout: 40000 });
