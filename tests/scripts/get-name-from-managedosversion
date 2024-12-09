@@ -2,7 +2,7 @@
 
 # This script returns the OS version/channel name from ManagedOSVersion
 
-set -e -x
+set -evx
 
 # Variables
 typeset -l KIND_OF_OS=$1
