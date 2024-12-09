@@ -2,7 +2,13 @@
 
 # Build Airgap
 
-set -x
+set -vx
+
+# Error function
+function error() {
+  echo -e "$@" >&2
+  exit 1
+}
 
 # Retry helm command in case of sporadic issue
 function RunHelmCmdWithRetry() {
@@ -144,6 +150,11 @@ cd ${OPT_RANCHER}/images/
 RANCHER_REPO=https://github.com/rancher/rancher/releases/download/v${RANCHER_MANAGER_VERSION}
 RANCHER_IMAGES_FILE=rancher-images.txt
 curl -sOL ${RANCHER_REPO}/${RANCHER_IMAGES_FILE}
+
+# Rancher image file should not be empty
+if $(grep -iq 'not found' ${RANCHER_IMAGES_FILE}) || [[ ! -s ${RANCHER_IMAGES_FILE} ]]; then
+  error "ERROR: file ${RANCHER_IMAGES_FILE} is empty or not found!"
+fi
 
 # CertManager image list
 CERT_IMAGES_FILE=cert-manager-images.txt
