@@ -3,7 +3,7 @@
 # This script deploys a local helm repo to host the dev operator chart
 # because it is not exported anywhere else.
 
-set -e -x
+set -evx
 
 # Add missing PATH, removed in recent distributions for security reasons...
 PATH+=:/usr/local/bin
