@@ -156,6 +156,11 @@ if $(grep -iq 'not found' ${RANCHER_IMAGES_FILE}) || [[ ! -s ${RANCHER_IMAGES_FI
   error "ERROR: file ${RANCHER_IMAGES_FILE} is empty or not found!"
 fi
 
+# Fleet should be present in the file, otherwise no need to go further!
+if ! $(grep -iq 'fleet' ${RANCHER_IMAGES_FILE}); then
+  error "ERROR: fleet is not found in file ${RANCHER_IMAGES_FILE}!"
+fi
+
 # CertManager image list
 CERT_IMAGES_FILE=cert-manager-images.txt
 RunHelmCmdWithRetry template ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
