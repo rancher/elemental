@@ -2,7 +2,7 @@
 
 # This script extracts the kernel and initrd files from an ISO image
 
-set -e -x
+set -evx
 
 # Cleaning function
 function clean_and_exit() {

@@ -2,7 +2,7 @@
 
 # Deploy Airgap
 
-set -x
+set -vx
 
 # Retry skopeo command in case of sporadic issue
 function RunSkopeoCmdWithRetry() {

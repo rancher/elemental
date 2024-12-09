@@ -2,6 +2,12 @@
 
 set -evx
 
+# Error function
+function error() {
+  echo -e "$@" >&2
+  exit 1
+}
+
 # Variable(s) and default values
 ARCH=$(uname -m)
 EMULATED_TPM="none"
@@ -49,8 +55,7 @@ if [[ ${BOOT_TYPE} == "iso" ]]; then
 
   # Exit if ISO is not available
   [[ ! -f ${ISO} ]] \
-    && echo "File ${ISO} not found! Exiting!" >&2 \
-    && exit 1
+    && error "File ${ISO} not found! Exiting!"
 
   # Soft-link the ISO to avoid "Could not define storage pool" error
   ln -s ${ISO} ${VM_NAME}/
@@ -66,8 +71,7 @@ elif [[ ${BOOT_TYPE} == "raw" ]]; then
 
   # Exit if RAW is not available
   [[ ! -f ${RAW_IMAGE} ]] \
-    && echo "File ${RAW_IMAGE} not found! Exiting!" >&2 \
-    && exit 1  
+    && error "File ${RAW_IMAGE} not found! Exiting!"
   
   # Duplicate the raw image depending on nodes number
   cp ${RAW_IMAGE} ${VM_NAME}/${VM_NAME}.img
@@ -83,8 +87,7 @@ else
     # Exit if binary is not available
     IPXE_BIN=$(realpath ../assets/ipxe-${ARCH}.efi)
     [[ ! -f ${IPXE_BIN} ]] \
-      && echo "File ${IPXE_BIN} not found! Exiting!" >&2 \
-      && exit 1
+      && error "File ${IPXE_BIN} not found! Exiting!"
 
     # Force remove, to avoid issue with 'ln'
     # Only useful if an EFI file exists and it's not a symlink

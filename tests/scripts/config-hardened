@@ -3,7 +3,7 @@
 # This script configures all we need to configure k3s / rke2 hardened cluster
 # Instructions from https://docs.k3s.io/security/hardening-guide and https://docs.rke2.io/security/hardening_guide
 
-set -e -x
+set -evx
 
 # Variables
 K3S_SERVER_DIR="/var/lib/rancher/k3s/server"
