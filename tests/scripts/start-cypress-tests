@@ -79,7 +79,7 @@ docker run -v $PWD:/workdir -w /workdir                         \
 
 if [[ ! -f ${ELEMENTAL_MEDIA_PATH} ]]; then
   # Move elemental image into the expected folder
-  for EXT in iso img; do
+  for EXT in iso img raw; do
     mv downloads/*.${EXT} ${ELEMENTAL_MEDIA_PATH} 2>/dev/null || true
   done
 fi

@@ -15,7 +15,7 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
-import { isBootType } from '~/support/utils';
+import { isBootType, isRancherManagerVersion, isUIVersion } from '~/support/utils';
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -41,7 +41,21 @@ filterTests(['main'], () => {
       cy.exec('rm -f cypress/downloads/*', { failOnNonZeroExit: false });
       cy.clickNavMenu(["Advanced", "Seed Images"]);
       cy.getBySel(selectors.sortableTableRow).contains('Download').click();
-      cy.verifyDownload(isBootType('iso') ? '.iso' : '.img', { contains: true, timeout: 300000, interval: 5000 });
+      if (isBootType('iso')) {
+        cy.verifyDownload('.iso', { contains: true, timeout: 300000, interval: 5000 });
+      } else {
+        // .img will be removed in next elemental UI, only .raw will be available
+        let extension = 'img';
+        isRancherManagerVersion('2.10') ? extension = 'raw' : null;
+        cy.verifyDownload('.'+extension, { contains: true, timeout: 300000, interval: 5000 });
+      }
+      // The following line will replace the confition just above very soon
+      //cy.verifyDownload(isBootType('iso') ? '.iso' : '.raw', { contains: true, timeout: 300000, interval: 5000 });
+          // Check we can download the checksum file (only in dev UI for now)
+      if (isUIVersion('dev')) {
+        cy.getBySel('download-checksum-btn-list').click();
+        cy.verifyDownload('.sh256', { contains: true, timeout: 60000, interval: 5000 });
+      }
     });
   });
 });
