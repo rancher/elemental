@@ -18,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -33,10 +34,13 @@ var _ = Describe("E2E - Build the airgap archive", Label("prepare-archive"), fun
 		if certManagerVersion == "" {
 			certManagerVersion = "latest"
 		}
+		if rancherVersion == "" {
+			rancherVersion = "latest"
+		}
 
 		// Could be useful for manual debugging!
-		GinkgoWriter.Printf("Executed command: %s %s %s %s %s %s\n", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sDownstreamVersion, operatorRepo)
-		out, err := exec.Command(airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, k8sDownstreamVersion, operatorRepo).CombinedOutput()
+		GinkgoWriter.Printf("Executed command: %s %s %s %s %s %s %s\n", airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, rancherVersion, k8sDownstreamVersion, operatorRepo)
+		out, err := exec.Command(airgapBuildScript, k8sUpstreamVersion, certManagerVersion, rancherChannel, rancherVersion, k8sDownstreamVersion, operatorRepo).CombinedOutput()
 		Expect(err).To(Not(HaveOccurred()), string(out))
 	})
 })
@@ -194,7 +198,7 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 
 			// Set flags for Rancher Manager installation
 			flags := []string{
-				"upgrade", "--install", "rancher", string(rancherManagerChart),
+				"upgrade", "--install", "rancher", strings.TrimSpace(string(rancherManagerChart)),
 				"--namespace", "cattle-system",
 				"--create-namespace",
 				"--set", "hostname=" + rancherManager,

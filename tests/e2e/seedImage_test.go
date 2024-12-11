@@ -57,11 +57,10 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 				WaitForOSVersion(clusterNS)
 
 				// Get OSVersion name
-				Eventually(func() error {
-					OSVersion, err = exec.Command(getOSScript, os2Test, "true").Output()
-					return err
-				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(BeNil())
-				Expect(OSVersion).To(Not(BeEmpty()))
+				Eventually(func() string {
+					OSVersion, _ = exec.Command(getOSScript, os2Test, "true").Output()
+					return string(OSVersion)
+				}, tools.SetTimeout(2*time.Minute), 30*time.Second).Should(Not(BeEmpty()))
 
 				// Extract container image URL
 				baseImageURL, err = elemental.GetImageURI(clusterNS, string(OSVersion))
