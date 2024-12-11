@@ -448,7 +448,7 @@ jobs:
         env:
           OPERATOR_REPO: ${{ inputs.operator_repo }}
         # Don't test Operator uninstall if we want to keep the runner for debugging purposes
-        if: ${{ inputs.destroy_runner == true && inputs.full_backup_restore == false }}
+        if: ${{ inputs.destroy_runner == true }}
         run: cd tests && make e2e-uninstall-operator
 
       # This step must be called in each worklow that wants a summary!
