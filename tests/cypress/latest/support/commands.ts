@@ -152,20 +152,17 @@ Cypress.Commands.add('createMachReg', (
     cy.getBySel(selectors.downloadMediaBtn, { timeout: 600000 }).should('not.have.attr', 'disabled');
     cy.getBySel(selectors.downloadMediaBtn).click();
 
-    // RAW image not available in upgrade scenario because we start from stable
-    // and RAW feature is not already available in stable
-    // upgrade condition will be removed in next elemental stable version
-    if (utils.isBootType('raw') && !utils.isCypressTag('upgrade')) {
+    if (utils.isBootType('raw')) {
       // .img will be removed in next elemental UI, only .raw will be available
       let extension = 'img';
-      utils.isRancherManagerVersion('2.10') ? extension = 'raw' : null;
+      !utils.isRancherManagerVersion('2.8') ? extension = 'raw' : null;
       cy.verifyDownload('.'+extension, { contains: true, timeout: 300000, interval: 5000 });
     } else {
       cy.verifyDownload('.iso', { contains: true, timeout: 300000, interval: 5000 });
     }
 
-    // Check we can download the checksum file (only in dev UI for now)
-    if (utils.isUIVersion('dev')) {
+    // Check we can download the checksum file (only in dev UI for Rancher 2.9 / 2.10)
+    if (!utils.isRancherManagerVersion('2.8') && utils.isUIVersion('dev')) {
       cy.getBySel('download-checksum-btn').click();
       cy.verifyDownload('.sh256', { contains: true, timeout: 60000, interval: 5000 });
     }

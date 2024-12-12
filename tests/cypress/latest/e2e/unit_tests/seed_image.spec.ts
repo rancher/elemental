@@ -15,7 +15,7 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
-import { isBootType, isRancherManagerVersion, isUIVersion } from '~/support/utils';
+import * as utils from "~/support/utils";
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -41,18 +41,18 @@ filterTests(['main'], () => {
       cy.exec('rm -f cypress/downloads/*', { failOnNonZeroExit: false });
       cy.clickNavMenu(["Advanced", "Seed Images"]);
       cy.getBySel(selectors.sortableTableRow).contains('Download').click();
-      if (isBootType('iso')) {
+      if (utils.isBootType('iso')) {
         cy.verifyDownload('.iso', { contains: true, timeout: 300000, interval: 5000 });
       } else {
-        // .img will be removed in next elemental UI, only .raw will be available
+        // .img still needed for rancher 2.8
         let extension = 'img';
-        isRancherManagerVersion('2.10') ? extension = 'raw' : null;
+        !utils.isRancherManagerVersion('2.8') ? extension = 'raw' : null;
         cy.verifyDownload('.'+extension, { contains: true, timeout: 300000, interval: 5000 });
       }
-      // The following line will replace the confition just above very soon
+      // The following line will replace the confition just above when we will remove 2.8 tests
       //cy.verifyDownload(isBootType('iso') ? '.iso' : '.raw', { contains: true, timeout: 300000, interval: 5000 });
-          // Check we can download the checksum file (only in dev UI for now)
-      if (isUIVersion('dev')) {
+      // Check we can download the checksum file (only in dev UI for Rancher 2.9 / 2.10)
+      if (!utils.isRancherManagerVersion('2.8') && utils.isUIVersion('dev')) {
         cy.getBySel('download-checksum-btn-list').click();
         cy.verifyDownload('.sh256', { contains: true, timeout: 60000, interval: 5000 });
       }
