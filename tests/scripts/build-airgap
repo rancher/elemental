@@ -115,6 +115,7 @@ case ${RANCHER_CHANNEL} in
     ;;
   prime-optimus)
     RANCHER_CHART_REPO="https://charts.optimus.rancher.io/server-charts/latest"
+    RANCHER_IMAGES_REPO="stgregistry.suse.com"
     ;;
   prime-optimus-alpha)
     RANCHER_CHART_REPO="https://charts.optimus.rancher.io/server-charts/alpha"
@@ -122,7 +123,6 @@ case ${RANCHER_CHANNEL} in
     ;;
   alpha|latest|stable)
     RANCHER_CHART_REPO="https://releases.rancher.com/server-charts/${RANCHER_CHANNEL}"
-    RANCHER_IMAGES_REPO="stgregistry.suse.com"
     ;;
   *)
     error "Rancher channel '${RANCHER_CHANNEL}' unknown!"
