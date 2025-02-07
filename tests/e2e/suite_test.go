@@ -49,6 +49,7 @@ const (
 	localStorageYaml      = "../assets/local-storage.yaml"
 	metallbRscYaml        = "../assets/metallb_rsc.yaml"
 	numberOfNodesMax      = 30
+	osChannelYaml         = "../assets/osChannel.yaml"
 	resetMachineInv       = "../assets/reset_machine_inventory.yaml"
 	restoreYaml           = "../assets/restore.yaml"
 	sshConfigFile         = "../assets/ssh_config"

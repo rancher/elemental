@@ -1,0 +1,11 @@
+apiVersion: elemental.cattle.io/v1beta1
+kind: ManagedOSVersionChannel
+metadata:
+  name: os-channel-to-test
+  # namespace: fleet-default
+spec:
+  deleteNoLongerInSyncVersions: true
+  options:
+    image: %OS_CHANNEL%
+  syncInterval: 1h
+  type: custom

@@ -9,8 +9,8 @@ on:
         description: Version of backup-restore-operator to use
         type: string
       boot_type:
-        description: Choose booting type (pxe, iso, raw) 
-        default: pxe 
+        description: Choose booting type (pxe, iso, raw)
+        default: pxe
         type: string
       ca_type:
         description: CA type to use (selfsigned or private)
