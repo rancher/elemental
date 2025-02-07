@@ -18,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -41,6 +42,62 @@ var _ = Describe("E2E - Creating ISO image", Label("iso-image"), func() {
 	It("Configure and create ISO image", func() {
 		// Report to Qase
 		testCaseID = 38
+
+		// If registry keyword is found this means that we have to test a specific OS channel
+		if strings.Contains(os2Test, "registry") {
+			// Get default channel image
+			defChannel, err := kubectl.RunWithoutErr("get", "managedOSVersionChannel",
+				"--namespace", clusterNS,
+				"-o", "jsonpath={.items[0].spec.options.image}")
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(defChannel).To(Not(BeEmpty()))
+
+			// Add channel to test if needed
+			if !strings.Contains(defChannel, os2Test) {
+				By("Adding OSChannel to test", func() {
+					// Get channel name (to be able to remove it later)
+					channelName, err := kubectl.RunWithoutErr("get", "managedOSVersionChannel",
+						"--namespace", clusterNS,
+						"-o", "jsonpath={.items[0].metadata.name}")
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(channelName).To(Not(BeEmpty()))
+
+					// Set temporary file
+					osChannelTmp, err := tools.CreateTemp("osChannel")
+					Expect(err).To(Not(HaveOccurred()))
+					defer os.Remove(osChannelTmp)
+
+					// Save original file as it can be modified multiple time
+					err = tools.CopyFile(osChannelYaml, osChannelTmp)
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Set the OS channel to test
+					err = tools.Sed("%OS_CHANNEL%", os2Test, osChannelTmp)
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Apply to k8s
+					err = kubectl.Apply(clusterNS, osChannelTmp)
+					Expect(err).To(Not(HaveOccurred()))
+
+					// Check that the OS channel to test has been added
+					const channel = "os-channel-to-test"
+					newChannel, err := kubectl.RunWithoutErr("get", "managedOSVersionChannel",
+						"--namespace", clusterNS, channel,
+						"-o", "jsonpath={.spec.options.image}")
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(newChannel).To(Equal(os2Test))
+
+					// Delete the default channel (to be sure that it can't be used)
+					out, err := kubectl.RunWithoutErr("delete", "managedOSVersionChannel",
+						"--namespace", clusterNS, channelName)
+					Expect(err).To(Not(HaveOccurred()))
+					Expect(out).To(ContainSubstring("deleted"))
+				})
+			}
+
+			// Clear OS_TO_TEST, as Staging and Dev channels manually added do not contain "unstable" tag
+			os2Test = ""
+		}
 
 		By("Adding SeedImage", func() {
 			var (
