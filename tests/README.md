@@ -294,6 +294,7 @@
 
 - **Describe:** E2E - Creating ISO image
     - **It:** Configure and create ISO image
+      -  **By:** Adding OSChannel to test
       -  **By:** Adding SeedImage
       -  **By:** Setting emulated TPM to +strconv.FormatBoolemulateTPM
     - **It:** Download ISO built by SeedImage
