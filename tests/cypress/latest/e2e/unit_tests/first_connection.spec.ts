@@ -15,6 +15,7 @@ limitations under the License.
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { isRancherManagerVersion } from '~/support/utils';
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
@@ -29,7 +30,12 @@ filterTests(['main', 'upgrade'], () => {
       cy.login();
       cy.visit('/');
       cy.getBySel('nav_header_showUserMenu').click();
-      cy.getBySel('user-menu-dropdown').contains('Preferences').click();
+      // HTML selector user-menu-dropdown is not in 2.11 anymore
+      if (isRancherManagerVersion('2.11')) {
+        cy.contains('Preferences').click();
+      } else {
+        cy.getBySel('user-menu-dropdown').contains('Preferences').click();
+      }
       cy.clickButton('Include Prerelease Versions');
       cypressLib.burgerMenuToggle();
       cy.getBySel('side-menu').contains('Home').click();

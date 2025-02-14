@@ -68,7 +68,7 @@ filterTests(['main'], () => {
         cy.clickNavMenu(['Inventory of Machines']);
         cy.get('[width="30"] > .checkbox-outer-container > .checkbox-container > .checkbox-custom').click();
         cy.clickButton('Actions');
-        if (!isRancherManagerVersion('2.10')) {
+        if (isRancherManagerVersion('2.8') || isRancherManagerVersion('2.9')) {
           cy.get('.tooltip-inner > :nth-child(1) > .list-unstyled > :nth-child(3)').click();
         } else {
           cy.get('.v-popper__inner').contains('Delete').click();

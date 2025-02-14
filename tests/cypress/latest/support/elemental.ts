@@ -31,7 +31,7 @@ export class Elemental {
       expect($lis).to.have.length(7);
       // There is a bug with Dashboard entry in rancher 2.10
       // https://github.com/rancher/elemental-ui/issues/230
-      if (!isRancherManagerVersion('2.10')) {
+      if (isRancherManagerVersion('2.9')) {
         expect($lis.eq(0)).to.contain('Dashboard');
       }
       expect($lis.eq(1)).to.contain('Registration Endpoints');
@@ -93,7 +93,7 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', { timeout: 120000 });
     cy.reload();
-    if (!isRancherManagerVersion('2.10')) {
+    if (isRancherManagerVersion('2.9')) {
       // eslint-disable-next-line cypress/unsafe-to-chain-command
       cy.contains('Only User Namespaces').click().type('cattle-elemental-system{enter}{esc}');
       cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', { timeout: 120000 });

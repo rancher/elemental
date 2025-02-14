@@ -51,7 +51,6 @@ filterTests(['main'], () => {
       }
       // The following line will replace the confition just above when we will remove 2.8 tests
       //cy.verifyDownload(isBootType('iso') ? '.iso' : '.raw', { contains: true, timeout: 300000, interval: 5000 });
-      // Check we can download the checksum file (only in dev UI for Rancher 2.9 / 2.10)
       if (!utils.isRancherManagerVersion('2.8') && utils.isUIVersion('dev')) {
         cy.getBySel('download-checksum-btn-list').click();
         cy.verifyDownload('.sh256', { contains: true, timeout: 60000, interval: 5000 });
