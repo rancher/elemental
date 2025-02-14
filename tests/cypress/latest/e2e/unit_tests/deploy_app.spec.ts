@@ -31,6 +31,8 @@ filterTests(['main'], () => {
 
     qase(31,
       it('Deploy Alerting Drivers application', () => {
+        let myAppToInstall;
+        isRancherManagerVersion('2.11') ? myAppToInstall = 'Cerbos' : myAppToInstall = 'Alerting Drivers';
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -44,19 +46,25 @@ filterTests(['main'], () => {
         }
         cy.get('.nav').contains('Apps').click();
         cy.contains('Charts').click();
-        cy.contains('Alerting Drivers', { timeout: 30000 }).click();
-        cy.contains('.name-logo-install', 'Alerting Drivers', { timeout: 30000 });
+        cy.contains(myAppToInstall, { timeout: 30000 }).click();
+        cy.contains('.name-logo-install', myAppToInstall, { timeout: 30000 });
         cy.clickButton('Install');
-        cy.contains('.outer-container > .header', 'Alerting Drivers');
+        cy.contains('.outer-container > .header', myAppToInstall);
         cy.clickButton('Next');
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload();
-        cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
+        if (isRancherManagerVersion('2.11')) {
+          cy.contains(new RegExp('Deployed.*cerbos'));
+        } else { 
+          cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
+        }
       }));
 
     qase(32,
       it('Remove Alerting Drivers application', () => {
+        let myAppToInstall;
+        isRancherManagerVersion('2.11') ? myAppToInstall = 'cerbos' : myAppToInstall = 'rancher-alerting-drivers';
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         if (!isRancherManagerVersion('2.8')) {
           cy.get('.main-panel').contains(clusterName).click();
@@ -66,12 +74,12 @@ filterTests(['main'], () => {
         cy.get('.nav').contains('Apps').click();
         cy.contains('Installed Apps').click();
         cy.contains('.title', 'Installed Apps', { timeout: 20000 });
-        cy.contains('rancher-alerting-drivers');
+        cy.contains(myAppToInstall);
         cy.get('[width="30"] > .checkbox-outer-container').click();
         cy.get('.outlet').getBySel('sortable-table-promptRemove').click();
         cy.confirmDelete();
         cy.contains('SUCCESS: helm uninstall', { timeout: 60000 });
-        cy.contains('.apps', 'rancher-alerting-drivers').should('not.exist');
+        cy.contains('.apps', myAppToInstall).should('not.exist');
       }));
   });
 });

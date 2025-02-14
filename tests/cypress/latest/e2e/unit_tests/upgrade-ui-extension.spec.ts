@@ -31,10 +31,10 @@ describe('UI extension upgrade tests', () => {
 
   filterTests(['upgrade'], () => {
     // 1 - Enable only with K3S because still too much flaky with RKE2
-    // 2 - TODO: Remove rancher 2-10 condition later
-    // UI extension upgrade cannot be upgraded with rancher manager 2.10 yet
+    // 2 - TODO: Remove rancher 2-11 condition later
+    // UI extension upgrade cannot be upgraded with rancher manager 2.11 yet
     // because we have only one version so far
-    if (utils.isK8sVersion('k3s') && !utils.isRancherManagerVersion('2.10')) {
+    if (utils.isK8sVersion('k3s') && !utils.isRancherManagerVersion('2.11')) {
       it('Add elemental-ui dev repo', () => {
         cypressLib.addRepository('elemental-ui', 'https://github.com/rancher/elemental-ui.git', 'git', 'gh-pages');
       });
