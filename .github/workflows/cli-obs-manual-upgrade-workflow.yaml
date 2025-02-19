@@ -64,5 +64,5 @@ jobs:
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/containers/suse/sl-micro/${{ inputs.slem_version }}/baremetal-os-container:latest
+      upgrade_image: registry.suse.com/suse/sl-micro/${{ inputs.slem_version }}/baremetal-os-container:latest
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}
