@@ -140,6 +140,9 @@ Cypress.Commands.add('createMachReg', (
     // Sometimes we want to test dev/staging operator version with stable OS version
     } else if ( utils.isOsVersion('stable') && utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
       cy.contains(Cypress.env('iso_stable_os_version')).click();
+    // For maintenance, we need to select the last -1 version, the last one is the unstable one.
+    } else if (utils.isOperatorVersion('maintenance')) {
+      cy.get('.vs__dropdown-option').last().prev().click();
     } else {
       cy.contains('(unstable)').click();
     }
