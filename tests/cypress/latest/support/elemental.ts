@@ -77,7 +77,7 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    cy.contains('.outer-container > .header', 'Elemental');
+    isRancherManagerVersion('2.11') ? cy.contains('.top > .title', 'Elemental') : cy.contains('.outer-container > .header', 'Elemental');
 
     if (isRancherPrime() && isCypressTag('main')) {
       const registryLabel = 'Container Registry';

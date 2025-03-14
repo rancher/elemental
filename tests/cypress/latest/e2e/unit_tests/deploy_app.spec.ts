@@ -49,7 +49,7 @@ filterTests(['main'], () => {
         cy.contains(myAppToInstall, { timeout: 30000 }).click();
         cy.contains('.name-logo-install', myAppToInstall, { timeout: 30000 });
         cy.clickButton('Install');
-        cy.contains('.outer-container > .header', myAppToInstall);
+        isRancherManagerVersion('2.11') ? cy.contains('.top > .title', myAppToInstall) : cy.contains('.outer-container > .header', myAppToInstall);
         cy.clickButton('Next');
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
