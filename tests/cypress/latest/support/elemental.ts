@@ -82,7 +82,7 @@ export class Elemental {
     } else {
       cy.contains('.outer-container > .header', 'Elemental');
     }
-    if (isRancherPrime() && isCypressTag('main')) {
+    if (isRancherPrime() && isCypressTag('main') && !isOperatorVersion('marketplace')) {
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();
       if (isOperatorVersion('staging')) {
@@ -96,7 +96,7 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', { timeout: 120000 });
     cy.reload();
-    if (isRancherManagerVersion('2.9')) {
+    if (isRancherManagerVersion('2.9') || isRancherManagerVersion('2.8')) {
       // eslint-disable-next-line cypress/unsafe-to-chain-command
       cy.contains('Only User Namespaces').click().type('cattle-elemental-system{enter}{esc}');
       cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', { timeout: 120000 });
