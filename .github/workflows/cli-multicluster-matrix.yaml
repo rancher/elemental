@@ -10,18 +10,18 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: '"v1.30.4+k3s1"'
+        default: '"v1.31.7+k3s1"'
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: '"v1.30.4+k3s1"'
+        default: '"v1.31.7+k3s1"'
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
-        default: '"stable/latest"'
+        default: '"prime/latest"'
         type: string
   schedule:
     # Every Sunday at 5am UTC (0am in us-central1)
@@ -33,9 +33,9 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.30.4+rke2r1"')) }}
-        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.30.4+k3s1"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest"')) }}
+        k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.31.7+rke2r1"')) }}
+        k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.31.7+k3s1"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"prime/latest"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
