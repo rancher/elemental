@@ -23,9 +23,6 @@ on:
         description: Rancher Manager channel/version/head_version to use
         default: '"prime/latest"'
         type: string
-  schedule:
-    # Every Sunday at 5am UTC (0am in us-central1)
-    - cron: '0 5 * * 0'
 
 jobs:
   cli:

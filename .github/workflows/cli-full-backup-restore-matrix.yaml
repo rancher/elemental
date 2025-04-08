@@ -24,8 +24,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # Every Sunday at 4pm UTC (11am in us-central1)
-    - cron: '0 16 * * 0'
+    # Every Friday at 2am UTC (9pm in us-central1)
+    - cron: '0 2 * * 5'
 
 jobs:
   cli:

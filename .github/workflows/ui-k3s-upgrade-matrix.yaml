@@ -28,8 +28,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # From Monday to Saturday at 4am UTC (11pm in us-central1)
-    - cron: '0 4 * * 1-6'
+    # Tuesday and Thursday at 4am UTC (11pm in us-central1)
+    - cron: '0 4 * * 2,4'
 
 jobs:
   ui:

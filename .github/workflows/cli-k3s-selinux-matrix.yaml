@@ -35,9 +35,6 @@ on:
         description: Allow reset test (mainly used on CLI tests)
         default: false
         type: boolean
-  schedule:
-    # Every Sunday at 2am UTC (9pm in us-central1)
-    - cron: '0 2 * * 0'
 
 jobs:
   cli:

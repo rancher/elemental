@@ -20,8 +20,8 @@ on:
         description: Qase run ID where the results will be reported
         type: string
   schedule:
-    # Every Saturday at 6am UTC (11am in us-central1)
-    - cron: '0 6 * * 6'
+    # Every Friday at 8am UTC (3am in us-central1)
+    - cron: '0 8 * * 5'
 
 jobs:
   cli:

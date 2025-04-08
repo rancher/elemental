@@ -28,8 +28,8 @@ on:
         default: '"latest/devel/head"'
         type: string
   schedule:
-    # From Monday to Saturday at 5am UTC (0am in us-central1)
-    - cron: '0 5 * * 1-6'
+    # Monday and Wednesday at 8am UTC (3am in us-central1)
+    - cron: '0 8 * * 1,3'
 
 jobs:
   cli:
