@@ -14,11 +14,11 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: v1.30.4+k3s1
+        default: v1.37.1+k3s1
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: v1.30.4+k3s1
+        default: v1.37.1+k3s1
         type: string
       operator_repo:
         description: Operator version to use for initial deployment
@@ -28,8 +28,8 @@ on:
         description: Qase run ID where the results will be reported
         type: string
       rancher_upgrade:
-        description: Rancher Manager channel/version to upgrade to
-        default: latest/devel/2.8
+        description: Rancher Manager channel/version/head_version to upgrade to
+        default: latest/devel/head
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
