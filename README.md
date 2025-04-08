@@ -2,7 +2,7 @@
 
 [![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
 
-## Daily CI
+## Bi-weekly CI
 
 [![CLI-K3s](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml)
 [![CLI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml)
@@ -16,15 +16,10 @@
 
 ## Weekly CI
 
+[![CLI-Full-Backup-Restore](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml)
 [![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
 [![CLI-K3s-Downgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-downgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-downgrade-matrix.yaml)
-[![CLI-K3s-Scalability](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-scalability-matrix.yaml)
-[![CLI-K3s-SELinux](https://github.com/rancher/elemental/actions/workflows/cli-k3s-selinux-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-selinux-matrix.yaml)
-[![CLI-Full-Backup-Restore](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml)
-[![CLI-Multicluster](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-multicluster-matrix.yaml)
-[![CLI-Rancher-Manager-Head-2.8](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.8-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rm-head-2.8-matrix.yaml)
 [![CLI-Regression](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml)
-[![UI-Rancher-Manager-Head-2.8](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.8-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rm-head-2.8-matrix.yaml)
 
 ## Goal
 
