@@ -28,8 +28,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # Tuesday and Thursday at 4am UTC (11pm in us-central1)
-    - cron: '0 4 * * 2,4'
+    # Tuesday and Thursday at 3am UTC (10pm in us-central1)
+    - cron: '0 3 * * 2,4'
 
 jobs:
   ui:
@@ -59,4 +59,4 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
       upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.1/baremetal-os-container:latest
-      zone: us-central1-a
+      zone: us-central1-b

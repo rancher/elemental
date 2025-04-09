@@ -24,8 +24,8 @@ on:
         description: Qase run ID where the results will be reported
         type: string
   schedule:
-    # Every Friday at 6am UTC (1am in us-central1)
-    - cron: '0 6 * * 5'
+    # Every Friday at 4am UTC (11pm in us-central1)
+    - cron: '0 4 * * 5'
 
 jobs:
   cli:
@@ -52,4 +52,4 @@ jobs:
       rancher_version: stable/latest
       test_type: cli
       upgrade_image: registry.suse.com/suse/sl-micro/6.1/baremetal-os-container:latest
-      zone: us-central1-b
+      zone: us-central1-c

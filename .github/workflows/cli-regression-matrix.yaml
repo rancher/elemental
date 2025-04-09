@@ -20,8 +20,8 @@ on:
         description: Qase run ID where the results will be reported
         type: string
   schedule:
-    # Every Friday at 8am UTC (3am in us-central1)
-    - cron: '0 8 * * 5'
+    # Every Friday at 5am UTC (12am in us-central1)
+    - cron: '0 5 * * 5'
 
 jobs:
   cli:
@@ -46,4 +46,4 @@ jobs:
       reset: true
       sequential: false
       test_type: cli
-      zone: us-central1-c
+      zone: us-central1-f

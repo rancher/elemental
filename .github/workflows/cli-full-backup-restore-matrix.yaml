@@ -50,4 +50,4 @@ jobs:
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: cli
-      zone: us-central1-c
+      zone: us-central1-a

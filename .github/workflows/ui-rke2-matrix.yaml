@@ -28,8 +28,8 @@ on:
         default: '"prime/latest"'
         type: string
   schedule:
-    # Tuesday and Thursday at 6am UTC (1am in us-central1)
-    - cron: '0 6 * * 2,4'
+    # Tuesday and Thursday at 4am UTC (11pm in us-central1)
+    - cron: '0 4 * * 2,4'
 
 jobs:
   ui:
@@ -59,4 +59,4 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
       ui_account: user
-      zone: us-central1-b
+      zone: us-central1-c
