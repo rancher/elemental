@@ -65,4 +65,4 @@ jobs:
       reset: ${{ matrix.reset }}
       selinux: true
       test_type: cli
-      zone: us-central1-c
+      zone: us-central1-a

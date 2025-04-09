@@ -24,8 +24,8 @@ on:
         default: '"stable/latest"'
         type: string
   schedule:
-    # Every Friday at 4am UTC (11pm in us-central1)
-    - cron: '0 4 * * 5'
+    # Every Friday at 3am UTC (10pm in us-central1)
+    - cron: '0 3 * * 5'
 
 jobs:
   cli:
@@ -48,4 +48,4 @@ jobs:
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: airgap
-      zone: us-central1-c
+      zone: us-central1-b

@@ -68,4 +68,4 @@ jobs:
       reset: ${{ matrix.reset }}
       sequential: ${{ matrix.sequential }}
       test_type: cli
-      zone: us-central1-c
+      zone: us-central1-a

@@ -1,10 +1,9 @@
 # Elemental
 
+See [here](.github/workflows/README.md) for a detailed view of the tests scheduling.
+
 [![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
 
-## Bi-weekly CI
-
-[![CLI-K3s](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml)
 [![CLI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml)
 [![CLI-RKE2](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml)
 [![CLI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml)
@@ -13,8 +12,6 @@
 [![UI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml)
 [![UI-RKE2](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml)
 [![UI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml)
-
-## Weekly CI
 
 [![CLI-Full-Backup-Restore](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml)
 [![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
@@ -33,7 +30,7 @@ Follow our [Quickstart](https://rancher.github.io/elemental/quickstart/) or see 
 
 ## License
 
-Copyright (c) 2020-2024 [SUSE, LLC](http://suse.com)
+Copyright (c) 2020-2025 [SUSE, LLC](http://suse.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
