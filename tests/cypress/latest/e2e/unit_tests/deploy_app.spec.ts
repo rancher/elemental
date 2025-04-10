@@ -32,7 +32,11 @@ filterTests(['main'], () => {
     qase(31,
       it('Deploy Alerting Drivers application', () => {
         let myAppToInstall;
-        isRancherManagerVersion('2.11') ? myAppToInstall = 'Cerbos' : myAppToInstall = 'Alerting Drivers';
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+          myAppToInstall = 'Cerbos'
+        } else {
+          myAppToInstall = 'Alerting Drivers';
+        }
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -49,12 +53,16 @@ filterTests(['main'], () => {
         cy.contains(myAppToInstall, { timeout: 30000 }).click();
         cy.contains('.name-logo-install', myAppToInstall, { timeout: 30000 });
         cy.clickButton('Install');
-        isRancherManagerVersion('2.11') ? cy.contains('.top > .title', myAppToInstall) : cy.contains('.outer-container > .header', myAppToInstall);
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+          cy.contains('.top > .title', myAppToInstall)
+        } else {
+          cy.contains('.outer-container > .header', myAppToInstall);
+        }
         cy.clickButton('Next');
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload();
-        if (isRancherManagerVersion('2.11')) {
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
           cy.contains(new RegExp('Deployed.*cerbos'));
         } else { 
           cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
@@ -64,7 +72,11 @@ filterTests(['main'], () => {
     qase(32,
       it('Remove Alerting Drivers application', () => {
         let myAppToInstall;
-        isRancherManagerVersion('2.11') ? myAppToInstall = 'cerbos' : myAppToInstall = 'rancher-alerting-drivers';
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+          myAppToInstall = 'cerbos'
+        } else {
+          myAppToInstall = 'rancher-alerting-drivers';
+        }
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         if (!isRancherManagerVersion('2.8')) {
           cy.get('.main-panel').contains(clusterName).click();
