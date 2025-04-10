@@ -77,8 +77,11 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    isRancherManagerVersion('2.11') ? cy.contains('.top > .title', 'Elemental') : cy.contains('.outer-container > .header', 'Elemental');
-
+    if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+      cy.contains('.top > .title', 'Elemental') 
+    } else {
+      cy.contains('.outer-container > .header', 'Elemental');
+    }
     if (isRancherPrime() && isCypressTag('main')) {
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();
