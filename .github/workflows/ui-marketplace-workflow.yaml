@@ -41,7 +41,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: latest/devel/2.9
+        default: stable/latest
         type: string
 
 jobs:
