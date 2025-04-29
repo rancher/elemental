@@ -11,8 +11,7 @@ Tests that are scheduled (can be manually triggered as well):
 | CLI RKE2 Upgrade | Monday/Wednesday | 5am | us-central1-f |
 | CLI Full backup/restore (migration) | Friday | 2am | us-central1-a |
 | CLI K3s Airgap | Friday | 3am | us-central1-b |
-| CLI K3s Downgrade | Friday | 4am | us-central1-c |
-| CLI Regression | Friday | 5am | us-central1-f |
+| CLI Regression | Friday | 4am | us-central1-f |
 | UI K3s | Tuesday/Thursday | 2am | us-central1-a |
 | UI K3s Upgrade | Tuesday/Thursday | 3am | us-central1-b |
 | UI RKE2 | Tuesday/Thursday | 4am | us-central1-c |
@@ -22,6 +21,7 @@ Tests that are scheduled (can be manually triggered as well):
 Tests that are not scheduled (but can be manually triggered):
 | Test type | Zones |
 |:---:|:---:|
+| CLI K3s Downgrade | us-central1-c |
 | CLI K3s IBS Stable | us-central1-f |
 | CLI K3s OBS Dev | us-central1-f |
 | CLI K3s OBS Staging | us-central1-f |
