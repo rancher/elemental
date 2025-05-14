@@ -14,7 +14,7 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: '"v1.37.7+rke2r1"'
+        default: '"v1.31.7+rke2r1"'
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
@@ -51,7 +51,7 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.0/charts/rancher
       operator_repo: oci://registry.suse.com/rancher
       os_to_test: stable
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
@@ -59,6 +59,6 @@ jobs:
       rancher_version: prime/latest
       reset: true
       test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/dev/containers/suse/sl-micro/6.1/baremetal-os-container:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/maintenance/6.0/containers/suse/sl-micro/6.0/baremetal-os-container:latest
       upgrade_os_channel: dev
       zone: us-central1-f
