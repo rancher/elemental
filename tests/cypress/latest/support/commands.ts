@@ -117,6 +117,12 @@ Cypress.Commands.add('createMachReg', (
       cy.getBySel(selectors.selectOsVersionBuildMedia).click();
     }
 
+    const osVersion = utils.isBootType('raw') ? Cypress.env('container_stable_os_version') : Cypress.env('iso_stable_os_version');
+    const imageType = utils.isBootType('raw') ? 'OS' : 'ISO';
+    const arch = Cypress.env('arch');
+    const osRegex = imageType + '.*' + osVersion + '.*' +arch;
+    cy.log(`OS selection regex: ${osRegex}`);
+
     // Never build from dev ISO in upgrade scenario
     if (utils.isCypressTag('upgrade')) {
       // Stable operator version is hardcoded for now
@@ -129,20 +135,20 @@ Cypress.Commands.add('createMachReg', (
       } else if (utils.isOperatorVersion('marketplace')) {
         cy.contains(Cypress.env('os_version_install')).click();
       } else {
-          if (utils.isBootType('raw')) {
-            cy.contains(new RegExp(`OS.*${Cypress.env('container_stable_os_version')}`)).click();
-          } else {
-            cy.contains(new RegExp(`ISO.*${Cypress.env('iso_stable_os_version')}`)).click();
-          }
+        cy.contains(new RegExp(osRegex)).click();
       }
     } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
       cy.contains(Cypress.env('os_version_install')).click();
     // Sometimes we want to test dev/staging operator version with stable OS version
-    } else if ( utils.isOsVersion('stable') && utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
-      cy.contains(Cypress.env('iso_stable_os_version')).click();
+    } else if (utils.isOsVersion('stable') && utils.isOperatorVersion('dev') || utils.isOperatorVersion('staging')) {
+      cy.contains(new RegExp(osRegex)).click();
     // For maintenance, we need to select the last -1 version, the last one is the unstable one.
     } else if (utils.isOperatorVersion('maintenance')) {
-      cy.get('.vs__dropdown-option').last().prev().click();
+      if (osVersion === "") {
+        cy.get('.vs__dropdown-option').last().prev().click();
+      } else {
+        cy.contains(new RegExp(osRegex)).click();
+      }
     } else {
       cy.contains('(unstable)').click();
     }
