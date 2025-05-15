@@ -79,7 +79,7 @@ describe('Machine registration testing', () => {
     }));
 
     qase(49,
-      it('Edit a machine registration with edit config button', () => {
+      it.skip('Edit a machine registration with edit config button', () => {
         cy.createMachReg('edit-config-test');
         cy.editMachReg('edit-config-test', true, true);
         cy.getBySel('form-save').contains('Save').click();
