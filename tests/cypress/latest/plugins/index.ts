@@ -29,6 +29,7 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   on('task', { isFileExist, findFiles })
 
   config.baseUrl = url.replace(/\/$/,);
+  config.env.arch = process.env.ARCH;
   config.env.boot_type = process.env.BOOT_TYPE;
   config.env.cache_session = process.env.CACHE_SESSION || false;
   config.env.chartmuseum_repo = process.env.CHARTMUSEUM_REPO;

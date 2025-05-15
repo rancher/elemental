@@ -40,8 +40,12 @@ CONTAINER_STABLE_OS_VERSION=$(docker run --entrypoint busybox ${OS_IMAGE} cat ch
   | sort -V \
   | tail -1)
 
+# Local architecture (to select the correct OS image)
+ARCH=$(uname -m)
+
 # Start Cypress tests with docker
 docker run -v $PWD:/workdir -w /workdir                         \
+    -e ARCH=$ARCH                                               \
     -e BOOT_TYPE=$BOOT_TYPE                                     \
     -e CYPRESS_TAGS=$CYPRESS_TAGS                               \
     -e ELEMENTAL_DEV_VERSION=$ELEMENTAL_DEV_VERSION             \
