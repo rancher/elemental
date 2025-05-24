@@ -227,22 +227,22 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		By("Installing Elemental Operator", func() {
 			// Install Elemental Operator CRDs first
 			// Set flags for Elemental Operator CRDs installation
-			elementalCrdsChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-crds-chart-*.tgz").Output()
+			elementalCrdsChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-crds-chart-*.tgz | tail -1").Output()
 			Expect(err).To(Not(HaveOccurred()))
 
 			flags := []string{
-				"upgrade", "--install", "elemental-crds", string(elementalCrdsChart),
+				"upgrade", "--install", "elemental-crds", strings.TrimSpace(string(elementalCrdsChart)),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			}
 			RunHelmCmdWithRetry(flags...)
 
 			// Set flags for Elemental Operator installation
-			elementalChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz").Output()
+			elementalChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz | tail -1").Output()
 			Expect(err).To(Not(HaveOccurred()))
 
 			flags = []string{
-				"upgrade", "--install", "elemental", string(elementalChart),
+				"upgrade", "--install", "elemental", strings.TrimSpace(string(elementalChart)),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 				"--set", "image.repository=" + repoServer + rancherPath + "elemental-operator",
