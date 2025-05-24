@@ -52,6 +52,9 @@ function RunSkopeoCmdWithRetry() {
   exit 1
 }
 
+# Example of a call:
+# ../scripts/build-airgap v1.34.2+k3s1 latest stable latest v1.34.2+k3s1 oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/charts/rancher
+
 # Variable(s)
 K3S_UPSTREAM_VERSION=$1
 CERT_MANAGER_VERSION=$2
@@ -67,6 +70,11 @@ REPO_SERVER="rancher-manager.test:5000"
 case ${ELEMENTAL_REPO} in
   */dev/*)
     ELEMENTAL_VERSION=dev
+    ;;
+  */maintenance/*)
+    # Extract the OS version
+    V=${ELEMENTAL_REPO#*/maintenance/}
+    ELEMENTAL_VERSION=maintenance/${V%%/*}
     ;;
   */staging/*)
     ELEMENTAL_VERSION=staging
@@ -113,11 +121,11 @@ case ${RANCHER_CHANNEL} in
   prime)
     RANCHER_CHART_REPO="https://charts.rancher.com/server-charts/prime"
     ;;
-  prime-optimus)
+  prime-rc)
     RANCHER_CHART_REPO="https://charts.optimus.rancher.io/server-charts/latest"
     RANCHER_IMAGES_REPO="stgregistry.suse.com"
     ;;
-  prime-optimus-alpha)
+  prime-alpha)
     RANCHER_CHART_REPO="https://charts.optimus.rancher.io/server-charts/alpha"
     RANCHER_IMAGES_REPO="stgregistry.suse.com"
     ;;
@@ -155,7 +163,7 @@ CERT_MANAGER_VERSION=${CERT_MANAGER_VERSION%.*}
 RunHelmCmdWithRetry pull ${DEVEL} ${VER_OPT} rancher-${RANCHER_CHANNEL}/rancher > /dev/null 2>&1
 
 # Get Elemental charts
-[[ "${ELEMENTAL_REPO}" =~ (/dev/|/staging/) ]] \
+[[ "${ELEMENTAL_REPO}" =~ (/dev/|/staging/|/maintenance/) ]] \
   && DEVEL="--devel" \
   || unset DEVEL
 for i in elemental-operator-chart elemental-operator-crds-chart ; do
@@ -170,7 +178,8 @@ if [[ -z "${RANCHER_VERSION}" || "${RANCHER_VERSION}" == "latest" ]]; then
 fi
 
 # Get the Elemental repositories
-ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
+#ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
+ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/refs/heads/fix-airgap/scripts
 ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
 curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
 bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa -ac ${ELEMENTAL_VERSION} || exit 1
@@ -211,10 +220,17 @@ loop=0
 for i in $(< ${CERT_IMAGES_FILE}) $(< ${ELEMENTAL_IMAGES_FILE}) $(< ${RANCHER_IMAGES_FILE}); do
   mkdir -p ${i%/*}
 
-  # Devel/Staging versions of Rancher are hosted in a specific registry
-  [[ "${i}" =~ (rancher/rancher-agent:|rancher/rancher:) && -n "${RANCHER_IMAGES_REPO}" ]] \
-    && j="${RANCHER_IMAGES_REPO}/${i}" \
-    || j="${i}"
+  if [[ "${i}" =~ (rancher/rancher-agent:|rancher/rancher:) && -n "${RANCHER_IMAGES_REPO}" ]]; then
+    # Devel/Staging versions of Rancher are hosted in a specific registry
+    j="${RANCHER_IMAGES_REPO}/${i}"
+  elif [[ "${i}" =~ (rancher/elemental-operator:|rancher/seedimage-builder:) ]]; then
+    # Devel/Maintenance/Staging versions of Elemental are hosted in a specific registry
+    [[ "${ELEMENTAL_VERSION}" == "stable" ]] \
+      && j="registry.suse.com/${i}" \
+      || j="registry.opensuse.org/isv/rancher/elemental/${ELEMENTAL_VERSION}/containers/${i}"
+  else
+    j="${i}"
+  fi
 
   # Copy images
   RunSkopeoCmdWithRetry copy docker://${j} docker-archive:${i/:/_}.tar:${i} &
