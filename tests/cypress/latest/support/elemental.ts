@@ -60,7 +60,7 @@ export class Elemental {
     cy.get('.nav').contains('Apps').click();
 
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
+      isRancherManagerVersion('rancher:head') ? cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click() : cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
     } else {
         // Uncheck Rancher (rancher.io) repo if it's checked
         if (isGitRepo('github')) {
