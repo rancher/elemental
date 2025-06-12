@@ -41,6 +41,9 @@ on:
       operator_repo:
         required: true
         type: string
+      operator_upgrade:
+        required: true
+        type: string
       os_to_test:
         required: true
         type: string
@@ -186,6 +189,7 @@ jobs:
         env: 
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           OS_TO_TEST: ${{ inputs.os_to_test }}
+          UPGRADE_REPO: ${{ inputs.operator_upgrade }}
         run: |
           cd tests && make e2e-install-chartmuseum
           # Extract latest dev operator version
