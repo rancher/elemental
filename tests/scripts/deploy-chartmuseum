@@ -10,9 +10,14 @@ PATH+=:/usr/local/bin
 
 # Variables
 typeset REPO=$1
+typeset UPGRADE_REPO=$2
+
+if [[ -n "$UPGRADE_REPO" ]]; then
+  REPO="$UPGRADE_REPO"
+fi
 
 # Create a systemctl file for chartmuseum
-cat > /etc/systemd/system/chartmuseum.service << EOF
+cat >/etc/systemd/system/chartmuseum.service <<EOF
 [Unit]
 Description=Chartmuseum server
 
@@ -45,7 +50,7 @@ helm plugin install https://github.com/chartmuseum/helm-push.git
 helm repo add chartmuseum http://localhost:8080
 
 # Check if we want to use Development version of Elemental
-[[ "${REPO}" =~ (dev|staging) ]] && DEVEL="--devel"
+[[ "${REPO}" =~ (dev|staging|maintenance) ]] && DEVEL="--devel"
 
 # Download needed helm charts
 helm pull ${DEVEL} ${REPO}/elemental-operator-crds-chart
