@@ -75,7 +75,7 @@ RUN rm -rf /var/log/update* && \
 
 # Add the arm-firwmware feature
 #!ArchExclusiveLine: aarch64
-RUN if [[ "$(uname -m)"  == "aarch64" ]]; then elemental init --mkinitrd=false arm-firmware; fi
+RUN if [[ "$(uname -m)"  == "aarch64" ]]; then elemental init --force --mkinitrd=false arm-firmware; fi
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
