@@ -25,7 +25,7 @@ on:
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version to upgrade to
-        default: '"latest/devel/head"'
+        default: '"head/2.12"'
         type: string
   schedule:
     # Monday and Wednesday at 3am UTC (10pm in us-central1)
@@ -40,7 +40,7 @@ jobs:
         cluster_type: ${{ fromJSON(format('[{0}]', inputs.cluster_type || '"", "hardened"')) }}
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.31.7+k3s1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.31.7+k3s1"')) }}
-        rancher_upgrade: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"latest/devel/head"')) }}
+        rancher_upgrade: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"head/2.12"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
