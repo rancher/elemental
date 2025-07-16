@@ -24,7 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('rancher:head')) {
+    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.12')) {
       cy.get('.accordion-item > .icon').eq(0).click();
     } else {
       cy.get('div.header > i').eq(0).click();
@@ -64,7 +64,7 @@ export class Elemental {
     cy.get('.nav').contains('Apps').click();
 
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      isRancherManagerVersion('rancher:head') ? cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click() : cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
+      isRancherManagerVersion('2.12') ? cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click() : cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
     } else {
         // Uncheck Rancher (rancher.io) repo if it's checked
         if (isGitRepo('github')) {
@@ -81,7 +81,7 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+    if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
       cy.contains('.top > .title', 'Elemental') 
     } else {
       cy.contains('.outer-container > .header', 'Elemental');
@@ -100,7 +100,7 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', { timeout: 120000 });
     cy.reload();
-    if (isRancherManagerVersion('2.9') || isRancherManagerVersion('2.8')) {
+    if (isRancherManagerVersion('2\.9') || isRancherManagerVersion('2\.8')) {
       // eslint-disable-next-line cypress/unsafe-to-chain-command
       cy.contains('Only User Namespaces').click().type('cattle-elemental-system{enter}{esc}');
       cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', { timeout: 120000 });
