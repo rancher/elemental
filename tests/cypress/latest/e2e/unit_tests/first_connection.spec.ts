@@ -30,8 +30,8 @@ filterTests(['main', 'upgrade'], () => {
       cy.login();
       cy.visit('/');
       cy.getBySel('nav_header_showUserMenu').click();
-      // HTML selector user-menu-dropdown is not in 2.11 (rancher:head) anymore
-      if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+      // HTML selector user-menu-dropdown is not in 2.11 or 2.12 anymore
+      if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
         cy.contains('Preferences').click();
       } else {
         cy.getBySel('user-menu-dropdown').contains('Preferences').click();

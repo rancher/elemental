@@ -32,7 +32,7 @@ filterTests(['main'], () => {
     qase(31,
       it('Deploy Alerting Drivers application', () => {
         let myAppToInstall;
-        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
           myAppToInstall = 'Cerbos'
         } else {
           myAppToInstall = 'Alerting Drivers';
@@ -53,7 +53,7 @@ filterTests(['main'], () => {
         cy.contains(myAppToInstall, { timeout: 30000 }).click();
         cy.contains('.name-logo-install', myAppToInstall, { timeout: 30000 });
         cy.clickButton('Install');
-        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
           cy.contains('.top > .title', myAppToInstall)
         } else {
           cy.contains('.outer-container > .header', myAppToInstall);
@@ -62,7 +62,7 @@ filterTests(['main'], () => {
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload();
-        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
           cy.contains(new RegExp('Deployed.*cerbos'));
         } else { 
           cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
@@ -72,7 +72,7 @@ filterTests(['main'], () => {
     qase(32,
       it('Remove Alerting Drivers application', () => {
         let myAppToInstall;
-        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('rancher:head')) {
+        if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
           myAppToInstall = 'cerbos'
         } else {
           myAppToInstall = 'rancher-alerting-drivers';
