@@ -170,16 +170,6 @@ jobs:
           PUBLIC_DOMAIN: ${{ inputs.public_domain }}
         run: cd tests && make e2e-install-rancher
 
-      - name: Workaround for DynamicSchemas for operator uninstallation (if needed)
-        id: workaround_for_dynamicschemas
-        run: |
-          # Check if DynamicSchemas for MachineInventorySelectorTemplate exists
-          if ! kubectl get dynamicschema machineinventoryselectortemplate >/dev/null 2>&1; then
-            # If not we have to add it to avoid weird issues!
-            echo "WORKAROUND: DynamicSchemas for MachineInventorySelectorTemplate is missing!"
-            kubectl apply -f tests/assets/add_missing_dynamicschemas.yaml
-          fi
-
       - name: Install backup-restore components
         id: install_backup_restore
         env:
