@@ -178,7 +178,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 			client, _ := GetNodeInfo(hostName)
 			Expect(client).To(Not(BeNil()))
 
-			// Execute node deployment in parallel
+			// Execute checking in parallel
 			wg.Add(1)
 			go func(h string, cl *tools.Client) {
 				defer wg.Done()
@@ -254,13 +254,13 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					"--namespace", clusterNS, value,
 					"-o", "jsonpath={.spec.metadata.upgradeImage}")
 				Expect(err).To(Not(HaveOccurred()))
-				valueToCheck = tools.TrimStringFromChar(out, ":")
+				valueToCheck = tools.TrimStringFromChar(strings.Trim(out, "\n"), ":")
 			} else if upgradeType == "osImage" {
 				// Set OS image to use for upgrade
 				value = upgradeImage
 
 				// Extract the value to check after the upgrade
-				valueToCheck = tools.TrimStringFromChar(upgradeImage, ":")
+				valueToCheck = tools.TrimStringFromChar(strings.Trim(upgradeImage, "\n"), ":")
 			}
 
 			// Add a nodeSelector if needed
@@ -353,17 +353,13 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
 				})
 
-				By("Getting annotations for "+h+" after upgrade", func() {
-					annotationsAfter = getAnnotations(cl)
-				})
-
 				By("Checking that annotations have been updated after upgrade", func() {
-					// Maps should not be equal after an upgrade
-					status := maps.Equal(annotationsBefore, annotationsAfter)
-					if status {
-						GinkgoWriter.Println("Annotations have not been updated!")
-					}
-					Expect(status).To(BeFalse())
+					Eventually(func() bool {
+						annotationsAfter = getAnnotations(cl)
+
+						// Maps should not be equal after an upgrade
+						return maps.Equal(annotationsBefore, annotationsAfter)
+					}, tools.SetTimeout(5*time.Minute), 30*time.Second).Should(BeFalse())
 				})
 
 				if grubRecovery {
