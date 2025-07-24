@@ -59,6 +59,5 @@ jobs:
       rancher_version: stable/latest
       reset: true
       test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/maintenance/6.0/containers/suse/sl-micro/6.0/baremetal-os-container:latest
-      upgrade_os_channel: dev
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.1/baremetal-os-container:latest
       zone: us-central1-b
