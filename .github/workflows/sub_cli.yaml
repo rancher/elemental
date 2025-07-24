@@ -335,8 +335,20 @@ jobs:
         run: |
           cd tests && make e2e-upgrade-node && make e2e-check-app
 
+      - name: Upgrade other nodes to specified OS version with osImage
+        id: upgrade_other_nodes_osimage
+        if: ${{ inputs.upgrade_image != '' && inputs.upgrade_os_channel == ''}}
+        env:
+          FORCE_DOWNGRADE: ${{ inputs.force_downgrade }}
+          UPGRADE_IMAGE: ${{ inputs.upgrade_image }}
+          UPGRADE_TYPE: osImage
+          VM_INDEX: 2
+          VM_NUMBERS: 3
+        run: |
+          cd tests && make e2e-upgrade-node && make e2e-check-app
+
       - name: Upgrade other nodes to specified OS version with managedOSVersionName
-        id: upgrade_other_nodes
+        id: upgrade_other_nodes_managedosversionname
         if: ${{ inputs.upgrade_os_channel != '' }}
         env:
           FORCE_DOWNGRADE: ${{ inputs.force_downgrade }}
