@@ -349,7 +349,6 @@
       -  **By:** Getting annotations for +h+ before upgrade
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
       -  **By:** Checking VM upgrade on +h
-      -  **By:** Getting annotations for +h+ after upgrade
       -  **By:** Checking that annotations have been updated after upgrade
       -  **By:** Testing Grub Recovery entry on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
