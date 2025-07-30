@@ -316,7 +316,7 @@ jobs:
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Basics)
         if: ${{ failure() && inputs.test_type == 'ui' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots-basics-${{ inputs.cluster_name }}
           path: tests/cypress/latest/screenshots
@@ -325,7 +325,7 @@ jobs:
       - name: Upload Cypress videos (Basics)
         # Test run video is always captured, so this action uses "always()" condition
         if: ${{ always() && inputs.test_type == 'ui' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos-basics-${{ inputs.cluster_name }}
           path: tests/cypress/latest/videos
@@ -370,7 +370,7 @@ jobs:
         run: cd tests && make start-cypress-tests
       - name: Upload Cypress screenshots (Advanced)
         if: ${{ failure() && inputs.test_type == 'ui' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots-advanced-${{ inputs.cluster_name }}
           path: tests/cypress/latest/screenshots
@@ -379,7 +379,7 @@ jobs:
       - name: Upload Cypress videos (Advanced)
         # Test run video is always captured, so this action uses "always()" condition
         if: ${{ always() && inputs.test_type == 'ui' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-videos-advanced-${{ inputs.cluster_name }}
           path: tests/cypress/latest/videos
@@ -591,7 +591,7 @@ jobs:
           )
       - name: Upload cluster logs
         if: ${{ always() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: support-logs
           path: tests/**/logs/*
