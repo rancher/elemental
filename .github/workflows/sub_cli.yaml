@@ -205,6 +205,7 @@ jobs:
 
           # Export values
           echo "backup_operator_version=${BACKUP_OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "backup_restore_version=${BACKUP_OPERATOR_VERSION##*:}" >> ${GITHUB_OUTPUT}
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
@@ -362,6 +363,7 @@ jobs:
       - name: Test Backup/Restore Rancher Manager/Elemental resources
         id: test_backup_restore
         env:
+          BACKUP_RESTORE_VERSION: ${{ steps.component.outputs.backup_restore_version }}
           CA_TYPE: ${{ inputs.ca_type }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           PUBLIC_FQDN: ${{ inputs.public_fqdn }}
