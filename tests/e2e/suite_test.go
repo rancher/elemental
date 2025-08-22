@@ -298,13 +298,30 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 	// Default chart
 	chartRepo := "rancher-chart"
 
-	// Set specific operator version if defined
-	if backupRestoreVersion != "" {
-		chartRepo = "https://github.com/rancher/backup-restore-operator/releases/download/" + backupRestoreVersion
-	} else {
-		RunHelmCmdWithRetry("repo", "add", chartRepo, "https://charts.rancher.io")
-		RunHelmCmdWithRetry("repo", "update")
+	// Use specific operator version if defined
+	if backupRestoreVersion == "" {
+		// Autodetect operator version based on Rancher Manager version
+		rancherVersion, err := kubectl.RunWithoutErr("get", "deploy", "rancher",
+			"--namespace", "cattle-system",
+			"-o", "jsonpath={.spec.template.spec.containers[0].image}")
+		Expect(err).To(Not(HaveOccurred()))
+
+		switch {
+		case strings.Contains(rancherVersion, ":v2.12"):
+			backupRestoreVersion = "v8.0.0"
+		case strings.Contains(rancherVersion, ":v2.11"):
+			backupRestoreVersion = "v7.0.2"
+		case strings.Contains(rancherVersion, ":v2.10"):
+			backupRestoreVersion = "v6.0.2"
+		case strings.Contains(rancherVersion, ":v2.9"):
+			backupRestoreVersion = "v5.0.4"
+		case strings.Contains(rancherVersion, ":v2.8"):
+			backupRestoreVersion = "v4.0.4"
+		}
 	}
+	chartRepo = "https://github.com/rancher/backup-restore-operator/releases/download/" + backupRestoreVersion
+	GinkgoWriter.Printf("Install Backup/Restore operator version %s\n", backupRestoreVersion)
+	GinkgoWriter.Printf("Using chart repository %s\n", chartRepo)
 
 	for _, chart := range []string{"rancher-backup-crd", "rancher-backup"} {
 		// Set the filename in chart if a custom version is defined
