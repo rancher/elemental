@@ -8,8 +8,9 @@
 #!UseOBSRepositories
 
 ARG SLMICRO_VERSION
+ARG SL_VERSION
 
-FROM suse/sl-micro/${SLMICRO_VERSION}/toolbox:latest as host
+FROM bci/bci-base:${SL_VERSION} as host
 
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
