@@ -18,7 +18,7 @@ RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 RUN zypper in --no-recommends -y procps openssh openssh-server \
     vim-small less kernel-firmware-all NetworkManager-wwan cryptsetup \
     \
-    avahi bash-completion catatonit cni cni-plugins conmon conntrack-tools \
+    avahi bash-completion catatonit conmon conntrack-tools \
     container-selinux ethtool fuse-overlayfs hdparm hostname iptables \
     issue-generator jq keyutils lshw lsof lsscsi mdadm multipath-tools \
     netcat-openbsd net-tools nfs-client \
