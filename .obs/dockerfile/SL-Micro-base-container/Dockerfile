@@ -104,3 +104,7 @@ RUN zypper clean --all && \
 
 # Rebuild initrd to setup dracut with the boot configurations
 RUN elemental init --force elemental-rootfs,elemental-sysroot,grub-config,dracut-config,cloud-config-essentials,elemental-setup,boot-assessment
+
+# Empty machine-id is not considered a firstboot by systemd
+# https://www.freedesktop.org/software/systemd/man/latest/machine-id.html#First%20Boot%20Semantics
+RUN > /etc/machine-id
