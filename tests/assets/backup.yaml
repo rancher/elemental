@@ -5,5 +5,5 @@ metadata:
   annotations:
     field.cattle.io/description: Backup Elemental/Rancher resources
 spec:
-  resourceSetName: rancher-resource-set
+  resourceSetName: %RSC_SET%
   retentionCount: 1

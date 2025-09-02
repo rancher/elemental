@@ -295,8 +295,8 @@ Install rancher-backup operator
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func InstallBackupOperator(k *kubectl.Kubectl) {
-	// Default chart
-	chartRepo := "rancher-chart"
+	chartRepo := "rancher-chart"           // Default chart
+	backupRscSet := "rancher-resource-set" // Default resource set
 
 	// Use specific operator version if defined
 	if backupRestoreVersion == "" {
@@ -309,6 +309,7 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 		switch {
 		case strings.Contains(rancherVersion, ":v2.12"):
 			backupRestoreVersion = "v8.0.0"
+			backupRscSet = "rancher-resource-set-full" // Newer resources set should now be used
 		case strings.Contains(rancherVersion, ":v2.11"):
 			backupRestoreVersion = "v7.0.2"
 		case strings.Contains(rancherVersion, ":v2.10"):
@@ -320,8 +321,13 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 		}
 	}
 	chartRepo = "https://github.com/rancher/backup-restore-operator/releases/download/" + backupRestoreVersion
+	err := tools.Sed("%RSC_SET%", backupRscSet, backupYaml)
+	Expect(err).To(Not(HaveOccurred()))
+
+	// Log some debugging informations
 	GinkgoWriter.Printf("Install Backup/Restore operator version %s\n", backupRestoreVersion)
 	GinkgoWriter.Printf("Using chart repository %s\n", chartRepo)
+	GinkgoWriter.Printf("Using Resource Set %s\n", backupRscSet)
 
 	for _, chart := range []string{"rancher-backup-crd", "rancher-backup"} {
 		// Set the filename in chart if a custom version is defined
