@@ -46,8 +46,8 @@ describe('Upgrade tests', () => {
         cy.deleteAllResources();
       });
 
-      it('Add dev channel for RKE2 upgrade', () => {
-        cy.addOsVersionChannel('dev');
+      it('Add staging channel for RKE2 upgrade', () => {
+        cy.addOsVersionChannel('staging');
       });
     }
 
@@ -70,7 +70,7 @@ describe('Upgrade tests', () => {
         // Marketplace test uses OS version channel
         cy.clickNavMenu(['Advanced', 'Update Groups']);
         cy.getBySel('masthead-create').contains('Create').click();
-        cy.get('.primaryheader').contains('Update Group: Create');
+        cy.get('.masthead').contains('Update Group: Create');
         cy.getBySel('name-ns-description-name').type(channelName);
         cy.contains('Target Cluster');
         cy.getBySel('cluster-target').click();
@@ -101,15 +101,15 @@ describe('Upgrade tests', () => {
         cy.getBySel('card-clusters').contains('Manage Elemental Clusters').click();
         cy.get('.title').contains('Clusters');
         cy.get('.outlet').contains(clusterName).click();
-        cy.get('.primaryheader').contains('Updating', { timeout: 420000 });
-        cy.get('.primaryheader').contains('Active', { timeout: 720000 });
+        cy.get('.top').contains('Updating', { timeout: 420000 });
+        cy.get('.top').contains('Active', { timeout: 720000 });
     }));
 
     qase(35,
       it('Cannot create two upgrade groups targeting the same cluster', () => {
         cy.clickNavMenu(['Advanced', 'Update Groups']);
         cy.getBySel('masthead-create').contains('Create').click();
-        cy.get('.primaryheader').contains('Update Group: Create');
+        cy.get('.masthead').contains('Update Group: Create');
         cy.getBySel('cluster-target').click();
         // As there is already an upgrade group targeting the cluster,
         // the cluster should not be available in the dropdown
