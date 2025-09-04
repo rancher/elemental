@@ -68,6 +68,9 @@ case ${ELEMENTAL_REPO} in
   */dev/*)
     ELEMENTAL_VERSION=dev
     ;;
+  */maintenance/*)
+    ELEMENTAL_VERSION=maintenance
+    ;;
   */staging/*)
     ELEMENTAL_VERSION=staging
     ;;
