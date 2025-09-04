@@ -338,7 +338,7 @@
 
 - **Describe:** Upgrade tests
     - **It:** Delete stable channel for RKE2 upgrade
-    - **It:** Add dev channel for RKE2 upgrade
+    - **It:** Add staging channel for RKE2 upgrade
     - **It:** Check OS Versions
     - **It:** Upgrade one node different methods if rke2 or k3s
     - **It:** Cannot create two upgrade groups targeting the same cluster
