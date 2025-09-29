@@ -14,8 +14,9 @@ ifeq ($(TEST_TYPE),multi)
 endif
 
 # Define SELinux command line
+SELINUX_CMDLINE="security=selinux enforcing=0"
 ifeq ($(SELINUX),true)
-	SELINUX_CMDLINE?="security=selinux enforcing=0"
+	SELINUX_CMDLINE="security=selinux enforcing=1"
 endif
 
 extract_kernel_init_squash:
