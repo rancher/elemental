@@ -78,7 +78,7 @@ filterTests(['main', 'upgrade'], () => {
     );
     it('Add additional channel', () => {
       // Sometimes we want to test dev/staging operator version with stable OS version
-      if ( isOsVersion('stable') && isOperatorVersion('dev') || isOperatorVersion('staging')) {
+      if (isOsVersion('stable') && (isOperatorVersion('dev') || isOperatorVersion('staging'))) {
         cypressLib.accesMenu('OS Management');
         cy.addOsVersionChannel('stable');
       }});
