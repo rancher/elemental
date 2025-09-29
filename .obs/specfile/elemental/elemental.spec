@@ -31,8 +31,8 @@ URL:            https://github.com/rancher/%{name}
 Source:         %{name}.tar.xz
 Source3:        %{name}-rpmlintrc
 
-Requires:       elemental-toolkit >= 2.2.0
-Requires:       elemental-toolkit < 2.3.0
+Requires:       elemental-toolkit >= 2.3.0
+Requires:       elemental-toolkit < 2.4.0
 Requires:       elemental-register
 Requires:       elemental-system-agent
 Requires:       elemental-support
