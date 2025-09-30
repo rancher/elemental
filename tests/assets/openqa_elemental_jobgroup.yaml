@@ -14,21 +14,22 @@
   distri: sle-micro
 
 .test_settings: &test_settings
-  HDDSIZEGB: '20'
+  HDDSIZEGB: '30'
   QEMURAM: '2048'
   PASSWORD: ros
   TEST_PASSWORD: Elemental@R00t
   YAML_SCHEDULE: schedule/elemental/test_image.yaml
 
 .generate_settings: &generate_settings
-  BOOT_HDD_IMAGE: "1"
-  CONTAINER_RUNTIMES: "podman"
-  DESKTOP: "textmode"
-  EXCLUDE_MODULES: "suseconnect_scc"
-  HDD_1: "SL-Micro.%ARCH%-6.0.0-Default-Updated.qcow2"
-  KEEP_GRUB_TIMEOUT: "0"
+  QEMURAM: '2048'
+  BOOT_HDD_IMAGE: '1'
+  CONTAINER_RUNTIMES: 'podman'
+  DESKTOP: 'textmode'
+  EXCLUDE_MODULES: 'suseconnect_scc'
+  HDD_1: 'SL-Micro.%ARCH%-6.0.0-Default-Updated.qcow2'
+  KEEP_GRUB_TIMEOUT: '0'
   TEST_PASSWORD: Elemental@R00t
-  VIDEOMODE: "text"
+  VIDEOMODE: 'text'
   YAML_SCHEDULE: schedule/elemental/validate_generate_image.yaml
 
 .image_test_settings: &image_test_settings
@@ -100,6 +101,22 @@ products:
     <<: *default_products
     flavor: Elemental-Iso
     version : '6.1'
+  sl-micro-elemental-image-6.2-aarch64:
+    <<: *default_products
+    flavor: Elemental-Image
+    version: '6.2'
+  sl-micro-elemental-iso-6.2-aarch64:
+    <<: *default_products
+    flavor: Elemental-Iso
+    version: '6.2'
+  sl-micro-elemental-image-6.2-x86_64:
+    <<: *default_products
+    flavor: Elemental-Image
+    version: '6.2'
+  sl-micro-elemental-iso-6.2-x86_64:
+    <<: *default_products
+    flavor: Elemental-Iso
+    version : '6.2'
 
 scenarios:
   aarch64:
@@ -149,6 +166,26 @@ scenarios:
             <<: *test_settings
             <<: *image_test_settings
     sl-micro-elemental-iso-6.1-aarch64:
+      - generate_iso:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *iso_test_settings
+    sl-micro-elemental-image-6.2-aarch64:
+      - generate_image:
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *image_test_settings
+    sl-micro-elemental-iso-6.2-aarch64:
       - generate_iso:
           testsuite: null
           settings:
@@ -214,6 +251,30 @@ scenarios:
             <<: *image_test_settings
             START_AFTER_TEST: generate_image@64bit
     sl-micro-elemental-iso-6.1-x86_64:
+      - generate_iso:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_iso:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *iso_test_settings
+            START_AFTER_TEST: generate_iso@64bit
+    sl-micro-elemental-image-6.2-x86_64:
+      - generate_image:
+          machine: 64bit
+          testsuite: null
+          settings:
+            <<: *generate_settings
+      - test_image:
+          testsuite: null
+          settings:
+            <<: *test_settings
+            <<: *image_test_settings
+            START_AFTER_TEST: generate_image@64bit
+    sl-micro-elemental-iso-6.2-x86_64:
       - generate_iso:
           machine: 64bit
           testsuite: null
