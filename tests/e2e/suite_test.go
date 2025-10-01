@@ -307,7 +307,7 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 		Expect(err).To(Not(HaveOccurred()))
 
 		switch {
-		case strings.Contains(rancherVersion, ":v2.12"):
+		case strings.Contains(rancherVersion, ":v2.12") || strings.Contains(rancherVersion, ":v2.13"):
 			backupRestoreVersion = "v8.0.0"
 			backupRscSet = "rancher-resource-set-full" // Newer resources set should now be used
 		case strings.Contains(rancherVersion, ":v2.11"):
