@@ -41,7 +41,11 @@ describe('Elemental operator upgrade tests', () => {
         it('Upgrade Elemental operator', () => {
           cy.contains('local').click();
           cy.get('.nav').contains('Apps').click();
-          utils.isRancherManagerVersion('2.12') ? cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click() : cy.get('.color1').contains('Elemental').click();
+          if (utils.isRancherManagerVersion('2.12')|| (utils.isRancherManagerVersion('2.13'))) {
+            cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+          } else {
+            cy.get('.color1').contains('Elemental').click()
+          }
           cy.contains('Charts: Elemental', { timeout: 30000 });
           cy.getBySel('btn-chart-install').click();
           //cy.clickButton('Upgrade');

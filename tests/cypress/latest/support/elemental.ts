@@ -24,7 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.12')) {
+    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13')) {
       cy.get('.accordion-item > .icon').eq(0).click();
     } else {
       cy.get('div.header > i').eq(0).click();
@@ -33,11 +33,6 @@ export class Elemental {
     // Check all listed options once accordion is opened
     cy.get('li.child.nav-type').should(($lis) => {
       expect($lis).to.have.length(7);
-      // There is a bug with Dashboard entry in rancher 2.10
-      // https://github.com/rancher/elemental-ui/issues/230
-      if (isRancherManagerVersion('2.9')) {
-        expect($lis.eq(0)).to.contain('Dashboard');
-      }
       expect($lis.eq(1)).to.contain('Registration Endpoints');
       expect($lis.eq(2)).to.contain('Inventory of Machines');
       expect($lis.eq(3)).to.contain('Update Groups');
@@ -64,7 +59,11 @@ export class Elemental {
     cy.get('.nav').contains('Apps').click();
 
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      isRancherManagerVersion('2.12') ? cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click() : cy.contains('.item.has-description.color1', 'Elemental', { timeout: 30000 }).click();
+      if (isRancherManagerVersion('2.12')|| (isRancherManagerVersion('2.13'))) {
+        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+      } else {
+        cy.get('.color1').contains('Elemental').click()
+      }  
     } else {
         // Uncheck Rancher (rancher.io) repo if it's checked
         if (isGitRepo('github')) {
@@ -81,10 +80,10 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    if (isRancherManagerVersion('2.11') || isRancherManagerVersion('2.12')) {
-      cy.contains('.top > .title', 'Elemental') 
-    } else {
+    if (isRancherManagerVersion('2.10')) {
       cy.contains('.outer-container > .header', 'Elemental');
+    } else {
+      cy.contains('.top > .title', 'Elemental') 
     }
     if (isRancherPrime() && isCypressTag('main') && !isOperatorVersion('marketplace')) {
       const registryLabel = 'Container Registry';
@@ -100,15 +99,9 @@ export class Elemental {
     cy.clickButton('Install');
     cy.contains('SUCCESS: helm', { timeout: 120000 });
     cy.reload();
-    if (isRancherManagerVersion('2\.9') || isRancherManagerVersion('2\.8')) {
-      // eslint-disable-next-line cypress/unsafe-to-chain-command
-      cy.contains('Only User Namespaces').click().type('cattle-elemental-system{enter}{esc}');
-      cy.get('.outlet').contains('Deployed elemental-operator cattle-elemental-system', { timeout: 120000 });
-    } else {
-      cy.contains('Only User Namespaces').click()
-      // Select All Namespaces entry
-      cy.getBySel('namespaces-option-0').click();
-      cy.get('.outlet').contains(new RegExp('Deployed.*elemental-operator'), { timeout: 120000 });
-    }
+    cy.contains('Only User Namespaces').click()
+    // Select All Namespaces entry
+    cy.getBySel('namespaces-option-0').click();
+    cy.get('.outlet').contains(new RegExp('Deployed.*elemental-operator'), { timeout: 120000 });
   }
 }
