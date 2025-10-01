@@ -38,18 +38,10 @@ filterTests(['main', 'upgrade'], () => {
       })
     );
 
-    // Add rancher-ui-plugin-charts repo except for rancher manager 2.7
+    // Add rancher-ui-plugin-charts repo
     it('Add rancher-ui-plugin-charts repo', () => {
-      !isRancherManagerVersion('2.7') ? cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main') : null;
+      cypressLib.addRepository('rancher-ui-plugin-charts', 'https://github.com/rancher/ui-plugin-charts.git', 'git', 'main');
     });
-
-    qase(12,
-      it('Enable extension support', () => {
-        if (isRancherManagerVersion('2.8')) {
-          isUIVersion('stable') ? cypressLib.enableExtensionSupport(true) : cypressLib.enableExtensionSupport(false);
-        }
-      })
-    );
 
     qase(13,
       it('Install Elemental plugin', () => {
@@ -57,23 +49,35 @@ filterTests(['main', 'upgrade'], () => {
         cy.contains('Extensions')
           .click();
         cy.contains('elemental');
-        cy.get('.plugin')
-          .contains('Install')
-          .click();
-        if (isRancherManagerVersion('2.8')) {
-          cy.getBySel('install-ext-modal-select-version')
+        if (isRancherManagerVersion('2.13')) {
+          cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
+            cy.get('[data-testid="rc-item-card-action"]')
+            //.getBySel('rc-item-card-action')
             .click();
-          cy.contains('1.3.1')
+            cy.contains('Install')
+            .click();
+          });
+
+        } else {
+          cy.contains('elemental');
+          cy.get('.plugin')
+            .contains('Install')
             .click();
         }
         cy.clickButton('Install');
         cy.contains('Installing');
         cy.contains('Extensions changed - reload required', { timeout: 40000 });
         cy.clickButton('Reload');
-        cy.get('.plugins')
-          .children()
-          .should('contain', 'elemental')
-          .and('contain', 'Uninstall');
+        if (isRancherManagerVersion('2.13')) {
+          cy.getBySel('btn-installed')
+            .click();
+          cy.getBySel('item-card-header-title')
+        } else {
+          cy.get('.plugins')
+            .children()
+            .should('contain', 'elemental')
+            .and('contain', 'Uninstall');
+        }
       })
     );
     it('Add additional channel', () => {
