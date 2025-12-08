@@ -26,6 +26,7 @@ describe('UI extension upgrade tests', () => {
   beforeEach(() => {
     cy.login();
     cy.visit('/');
+    cy.viewport(1920, 1080);
     cypressLib.burgerMenuToggle();
   });
 
@@ -38,14 +39,26 @@ describe('UI extension upgrade tests', () => {
 
       qase(56,
         it('Upgrade Elemental UI extension', () => {
-          cy.contains('Extensions').click();
-          cy.getBySel('btn-available').click();
-          cy.getBySel('extension-card-elemental').contains('elemental');
-          cy.getBySel('extension-card-install-btn-elemental').click();
-          cy.getBySel('install-ext-modal-install-btn').click();
-          cy.wait(120000); // eslint-disable-line cypress/no-unnecessary-waiting
-          cy.reload();
-          cy.getBySel('extension-card-uninstall-btn-elemental');
+          if (utils.isRancherManagerVersion('v2.13')) {
+            cy.visit('c/local/uiplugins#installed');
+            cy.wait(5000); // eslint-disable-line cypress/no-unnecessary-waiting
+            cy.get('[data-testid="item-card-cluster/elemental-ui/elemental"]').click();
+            cy.getBySel('extension-details').contains('Upgrade to this version').click();
+            cy.getBySel('install-ext-modal-install-btn').click();
+            cy.wait(40000); // eslint-disable-line cypress/no-unnecessary-waiting
+            cy.reload();
+            cy.get('[data-testid="item-card-header-action-menu"] > .icon').click();
+            cy.get('.v-popper__inner').contains('Upgrade').should('not.exist');
+          } else {
+            cy.contains('Extensions').click();
+            cy.getBySel('btn-available').click();
+            cy.getBySel('extension-card-elemental').contains('elemental');
+            cy.getBySel('extension-card-install-btn-elemental').click();
+            cy.getBySel('install-ext-modal-install-btn').click();
+            cy.wait(120000); // eslint-disable-line cypress/no-unnecessary-waiting
+            cy.reload();
+            cy.getBySel('extension-card-uninstall-btn-elemental');
+          }
       }));
 
       qase(58,

@@ -51,7 +51,6 @@ module.exports = (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions)
   config.env.rancher_channel = process.env.RANCHER_CHANNEL;
   config.env.rancher_version = process.env.RANCHER_VERSION;
   config.env.iso_stable_os_version = process.env.ISO_STABLE_OS_VERSION;
-  config.env.ui_account = process.env.UI_ACCOUNT;
   config.env.upgrade_from_version = process.env.UPGRADE_FROM_VERSION;
   config.env.upgrade_image = process.env.UPGRADE_IMAGE;
   config.env.upgrade_os_channel = process.env.UPGRADE_OS_CHANNEL;

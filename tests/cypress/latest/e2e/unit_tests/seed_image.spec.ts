@@ -21,13 +21,10 @@ filterTests(['main'], () => {
   Cypress.config();
   
   describe('Seed images menu testing', () => {
-    const elementalUser = "elemental-user";
-    const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword";
     const selectors = {
       sortableTableRow: 'sortable-table-0-row',
     };
-    const login = uiAccount === "user" ? () => cy.login(elementalUser, uiPassword) : () => cy.login();
+    const login = () => cy.login();
 
     beforeEach(() => {
       login();

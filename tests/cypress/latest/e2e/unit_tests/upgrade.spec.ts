@@ -22,11 +22,8 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 describe('Upgrade tests', () => {
   const channelName = 'mychannel';
   const clusterName = 'mycluster';
-  const elementalUser = 'elemental-user';
-  const uiAccount = Cypress.env('ui_account');
-  const uiPassword = 'rancherpassword';
   const upgradeImage = Cypress.env('upgrade_image');
-  const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
+  const login = () => cy.login();
 
   beforeEach(() => {
     login();
@@ -113,7 +110,11 @@ describe('Upgrade tests', () => {
         cy.getBySel('cluster-target').click();
         // As there is already an upgrade group targeting the cluster,
         // the cluster should not be available in the dropdown
-        cy.get('#vs4__listbox').should('not.contain', clusterName);
+        if (utils.isRancherManagerVersion('v2.13')) {
+          cy.get('.no-options-slot').should('contain', 'No options');
+        } else {
+          cy.get('#vs4__listbox').should('not.contain', clusterName);
+        }
     }));
 
     qase(76,

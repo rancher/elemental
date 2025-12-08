@@ -21,11 +21,8 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 filterTests(['main'], () => {
   describe('Machine selector testing', () => {
     const elemental = new Elemental();
-    const elementalUser = 'elemental-user';
-    const uiAccount = Cypress.env('ui_account');
-    const uiPassword = 'rancherpassword';
     const vmNumber = 3;
-    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
+    const login = () => cy.login();
 
     beforeEach(() => {
       login();

@@ -20,10 +20,7 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 
 Cypress.config();
 describe('Machine registration testing', () => {
-  const elementalUser = 'elemental-user';
-  const uiAccount = Cypress.env('ui_account');
-  const uiPassword = 'rancherpassword';
-  const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
+  const login = () => cy.login();
 
   before(() => {
     login();
