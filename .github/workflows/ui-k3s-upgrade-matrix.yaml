@@ -54,10 +54,10 @@ jobs:
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
       operator_repo: oci://registry.suse.com/rancher
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.0/charts/rancher
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
       proxy: ${{ inputs.proxy || 'elemental' }}
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/maintenance/6.0/containers/suse/sl-micro/6.0/baremetal-os-container:latest
+      upgrade_image: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.2/baremetal-os-container:latest
       zone: us-central1-b

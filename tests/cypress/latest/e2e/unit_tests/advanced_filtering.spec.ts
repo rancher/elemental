@@ -20,11 +20,7 @@ import { isRancherManagerVersion } from '~/support/utils';
 
 filterTests(['main'], () => {
   describe('Advanced filtering testing', () => {
-    const elementalUser = 'elemental-user';
-    const uiAccount = Cypress.env('ui_account');
-    const uiPassword = 'rancherpassword';
-    const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
-
+    const login = () => cy.login();
     beforeEach(() => {
       login();
       cy.visit('/');

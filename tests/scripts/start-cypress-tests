@@ -70,7 +70,6 @@ docker run -v $PWD:/workdir -w /workdir                         \
     -e RANCHER_URL=$RANCHER_URL                                 \
     -e RANCHER_USER=$RANCHER_USER                               \
     -e ISO_STABLE_OS_VERSION=$ISO_STABLE_OS_VERSION             \
-    -e UI_ACCOUNT=$UI_ACCOUNT                                   \
     -e UPGRADE_FROM_VERSION=$UPGRADE_FROM_VERSION               \
     -e UPGRADE_IMAGE=$UPGRADE_IMAGE                             \
     -e UPGRADE_OS_CHANNEL=$UPGRADE_OS_CHANNEL                   \

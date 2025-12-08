@@ -21,9 +21,6 @@ filterTests(['main'], () => {
   Cypress.config();
   
   describe('OS versions testing', () => {
-    const elementalUser = "elemental-user";
-    const uiAccount = Cypress.env('ui_account');
-    const uiPassword = "rancherpassword";
     const selectors = {
       sortableTableList: 'sortable-table-list-container',
       clusterList: 'cluster-list-container',
@@ -33,9 +30,10 @@ filterTests(['main'], () => {
       mediaTypeBuildMedia: 'select-media-type-build-media',
       osVersionBuildMedia: 'select-os-version-build-media'
     };
-    const login = uiAccount === "user" ? () => cy.login(elementalUser, uiPassword) : () => cy.login();
+    const login = () => cy.login();
 
     beforeEach(() => {
+      cy.viewport(1920, 1080);
       login();
       cy.visit('/');
       cypressLib.burgerMenuToggle();

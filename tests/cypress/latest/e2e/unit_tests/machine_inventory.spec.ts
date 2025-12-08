@@ -21,7 +21,6 @@ import { qase } from 'cypress-qase-reporter/dist/mocha';
 Cypress.config();
 describe('Machine inventory testing', () => {
   const clusterName = 'mycluster';
-  const elementalUser = 'elemental-user';
   const hwLabels = [
     'TotalCPUThread', 'TotalMemory', 'CPUModel',
     'CPUVendor', 'NumberBlockDevices', 'NumberNetInterface',
@@ -29,11 +28,9 @@ describe('Machine inventory testing', () => {
   ];
   const k8sDownstreamVersion = Cypress.env('k8s_downstream_version');
   const proxy = 'http://172.17.0.1:3128';
-  const uiAccount = Cypress.env('ui_account');
-  const uiPassword = 'rancherpassword';
   const vmNumber = 3;
 
-  const login = () => (uiAccount === 'user' ? cy.login(elementalUser, uiPassword) : cy.login());
+  const login = () => cy.login();
 
   beforeEach(() => {
     login();
