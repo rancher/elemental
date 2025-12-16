@@ -34,7 +34,7 @@ filterTests(['main', 'upgrade'], () => {
 
     if (isOperatorVersion('marketplace') && isGitRepo('github')) {
       it('Configure from which git repo charts are pulled from', () => {
-        cypressLib.addRepository('rancher-dev', 'https://github.com/rancher/charts.git', 'git', isRancherManagerVersion('2.9') ? 'dev-v2.9' : 'dev-v2.8');
+        cypressLib.addRepository('rancher-dev', 'https://github.com/rancher/charts.git', 'git', 'dev-v2.13');
       });
     }
     if (!isOperatorVersion('marketplace') && isCypressTag('main')) {
@@ -49,7 +49,8 @@ filterTests(['main', 'upgrade'], () => {
     } else if (!isOperatorInstallType('cli')) {
       qase(57,
         it('Install latest stable Elemental operator', () => {
-          elemental.installElementalOperator(upgradeFromVersion);
+          //elemental.installElementalOperator(upgradeFromVersion);
+          cy.wait(200000); // Placeholder until stable operator is available in chart repo
       }));
     }
   });
