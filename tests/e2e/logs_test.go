@@ -72,7 +72,7 @@ var _ = Describe("E2E - Getting logs node", Label("logs"), func() {
 					err := exec.Command(myDir + "/" + b.Name).Run()
 					checkRC(err)
 				} else {
-					err := exec.Command("sudo", myDir+"/"+b.Name, "-d", "../logs").Run()
+					err := exec.Command("sudo", myDir+"/"+b.Name, "-d", myDir).Run()
 					checkRC(err)
 				}
 			}
