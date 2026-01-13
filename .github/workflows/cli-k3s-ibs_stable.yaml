@@ -13,11 +13,11 @@ on:
         type: boolean
       k8s_downstream_version:
         description: Rancher cluster downstream version to use
-        default: v1.31.7+k3s1
+        default: v1.34.2+k3s1
         type: string
       k8s_upstream_version:
         description: Rancher cluster upstream version to use
-        default: v1.31.7+k3s1
+        default: v1.34.2+k3s1
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
