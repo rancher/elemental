@@ -306,12 +306,16 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 			"-o", "jsonpath={.spec.template.spec.containers[0].image}")
 		Expect(err).To(Not(HaveOccurred()))
 
+		// backupRscSet should be used for newer versions
 		switch {
-		case strings.Contains(rancherVersion, ":v2.12") || strings.Contains(rancherVersion, ":v2.13"):
-			backupRestoreVersion = "v8.0.0"
-			backupRscSet = "rancher-resource-set-full" // Newer resources set should now be used
+		case strings.Contains(rancherVersion, ":v2.13"):
+			backupRestoreVersion = "v9.0.0"
+			backupRscSet = "rancher-resource-set-full"
+		case strings.Contains(rancherVersion, ":v2.12"):
+			backupRestoreVersion = "v8.1.1"
+			backupRscSet = "rancher-resource-set-full"
 		case strings.Contains(rancherVersion, ":v2.11"):
-			backupRestoreVersion = "v7.0.2"
+			backupRestoreVersion = "v7.0.4"
 		case strings.Contains(rancherVersion, ":v2.10"):
 			backupRestoreVersion = "v6.0.2"
 		case strings.Contains(rancherVersion, ":v2.9"):
