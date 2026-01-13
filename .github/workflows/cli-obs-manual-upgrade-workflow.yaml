@@ -29,7 +29,7 @@ on:
         type: string
       rancher_upgrade:
         description: Rancher Manager channel/version/head_version to upgrade to
-        default: head/2.12
+        default: head/2.13
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
