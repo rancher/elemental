@@ -35,7 +35,7 @@ jobs:
       matrix:
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.34.2+k3s1","v1.34.2+rke2r1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.34.2+k3s1","v1.34.2+rke2r1"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"prime/latest","head/2.12"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"prime/latest","head/2.13"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
