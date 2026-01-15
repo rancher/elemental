@@ -140,7 +140,7 @@ Cypress.Commands.add('createMachReg', (
     } else if (utils.isOperatorVersion('registry.suse.com') || utils.isOperatorVersion('marketplace')) {
       cy.contains(Cypress.env('os_version_install')).click();
     // Sometimes we want to test dev/staging operator version with stable OS version
-    } else if (utils.isOsVersion('stable') && (utils.isOperatorVersion('maintenance') || utils.isOperatorVersion('staging'))) {
+    } else if (utils.isOsVersion('stable') && (!utils.isOperatorVersion('maintenance') || utils.isOperatorVersion('staging'))) {
       cy.contains(new RegExp(osRegex)).click();
     } else {
       cy.contains('(unstable)').click();
