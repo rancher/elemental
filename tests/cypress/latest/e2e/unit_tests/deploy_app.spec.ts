@@ -91,6 +91,7 @@ filterTests(['main'], () => {
         cy.get('.nav').contains('Apps').click();
         cy.contains('Installed Apps').click();
         cy.contains('.title', 'Installed Apps', { timeout: 20000 });
+        cy.reload();
         cy.contains(myAppToInstall);
         cy.get('[width="30"] > .checkbox-outer-container').click();
         cy.get('.outlet').getBySel('sortable-table-promptRemove').click();

@@ -121,6 +121,11 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
   cypressLib.burgerMenuToggle();
   cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
   // Ugly but needed unfortunately to make sure the cluster stops switching status
-  // eslint-disable-next-line cypress/no-unnecessary-waiting
-  cy.wait(240000);
+  if (isK8sVersion('rke2')) {
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(400000);
+  } else {
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(240000);
+  }
 }
