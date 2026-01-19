@@ -34,7 +34,7 @@ describe('Upgrade tests', () => {
   });
 
   filterTests(['upgrade'], () => {
-    // Add dev OS Version Channel if stable operator is installed
+    // Add maintenance (new dev) OS Version Channel if stable operator is installed
     // because we do not update the operator in RKE2 UI test so far
     // Only RKE2 tests use os version channel
     if (utils.isK8sVersion('rke2')) {
@@ -43,8 +43,8 @@ describe('Upgrade tests', () => {
         cy.deleteAllResources();
       });
 
-      it('Add staging channel for RKE2 upgrade', () => {
-        cy.addOsVersionChannel('staging');
+      it('Add maintenance channel for RKE2 upgrade', () => {
+        cy.addOsVersionChannel('maintenance');
       });
     }
 

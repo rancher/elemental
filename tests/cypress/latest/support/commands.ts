@@ -378,10 +378,10 @@ Cypress.Commands.add('addOsVersionChannel', (channelVersion: string) => {
 
   switch (channelVersion) {
     case "stable":
-      channelRepo = 'registry.suse.com/rancher/elemental-channel/sl-micro:6.0-baremetal';
+      channelRepo = 'registry.suse.com/rancher/elemental-channel/sl-micro:6.2-baremetal'
       break;
-    case "staging":
-      channelRepo = 'registry.opensuse.org/isv/rancher/elemental/staging/containers/rancher/elemental-unstable-channel:latest';
+    case "maintenance":
+      channelRepo ='registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/containers/rancher/elemental-unstable-channel:latest';
       break;
     default:
       cy.log("Channel not found");
