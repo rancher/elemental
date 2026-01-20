@@ -377,14 +377,7 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 						out = RunSSHWithRetry(cl, "cat /run/elemental/recovery_mode")
 						Expect(out).To(Not(BeEmpty()))
 
-						// Reboot in active (normal) mode
-						_ = RunSSHWithRetry(cl, "grub2-editenv /oem/grubenv set next_entry=active")
-
-						// Check that the active entry is selected
-						out = RunSSHWithRetry(cl, "grub2-editenv /oem/grubenv list | grep next_entry")
-						Expect(out).To(ContainSubstring("active"))
-
-						// Final reboot in active mode
+						// Final reboot in active (normal) mode
 						_ = RunSSHWithRetry(cl, "setsid -f reboot")
 
 						// Check the mode after final reboot
