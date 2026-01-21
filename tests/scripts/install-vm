@@ -11,7 +11,7 @@ function error() {
 # Variable(s) and default values
 ARCH=$(uname -m)
 EMULATED_TPM="none"
-FW_CODE=/usr/share/qemu/ovmf-${ARCH}-smm-suse-code.bin
+FW_CODE=$(realpath ../assets/ovmf-${ARCH}-smm-suse-code.bin)
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
 HDD_SIZE=30
 MAC=$2
