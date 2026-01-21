@@ -37,11 +37,11 @@ on:
         type: string
       upgrade_image:
         description: OS image to use during the upgrade
-        default: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.2/baremetal-os-container:latest
+        default: registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/containers/suse/sl-micro/6.2/baremetal-os-container:latest
         type: string
       upgrade_os_channel:
         description: Channel to use for the Elemental OS upgrade
-        default: staging
+        default: maintenance/6.2
         type: string
 
 jobs:

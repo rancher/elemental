@@ -60,5 +60,6 @@ jobs:
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       test_type: ui
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.1/baremetal-os-container:latest
+      # Always use the IBS images upn the OBS ones
+      upgrade_image: registry.suse.com/suse/sl-micro/6.2/baremetal-os-container:latest
       zone: us-central1-f
