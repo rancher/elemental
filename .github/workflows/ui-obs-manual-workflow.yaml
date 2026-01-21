@@ -29,12 +29,12 @@ on:
         type: string
       operator_repo:
         description: Elemental operator repository to use
-        default: oci://registry.opensuse.org/isv/rancher/elemental/dev/charts/rancher
+        default: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/charts/rancher
         type: string
       os_to_test:
-        description: OS repository to test (dev/staging/stable)
+        description: OS repository to test
         type: string
-        default: dev
+        default: maintenance/6.2
       proxy:
         description: Deploy a proxy (none/rancher/elemental)
         default: elemental

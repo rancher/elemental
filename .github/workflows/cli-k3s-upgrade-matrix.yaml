@@ -51,12 +51,16 @@ jobs:
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
+      # Install older version to be able to perform an OS update
+      operator_repo: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.1/charts/rancher
+      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/charts/rancher
       os_to_test: stable
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_upgrade: ${{ matrix.rancher_upgrade }}
       rancher_version: stable/latest
       reset: true
       test_type: cli
-      upgrade_image: registry.opensuse.org/isv/rancher/elemental/staging/containers/suse/sl-micro/6.2/baremetal-os-container:latest
+      # Always use the IBS images upn the OBS ones
+      upgrade_image: registry.suse.com/suse/sl-micro/6.2/baremetal-os-container:latest
+      upgrade_os_channel: maintenance/6.2
       zone: us-central1-b

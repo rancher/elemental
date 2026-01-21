@@ -66,12 +66,12 @@ on:
       operator_repo:
         description: Elemental operator repository to use
         type: string
-        default: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.1/charts/rancher
+        default: oci://registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/charts/rancher
       operator_upgrade:
         description: Elemental operator version to upgrade to
         type: string
       os_to_test:
-        description: OS repository to test (dev/staging/stable)
+        description: OS repository to test
         type: string
         default: stable
       os_version_install:
