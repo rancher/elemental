@@ -595,7 +595,11 @@ func WaitCluster(ns, cn string) {
 	states := []state{
 		{
 			conditionStatus: "True",
-			conditionType:   "AgentDeployed",
+			conditionType:   "Connected",
+		},
+		{
+			conditionStatus: "True",
+			conditionType:   "Created",
 		},
 		{
 			conditionStatus: "True",
