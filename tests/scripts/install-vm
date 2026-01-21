@@ -8,14 +8,17 @@ function error() {
   exit 1
 }
 
-# Variable(s) and default values
+# Variable(s)
 ARCH=$(uname -m)
-EMULATED_TPM="none"
 FW_CODE=$(realpath ../assets/ovmf-${ARCH}-smm-suse-code.bin)
 FW_VARS=$(realpath ../assets/ovmf-template-vars.fd)
-HDD_SIZE=30
 MAC=$2
 VM_NAME=$1
+
+# Default values
+: EMULATED_TPM=${EMULATED_TPM:="none"}
+: HDD_SIZE=${HDD_SIZE:="30"}
+: SECURE_BOOT=${SECURE_BOOT:="yes"}
 
 # Configure hugepages if needed
 NR_HUGEPAGES=$(</proc/sys/vm/nr_hugepages)
@@ -109,10 +112,10 @@ CMD="sudo virt-install \
        --os-variant opensuse-unknown \
        --virt-type kvm \
        --machine q35 \
-       --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=yes,loader.type=pflash,nvram.template=${FW_VARS} \
+       --boot loader=${FW_CODE},loader.readonly=yes,loader.secure=${SECURE_BOOT},loader.type=pflash,nvram.template=${FW_VARS} \
        --features smm.state=yes \
        --vcpus ${VM_CPU:-4} \
-       --cpu host \
+       --cpu host-passthrough \
        --disk path=${VM_NAME}/${VM_NAME}.img,size=${HDD_SIZE},${DISK_TUNE} \
        --disk path=${VM_NAME}/${VM_NAME}-data.img,size=${HDD_SIZE},${DISK_TUNE} \
        --check disk_size=off \
