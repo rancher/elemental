@@ -26,7 +26,7 @@ spec:
               network:
                 - if: '! grep -q ipv6.disable /oem/grubenv'
                   commands:
-                    - grub2-editenv /oem/grubenv set extra_cmdline=ipv6.disable=1 && shutdown -r now
+                    - grub2-editenv /oem/grubenv set extra_cmdline="ipv6.disable=1 console=ttyS0" && shutdown -r now
         - path: %SSHD_CONFIG_FILE%
           append: true
           content: |
