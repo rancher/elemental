@@ -207,7 +207,7 @@ jobs:
           BOOT_TYPE: ${{ inputs.boot_type }}
           BROWSER: chrome
           CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
-          CYPRESS_DOCKER: 'cypress/included:13.9.0'
+          CYPRESS_DOCKER: 'cypress/included:15.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
           K8S_UPSTREAM_VERSION: ${{ inputs.k8s_upstream_version }}
@@ -296,7 +296,7 @@ jobs:
           BOOT_TYPE: ${{ inputs.boot_type }}
           BROWSER: firefox
           CHARTMUSEUM_REPO: http://${{ inputs.public_fqdn }}
-          CYPRESS_DOCKER: 'cypress/included:13.9.0'
+          CYPRESS_DOCKER: 'cypress/included:15.9.0'
           CYPRESS_TAGS: ${{ inputs.cypress_tags }}
           ELEMENTAL_DEV_VERSION: ${{ steps.install_chartmuseum.outputs.operator_dev_version }}
           ELEMENTAL_UI_VERSION: ${{ inputs.elemental_ui_version }}
