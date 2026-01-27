@@ -65,6 +65,34 @@ ELEMENTAL_REPO=$6
 DEPLOY_AIRGAP_SCRIPT=$(realpath ../scripts/deploy-airgap)
 OPT_RANCHER="${HOME}/airgap_rancher"
 REPO_SERVER="rancher-manager.test:5000"
+ELEMENTAL_IMAGES_FILE="elemental-images.txt"
+RANCHER_IMAGES_FILE="rancher-images.txt"
+RANCHER_LOAD_SCRIPT="rancher-load-images.sh"
+RANCHER_SAVE_SCRIPT="rancher-save-images.sh"
+ELEMENTAL_AIRGAP_REPO="https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts"
+ELEMENTAL_AIRGAP_SCRIPT="elemental-airgap.sh"
+IMAGES_PATH="${HOME}/container-images"
+
+# Install needed packages
+sudo zypper --no-refresh -n in skopeo yq
+
+# First we need to move docker directory to ensure that we have enough disk space
+if [[ ! -d ${HOME}/var-lib-docker ]]; then
+  sudo systemctl stop docker
+
+  # Move the directory
+  sudo mv /var/lib/docker ${HOME}/var-lib-docker/
+  sudo ln -s ${HOME}/var-lib-docker /var/lib/docker
+
+  # Allow local insecure registry
+  sudo sed -i 's/^{$/{\n  "insecure-registries": ["rancher-manager.test:5000"],/' /etc/docker/daemon.json
+
+  # Restart docker daemon
+  sudo systemctl start docker
+  if ! sudo systemctl is-active --quiet docker; then
+    error "Docker service is not running!"
+  fi
+fi
 
 # Set Elemental version
 case ${ELEMENTAL_REPO} in
@@ -91,10 +119,7 @@ TMP_VER=${K3S_DOWNSTREAM_VERSION/+*}
 K8S_DOWNSTREAM_VERSION=${TMP_VER/v}
 
 # Create directories
-mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},k3s_${K8S_DOWNSTREAM_VERSION},helm} ${OPT_RANCHER}/images/registry
-
-# Install packages
-sudo zypper --no-refresh -n in skopeo yq
+mkdir -p ${OPT_RANCHER}/{k3s_${K8S_UPSTREAM_VERSION},k3s_${K8S_DOWNSTREAM_VERSION},helm,registry} ${IMAGES_PATH}
 
 # Add rancher manager in /etc/hosts
 sudo sh -c "echo '192.168.122.102 ${REPO_SERVER%:*}' >> /etc/hosts"
@@ -146,7 +171,7 @@ RunHelmCmdWithRetry repo update > /dev/null 2>&1
 [[ "${CERT_MANAGER_VERSION}" == "latest" ]] \
   && unset VER_OPT \
   || VER_OPT="--version ${CERT_MANAGER_VERSION}"
-RunHelmCmdWithRetry pull ${VER_OPT} jetstack/cert-manager > /dev/null 2>&1
+RunHelmCmdWithRetry pull jetstack/cert-manager > /dev/null 2>&1
 
 # Get CertManager version
 CERT_MANAGER_VERSION=$(ls cert-manager-*.tgz 2>/dev/null)
@@ -177,23 +202,20 @@ if [[ -z "${RANCHER_VERSION}" || "${RANCHER_VERSION}" == "latest" ]]; then
   RANCHER_VERSION=${RANCHER_VERSION%.*}
 fi
 
-# Get the Elemental repositories
-#ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/main/scripts
-ELEMENTAL_AIRGAP_REPO=https://raw.githubusercontent.com/rancher/elemental-operator/refs/heads/fix-airgap/scripts
-ELEMENTAL_AIRGAP_SCRIPT=elemental-airgap.sh
-curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
-bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa -ac ${ELEMENTAL_VERSION} || exit 1
-rm -f ${ELEMENTAL_AIRGAP_SCRIPT}
-
 # Get container images
-cd ${OPT_RANCHER}/images/
+cd ${IMAGES_PATH}
 
-# Rancher image list
+# Rancher images list
 [[ "${RANCHER_CHANNEL}" =~ prime ]] \
   && RANCHER_REPO=https://prime.ribs.rancher.io/rancher/v${RANCHER_VERSION} \
   || RANCHER_REPO=https://github.com/rancher/rancher/releases/download/v${RANCHER_VERSION}
-RANCHER_IMAGES_FILE=rancher-images.txt
 curl -sOL ${RANCHER_REPO}/${RANCHER_IMAGES_FILE}
+
+# Rancher scripts
+for I in ${RANCHER_LOAD_SCRIPT} ${RANCHER_SAVE_SCRIPT}; do
+  curl -sOL ${RANCHER_REPO}/${I}
+  chmod +x ${I}
+done
 
 # Rancher image file should not be empty
 if $(grep -iq 'not found' ${RANCHER_IMAGES_FILE}) || [[ ! -s ${RANCHER_IMAGES_FILE} ]]; then
@@ -205,53 +227,29 @@ if ! $(grep -iq 'fleet' ${RANCHER_IMAGES_FILE}); then
   error "ERROR: fleet is not found in file ${RANCHER_IMAGES_FILE}!"
 fi
 
-# CertManager image list
-CERT_IMAGES_FILE=cert-manager-images.txt
+# CertManager images list
 RunHelmCmdWithRetry template ${OPT_RANCHER}/helm/cert-manager-${CERT_MANAGER_VERSION}.tgz \
   | awk '$1 ~ /image:/ {print $2}' \
-  | sed s/\"//g > ${CERT_IMAGES_FILE}
+  | sed s/\"//g >> ${RANCHER_IMAGES_FILE}
 
-# Elemental image list
-ELEMENTAL_IMAGES_FILE=elemental-images.txt
-mv -f ${OPT_RANCHER}/helm/${ELEMENTAL_IMAGES_FILE} .
+# Get the Elemental repositories
+curl -sOL ${ELEMENTAL_AIRGAP_REPO}/${ELEMENTAL_AIRGAP_SCRIPT}
+bash ${ELEMENTAL_AIRGAP_SCRIPT} -d -r ${REPO_SERVER} -sa -ac ${ELEMENTAL_VERSION} || exit 1
 
-# Get images
-loop=0
-for i in $(< ${CERT_IMAGES_FILE}) $(< ${ELEMENTAL_IMAGES_FILE}) $(< ${RANCHER_IMAGES_FILE}); do
-  mkdir -p ${i%/*}
+# Elemental images list
+cat ${ELEMENTAL_IMAGES_FILE} >> ${RANCHER_IMAGES_FILE}
+rm -f ${ELEMENTAL_IMAGES_FILE}
 
-  if [[ "${i}" =~ (rancher/rancher-agent:|rancher/rancher:) && -n "${RANCHER_IMAGES_REPO}" ]]; then
-    # Devel/Staging versions of Rancher are hosted in a specific registry
-    j="${RANCHER_IMAGES_REPO}/${i}"
-  elif [[ "${i}" =~ (rancher/elemental-operator:|rancher/seedimage-builder:) ]]; then
-    # Devel/Maintenance/Staging versions of Elemental are hosted in a specific registry
-    [[ "${ELEMENTAL_VERSION}" == "stable" ]] \
-      && j="registry.suse.com/${i}" \
-      || j="registry.opensuse.org/isv/rancher/elemental/${ELEMENTAL_VERSION}/containers/${i}"
-  else
-    j="${i}"
-  fi
+# Sort and clean container images list
+sort -u ${RANCHER_IMAGES_FILE} -o ${RANCHER_IMAGES_FILE}
 
-  # Copy images
-  RunSkopeoCmdWithRetry copy docker://${j} docker-archive:${i/:/_}.tar:${i} &
+# Save container images
+./${RANCHER_SAVE_SCRIPT} --image-list ${RANCHER_IMAGES_FILE}
 
-  # Wait for skopeo jobs to finish if we already have too much jobs in parallel
-  # This is to avoid the "too many requests to registry" error!
-  if (( ++loop > 50 )); then
-    echo "Wait for sync..."
-    wait
 
-    # Reset loop counter
-    loop=0
-  fi
-done
-
-# Wait for *ALL* skopeo jobs to finish
-wait
-
-# Skopeo - Registry
+# Export registry with skopeo
+cd ${OPT_RANCHER}
 RunSkopeoCmdWithRetry copy --additional-tag registry:latest docker://registry:latest docker-archive:registry/registry.tar
 
-# Compress all the things
-cd ${OPT_RANCHER}
+# Compress all the things but the container images
 tar -I pzstd -vcf ${OPT_RANCHER%/*}/airgap_rancher.zst $(ls 2>/dev/null)

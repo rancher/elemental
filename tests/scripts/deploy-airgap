@@ -4,33 +4,6 @@
 
 set -vx
 
-# Retry skopeo command in case of sporadic issue
-function RunSkopeoCmdWithRetry() {
-  CMD=$*
-
-  # Wait for a maximum of 1 minute
-  for ((i=0; i<60; i++)); do
-    # If skopeo command is OK then we simply return (exit the function)
-    ERRMSG=$(skopeo ${CMD} 2>&1 > /dev/null) && return
-
-    # If resource access is denied retry with local access
-    case ${ERRMSG} in
-      *requested\ access\ to\ the\ resource\ is\ denied*)
-        CMD=${CMD/docker:\/\//docker-daemon:}
-      ;;
-      *Storing\ signatures\ for\ docker\ tar\ files\ is\ not\ supported*)
-        CMD=${CMD/copy/copy --remove-signatures}
-      ;;
-    esac
-
-    # Wait a little
-    sleep 5
-  done
-
-  # If we are here then an error happened!
-  exit 1
-}
-
 # Variable(s)
 K3S_UPSTREAM_VERSION=$1
 OPT_RANCHER=/opt/rancher
@@ -51,17 +24,23 @@ sudo sh -c '
 # Add registry configuration
 cat <<EOF | sudo tee /etc/rancher/k3s/registries.yaml
 mirrors:
-  "rancher-manager.test:5000":
+  "*":
     endpoint:
       - "http://rancher-manager.test:5000"
 configs:
-  "rancher-manager.test:5000":
+  "*":
     tls:
       insecure_skip_verify: true
 EOF
 
+# Add default configuration
+cat <<EOF | sudo tee /etc/rancher/k3s/config.yaml
+cluster-init: true
+disable-default-registry-endpoint: true
+EOF
+
 # Pre-load registry image
-rsync -avP ${OPT_RANCHER}/images/registry/registry.tar /var/lib/rancher/k3s/agent/images/
+rsync -avP ${OPT_RANCHER}/registry/registry.tar /var/lib/rancher/k3s/agent/images/
 
 # Install k3s
 INSTALL_K3S_SKIP_DOWNLOAD=true INSTALL_K3S_VERSION=${K3S_UPSTREAM_VERSION} ./install.sh
@@ -112,29 +91,3 @@ EOF
 
 # Wait for registry to be ready
 sleep 1m
-
-# Load images inside the local registry
-IMAGES_PATH=${OPT_RANCHER}/images
-
-# Elemental + Cert-Manager + Rancher
-loop=0
-for file in $(find ${IMAGES_PATH} -name '*.tar' 2>/dev/null); do
-  LOCAL_PATH="${file#*${IMAGES_PATH}}"
-  DOCKER_PATH="rancher-manager.test:5000${LOCAL_PATH/.tar}"
-
-  # Add to local registry
-  RunSkopeoCmdWithRetry copy docker-archive:${file} docker://${DOCKER_PATH/_/:} --dest-tls-verify=false &
-
-  # Wait for skopeo jobs to finish if we already have too much jobs in parallel
-  # This is to avoid the "too many requests to registry" error!
-  if (( ++loop > 50 )); then
-    echo "Wait for sync..."
-    wait
-
-    # Reset loop counter
-    loop=0
-  fi
-done
-
-# Wait for *ALL* skopeo jobs to finish
-wait
