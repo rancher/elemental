@@ -133,6 +133,19 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 			Expect(err).To(Not(HaveOccurred()), string(out))
 		})
 
+		By("Dumping the container images", func() {
+			imagesPath := os.Getenv("HOME") + "/container-images"
+			imagesList := imagesPath + "/rancher-images.txt"
+			imagesFile := imagesPath + "/rancher-images.tar.gz"
+			registrySrv := "rancher-manager.test:5000"
+			imagesLoad := imagesPath + "/rancher-load-images.sh"
+
+			// Could be useful for manual debugging!
+			GinkgoWriter.Printf("Executed command: %s --image-list %s --images %s --registry %s\n", imagesLoad, imagesList, imagesFile, registrySrv)
+			out, err := exec.Command(imagesLoad, "--image-list", imagesList, "--images", imagesFile, "--registry", registrySrv).CombinedOutput()
+			Expect(err).To(Not(HaveOccurred()), string(out))
+		})
+
 		By("Getting the kubeconfig file of the airgap cluster", func() {
 			// Define local Kubeconfig file
 			localKubeconfig := os.Getenv("HOME") + "/.kube/config"
@@ -227,22 +240,22 @@ var _ = Describe("E2E - Deploy K3S/Rancher in airgap environment", Label("airgap
 		By("Installing Elemental Operator", func() {
 			// Install Elemental Operator CRDs first
 			// Set flags for Elemental Operator CRDs installation
-			elementalCrdsChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-crds-chart-*.tgz").Output()
+			elementalCrdsChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-crds-chart-*.tgz | tail -1").Output()
 			Expect(err).To(Not(HaveOccurred()))
 
 			flags := []string{
-				"upgrade", "--install", "elemental-crds", string(elementalCrdsChart),
+				"upgrade", "--install", "elemental-crds", strings.TrimSpace(string(elementalCrdsChart)),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 			}
 			RunHelmCmdWithRetry(flags...)
 
 			// Set flags for Elemental Operator installation
-			elementalChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz").Output()
+			elementalChart, err := exec.Command("bash", "-c", "ls "+airgapRepo+"/helm/elemental-operator-chart-*.tgz | tail -1").Output()
 			Expect(err).To(Not(HaveOccurred()))
 
 			flags = []string{
-				"upgrade", "--install", "elemental", string(elementalChart),
+				"upgrade", "--install", "elemental", strings.TrimSpace(string(elementalChart)),
 				"--namespace", "cattle-elemental-system",
 				"--create-namespace",
 				"--set", "image.repository=" + repoServer + rancherPath + "elemental-operator",

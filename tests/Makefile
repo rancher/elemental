@@ -12,6 +12,9 @@ endif
 ifeq ($(TEST_TYPE),multi)
 	GINKGO_TIMEOUT=10800
 endif
+ifeq ($(TEST_TYPE),airgap)
+	GINKGO_AIRGAP_TIMEOUT=10800
+endif
 
 # Define SELinux command line
 SELINUX_CMDLINE="security=selinux enforcing=0"
@@ -57,7 +60,7 @@ publish-qase-run: deps
 
 # E2E tests
 e2e-airgap-rancher: deps
-	ginkgo --label-filter airgap-rancher -r -v ./e2e
+	ginkgo --timeout $(GINKGO_AIRGAP_TIMEOUT)s --label-filter airgap-rancher -r -v ./e2e
 
 e2e-bootstrap-node: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter bootstrap -r -v ./e2e
@@ -93,7 +96,7 @@ e2e-multi-cluster: deps
 	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter multi-cluster -r -v ./e2e
 
 e2e-prepare-archive: deps
-	ginkgo --label-filter prepare-archive -r -v ./e2e
+	ginkgo --timeout $(GINKGO_AIRGAP_TIMEOUT)s -label-filter prepare-archive -r -v ./e2e
 
 e2e-reset: deps
 	ginkgo --label-filter reset -r -v ./e2e
