@@ -215,6 +215,9 @@ curl -sOL ${RANCHER_REPO}/${RANCHER_IMAGES_FILE}
 for I in ${RANCHER_LOAD_SCRIPT} ${RANCHER_SAVE_SCRIPT}; do
   curl -sOL ${RANCHER_REPO}/${I}
   chmod +x ${I}
+
+  # Workaround to speed up the save/load process
+  sed -i 's/gzip/pigz --fast/' ${I}
 done
 
 # Rancher image file should not be empty
