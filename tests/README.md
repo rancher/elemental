@@ -11,6 +11,7 @@
     - **It:** Install K3S/Rancher in the rancher-manager machine
       -  **By:** Sending the archive file into the rancher server
       -  **By:** Deploying airgap infrastructure by executing the deploy script
+      -  **By:** Dumping the container images
       -  **By:** Getting the kubeconfig file of the airgap cluster
       -  **By:** Installing kubectl
       -  **By:** Installing CertManager
