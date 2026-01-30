@@ -95,8 +95,13 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				RunHelmCmdWithRetry("repo", "add", "traefik", "https://traefik.github.io/charts")
 				RunHelmCmdWithRetry("repo", "update")
 
+				// Latest version of Traefik (>3.6.6) cannot be installed (changes in variables)
+				// As this is just a simple application test, it is easier to force the correct
+				// version to use, eg. 3.6.6 but the app version is different from the chart version!
+				// App v3.6.6 => chart v38.0.2
 				flags := []string{
 					"upgrade", "--install", "traefik", "traefik/traefik",
+					"--version", "38.0.2",
 					"--namespace", traefikNS,
 					"--create-namespace",
 					"--set", "ports.web.redirections.entryPoint.to=websecure",
