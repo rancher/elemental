@@ -30,6 +30,14 @@ var _ = Describe("E2E - Test the reset feature", Label("reset"), func() {
 		// Report to Qase
 		testCaseID = 54
 
+		By("Waiting for all pods", func() {
+			WaitForAllPods()
+		})
+
+		By("Checking cluster state", func() {
+			WaitCluster(clusterNS, clusterName)
+		})
+
 		// Get the machine inventory name list
 		machineInventory, err := kubectl.RunWithoutErr("get", "MachineInventory",
 			"--namespace", clusterNS,

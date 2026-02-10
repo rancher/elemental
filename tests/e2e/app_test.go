@@ -141,6 +141,10 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 			err := kubectl.Apply("default", appYaml)
 			Expect(err).To(Not(HaveOccurred()))
 		})
+
+		By("Waiting for all pods", func() {
+			WaitForAllPods()
+		})
 	})
 })
 
@@ -156,6 +160,10 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
 		Expect(kubeConfig).To(Not(BeEmpty()))
+
+		By("Waiting for all pods", func() {
+			WaitForAllPods()
+		})
 
 		By("Scaling the deployment to the number of nodes", func() {
 			var nodeList string
