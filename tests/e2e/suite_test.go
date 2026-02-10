@@ -702,6 +702,28 @@ func WaitCluster(ns, cn string) {
 }
 
 /*
+Wait for all pods to be Running/Succeeded in the current K8s cluster
+  - @returns Nothing, the function will fail through Ginkgo in case of issue
+*/
+func WaitForAllPods() {
+	// Extract list of pods
+	pods, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces",
+		"-o", "jsonpath={.items[*].metadata.name}")
+
+	for _, p := range strings.Fields(pods) {
+		Eventually(func() string {
+			// We have to search for p in all namespaces as we don't know them in advance
+			status, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces",
+				"-o", "jsonpath={.items[?(@.metadata.name==\""+p+"\")].status.phase}")
+			return status
+		}, tools.SetTimeout(8*time.Minute), 30*time.Second).Should(Or(
+			ContainSubstring("Running"),
+			ContainSubstring("Succeeded"),
+		))
+	}
+}
+
+/*
 Wait for K3s to start
   - @param k kubectl structure
   - @returns Nothing, the function will fail through Ginkgo in case of issue
