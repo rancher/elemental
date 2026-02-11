@@ -27,8 +27,10 @@
       -  **By:** Installing Traefik
       -  **By:** Checking LoadBalancer IP
       -  **By:** Installing application
+      -  **By:** Waiting for all pods
 - **Describe:** E2E - Checking a simple application
     - **It:** Check HelloWorld application
+      -  **By:** Waiting for all pods
       -  **By:** Scaling the deployment to the number of nodes
       -  **By:** Waiting for deployment to be rollout
       -  **By:** Checking application
@@ -158,6 +160,8 @@
 
 - **Describe:** E2E - Test the reset feature
     - **It:** Reset one node in the cluster
+      -  **By:** Waiting for all pods
+      -  **By:** Checking cluster state
       -  **By:** Configuring reset at MachineInventory level
       -  **By:** Deleting and removing the node from the cluster
       -  **By:** Checking that MachineInventory is deleted
