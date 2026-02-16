@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/rancher/elemental#readme",
   "dependencies": {
-    "@rancher-ecp-qa/cypress-library": "1.2.1",
+    "@rancher-ecp-qa/cypress-library": "2.1.0",
     "cy-verify-downloads": "^0.3.0",
     "cypress": "^15.9.0",
     "cypress-dark": "^1.8.3",
