@@ -24,7 +24,7 @@
   "dependencies": {
     "@rancher-ecp-qa/cypress-library": "2.1.0",
     "cy-verify-downloads": "^0.3.0",
-    "cypress": "^15.9.0",
+    "cypress": "15.9.0",
     "cypress-dark": "^1.8.3",
     "cypress-file-upload": "^5.0.8",
     "cypress-plugin-tab": "^1.0.5",
