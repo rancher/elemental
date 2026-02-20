@@ -308,8 +308,11 @@ func InstallBackupOperator(k *kubectl.Kubectl) {
 
 		// backupRscSet should be used for newer versions
 		switch {
+		case strings.Contains(rancherVersion, ":v2.14"):
+			backupRestoreVersion = "v9.0.1"
+			backupRscSet = "rancher-resource-set-full"
 		case strings.Contains(rancherVersion, ":v2.13"):
-			backupRestoreVersion = "v9.0.0"
+			backupRestoreVersion = "v9.0.1"
 			backupRscSet = "rancher-resource-set-full"
 		case strings.Contains(rancherVersion, ":v2.12"):
 			backupRestoreVersion = "v8.1.1"
