@@ -5,6 +5,7 @@ metadata:
   # namespace: fleet-default
 spec:
   deleteNoLongerInSyncVersions: true
+  enabled: true
   options:
     image: %OS_CHANNEL%
   syncInterval: 1h
