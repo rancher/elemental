@@ -710,6 +710,10 @@ func WaitForAllPods() {
 	pods, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces",
 		"-o", "jsonpath={.items[*].metadata.name}")
 
+	// Log pods list, useful for debugging
+	podDetails, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces")
+	GinkgoWriter.Printf("%s\n", podDetails)
+
 	for _, p := range strings.Fields(pods) {
 		Eventually(func() string {
 			// We have to search for p in all namespaces as we don't know them in advance
