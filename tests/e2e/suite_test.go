@@ -709,11 +709,20 @@ Wait for all pods to be Running/Succeeded in the current K8s cluster
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
 func WaitForAllPods() {
+	// Log pods list, useful for debugging
+	podDetails, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces")
+	GinkgoWriter.Printf("%s\n", podDetails)
+
 	okStatus := strings.NewReplacer("Running", "", "Succeeded", "", "Completed", "")
 	Eventually(func() string {
 		podStatus, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces",
 			"-o", "jsonpath={.items[*].status.phase}")
-		return strings.TrimSpace(okStatus.Replace(podStatus))
+		s := strings.TrimSpace(okStatus.Replace(podStatus))
+
+		// Log pods status, useful for debugging
+		GinkgoWriter.Printf("Pods Status: %s\n", s)
+
+		return s
 	}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(BeEmpty())
 }
 
