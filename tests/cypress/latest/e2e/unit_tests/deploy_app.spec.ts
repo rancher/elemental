@@ -51,7 +51,7 @@ filterTests(['main'], () => {
         cy.get('.nav').contains('Apps').click();
         cy.contains('Charts').click();
         cy.contains(myAppToInstall, { timeout: 30000 }).click();
-        if (isRancherManagerVersion('2.13')) {
+        if (isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
           cy.getBySel('chart-header-title').should('contain.text', myAppToInstall);
           cy.getBySel('btn-chart-install').click();
         } else {

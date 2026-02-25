@@ -24,7 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13')) {
+    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
       cy.get('.accordion-item > .icon').eq(0).click();
     } else {
       cy.get('div.header > i').eq(0).click();
@@ -59,7 +59,10 @@ export class Elemental {
     cy.get('.nav').contains('Apps').click();
 
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      if (isRancherManagerVersion('2.12')|| (isRancherManagerVersion('2.13'))) {
+      if (isRancherManagerVersion('2.14')) {
+        cy.getBySel("filter-panel-filter-group").contains('elemental-operator').click();
+      }
+      if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
         cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
       } else {
         cy.get('.color1').contains('Elemental').click()

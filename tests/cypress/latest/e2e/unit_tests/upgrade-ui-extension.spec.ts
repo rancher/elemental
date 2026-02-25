@@ -39,7 +39,7 @@ describe('UI extension upgrade tests', () => {
 
       qase(56,
         it('Upgrade Elemental UI extension', () => {
-          if (utils.isRancherManagerVersion('v2.13')) {
+          if (utils.isRancherManagerVersion('v2.13') || utils.isRancherManagerVersion('v2.14')) {
             cy.visit('c/local/uiplugins#installed');
             cy.wait(5000); // eslint-disable-line cypress/no-unnecessary-waiting
             cy.get('[data-testid="item-card-cluster/elemental-ui/elemental"]').click();

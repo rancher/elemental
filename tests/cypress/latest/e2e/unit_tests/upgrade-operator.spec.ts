@@ -41,7 +41,7 @@ describe('Elemental operator upgrade tests', () => {
         it('Upgrade Elemental operator', () => {
           cy.contains('local').click();
           cy.get('.nav').contains('Apps').click();
-          if (utils.isRancherManagerVersion('2.12')|| (utils.isRancherManagerVersion('2.13'))) {
+          if (utils.isRancherManagerVersion('2.12')|| (utils.isRancherManagerVersion('2.13') || (utils.isRancherManagerVersion('2.14')))) {
             cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
           } else {
             cy.get('.color1').contains('Elemental').click()
