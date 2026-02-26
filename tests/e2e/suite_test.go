@@ -713,10 +713,15 @@ func WaitForAllPods() {
 	podDetails, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces")
 	GinkgoWriter.Printf("%s\n", podDetails)
 
+	// NOTE: pods from cattle-system NS are removed because, at this stage,
+	// they can contains helm ones which can be seen as Failed when they
+	// are in Unknown status.
+	// If this exclusion is not enough, next time we can try something like:
+	// kubectl get pod -A -o json | jq -r '.items[] | select(.metadata.name | test("helm-") | not).status.phase'
 	okStatus := strings.NewReplacer("Running", "", "Succeeded", "", "Completed", "")
 	Eventually(func() string {
 		podStatus, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces",
-			"-o", "jsonpath={.items[*].status.phase}")
+			"-o", "jsonpath={.items[?(@.metadata.namespace!=\"cattle-system\")].status.phase}")
 		s := strings.TrimSpace(okStatus.Replace(podStatus))
 
 		// Log pods status, useful for debugging
