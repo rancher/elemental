@@ -57,7 +57,8 @@ jobs:
       k8s_downstream_version: ${{ inputs.k8s_downstream_version }}
       k8s_upstream_version: ${{ inputs.k8s_upstream_version }}
       node_number: 5
-      operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
+      #operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
+      operator_upgrade: oci://registry.opensuse.org/home/dcassany/staging/charts/rancher
       operator_repo: ${{ inputs.operator_repo }}
       os_to_test: stable
       qase_run_id: ${{ inputs.qase_run_id }}
