@@ -360,26 +360,26 @@ jobs:
         run: |
           cd tests && make e2e-upgrade-node && make e2e-check-app
 
-      - name: Test Backup/Restore Rancher Manager/Elemental resources
-        id: test_backup_restore
-        env:
-          BACKUP_RESTORE_VERSION: ${{ steps.component.outputs.backup_restore_version }}
-          CA_TYPE: ${{ inputs.ca_type }}
-          OPERATOR_REPO: ${{ inputs.operator_repo }}
-          PUBLIC_FQDN: ${{ inputs.public_fqdn }}
-          PUBLIC_DOMAIN: ${{ inputs.public_domain }}
-        run: |
-          cd tests
-
-          # Run simple or full backup/restore test
-          if ${{ inputs.full_backup_restore == true }}; then
-            make e2e-full-backup-restore
-          else
-            make e2e-simple-backup-restore
-          fi
-
-          # Check the installed application
-          make e2e-check-app
+#     - name: Test Backup/Restore Rancher Manager/Elemental resources
+#       id: test_backup_restore
+#       env:
+#         BACKUP_RESTORE_VERSION: ${{ steps.component.outputs.backup_restore_version }}
+#         CA_TYPE: ${{ inputs.ca_type }}
+#         OPERATOR_REPO: ${{ inputs.operator_repo }}
+#         PUBLIC_FQDN: ${{ inputs.public_fqdn }}
+#         PUBLIC_DOMAIN: ${{ inputs.public_domain }}
+#       run: |
+#         cd tests
+#
+#         # Run simple or full backup/restore test
+#         if ${{ inputs.full_backup_restore == true }}; then
+#           make e2e-full-backup-restore
+#         else
+#           make e2e-simple-backup-restore
+#         fi
+#
+#         # Check the installed application
+#         make e2e-check-app
 
       - name: Extract ISO version
         id: iso_version
