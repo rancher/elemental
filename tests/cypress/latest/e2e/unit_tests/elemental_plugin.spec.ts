@@ -49,7 +49,7 @@ filterTests(['main', 'upgrade'], () => {
         cy.contains('Extensions')
           .click();
         cy.contains('elemental');
-        if (isRancherManagerVersion('2.13')) {
+        if (isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
           cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
             cy.get('[data-testid="rc-item-card-action"]')
             //.getBySel('rc-item-card-action')
@@ -68,7 +68,7 @@ filterTests(['main', 'upgrade'], () => {
         cy.contains('Installing');
         cy.contains('Extensions changed - reload required', { timeout: 40000 });
         cy.clickButton('Reload');
-        if (isRancherManagerVersion('2.13')) {
+        if (isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
           cy.getBySel('btn-installed')
             .click();
           cy.getBySel('item-card-header-title')
