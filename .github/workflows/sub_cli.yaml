@@ -170,21 +170,9 @@ jobs:
           PUBLIC_DOMAIN: ${{ inputs.public_domain }}
         run: cd tests && make e2e-install-rancher
 
-      - name: Install backup-restore components
-        id: install_backup_restore
-        env:
-          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
-        run: cd tests && make e2e-install-backup-restore
-
       - name: Extract component versions/informations
         id: component
         run: |
-          # Extract rancher-backup-operator version
-          BACKUP_OPERATOR_VERSION=$(kubectl get pod \
-                                     --namespace cattle-resources-system \
-                                     -l app.kubernetes.io/name=rancher-backup \
-                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-
           # Extract CertManager version
           CERT_MANAGER_VERSION=$(kubectl get pod \
                                    --namespace cert-manager \
@@ -204,8 +192,6 @@ jobs:
                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
 
           # Export values
-          echo "backup_operator_version=${BACKUP_OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
-          echo "backup_restore_version=${BACKUP_OPERATOR_VERSION##*:}" >> ${GITHUB_OUTPUT}
           echo "cert_manager_version=${CERT_MANAGER_VERSION}" >> ${GITHUB_OUTPUT}
           echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
           echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
@@ -271,32 +257,6 @@ jobs:
         if: ${{ inputs.reset == true }}
         run: cd tests && make e2e-reset && make e2e-check-app
 
-      - name: Upgrade Elemental Operator
-        id: operator_upgrade
-        if: ${{ inputs.operator_upgrade != '' }}
-        env:
-          OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
-        run: |
-          cd tests
-
-          if make e2e-upgrade-operator; then
-            # Extract elemental-operator version
-            OPERATOR_VERSION=$(kubectl get pod \
-                               --namespace cattle-elemental-system \
-                               -l app=elemental-operator \
-                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
-
-            # Export values
-            echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
-            echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
-
-            # Check application
-            make e2e-check-app
-          else
-            # Needed to be sure that Github Action will see the failure
-            false
-          fi
-
       - name: Upgrade Rancher Manager
         id: rancher_upgrade
         if: ${{ inputs.rancher_upgrade != '' }}
@@ -317,6 +277,32 @@ jobs:
 
             # Export values
             echo "rancher_image_version=${RANCHER_VERSION}" >> ${GITHUB_OUTPUT}
+
+            # Check application
+            make e2e-check-app
+          else
+            # Needed to be sure that Github Action will see the failure
+            false
+          fi
+
+      - name: Upgrade Elemental Operator
+        id: operator_upgrade
+        if: ${{ inputs.operator_upgrade != '' }}
+        env:
+          OPERATOR_UPGRADE: ${{ inputs.operator_upgrade }}
+        run: |
+          cd tests
+
+          if make e2e-upgrade-operator; then
+            # Extract elemental-operator version
+            OPERATOR_VERSION=$(kubectl get pod \
+                               --namespace cattle-elemental-system \
+                               -l app=elemental-operator \
+                               -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+            # Export values
+            echo "operator_upgrade=${OPERATOR_UPGRADE}" >> ${GITHUB_OUTPUT}
+            echo "operator_version=${OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
 
             # Check application
             make e2e-check-app
@@ -360,10 +346,27 @@ jobs:
         run: |
           cd tests && make e2e-upgrade-node && make e2e-check-app
 
+      - name: Install backup-restore components
+        id: install_backup_restore
+        env:
+          BACKUP_RESTORE_VERSION: ${{ inputs.backup_restore_version }}
+        run: |
+          cd tests && make e2e-install-backup-restore
+
+          # Extract rancher-backup-operator version
+          BACKUP_OPERATOR_VERSION=$(kubectl get pod \
+                                     --namespace cattle-resources-system \
+                                     -l app.kubernetes.io/name=rancher-backup \
+                                     -o jsonpath={.items[*].status.containerStatuses[*].image} 2> /dev/null || true)
+
+          # Export values
+          echo "backup_operator_version=${BACKUP_OPERATOR_VERSION}" >> ${GITHUB_OUTPUT}
+          echo "backup_restore_version=${BACKUP_OPERATOR_VERSION##*:}" >> ${GITHUB_OUTPUT}
+
       - name: Test Backup/Restore Rancher Manager/Elemental resources
         id: test_backup_restore
         env:
-          BACKUP_RESTORE_VERSION: ${{ steps.component.outputs.backup_restore_version }}
+          BACKUP_RESTORE_VERSION: ${{ steps.install_backup_restore.outputs.backup_restore_version }}
           CA_TYPE: ${{ inputs.ca_type }}
           OPERATOR_REPO: ${{ inputs.operator_repo }}
           PUBLIC_FQDN: ${{ inputs.public_fqdn }}
@@ -461,7 +464,7 @@ jobs:
         if: ${{ always() }}
         uses: ./.github/actions/logs-and-summary
         with:
-          backup_operator_version: ${{ steps.component.outputs.backup_operator_version }}
+          backup_operator_version: ${{ steps.install_backup_restore.outputs.backup_operator_version }}
           ca_type: ${{ inputs.ca_type }}
           cert_manager_version: ${{ steps.component.outputs.cert_manager_version }}
           cluster_type: ${{ inputs.cluster_type }}
