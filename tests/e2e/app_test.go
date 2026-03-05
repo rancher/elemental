@@ -155,11 +155,29 @@ var _ = Describe("E2E - Checking a simple application", Label("check-app"), func
 
 		appName := "hello-world"
 
+		// We need to be sure that the cluster is accessible (mainly in upgrade tests)
+		Eventually(func() error {
+			k, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
+			if err != nil {
+				return err
+			}
+
+			// A simple 'get' command is enough to validate here
+			if _, err = kubectl.Run("get", "pod"); err != nil {
+				GinkgoWriter.Printf("Check: %s\n", err.Error())
+			}
+
+			// Be sure to clean all
+			os.Unsetenv("KUBECONFIG")
+			os.Remove(k)
+			return err
+		}, tools.SetTimeout(5*time.Minute), 30*time.Second).ShouldNot(HaveOccurred())
+
 		// File where to host client cluster kubeconfig
 		kubeConfig, err := rancher.SetClientKubeConfig(clusterNS, clusterName)
-		defer os.Remove(kubeConfig)
 		Expect(err).To(Not(HaveOccurred()))
 		Expect(kubeConfig).To(Not(BeEmpty()))
+		defer os.Remove(kubeConfig)
 
 		By("Waiting for all pods", func() {
 			WaitForAllPods()

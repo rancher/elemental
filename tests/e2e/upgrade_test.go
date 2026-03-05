@@ -79,6 +79,9 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 		}
 
 		InstallElementalOperator(k, upgradeOrder, operatorUpgrade)
+
+		// Checking cluster state after upgrade
+		WaitCluster(clusterNS, clusterName)
 	})
 })
 
@@ -149,6 +152,9 @@ var _ = Describe("E2E - Upgrading Rancher Manager", Label("upgrade-rancher-manag
 		versionAfterUpgrade, err := kubectl.RunWithoutErr(getImageVersion...)
 		Expect(err).To(Not(HaveOccurred()))
 		Expect(versionAfterUpgrade).To(Not(Equal(versionBeforeUpgrade)))
+
+		// Checking cluster state after upgrade
+		WaitCluster(clusterNS, clusterName)
 	})
 })
 
