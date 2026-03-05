@@ -710,8 +710,19 @@ Wait for all pods to be Running/Succeeded in the current K8s cluster
 */
 func WaitForAllPods() {
 	// Log pods list, useful for debugging
-	podDetails, _ := kubectl.RunWithoutErr("get", "pod", "--all-namespaces")
-	GinkgoWriter.Printf("%s\n", podDetails)
+	// wait for some pod to be listed
+	Eventually(func() string {
+		podDetails, err := kubectl.RunWithoutErr("get", "pod", "--all-namespaces")
+		pd := strings.TrimSpace(podDetails)
+
+		// Log pods status, useful for debugging
+		GinkgoWriter.Printf("Pods Status: %s\n", pd)
+		if err != nil {
+			GinkgoWriter.Printf("Err: %s\n", err.Error())
+		}
+
+		return pd
+	}, tools.SetTimeout(20*time.Minute), 30*time.Second).ShouldNot(BeEmpty())
 
 	// NOTE: pods from cattle-system NS are removed because, at this stage,
 	// they can contains helm ones which can be seen as Failed when they
