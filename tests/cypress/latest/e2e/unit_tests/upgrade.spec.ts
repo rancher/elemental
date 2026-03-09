@@ -110,7 +110,7 @@ describe('Upgrade tests', () => {
         cy.getBySel('cluster-target').click();
         // As there is already an upgrade group targeting the cluster,
         // the cluster should not be available in the dropdown
-        if (utils.isRancherManagerVersion('v2.13')) {
+        if (utils.isRancherManagerVersion('v2.13') || utils.isRancherManagerVersion('v2.14')) {
           cy.get('.no-options-slot').should('contain', 'No options');
         } else {
           cy.get('#vs4__listbox').should('not.contain', clusterName);
