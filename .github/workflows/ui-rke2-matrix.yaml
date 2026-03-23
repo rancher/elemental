@@ -50,7 +50,7 @@ jobs:
       ca_type: private
       cypress_tags: main
       destroy_runner: ${{ github.event_name == 'schedule' && true || inputs.destroy_runner }}
-      elemental_ui_version: dev
+      elemental_ui_version: stable
       k8s_downstream_version: ${{ matrix.k8s_downstream_version }}
       k8s_upstream_version: ${{ matrix.k8s_upstream_version }}
       operator_install_type: ui
