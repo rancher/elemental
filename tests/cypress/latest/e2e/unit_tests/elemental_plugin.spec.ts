@@ -48,6 +48,9 @@ filterTests(['main', 'upgrade'], () => {
         // TODO: create a function to install any plugin and not elemental only
         cy.contains('Extensions')
           .click();
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(60000);
+        cy.reload();
         cy.contains('elemental');
         if (isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
           cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
