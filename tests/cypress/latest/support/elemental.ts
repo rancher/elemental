@@ -60,6 +60,7 @@ export class Elemental {
 
     if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
       if (isRancherManagerVersion('2.14')) {
+        cy.contains('rancher-dev').click();
         cy.getBySel("filter-panel-filter-group").contains('elemental-operator').click();
       }
       if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
