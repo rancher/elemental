@@ -106,7 +106,7 @@ runs:
         )
 
     - name: Upload logs
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       with:
         # Use PUBLIC_FQDN to avoid issue with parallel jobs, as it is unique
         name: support-logs-${{ inputs.public_fqdn }}-${{ steps.date.outputs.epoch }}
