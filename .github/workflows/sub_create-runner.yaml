@@ -92,8 +92,9 @@ jobs:
           typeset -i i=0
           while true; do
             # Get public IP
-            PUBLIC_IP=$(gcloud compute instances list 2> /dev/null \
-                        | awk '/${{ steps.generator.outputs.runner_hostname }}/ {print $6}')
+            PUBLIC_IP=$(gcloud compute instances describe ${{ steps.generator.outputs.runner_hostname }} \
+                        --zone ${{ inputs.zone }} \
+                        --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 
             # Exit if we reach the timeout or if IP is set
             if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then

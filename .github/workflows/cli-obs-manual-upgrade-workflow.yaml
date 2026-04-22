@@ -35,6 +35,13 @@ on:
         description: Rancher Manager channel/version/head_version to use for installation
         default: stable/latest
         type: string
+      runner_template:
+        description: Runner template to use
+        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
+        type: choice
+        options:
+          - elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
+          - elemental-e2e-ci-runner-x86-64-template-n2-standard-16-v5
       upgrade_image:
         description: OS image to use during the upgrade
         default: registry.opensuse.org/isv/rancher/elemental/maintenance/6.2/containers/suse/sl-micro/6.2/baremetal-os-container:latest
@@ -63,6 +70,7 @@ jobs:
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
       rancher_version: ${{ inputs.rancher_version }}
+      runner_template: ${{ inputs.runner_template }}
       test_type: cli
       upgrade_image: ${{ inputs.upgrade_image }}
       upgrade_os_channel: ${{ inputs.upgrade_os_channel }}

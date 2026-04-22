@@ -35,6 +35,13 @@ on:
         description: Allow reset test (mainly used on CLI tests)
         default: false
         type: boolean
+      runner_template:
+        description: Runner template to use
+        default: elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
+        type: choice
+        options:
+          - elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
+          - elemental-e2e-ci-runner-x86-64-template-n2-standard-16-v5
   schedule:
     # Monday and Wednesday at 2am UTC (9pm in us-central1)
     - cron: '0 2 * * 1,3'
@@ -66,6 +73,7 @@ jobs:
       qase_run_id: ${{ github.event_name == 'schedule' && 'auto' || inputs.qase_run_id }}
       rancher_version: ${{ matrix.rancher_version }}
       reset: ${{ matrix.reset }}
+      runner_template: ${{ inputs.runner_template }}
       sequential: ${{ matrix.sequential }}
       test_type: cli
       zone: us-central1-a
