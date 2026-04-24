@@ -22,7 +22,7 @@ jobs:
           go-version-file: tests/go.mod
 
       - name: Analysis
-        uses: golangci/golangci-lint-action@d6238b002a20823d52840fda27e2d4891c5952dc # v4
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
           args: -v
           working-directory: tests

@@ -31,6 +31,7 @@ func RandomSleep(sequential bool, index int) {
 	}
 
 	// Initialize the seed
+	// nolint:gosec
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// Get a pseudo-random value
