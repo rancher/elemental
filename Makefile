@@ -4,14 +4,16 @@ ELEMENTAL_ISO_IMAGE?=docker.io/local/elemental-iso:dev
 ELEMENTAL_REGISTER?=docker.io/local/elemental-register:dev 
 ELEMENTAL_TOOLKIT?=docker.io/local/elemental-toolkit:dev 
 
-RANCHER_SYSTEM_AGENT_VERSION?=v0.3.4
+RANCHER_SYSTEM_AGENT_VERSION?=v0.3.16
+RANCHER_SYSTEM_AGENT_CHECKSUM?=686dd937ce907185b642b12f34b0f94a9781b73f7d0d13e4204867d2f753249a
 
 .PHONY: build-dev-os
-build-dev-os: 
+build-dev-os:
 	$(DOCKER) build \
 			--build-arg ELEMENTAL_TOOLKIT=$(ELEMENTAL_TOOLKIT) \
 			--build-arg ELEMENTAL_REGISTER=$(ELEMENTAL_REGISTER) \
 			--build-arg RANCHER_SYSTEM_AGENT_VERSION=$(RANCHER_SYSTEM_AGENT_VERSION) \
+			--build-arg RANCHER_SYSTEM_AGENT_CHECKSUM=$(RANCHER_SYSTEM_AGENT_CHECKSUM) \
 			-t $(ELEMENTAL_OS_IMAGE) \
 			-f Dockerfile.dev.os .
 
