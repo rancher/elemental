@@ -1,8 +1,8 @@
 DOCKER?=docker
-ELEMENTAL_OS_IMAGE?=docker.io/local/elemental-os:dev 
-ELEMENTAL_ISO_IMAGE?=docker.io/local/elemental-iso:dev 
-ELEMENTAL_REGISTER?=docker.io/local/elemental-register:dev 
-ELEMENTAL_TOOLKIT?=docker.io/local/elemental-toolkit:dev 
+ELEMENTAL_OS_IMAGE?=docker.io/local/elemental-os:dev
+ELEMENTAL_ISO_IMAGE?=docker.io/local/elemental-iso:dev
+ELEMENTAL_REGISTER?=docker.io/local/elemental-register:dev
+ELEMENTAL_TOOLKIT?=docker.io/local/elemental-toolkit:dev
 
 RANCHER_SYSTEM_AGENT_VERSION?=v0.3.4
 
