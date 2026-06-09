@@ -33,8 +33,7 @@ COPY --from=builder /busybox /
 COPY --from=builder /output /elemental-disk
 
 ARG SLMICRO_VERSION
-ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-disk-image
+ARG IMAGE_REPO=registry.suse.com/suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-disk-image
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
