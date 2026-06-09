@@ -30,7 +30,7 @@ RUN zypper in --no-recommends -y procps openssh openssh-server \
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container
+ARG IMAGE_REPO=suse/sl-micro/%%SLMICRO_VERSION%%/baremetal-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # IMPORTANT: Setup elemental-release used for versioning/upgrade. The
@@ -40,7 +40,7 @@ RUN grep -v "IMAGE_REPO\|IMAGE_TAG\|IMAGE=\|TIMESTAMP\|GRUB_ENTRY_NAME" /etc/os-
 RUN mv /tmp/os-release /etc/os-release
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
-    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
+    echo IMAGE=\"${BUILD_REPO}/${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"SUSE Linux Micro\" >> /etc/os-release
 
@@ -53,7 +53,7 @@ LABEL org.opencontainers.image.url="https://www.suse.com/products/micro/"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.vendor="SUSE LLC"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
-LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
+LABEL org.opensuse.reference="registry.suse.com/${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 LABEL com.suse.supportlevel="l3"
 LABEL com.suse.eula="sle-eula"
