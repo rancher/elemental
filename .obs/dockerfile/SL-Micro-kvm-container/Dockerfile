@@ -22,7 +22,7 @@ MAINTAINER SUSE LLC (https://www.suse.com/)
 
 ARG SLMICRO_VERSION
 ARG BUILD_REPO=%%IMG_REPO%%
-ARG IMAGE_REPO=$BUILD_REPO/suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container
+ARG IMAGE_REPO=suse/sl-micro/%%SLMICRO_VERSION%%/kvm-os-container
 ARG IMAGE_TAG=%VERSION%-%RELEASE%
 
 # Define labels according to https://en.opensuse.org/Building_derived_containers
@@ -32,7 +32,7 @@ LABEL org.opencontainers.image.description="Image containing SUSE Linux Micro KV
 LABEL org.opencontainers.image.version="${IMAGE_TAG}"
 LABEL org.opencontainers.image.created="%BUILDTIME%"
 LABEL org.opencontainers.image.source="%SOURCEURL%"
-LABEL org.opensuse.reference="${IMAGE_REPO}:${IMAGE_TAG}"
+LABEL org.opensuse.reference="registry.suse.com/${IMAGE_REPO}:${IMAGE_TAG}"
 LABEL org.openbuildservice.disturl="%DISTURL%"
 # endlabelprefix
 
@@ -43,7 +43,7 @@ RUN grep -v "IMAGE_REPO\|IMAGE_TAG\|IMAGE=\|TIMESTAMP\|GRUB_ENTRY_NAME" /etc/os-
 RUN mv /tmp/os-release /etc/os-release
 RUN echo IMAGE_REPO=\"${IMAGE_REPO}\"              >> /etc/os-release && \
     echo IMAGE_TAG=\"${IMAGE_TAG}\"                >> /etc/os-release && \
-    echo IMAGE=\"${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
+    echo IMAGE=\"${BUILD_REPO}/${IMAGE_REPO}:${IMAGE_TAG}\"      >> /etc/os-release && \
     echo TIMESTAMP="`date +'%Y%m%d%H%M%S'`"        >> /etc/os-release && \
     echo GRUB_ENTRY_NAME=\"SUSE Linux Micro\" >> /etc/os-release
 
