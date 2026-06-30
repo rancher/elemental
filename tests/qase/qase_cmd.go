@@ -49,6 +49,7 @@ func main() {
 	flag.Parse()
 
 	// Only one option at a time is allowed
+	// nolint:gocritic
 	if *createRun {
 		id := qase.CreateRun()
 		if id <= 0 {
