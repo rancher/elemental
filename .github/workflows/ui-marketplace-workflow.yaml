@@ -41,7 +41,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use for installation
-        default: stable/latest
+        default: alpha/latest
         type: string
       runner_template:
         description: Runner template to use

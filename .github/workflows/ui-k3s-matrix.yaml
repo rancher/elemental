@@ -25,7 +25,7 @@ on:
         type: string
       rancher_version:
         description: Rancher Manager channel/version/head_version to use
-        default: '"stable/latest"'
+        default: '"alpha/latest"'
         type: string
       runner_template:
         description: Runner template to use
@@ -46,7 +46,7 @@ jobs:
       matrix:
         k8s_downstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_downstream_version || '"v1.34.9+k3s1"')) }}
         k8s_upstream_version: ${{ fromJSON(format('[{0}]', inputs.k8s_upstream_version || '"v1.34.9+k3s1"')) }}
-        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","head/2.13"')) }}
+        rancher_version: ${{ fromJSON(format('[{0}]', inputs.rancher_version || '"stable/latest","alpha/latest"')) }}
     uses: ./.github/workflows/master_e2e.yaml
     secrets:
       credentials: ${{ secrets.GCP_CREDENTIALS }}
