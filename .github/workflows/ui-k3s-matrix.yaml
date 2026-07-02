@@ -35,8 +35,8 @@ on:
           - elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
           - elemental-e2e-ci-runner-x86-64-template-n2-standard-16-v5
   schedule:
-    # Tuesday and Thursday at 2am UTC (9pm in us-central1)
-    - cron: '0 2 * * 2,4'
+    # Tuesday at 4am UTC (9pm in us-central1)
+    - cron: '0 4 * * 2'
 
 jobs:
   ui:

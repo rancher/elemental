@@ -4,19 +4,10 @@ See [here](.github/workflows/README.md) for a detailed view of the tests schedul
 
 [![Lint](https://github.com/rancher/elemental/actions/workflows/lint.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/lint.yaml)
 
-[![CLI-K3s](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-matrix.yaml)
-[![CLI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-upgrade-matrix.yaml)
 [![CLI-RKE2](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml)
-[![CLI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-upgrade-matrix.yaml)
-
-[![UI-K3s](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml)
-[![UI-K3s-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-upgrade-matrix.yaml)
-[![UI-RKE2](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-matrix.yaml)
-[![UI-RKE2-Upgrade](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-rke2-upgrade-matrix.yaml)
-
 [![CLI-Full-Backup-Restore](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml)
 [![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
-[![CLI-Regression](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-regression-matrix.yaml)
+[![UI-K3s](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml)
 
 ## Goal
 
