@@ -7,7 +7,6 @@ Tests that are scheduled (can be manually triggered as well):
 |:---:|:---:|:---:|:---:|
 | CLI RKE2 | Monday | 4am | us-central1-c |
 | CLI Full backup/restore (migration) | Wednesday | 4am | us-central1-a |
-| CLI K3s Airgap | Thursday | 4am | us-central1-b |
 | UI K3s | Tuesday | 4am | us-central1-a |
 | Update tests description | All days | 11pm | us-central1 |
 
@@ -15,6 +14,7 @@ Tests that are not scheduled (but can be manually triggered):
 | Test type | Zones |
 |:---:|:---:|
 | CLI K3s | us-central1-a |
+| CLI K3s Airgap | us-central1-b |
 | CLI K3s Downgrade | us-central1-c |
 | CLI K3s IBS Stable | us-central1-f |
 | CLI K3s OBS Dev | us-central1-f |

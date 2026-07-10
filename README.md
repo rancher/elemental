@@ -6,7 +6,6 @@ See [here](.github/workflows/README.md) for a detailed view of the tests schedul
 
 [![CLI-RKE2](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-rke2-matrix.yaml)
 [![CLI-Full-Backup-Restore](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-full-backup-restore-matrix.yaml)
-[![CLI-K3s-Airgap](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/cli-k3s-airgap-matrix.yaml)
 [![UI-K3s](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml/badge.svg)](https://github.com/rancher/elemental/actions/workflows/ui-k3s-matrix.yaml)
 
 ## Goal

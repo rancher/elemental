@@ -30,9 +30,6 @@ on:
         options:
           - elemental-e2e-ci-runner-spot-x86-64-template-n2-standard-16-v5
           - elemental-e2e-ci-runner-x86-64-template-n2-standard-16-v5
-  schedule:
-    # Every Thursday at 4am UTC (10pm in us-central1)
-    - cron: '0 4 * * 4'
 
 jobs:
   cli:
