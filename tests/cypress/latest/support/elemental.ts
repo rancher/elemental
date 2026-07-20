@@ -24,7 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
+    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14') || isRancherManagerVersion('2.15')) {
       cy.get('.accordion-item > .icon').eq(0).click();
     } else {
       cy.get('div.header > i').eq(0).click();
@@ -58,15 +58,23 @@ export class Elemental {
     cy.contains('local').click();
     cy.get('.nav').contains('Apps').click();
 
-    if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      if (isRancherManagerVersion('2.14')) {
+    if (isCypressTag('main')) {
+      if (isRancherManagerVersion('2.14') || isRancherManagerVersion('2.15')) {
         cy.getBySel("filter-panel-filter-group").contains('elemental-operator').click();
       }
-      if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
-        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+      if (isOperatorVersion('marketplace')) {
+        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental"]').click()
       } else {
-        cy.get('.color1').contains('Elemental').click()
-      }  
+        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+      }
+      //if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
+      //cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+      //} else {
+      //  cy.wait(120000);
+      //  cy.reload();
+      //  cy.wait(5000);
+      //  cy.get('[data-testid="item-card-cluster/elemental-operator/elemental"]').click()
+      //}  
     } else {
         // Uncheck Rancher (rancher.io) repo if it's checked
         if (isGitRepo('github')) {
@@ -83,11 +91,8 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    if (isRancherManagerVersion('2.10')) {
-      cy.contains('.outer-container > .header', 'Elemental');
-    } else {
-      cy.contains('.top > .title', 'Elemental') 
-    }
+    cy.contains('Elemental: Install');
+    
     if (isRancherPrime() && isCypressTag('main') && !isOperatorVersion('marketplace')) {
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();
