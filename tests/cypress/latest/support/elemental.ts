@@ -24,11 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14') || isRancherManagerVersion('2.15')) {
-      cy.get('.accordion-item > .icon').eq(0).click();
-    } else {
-      cy.get('div.header > i').eq(0).click();
-    }
+    cy.get('.accordion-item > .icon').eq(0).click();
     cy.get('div.header').contains('Advanced').should('be.visible');
     // Check all listed options once accordion is opened
     cy.get('li.child.nav-type').should(($lis) => {

@@ -31,8 +31,7 @@ filterTests(['main'], () => {
 
     qase(31,
       it('Deploy Alerting Drivers application', () => {
-        let myAppToInstall;
-        myAppToInstall = 'Cerbos'
+        const myAppToInstall = 'Cerbos'
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -63,8 +62,7 @@ filterTests(['main'], () => {
 
     qase(32,
       it('Remove Alerting Drivers application', () => {
-        let myAppToInstall;
-        myAppToInstall = 'cerbos'
+        const myAppToInstall = 'cerbos'
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cy.get('.main-panel').contains(clusterName).click();
         cy.get('.nav').contains('Apps').click();
