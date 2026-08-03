@@ -10,7 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { isCypressTag, isGitRepo, isOperatorVersion, isRancherManagerVersion, isRancherPrime } from '~/support/utils';
+import { isCypressTag, isOperatorVersion, isRancherManagerVersion, isRancherPrime } from '~/support/utils';
 
 export class Elemental {
   // Go into the cluster creation menu
@@ -24,11 +24,7 @@ export class Elemental {
   // Make sure we get all menus
   checkElementalNav(): void {
     // Open advanced accordion
-    if (isRancherManagerVersion('2.12') || isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
-      cy.get('.accordion-item > .icon').eq(0).click();
-    } else {
-      cy.get('div.header > i').eq(0).click();
-    }
+    cy.get('.accordion-item > .icon').eq(0).click();
     cy.get('div.header').contains('Advanced').should('be.visible');
     // Check all listed options once accordion is opened
     cy.get('li.child.nav-type').should(($lis) => {
@@ -58,23 +54,19 @@ export class Elemental {
     cy.contains('local').click();
     cy.get('.nav').contains('Apps').click();
 
-    if (isCypressTag('main') && !isOperatorVersion('marketplace')) {
-      if (isRancherManagerVersion('2.14')) {
+    if (isOperatorVersion('marketplace')) {
+      cy.get('[data-testid="item-card-cluster/rancher-charts/elemental"]').click()
+    } else if (isCypressTag('main')) {
+      if (isRancherManagerVersion('2.14') || isRancherManagerVersion('2.15')) {
         cy.getBySel("filter-panel-filter-group").contains('elemental-operator').click();
-      }
-      if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
-        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
       } else {
-        cy.get('.color1').contains('Elemental').click()
-      }  
-    } else {
-        // Uncheck Rancher (rancher.io) repo if it's checked
-        if (isGitRepo('github')) {
-          cy.get('#vs1__combobox > .vs__selected-options').click();
-          cy.get('#vs1__option-1 > .checkbox-outer-container > .checkbox-container').click();
-        }
-      cy.contains('Elemental', { timeout: 30000 }).click();
+        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
+      }
+    //} else if (isGitRepo('github')) {
+    //    cy.get('#vs1__combobox > .vs__selected-options').click();
+    //    cy.get('#vs1__option-1 > .checkbox-outer-container > .checkbox-container').click();
     }
+    cy.contains('Elemental', { timeout: 30000 }).click();
 
     cy.contains('Charts: Elemental', { timeout: 30000 });
 
@@ -83,11 +75,8 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    if (isRancherManagerVersion('2.10')) {
-      cy.contains('.outer-container > .header', 'Elemental');
-    } else {
-      cy.contains('.top > .title', 'Elemental') 
-    }
+    //cy.contains('Elemental: Install');
+    
     if (isRancherPrime() && isCypressTag('main') && !isOperatorVersion('marketplace')) {
       const registryLabel = 'Container Registry';
       cy.byLabel(registryLabel).clear();

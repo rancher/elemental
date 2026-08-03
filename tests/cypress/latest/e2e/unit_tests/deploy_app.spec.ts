@@ -31,35 +31,25 @@ filterTests(['main'], () => {
 
     qase(31,
       it('Deploy Alerting Drivers application', () => {
-        let myAppToInstall;
-        if (isRancherManagerVersion('2.10')) {
-          myAppToInstall = 'Alerting Drivers';
-        } else {
-          myAppToInstall = 'Cerbos'
-        }
+        const myAppToInstall = 'Cerbos'
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
         cypressLib.burgerMenuToggle();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(20000);
-        isRancherManagerVersion('2.8') && cypressLib.burgerMenuToggle();
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        if (!isRancherManagerVersion('2.8')) {
-          cy.get('.main-panel').contains(clusterName).click();
-        } else {
-          cy.contains(clusterName).click();
-        }
+        cy.get('.main-panel').contains(clusterName).click();
         cy.get('.nav').contains('Apps').click();
         cy.contains('Charts').click();
         cy.contains(myAppToInstall, { timeout: 30000 }).click();
-        if (isRancherManagerVersion('2.13') || isRancherManagerVersion('2.14')) {
-          cy.getBySel('chart-header-title').should('contain.text', myAppToInstall);
-          cy.getBySel('btn-chart-install').click();
-        } else {
+        if (isRancherManagerVersion('2.12')) {
           cy.contains('.name-logo-install', myAppToInstall, { timeout: 30000 });
           cy.clickButton('Install');
+        } else {
+          cy.getBySel('chart-header-title').should('contain.text', myAppToInstall);
+          cy.getBySel('btn-chart-install').click();
         }
-        if (isRancherManagerVersion('2.10')) {
-          cy.contains('.outer-container > .header', myAppToInstall);
+        if (isRancherManagerVersion('2.15')) {
+          cy.getBySel('chart-install-name-link').contains(myAppToInstall);
         } else {
           cy.contains('.top > .title', myAppToInstall)
         }
@@ -67,27 +57,14 @@ filterTests(['main'], () => {
         cy.clickButton('Install');
         cy.contains('SUCCESS: helm install', { timeout: 120000 });
         cy.reload();
-        if (isRancherManagerVersion('2.10')) {
-          cy.contains(new RegExp('Deployed.*rancher-alerting-drivers'))  
-        } else { 
-          cy.contains(new RegExp('Deployed.*cerbos'));
-        }
+        cy.contains(new RegExp('Deployed.*cerbos'));
       }));
 
     qase(32,
       it('Remove Alerting Drivers application', () => {
-        let myAppToInstall;
-        if (isRancherManagerVersion('2.10')) {
-          myAppToInstall = 'rancher-alerting-drivers';
-        } else {
-          myAppToInstall = 'cerbos'
-        }
+        const myAppToInstall = 'cerbos'
         cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-        if (!isRancherManagerVersion('2.8')) {
-          cy.get('.main-panel').contains(clusterName).click();
-        } else {
-          cy.contains(clusterName).click();
-        }
+        cy.get('.main-panel').contains(clusterName).click();
         cy.get('.nav').contains('Apps').click();
         cy.contains('Installed Apps').click();
         cy.contains('.title', 'Installed Apps', { timeout: 20000 });

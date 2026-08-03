@@ -15,7 +15,6 @@ limitations under the License.
 import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
-import { isRancherManagerVersion } from '~/support/utils';
 
 filterTests(['main'], () => {
   Cypress.config();
@@ -42,7 +41,7 @@ filterTests(['main'], () => {
 
     it('Check In Sync column status', () => {
       cy.clickNavMenu(["Advanced", "OS Versions"]);
-      const htmlSelector = isRancherManagerVersion('2.8') ? selectors.clusterList : selectors.sortableTableList;
+      const htmlSelector =  selectors.sortableTableList;
       cy.getBySel(htmlSelector)
         .should('not.contain', 'Unavailable');
       cy.getBySel(htmlSelector)
