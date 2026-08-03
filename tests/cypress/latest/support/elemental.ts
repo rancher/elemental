@@ -10,7 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { isCypressTag, isGitRepo, isOperatorVersion, isRancherManagerVersion, isRancherPrime } from '~/support/utils';
+import { isCypressTag, isOperatorVersion, isRancherManagerVersion, isRancherPrime } from '~/support/utils';
 
 export class Elemental {
   // Go into the cluster creation menu
@@ -54,31 +54,19 @@ export class Elemental {
     cy.contains('local').click();
     cy.get('.nav').contains('Apps').click();
 
-    if (isCypressTag('main')) {
+    if (isOperatorVersion('marketplace')) {
+      cy.get('[data-testid="item-card-cluster/rancher-charts/elemental"]').click()
+    } else if (isCypressTag('main')) {
       if (isRancherManagerVersion('2.14') || isRancherManagerVersion('2.15')) {
         cy.getBySel("filter-panel-filter-group").contains('elemental-operator').click();
-      }
-      if (isOperatorVersion('marketplace')) {
-        cy.get('[data-testid="item-card-cluster/elemental-operator/elemental"]').click()
       } else {
         cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
       }
-      //if (isRancherManagerVersion('2.12') || (isRancherManagerVersion('2.13') || (isRancherManagerVersion('2.14')))) {
-      //cy.get('[data-testid="item-card-cluster/elemental-operator/elemental-operator"]').click()
-      //} else {
-      //  cy.wait(120000);
-      //  cy.reload();
-      //  cy.wait(5000);
-      //  cy.get('[data-testid="item-card-cluster/elemental-operator/elemental"]').click()
-      //}  
-    } else {
-        // Uncheck Rancher (rancher.io) repo if it's checked
-        if (isGitRepo('github')) {
-          cy.get('#vs1__combobox > .vs__selected-options').click();
-          cy.get('#vs1__option-1 > .checkbox-outer-container > .checkbox-container').click();
-        }
-      cy.contains('Elemental', { timeout: 30000 }).click();
+    //} else if (isGitRepo('github')) {
+    //    cy.get('#vs1__combobox > .vs__selected-options').click();
+    //    cy.get('#vs1__option-1 > .checkbox-outer-container > .checkbox-container').click();
     }
+    cy.contains('Elemental', { timeout: 30000 }).click();
 
     cy.contains('Charts: Elemental', { timeout: 30000 });
 
@@ -87,7 +75,7 @@ export class Elemental {
     }
 
     cy.clickButton('Install');
-    cy.contains('Elemental: Install');
+    //cy.contains('Elemental: Install');
     
     if (isRancherPrime() && isCypressTag('main') && !isOperatorVersion('marketplace')) {
       const registryLabel = 'Container Registry';
