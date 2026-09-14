@@ -18,6 +18,9 @@ RUN zypper in --no-recommends -y systemd-presets-branding-Elemental elemental
 # replace default kernel with smaller one, sufficient to run kvm guests
 RUN zypper in --no-recommends -y kernel-default-base -kernel-default qemu-guest-agent
 
+# add utilities required by RKE2
+RUN zypper in --no-recommends -y iptables nfs-client
+
 MAINTAINER SUSE LLC (https://www.suse.com/)
 
 ARG SLMICRO_VERSION
