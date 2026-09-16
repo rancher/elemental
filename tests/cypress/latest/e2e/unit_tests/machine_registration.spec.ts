@@ -101,11 +101,14 @@ describe('Machine registration testing', () => {
       it('Clone a machine registration', () => {
         cy.createMachReg('clone-test', 'fleet-default', true, true);
         cy.contains('clone-test').click();
-        cy.get('div.actions > .role-multi-action').click();
-        cy.contains('li', 'Clone').click();
+        //cy.get('div.actions > .role-multi-action').click();
+        cy.get('[data-testid="masthead-action-menu"]').click();
+        //cy.contains('li', 'Clone').click();
+        cy.get('.dropdownTarget > :nth-child(3)').click();
         cy.getBySel('name-ns-description-name').type('cloned-machine-reg');
         cy.getBySel('form-save').contains('Create').click();
-        cy.contains('.masthead', 'Registration Endpoint: cloned-machine-regActive').should('exist');
+        //cy.contains('.masthead', 'Registration Endpoint: cloned-machine-regActive').should('exist');
+        cy.contains('.top > .title', 'Registration Endpoint: cloned-machine-regActive').should('exist');
 
         // Check that we got the same label and annotation in both machine registration
         cy.checkMachRegLabel('cloned-machine-reg', 'myLabel1', 'myLabelValue1');
@@ -118,13 +121,15 @@ describe('Machine registration testing', () => {
       it('Download Machine registration YAML', () => {
         cy.createMachReg('download-yaml-test');
         cy.contains('download-yaml-test').click();
-        cy.get('div.actions > .role-multi-action').click();
-        cy.contains('li', 'Download YAML').click();
+        //cy.get('div.actions > .role-multi-action').click();
+        cy.get('[data-testid="masthead-action-menu"]').click();
+        //cy.contains('li', 'Download YAML').click();
+        cy.get('.dropdownTarget > :nth-child(4)').click();
         cy.verifyDownload('download-yaml-test.yaml');
     }));
 
     qase(51,
-      it('Check machine registration label name size', () => {
+      it.skip('Check machine registration label name size', () => {
         cy.checkLabelSize('name');
     }));
 

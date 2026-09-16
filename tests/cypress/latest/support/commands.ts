@@ -93,10 +93,12 @@ Cypress.Commands.add('createMachReg', (
     .click();
 
   // Make sure the machine registration is created and active
-  cy.contains('.masthead', 'Registration Endpoint: ' + machRegName + 'Active')
+  //cy.contains('.titlebar', 'Registration Endpoint: ' + machRegName + ' Active')
+  cy.contains('.top > .title', new RegExp('Registration Endpoint:.*'+machRegName+'.*Active'))
     .should('exist');
+
   // Check the namespace
-  cy.contains('.masthead', 'Namespace: ' + namespace)
+  cy.contains('.identifying-info', 'Namespace' + namespace)
   .should('exist');
 
   // Make sure there is a URL registration in the Registration URL block
@@ -200,8 +202,12 @@ Cypress.Commands.add('addMachRegLabel', (labelName: string, labelValue: string) 
     .contains('Registration Endpoint')
     .click();
   cy.get(`${selectors.addLabelMachReg} > .footer > .btn`).click();
-  cy.get(`${selectors.addLabelMachReg} > .kv-container > .kv-item.key`).type(labelName);
-  cy.get(`${selectors.addLabelMachReg} > .kv-container > .kv-item.value`).type(labelValue);
+  cy.get(`${selectors.addLabelMachReg}`)
+    .find('[data-testid="input-kv-item-key-0"]')
+    .type(labelName)
+  cy.get(`${selectors.addLabelMachReg}`)
+    .find('[data-testid="kv-item-value-0"]')
+    .type(labelValue)
 });
 
 // Add Annotation to machine registration
@@ -210,8 +216,12 @@ Cypress.Commands.add('addMachRegAnnotation', (annotationName: string, annotation
     .contains('Registration Endpoint')
     .click();
   cy.get(`${selectors.addAnnotationMachReg} > .footer > .btn`).click();
-  cy.get(`${selectors.addAnnotationMachReg} > .kv-container > .kv-item.key`).type(annotationName);
-  cy.get(`${selectors.addAnnotationMachReg} > .kv-container > .kv-item.value`).type(annotationValue);
+  cy.get(`${selectors.addAnnotationMachReg}`)
+    .find('[data-testid="input-kv-item-key-0"]')
+    .type(annotationName)
+  cy.get(`${selectors.addAnnotationMachReg}`)
+    .find('[data-testid="kv-item-value-0"]')
+    .type(annotationValue)
 });
 
 // Add Label to machine inventory
@@ -220,8 +230,13 @@ Cypress.Commands.add('addMachInvLabel', (labelName: string, labelValue: string, 
     .contains('Inventory of Machines')
     .click();
   cy.get(`${selectors.addLabelMachInv} > .footer > .btn`).click();
-  cy.get(`${selectors.addLabelMachInv} > .kv-container > .kv-item.key`).type(labelName);
-  cy.get(`${selectors.addLabelMachInv} > .kv-container > .kv-item.value`).type(labelValue);
+  cy.get(`${selectors.addLabelMachInv}`)
+    .find('[data-testid="input-kv-item-key-0"]')
+    .type(labelName)
+
+  cy.get(`${selectors.addLabelMachInv}`)
+    .find('[data-testid="kv-item-value-0"]')
+    .type(labelValue);
 
   if (useHardwareLabels) {
     const isRancher28 = utils.isRancherManagerVersion('2.8');
@@ -246,16 +261,24 @@ Cypress.Commands.add('addMachInvAnnotation', (annotationName: string, annotation
     .contains('Inventory of Machines')
     .click();
   cy.clickButton('Add Annotation');
-  cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.key`).type(annotationName);
-  cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.value`).type(annotationValue);
+    cy.get(`${selectors.addAnnotationMachInv}`)
+    .find('[data-testid="input-kv-item-key-0"]')
+    .type(annotationName)
+    cy.get(`${selectors.addAnnotationMachInv}`)
+    .find('[data-testid="kv-item-value-0"]')
+    .type(annotationValue)
+  //cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.key`).type(annotationName);
+  //cy.get(`${selectors.addAnnotationMachInv} > .kv-container > .kv-item.value`).type(annotationValue);
 });
 
 // Check machine inventory label in YAML
 Cypress.Commands.add('checkMachInvLabel', (machRegName: string, labelName: string, labelValue: string, afterBoot: boolean = false, useHardwareLabels: boolean = true) => {
   if (!afterBoot) {
     cy.contains(machRegName).click();
-    cy.get('div.actions > .role-multi-action').click();
-    cy.contains('li', 'Edit YAML').click();
+      //cy.get('div.actions > .role-multi-action').click();
+    cy.get('[data-testid="masthead-action-menu"]').click();
+    //cy.contains('li', 'Edit YAML').click();
+    cy.get('.dropdownTarget > :nth-child(2)').click();
     cy.contains(`Registration Endpoint: ${machRegName}`).should('exist');
     cy.getBySel(selectors.yamlEditor).contains(`${labelName}: ${labelValue}`);
 
@@ -280,8 +303,10 @@ Cypress.Commands.add('checkMachInvLabel', (machRegName: string, labelName: strin
 // Check machine registration label in YAML
 Cypress.Commands.add('checkMachRegLabel', (machRegName: string, labelName: string, labelValue: string) => {
   cy.contains(machRegName).click();
-  cy.get('div.actions > .role-multi-action').click();
-  cy.contains('li', 'Edit YAML').click();
+  //cy.get('div.actions > .role-multi-action').click();
+  cy.get('[data-testid="masthead-action-menu"]').click();
+  //cy.contains('li', 'Edit YAML').click();
+  cy.get('.dropdownTarget > :nth-child(2)').click();
   cy.contains('Registration Endpoint: ' + machRegName).should('exist');
   cy.getBySel(selectors.yamlEditor).contains(`${labelName}: ${labelValue}`);
   cy.clickButton('Cancel');
@@ -290,8 +315,9 @@ Cypress.Commands.add('checkMachRegLabel', (machRegName: string, labelName: strin
 // Check machine registration annotation in YAML
 Cypress.Commands.add('checkMachRegAnnotation', (machRegName: string, annotationName: string, annotationValue: string) => {
   cy.contains(machRegName).click();
-  cy.get('div.actions > .role-multi-action').click();
-  cy.contains('li', 'Edit YAML').click();
+  //cy.get('div.actions > .role-multi-action').click();
+  cy.get('[data-testid="masthead-action-menu"]').click();
+  cy.get('.dropdownTarget > :nth-child(2)').click();
   cy.contains('Registration Endpoint: ' + machRegName).should('exist');
   cy.getBySel(selectors.yamlEditor).contains(`${annotationName}: ${annotationValue}`);
   cy.clickButton('Cancel');
@@ -300,10 +326,11 @@ Cypress.Commands.add('checkMachRegAnnotation', (machRegName: string, annotationN
 // Edit a machine registration
 Cypress.Commands.add('editMachReg', (machRegName: string, addLabel: boolean = false, addAnnotation: boolean = false, withYAML: boolean = false) => {
   cy.contains(machRegName).click();
-  cy.get('div.actions > .role-multi-action').click();
+  //cy.get('div.actions > .role-multi-action').click();
+  cy.get('[data-testid="masthead-action-menu"]').click();
 
   if (withYAML) {
-    cy.contains('li', 'Edit YAML').click();
+    cy.get('.dropdownTarget > :nth-child(2)').click();
     cy.contains('metadata').as('meta');
     cy.get('@meta').click(0, 0);
     cy.get('@meta').type('{end}{enter}  labels:{enter}  myLabel1: myLabelValue1');
@@ -311,7 +338,7 @@ Cypress.Commands.add('editMachReg', (machRegName: string, addLabel: boolean = fa
     cy.get('@meta').click(0, 0);
     cy.get('@meta').type('{end}{enter}  annotations:{enter}  myAnnotation1: myAnnotationValue1');
   } else {
-    cy.contains('li', 'Edit Config').click();
+    cy.get('.dropdownTarget > :nth-child(1)').click();
     addLabel && cy.addMachRegLabel('myLabel1', 'myLabelValue1');
     addAnnotation && cy.addMachRegAnnotation('myAnnotation1', 'myAnnotationValue1');
   }
