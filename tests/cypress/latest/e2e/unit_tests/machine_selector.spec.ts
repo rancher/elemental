@@ -39,10 +39,8 @@ filterTests(['main'], () => {
 
     qase(26,
       it('Testing selector with unmatching rule', () => {
-        cy.get('[cluster="[provisioning.cattle.io.cluster: undefined]"]').contains('Add Rule').click();
-        cy.get('[data-testid="input-match-expression-values-0"] > input').as('match-value');
-        // eslint-disable-next-line cypress/unsafe-to-chain-command
-        cy.get('@match-value').click().type('wrong');
+        cy.get('[data-testid="input-match-expression-add-rule"]').click();
+        cy.get('[data-testid="input-match-expression-values-control-0"]').type('wrong');
         cy.contains('.banner', 'Matches no existing Inventory of Machines').should('exist');
     }));
 
