@@ -598,19 +598,7 @@ func WaitCluster(ns, cn string) {
 	states := []state{
 		{
 			conditionStatus: "True",
-			conditionType:   "Connected",
-		},
-		{
-			conditionStatus: "True",
 			conditionType:   "Created",
-		},
-		{
-			conditionStatus: "True",
-			conditionType:   "NoDiskPressure",
-		},
-		{
-			conditionStatus: "True",
-			conditionType:   "NoMemoryPressure",
 		},
 		{
 			conditionStatus: "True",
@@ -631,10 +619,6 @@ func WaitCluster(ns, cn string) {
 		{
 			conditionStatus: "True",
 			conditionType:   "Updated",
-		},
-		{
-			conditionStatus: "True",
-			conditionType:   "Waiting",
 		},
 	}
 
