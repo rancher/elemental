@@ -131,6 +131,16 @@ func GetInternalMachine(ns, machineInventory string) (string, error) {
 		return "", err
 	}
 
+	// Fallback to checking MachineInventorySelector owner reference if nodeRef.name does not match
+	if machine == "" {
+		machine, err = kubectl.RunWithoutErr("get", "MachineInventorySelector",
+			"--namespace", ns,
+			"-o", "jsonpath={.items[?(@.status.machineInventoryRef.name==\""+machineInventory+"\")].metadata.ownerReferences[?(@.kind==\"Machine\")].name}")
+		if err != nil {
+			return "", err
+		}
+	}
+
 	return machine, nil
 }
 
