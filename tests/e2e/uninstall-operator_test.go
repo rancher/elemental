@@ -16,7 +16,6 @@ package e2e_test
 
 import (
 	"strings"
-	"sync"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -24,15 +23,15 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
 	"github.com/rancher-sandbox/ele-testhelpers/rancher"
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
-	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
 )
 
 func deleteFinalizers(ns, object, value string) {
 	_, err := kubectl.RunWithoutErr("patch", object,
 		"--namespace", ns, value, "--type", "merge",
 		"--patch", "{\"metadata\":{\"finalizers\":null}}")
-	Expect(err).To(Not(HaveOccurred()))
-
+	if err != nil && !strings.Contains(err.Error(), "NotFound") && !strings.Contains(err.Error(), "not found") {
+		Expect(err).To(Not(HaveOccurred()))
+	}
 }
 
 func testClusterAvailability(ns, cluster string) {
@@ -104,49 +103,33 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			Expect(out).To(ContainSubstring("CRDs from previous installations are pending to be removed"))
 		})
 
-		// NOTE: we have to run this in background to be able to apply the workaround!
-		var wg sync.WaitGroup
-		wg.Add(1)
-		go func(ns, name string) {
-			defer wg.Done()
-			defer GinkgoRecover()
-
-			By("Deleting cluster resource", func() {
-				Eventually(func() error {
-					_, err := kubectl.RunWithoutErr("delete", "cluster.v1.provisioning.cattle.io",
-						"--namespace", ns, name)
-					return err
-				}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
-			})
-		}(clusterNS, clusterName)
+		By("Deleting cluster resource", func() {
+			Eventually(func() error {
+				_, err := kubectl.RunWithoutErr("delete", "cluster.v1.provisioning.cattle.io",
+					"--namespace", clusterNS, clusterName, "--wait=false")
+				return err
+			}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
+		})
 
 		// Removing finalizers from MachineInventory and Machine
 		By("Removing finalizers from MachineInventory/Machine and ManagedOsVersion", func() {
-			// NOTE: wait a bit for the cluster deletion to be started (it's running in background)
-			time.Sleep(1 * time.Minute)
-
-			machineList, err := kubectl.RunWithoutErr("get", "MachineInventory",
+			// Delete blocking Finalizers for MachineInventory
+			miList, err := kubectl.RunWithoutErr("get", "MachineInventory",
 				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
-			Expect(err).To(Not(HaveOccurred()))
+			if err == nil {
+				for _, machine := range strings.Fields(miList) {
+					GinkgoWriter.Printf("Deleting Finalizers for MachineInventory '%s'...\n", machine)
+					deleteFinalizers(clusterNS, "MachineInventory", machine)
+				}
+			}
 
-			for _, machine := range strings.Fields(machineList) {
-				var internalMachine string
-
-				// Sporadic timeouts can occur sometimes
-				Eventually(func() error {
-					var err error
-					internalMachine, err = elemental.GetInternalMachine(clusterNS, machine)
-					return err
-				}, tools.SetTimeout(1*time.Minute), 10*time.Second).Should(Not(HaveOccurred()))
-
-				// Delete blocking Finalizers
-				GinkgoWriter.Printf("Deleting Finalizers for MachineInventory '%s'...\n", machine)
-				deleteFinalizers(clusterNS, "MachineInventory", machine)
-
-				// Only if Machine is still present
-				if internalMachine != "" {
-					GinkgoWriter.Printf("Deleting Finalizers for Machine '%s'...\n", internalMachine)
-					deleteFinalizers(clusterNS, "Machine", internalMachine)
+			// Delete blocking Finalizers for Machine
+			machineList, err := kubectl.RunWithoutErr("get", "Machine",
+				"--namespace", clusterNS, "-o", "jsonpath={.items[*].metadata.name}")
+			if err == nil {
+				for _, machine := range strings.Fields(machineList) {
+					GinkgoWriter.Printf("Deleting Finalizers for Machine '%s'...\n", machine)
+					deleteFinalizers(clusterNS, "Machine", machine)
 				}
 			}
 
@@ -157,7 +140,7 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 			if err != nil && strings.Contains(err.Error(), "doesn't have a resource type") {
 				mOSList = ""
 			} else {
-				Expect(err).ToNot((HaveOccurred()))
+				Expect(err).ToNot(HaveOccurred())
 			}
 
 			for _, mOS := range strings.Fields(mOSList) {
@@ -168,7 +151,17 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 		})
 
 		// Wait for cluster deletion to be completed
-		wg.Wait()
+		Eventually(func() string {
+			out, _ := kubectl.RunWithoutErr("get", "cluster.v1.provisioning.cattle.io",
+				"--namespace", clusterNS, clusterName,
+				"-o", "jsonpath={.metadata.name}")
+			if out != "" {
+				// If cluster resources are still present, force delete finalizers on cluster
+				deleteFinalizers(clusterNS, "clusters.cluster.x-k8s.io", clusterName)
+				deleteFinalizers(clusterNS, "cluster.v1.provisioning.cattle.io", clusterName)
+			}
+			return out
+		}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(BeEmpty())
 
 		By("Testing cluster resource unavailability", func() {
 			out, err := kubectl.Run("get", "cluster.v1.provisioning.cattle.io",

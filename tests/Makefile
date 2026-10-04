@@ -107,8 +107,8 @@ e2e-simple-backup-restore: deps
 e2e-ui-rancher: deps
 	ginkgo --label-filter ui -r -v ./e2e
 
-e2e-uninstall-operator:
-	ginkgo --label-filter uninstall-operator -r -v ./e2e
+e2e-uninstall-operator: deps
+	ginkgo --timeout $(GINKGO_TIMEOUT)s --label-filter uninstall-operator -r -v ./e2e
 
 e2e-upgrade-node: deps
 	ginkgo --label-filter upgrade-node -r -v ./e2e
