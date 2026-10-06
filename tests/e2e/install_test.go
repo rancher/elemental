@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -219,12 +220,12 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 	// Deploy operator in CLI test
 	It("Install Elemental Operator if needed", func() {
 		if operatorInstallType == "cli" {
-			By("Installing Operator with CLI", func() {
+			By(fmt.Sprintf("Installing Operator with CLI %s", operatorVersion), func() {
 				// Report to Qase
 				testCaseID = 62
 
 				installOrder := []string{"elemental-operator-crds", "elemental-operator"}
-				InstallElementalOperator(k, installOrder, operatorRepo)
+				InstallElementalOperator(k, installOrder, operatorRepo, operatorVersion)
 			})
 		}
 	})

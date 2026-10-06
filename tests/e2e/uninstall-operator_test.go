@@ -93,6 +93,10 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 				"--wait", "--wait-for-jobs",
 			}
 
+			if operatorVersion != "" {
+				flags = append(flags, "--version", operatorVersion)
+			}
+
 			// Dev and Staging versions need a specific treatment
 			if strings.Contains(os2Test, "dev") || strings.Contains(os2Test, "staging") {
 				flags = append(flags, "--devel")
@@ -184,6 +188,10 @@ var _ = Describe("E2E - Uninstall Elemental Operator", Label("uninstall-operator
 					"--namespace", "cattle-elemental-system",
 					"--create-namespace",
 					"--wait", "--wait-for-jobs",
+				}
+
+				if operatorVersion != "" {
+					flags = append(flags, "--version", operatorVersion)
 				}
 
 				// Dev and Staging versions need a specific treatment

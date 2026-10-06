@@ -15,6 +15,7 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -192,9 +193,9 @@ var _ = Describe("E2E - Test full Backup/Restore", Label("test-full-backup-resto
 			InstallRancher(k)
 		})
 
-		By("Upgrading/re-installing Elemental Operator", func() {
+		By(fmt.Sprintf("Upgrading/re-installing Elemental Operator %s", operatorVersion), func() {
 			installOrder := []string{"elemental-operator-crds", "elemental-operator"}
-			InstallElementalOperator(k, installOrder, operatorRepo)
+			InstallElementalOperator(k, installOrder, operatorRepo, operatorVersion)
 		})
 
 		By("Checking cluster state after restore", func() {

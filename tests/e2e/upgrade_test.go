@@ -78,7 +78,7 @@ var _ = Describe("E2E - Upgrading Elemental Operator", Label("upgrade-operator")
 			upgradeOrder = []string{"elemental-operator", "elemental-operator-crds"}
 		}
 
-		InstallElementalOperator(k, upgradeOrder, operatorUpgrade)
+		InstallElementalOperator(k, upgradeOrder, operatorUpgrade, "")
 
 		// Checking cluster state after upgrade
 		WaitCluster(clusterNS, clusterName)

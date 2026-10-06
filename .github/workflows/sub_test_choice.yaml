@@ -59,6 +59,8 @@ on:
       operator_repo:
         required: true
         type: string
+      operator_version:
+        type: string
       operator_upgrade:
         required: true
         type: string
@@ -182,6 +184,7 @@ jobs:
       node_number: ${{ inputs.node_number }}
       operator_install_type: ${{ inputs.operator_install_type }}
       operator_repo: ${{ inputs.operator_repo }}
+      operator_version: ${{ inputs.operator_version }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
       os_to_test: ${{ inputs.os_to_test }}
       public_domain: ${{ inputs.public_domain }}

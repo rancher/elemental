@@ -67,6 +67,10 @@ on:
         description: Elemental operator repository to use
         type: string
         default: oci://registry.opensuse.org/isv/rancher/elemental/staging/charts/rancher
+      operator_version:
+        description: Elemental operator version to use
+        type: string
+        default:
       operator_upgrade:
         description: Elemental operator version to upgrade to
         type: string
@@ -241,6 +245,7 @@ jobs:
       node_number: ${{ inputs.node_number }}
       operator_install_type: ${{ inputs.operator_install_type }}
       operator_repo: ${{ inputs.operator_repo }}
+      operator_version: ${{ inputs.operator_version }}
       operator_upgrade: ${{ inputs.operator_upgrade }}
       os_to_test: ${{ inputs.os_to_test }}
       os_version_install: ${{ inputs.os_version_install }}
