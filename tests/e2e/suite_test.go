@@ -78,6 +78,7 @@ var (
 	numberOfVMs               int
 	operatorInstallType       string
 	operatorRepo              string
+	operatorVersion           string
 	operatorUpgrade           string
 	os2Test                   string
 	poolType                  string
@@ -411,7 +412,7 @@ Install Elemental operator
   - @param repo Chart repository to use
   - @returns Nothing, the function will fail through Ginkgo in case of issue
 */
-func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string) {
+func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string, version string) {
 	for _, chart := range order {
 		// Set flags for installation
 		flags := []string{"upgrade", "--install", chart,
@@ -419,6 +420,10 @@ func InstallElementalOperator(k *kubectl.Kubectl, order []string, repo string) {
 			"--namespace", "cattle-elemental-system",
 			"--create-namespace",
 			"--wait", "--wait-for-jobs",
+		}
+
+		if version != "" {
+			flags = append(flags, "--version", version)
 		}
 
 		// Dev and Staging versions need a specific treatment
@@ -831,6 +836,7 @@ var _ = BeforeSuite(func() {
 	clusterNumber := os.Getenv("CLUSTER_NUMBER")
 	operatorInstallType = os.Getenv("OPERATOR_INSTALL_TYPE")
 	operatorRepo = os.Getenv("OPERATOR_REPO")
+	operatorVersion = os.Getenv("OPERATOR_VERSION")
 	operatorUpgrade = os.Getenv("OPERATOR_UPGRADE")
 	os2Test = os.Getenv("OS_TO_TEST")
 	poolType = os.Getenv("POOL")

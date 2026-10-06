@@ -21,8 +21,12 @@ on:
         default: v1.34.9+k3s1
         type: string
       operator_repo:
-        description: Operator version to use for initial deployment
+        description: Operator repository to use for initial deployment
         default: oci://registry.suse.com/rancher
+        type: string
+      operator_version:
+        description: Operator version to use for initial deployment
+        default:
         type: string
       qase_run_id:
         description: Qase run ID where the results will be reported
@@ -66,6 +70,7 @@ jobs:
       node_number: 5
       operator_upgrade: oci://registry.opensuse.org/isv/rancher/elemental/${{ inputs.upgrade_os_channel }}/charts/rancher
       operator_repo: ${{ inputs.operator_repo }}
+      operator_version: ${{ inputs.operator_version }}
       os_to_test: stable
       qase_run_id: ${{ inputs.qase_run_id }}
       rancher_upgrade: ${{ inputs.rancher_upgrade }}
