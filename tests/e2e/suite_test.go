@@ -667,6 +667,14 @@ func WaitCluster(ns, cn string) {
 				// Show the status in case of issue, easier to debug (but log after 10 different issues)
 				// NOTE: it's not perfect but it's mainly a way to inform that the cluster took time to came up
 				counter++
+
+				// status is empty if the condition is not present, ignore it after 3 attempts
+				// different Rancher versions define a different set of conditions
+				if status == "" && counter > 3 {
+					GinkgoWriter.Printf("Ignoring status %s, not defined\n", s.conditionType)
+					return s.conditionStatus
+				}
+
 				if counter > 10 {
 					GinkgoWriter.Printf("!! Cluster status issue !! %s is %s instead of %s\n",
 						s.conditionType, status, s.conditionStatus)
