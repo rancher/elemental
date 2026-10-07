@@ -12,7 +12,7 @@ typeset GREP_OPTS="-v"
 
 # Define if we check for stable or unstable OS
 case ${KIND_OF_OS} in
-  dev|staging)
+  dev|staging|maintenance*)
     unset INVERTED
     ;;
 esac
@@ -22,9 +22,8 @@ esac
 
 # Get the value
 VALUE=$(kubectl get ManagedOSVersion --namespace ${CLUSTER_NS} -o json 2>/dev/null \
-        | jq -r ".items[] | select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED}).metadata.name" 2>/dev/null \
+        | jq -r ".items | map(select(.spec.metadata.displayName | contains(\"unstable\")${INVERTED})) | sort_by(.spec.version | [scan(\"[0-9]+\")] | map(tonumber)) | .[].metadata.name" 2>/dev/null \
         | grep ${GREP_OPTS} '\-iso' \
-        | sort \
         | tail -1)
 
 # Return VALUE without \n
