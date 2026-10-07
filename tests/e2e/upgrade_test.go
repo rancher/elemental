@@ -359,6 +359,19 @@ var _ = Describe("E2E - Upgrading node", Label("upgrade-node"), func() {
 					}, tools.SetTimeout(10*time.Minute), 30*time.Second).Should(Equal(valueToCheck))
 				})
 
+				// If we reboot before the boot assessment succeeded it will count as a failed
+				// upgrade and set the default boot to passive mode!!
+				By("Checking boot assessment succeeded", func() {
+					Eventually(func() string {
+						// Use grep here in case of comment in the file!
+						out, _ := cl.RunSSH("systemctl is-active elemental-boot-assessment.service")
+
+						// This remove the version and keep only the repo, as in the file
+						// we have the exact version and we don't know it before the upgrade
+						return tools.TrimStringFromChar(strings.Trim(out, "\n"), ":")
+					}, tools.SetTimeout(2*time.Minute), 10*time.Second).Should(Equal("active"))
+				})
+
 				By("Checking that annotations have been updated after upgrade", func() {
 					Eventually(func() bool {
 						annotationsAfter = getAnnotations(cl)
