@@ -59,7 +59,7 @@
       -  **By:** Checking that the restore has been done
       -  **By:** Installing CertManager
       -  **By:** Installing Rancher Manager
-      -  **By:** Upgrading/re-installing Elemental Operator
+      -  **By:** fmt.SprintfUpgrading/re-installing Elemental Operator %s, operatorVersion
       -  **By:** Checking cluster state after restore
 - **Describe:** E2E - Test simple Backup/Restore
     - **It:** Do a backup
@@ -127,7 +127,7 @@
     - **It:** Install Rancher Manager
       -  **By:** Configuring kubectl to use Rancher admin user
     - **It:** Install Elemental Operator if needed
-      -  **By:** Installing Operator with CLI
+      -  **By:** fmt.SprintfInstalling Operator with CLI %s, operatorVersion
 
 ## `logs_test.go`
 
@@ -227,6 +227,7 @@
       -  **By:** Getting annotations for +h+ before upgrade
       -  **By:** Triggering Upgrade in Rancher with +upgradeType
       -  **By:** Checking VM upgrade on +h
+      -  **By:** Checking boot assessment succeeded
       -  **By:** Checking that annotations have been updated after upgrade
       -  **By:** Testing Grub Recovery entry on +h+ after upgrade
       -  **By:** Checking cluster state after upgrade
