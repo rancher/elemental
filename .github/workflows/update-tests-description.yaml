@@ -2,7 +2,7 @@ name: Update tests description
 
 on:
   schedule:
-    # Every day at 11pm UTC (6pm in us-central1)
+    # Every day at 11pm UTC
     - cron: 0 23 * * *
   workflow_dispatch:
 
