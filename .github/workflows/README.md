@@ -1,9 +1,9 @@
 # Scheduling rules for the CI tests
 
-We try to spread the tests as best as we can to avoid SPOT issue as well as not overload our public cloud zone.
+We try to spread the tests as best as we can to avoid SPOT issue as well as not overload our public cloud region.
 
 Tests that are scheduled (can be manually triggered as well):
-| Test type | Day(s) | Hour | Zones |
+| Test type | Day(s) | Hour | Region |
 |:---:|:---:|:---:|:---:|
 | CLI RKE2 | Monday | 2am | europe-west1 |
 | CLI Full backup/restore (migration) | Wednesday | 2am | europe-west1 |

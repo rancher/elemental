@@ -8,7 +8,7 @@ on:
       runner_template:
         required: true
         type: string
-      zone:
+      region:
         required: true
         type: string
 
@@ -66,16 +66,20 @@ jobs:
 
       - name: Create runner
         run: |
-          gcloud compute instances create ${{ steps.generator.outputs.runner_hostname }} \
+          gcloud compute instances bulk create \
+            --predefined-names ${{ steps.generator.outputs.runner_hostname }} \
             --source-instance-template ${{ inputs.runner_template }} \
-            --zone ${{ inputs.zone }}
+            --enable-nested-virtualization \
+            --region ${{ inputs.region }}
 
       - name: Create GCP secrets
         run: |
           echo -n ${{ secrets.pat_token }} \
-            | gcloud secrets create PAT_TOKEN_${{ steps.generator.outputs.runner_label }} --data-file=- --ttl="18000s" --quiet
+            | gcloud secrets create PAT_TOKEN_${{ steps.generator.outputs.runner_label }} \
+                --data-file=- --ttl="18000s" --quiet
           echo -n ${{ github.repository }} \
-            | gcloud secrets create GH_REPO_${{ steps.generator.outputs.runner_label }} --data-file=- --ttl="18000s" --quiet
+            | gcloud secrets create GH_REPO_${{ steps.generator.outputs.runner_label }} \
+                --data-file=- --ttl="18000s" --quiet
 
       - name: Get public FQDN and DOMAIN
         id: dns
@@ -92,9 +96,9 @@ jobs:
           typeset -i i=0
           while true; do
             # Get public IP
-            PUBLIC_IP=$(gcloud compute instances describe ${{ steps.generator.outputs.runner_hostname }} \
-                        --zone ${{ inputs.zone }} \
-                        --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+            PUBLIC_IP=$(gcloud compute instances list \
+                          --filter "name=${{ steps.generator.outputs.runner_hostname }}" \
+                          --format "get(networkInterfaces[0].accessConfigs[0].natIP)")
 
             # Exit if we reach the timeout or if IP is set
             if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then

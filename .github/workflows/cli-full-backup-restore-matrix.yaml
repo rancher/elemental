@@ -58,4 +58,4 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       runner_template: ${{ github.event_name == 'schedule' && 'elemental-e2e-ci-runner-x86-64-template-n2-standard-16-v6' || inputs.runner_template }}
       test_type: cli
-      zone: europe-west1
+      region: europe-west1

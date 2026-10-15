@@ -66,4 +66,4 @@ jobs:
       test_type: ui
       # Always use the IBS images upn the OBS ones
       upgrade_image: registry.suse.com/suse/sl-micro/6.2/baremetal-os-container:latest
-      zone: europe-west1
+      region: europe-west1

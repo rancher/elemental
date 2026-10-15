@@ -44,4 +44,4 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       elemental-e2e-ci-runner-spot-x86-64-template-n2-highmem-80-v6
       test_type: cli
-      zone: europe-west1
+      region: europe-west1
