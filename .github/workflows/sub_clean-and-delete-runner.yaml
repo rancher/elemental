@@ -8,9 +8,6 @@ on:
       runner_hostname:
         required: true
         type: string
-      zone:
-        required: true
-        type: string
 
     # Secrets to set when calling this reusable workflow
     secrets:
@@ -37,13 +34,19 @@ jobs:
           # Disable failure on first error, needed for the "delete" check
           set +e
 
-          # If runner is already deleted we can bypass the error
-          if ! LOGS=$(gcloud --quiet compute instances delete ${{ inputs.runner_hostname }} \
-                             --delete-disks all \
-                             --zone ${{ inputs.zone }} 2>&1); then
-            echo "${LOGS}" | grep -q "resource .* was not found" || RC=1
-            # Show logs in case of error
-            (( RC )) && echo "${LOGS}" || true
+          # Get instance's zone
+          ZONE=$(gcloud compute instances list --filter "name=${{ inputs.runner_hostname }}" --format "value(zone)")
+
+          # If runner is already deleted (or no zone have been found) we can bypass the error
+          if [[ -n "${ZONE}" ]]; then
+            if ! LOGS=$(gcloud compute instances delete ${{ inputs.runner_hostname }} \
+                          --quiet \
+                          --delete-disks all \
+                          --zone ${ZONE} 2>&1); then
+              echo "${LOGS}" | grep -q "resource .* was not found" || RC=1
+              # Show logs in case of error
+              (( RC )) && echo "${LOGS}" || true
+            fi
           fi
 
           # Force exit with the *real* error code
