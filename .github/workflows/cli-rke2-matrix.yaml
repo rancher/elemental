@@ -43,8 +43,8 @@ on:
           - elemental-e2e-ci-runner-spot-x86-64-template-n4d-standard-16-v6
           - elemental-e2e-ci-runner-x86-64-template-n4d-standard-16-v6
   schedule:
-    # Monday at 4am UTC (11pm in us-central1)
-    - cron: '0 4 * * 1'
+    # Monday at 2am UTC
+    - cron: '0 2 * * 1'
 
 jobs:
   cli:
@@ -76,4 +76,4 @@ jobs:
       runner_template: ${{ github.event_name == 'schedule' && 'elemental-e2e-ci-runner-x86-64-template-n4d-standard-16-v6' || inputs.runner_template }}
       sequential: ${{ matrix.sequential }}
       test_type: cli
-      zone: us-central1-c
+      zone: europe-west1

@@ -31,8 +31,8 @@ on:
           - elemental-e2e-ci-runner-spot-x86-64-template-n4d-standard-16-v6
           - elemental-e2e-ci-runner-x86-64-template-n4d-standard-16-v6
   schedule:
-    # Every Wednesday at 4am UTC (9pm in us-central1)
-    - cron: '0 4 * * 5'
+    # Every Wednesday at 2am UTC
+    - cron: '0 2 * * 5'
 
 jobs:
   cli:
@@ -58,4 +58,4 @@ jobs:
       rancher_version: ${{ matrix.rancher_version }}
       runner_template: ${{ github.event_name == 'schedule' && 'elemental-e2e-ci-runner-x86-64-template-n4d-standard-16-v6' || inputs.runner_template }}
       test_type: cli
-      zone: us-central1-a
+      zone: europe-west1

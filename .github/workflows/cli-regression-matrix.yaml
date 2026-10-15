@@ -51,4 +51,4 @@ jobs:
       runner_template: ${{ github.event_name == 'schedule' && 'elemental-e2e-ci-runner-x86-64-template-n4d-standard-16-v6' || inputs.runner_template }}
       sequential: false
       test_type: cli
-      zone: us-central1-f
+      zone: europe-west1

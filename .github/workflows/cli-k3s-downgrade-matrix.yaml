@@ -58,4 +58,4 @@ jobs:
       test_type: cli
       # Use the version just below the stable one
       upgrade_image: registry.suse.com/suse/sl-micro/6.1/baremetal-os-container:latest
-      zone: us-central1-c
+      zone: europe-west1

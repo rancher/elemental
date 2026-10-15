@@ -68,4 +68,4 @@ jobs:
       # Always use the IBS images upn the OBS ones
       upgrade_image: registry.suse.com/suse/sl-micro/6.2/baremetal-os-container:latest
       upgrade_os_channel: maintenance/6.2
-      zone: us-central1-f
+      zone: europe-west1
