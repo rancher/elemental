@@ -51,14 +51,16 @@ filterTests(['main', 'upgrade'], () => {
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(60000);
         cy.reload();
-        cy.contains('SUSE OS Management');
+        //cy.contains('SUSE OS Management');
+        cy.contains('elemental');
         if (isRancherManagerVersion('2.12')) {
           cy.contains('SUSE OS Management');
           cy.get('.plugin')
             .contains('Install')
             .click();
         } else {
-          cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
+          //cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
+          cy.get('[data-testid="item-card-cluster/elemental-ui/elemental"]').within(() => {
             cy.get('[data-testid="rc-item-card-action"]')
             .click();
             cy.contains('Install')
@@ -78,7 +80,8 @@ filterTests(['main', 'upgrade'], () => {
           cy.getBySel('btn-installed')
             .click();
           cy.getBySel('item-card-header-title')
-            .should('contain', 'SUSE OS Management');
+            //.should('contain', 'SUSE OS Management');
+            .should('contain', 'elemental');
         }
       })
     );

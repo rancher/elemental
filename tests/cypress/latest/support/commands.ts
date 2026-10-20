@@ -93,7 +93,7 @@ Cypress.Commands.add('createMachReg', (
     .click();
 
   // Make sure the machine registration is created and active
-  cy.contains('.top > .title', new RegExp('Registration Endpoint:.*'+machRegName+'.*Active'))
+  cy.contains('.title-row', new RegExp('Registration Endpoint:.*'+machRegName+'.*Active'))
     .should('exist');
 
   // Check the namespace
