@@ -37,14 +37,22 @@ ExecStart=/usr/local/bin/chartmuseum --port=8080
 WantedBy=multi-user.target
 EOF
 
+# Ensure storage directory exists
+mkdir -p /home/gh-runner/charts
+chown -R gh-runner:users /home/gh-runner/charts
+
 # Download and install chartmuseum
 curl https://raw.githubusercontent.com/helm/chartmuseum/main/scripts/get-chartmuseum | bash
 
-# Start chartmuseum
-systemctl start chartmuseum
+# Reload systemd and start chartmuseum
+systemctl daemon-reload
+systemctl enable --now chartmuseum
 
 # Download and install helm-push plugin
-helm plugin install https://github.com/chartmuseum/helm-push.git
+helm plugin install --verify=false https://github.com/chartmuseum/helm-push.git
+
+# Wait for chartmuseum to be ready
+curl -s --retry 10 --retry-delay 1 --retry-connrefused http://localhost:8080/health >/dev/null
 
 # Create a local helm repo
 helm repo add chartmuseum http://localhost:8080
