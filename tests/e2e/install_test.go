@@ -188,11 +188,17 @@ var _ = Describe("E2E - Install Rancher Manager", Label("install"), func() {
 			// Getting Rancher Manager local cluster CA
 			// NOTE: loop until the cmd return something, it could take some time
 			var rancherCA string
+			caSecret := "tls-rancher-ingress"
+			caKey := "{.data.tls\\.crt}"
+			if caType == "private" {
+				caSecret = "tls-ca"
+				caKey = "{.data.cacerts\\.pem}"
+			}
 			Eventually(func() error {
 				rancherCA, err = kubectl.RunWithoutErr("get", "secret",
 					"--namespace", "cattle-system",
-					"tls-rancher-ingress",
-					"-o", "jsonpath={.data.tls\\.crt}",
+					caSecret,
+					"-o", "jsonpath="+caKey,
 				)
 				return err
 			}, tools.SetTimeout(2*time.Minute), 5*time.Second).Should(Not(HaveOccurred()))
