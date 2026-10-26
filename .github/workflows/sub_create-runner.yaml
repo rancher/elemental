@@ -93,25 +93,30 @@ jobs:
           }
 
           # Do a timed out loop here, as gcloud can sometimes fail
+          # and DNS resolution may take some time to propagate
           typeset -i i=0
           while true; do
             # Get public IP
-            PUBLIC_IP=$(gcloud compute instances list \
-                          --filter "name=${{ steps.generator.outputs.runner_hostname }}" \
-                          --format "get(networkInterfaces[0].accessConfigs[0].natIP)")
+            if [[ -z "${PUBLIC_IP}" ]]; then
+              PUBLIC_IP=$(gcloud compute instances list \
+                            --filter "name=${{ steps.generator.outputs.runner_hostname }}" \
+                            --format "get(networkInterfaces[0].accessConfigs[0].natIP)")
+            fi
 
-            # Exit if we reach the timeout or if IP is set
-            if (( ++i > 10 )) || [[ -n "${PUBLIC_IP}" ]]; then
+            # Get the public FQDN if IP is available
+            if [[ -n "${PUBLIC_IP}" ]]; then
+              PUBLIC_FQDN=$(host ${PUBLIC_IP} 2> /dev/null \
+                           | awk '{sub(/\.$/, ""); print $5}')
+            fi
+
+            # Exit if we reach the timeout or if both IP and FQDN are set
+            if (( ++i > 30 )) || [[ -n "${PUBLIC_IP}" && -n "${PUBLIC_FQDN}" ]]; then
               break
             fi
 
             # Wait a little before retrying
             sleep 2
           done
-
-          # Get the public FQDN
-          PUBLIC_FQDN=$(host -l ${PUBLIC_IP} 2> /dev/null \
-                       | awk '{sub(/\.$/, ""); print $5}')
 
           # Get the public DOMAIN
           RIP=$(reverseip ${PUBLIC_IP})
