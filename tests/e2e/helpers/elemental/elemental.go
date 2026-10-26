@@ -114,6 +114,11 @@ func GetImageURI(ns, os string) (string, error) {
 		return "", err
 	}
 
+	// Check if URI is empty
+	if uri == "" {
+		return "", fmt.Errorf("empty URI for ManagedOSVersion %s", os)
+	}
+
 	return uri, nil
 }
 
