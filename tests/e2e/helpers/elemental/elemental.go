@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/rancher-sandbox/ele-testhelpers/kubectl"
-	"gopkg.in/yaml.v3"
+	"go.yaml.in/yaml/v3"
 )
 
 /*
