@@ -17,6 +17,7 @@ cat > ${CA_NAME}.config <<EOF
 [req]
 distinguished_name = dn
 prompt = no
+x509_extensions = v3_ca
 
 [dn]
 CN = ${CA_NAME}
@@ -25,10 +26,14 @@ L = Nuremberg
 O = ${VALUE}
 OU = ${VALUE} Team
 emailAddress = ${EMAIL}
+
+[v3_ca]
+basicConstraints = critical,CA:TRUE
+keyUsage = critical,digitalSignature,cRLSign,keyCertSign
 EOF
 
 # Generate the Root CA
-openssl req -x509 -new -nodes -sha256 -days 1 \
+openssl req -x509 -new -nodes -sha256 -days 365 \
   -passin pass:${VALUE} \
   -key ${CA_NAME}.key \
   -config ${CA_NAME}.config \
@@ -64,13 +69,14 @@ cat > ${FQDN}.ext <<EOF
 authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:FALSE
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
 subjectAltName = @alt_names
 [alt_names]
 DNS.1 = ${FQDN}
 EOF
 
 # Generate the final certificate
-openssl x509 -req -sha256 -days 1 -CAcreateserial \
+openssl x509 -req -sha256 -days 365 -CAcreateserial \
   -passin pass:${VALUE} \
   -CAkey ${CA_NAME}.key \
   -CA ${CA_NAME}.pem \
@@ -84,6 +90,6 @@ openssl x509 -noout -subject -issuer -in ${FQDN}.crt
 
 # Create links
 for I in crt key; do
-  ln -s ${FQDN}.${I} tls.${I}
+  ln -sf ${FQDN}.${I} tls.${I}
 done
-ln -s ${CA_NAME}.pem cacerts.pem
+ln -sf ${CA_NAME}.pem cacerts.pem
