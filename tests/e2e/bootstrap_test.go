@@ -15,6 +15,8 @@ limitations under the License.
 package e2e_test
 
 import (
+	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -52,13 +54,27 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			By("Downloading MachineRegistration file", func() {
 				// Download the new YAML installation config file
 				machineRegName := "machine-registration-" + poolType + "-" + clusterName
-				tokenURL, err := kubectl.RunWithoutErr("get", "MachineRegistration",
-					"--namespace", clusterNS, machineRegName,
-					"-o", "jsonpath={.status.registrationURL}")
-				Expect(err).To(Not(HaveOccurred()))
-
 				Eventually(func() error {
-					return tools.GetFileFromURL(tokenURL, installConfigYaml, false)
+					tokenURL, err := kubectl.RunWithoutErr("get", "MachineRegistration",
+						"--namespace", clusterNS, machineRegName,
+						"-o", "jsonpath={.status.registrationURL}")
+					if err != nil {
+						return err
+					}
+					if tokenURL == "" {
+						return fmt.Errorf("registrationURL is empty")
+					}
+					if err := tools.GetFileFromURL(tokenURL, installConfigYaml, false); err != nil {
+						return err
+					}
+					fi, err := os.Stat(installConfigYaml)
+					if err != nil {
+						return err
+					}
+					if fi.Size() == 0 {
+						return fmt.Errorf("downloaded installConfigYaml is empty")
+					}
+					return nil
 				}, tools.SetTimeout(2*time.Minute), 10*time.Second).ShouldNot(HaveOccurred())
 			})
 

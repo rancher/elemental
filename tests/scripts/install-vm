@@ -92,10 +92,8 @@ else
     [[ ! -f ${IPXE_BIN} ]] \
       && error "File ${IPXE_BIN} not found! Exiting!"
 
-    # Force remove, to avoid issue with 'ln'
-    # Only useful if an EFI file exists and it's not a symlink
-    rm -f ${SYM_LINK}
-    ln -s ${IPXE_BIN} ${SYM_LINK}
+    # Create link atomically
+    ln -sf ${IPXE_BIN} ${SYM_LINK}
   fi
 
   # Force PXE boot and add noreboot flag (cannot be used with raw image)

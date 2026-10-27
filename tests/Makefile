@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 ROOT_DIR:=$(realpath $(PWD)/..)
 IPXE:=$(ROOT_DIR)/install.ipxe
 ISO:=$(shell file -Ls $(ROOT_DIR)/*.iso 2>/dev/null | awk -F':' '/boot sector/ { print $$1 }')
@@ -17,9 +18,9 @@ ifeq ($(TEST_TYPE),airgap)
 endif
 
 # Define SELinux command line
-SELINUX_CMDLINE="security=selinux enforcing=0"
+SELINUX_CMDLINE ?= security=selinux enforcing=0
 ifeq ($(SELINUX),true)
-	SELINUX_CMDLINE="security=selinux enforcing=1"
+	SELINUX_CMDLINE = security=selinux enforcing=1
 endif
 
 extract_kernel_init_squash:
@@ -33,11 +34,13 @@ ipxe:
 	echo "set kernel $${VAR/\.iso/-linux}" >> $(IPXE); \
 	echo "set initrd $${VAR/\.iso/-initrd}" >> $(IPXE); \
 	echo "set rootfs $${VAR/\.iso/-squashfs}" >> $(IPXE); \
-	echo "# set config http://example.com/machine-config" >> $(IPXE); \
+	echo "set config \$${url}/install-config.yaml" >> $(IPXE); \
 	echo "# set cmdline cos.setup=/run/initramfs/live/cloud-config extra.values=1" >> $(IPXE); \
-	echo "set cmdline ip=dhcp rd.cos.disable $(SELINUX_CMDLINE) console=tty1 console=ttyS0" >> $(IPXE); \
+	echo "set cmdline ip=dhcp rd.neednet=1 rd.cos.disable rd.immucore.disable $(SELINUX_CMDLINE) console=tty1 console=ttyS0" >> $(IPXE); \
 	echo "initrd \$${url}/\$${initrd}" >> $(IPXE); \
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k \$${config} > /run/initramfs/live/livecd-cloud-config.yaml\" \$${cmdline}" >> $(IPXE)
+	echo "initrd \$${config} /run/initramfs/live/livecd-cloud-config.yaml" >> $(IPXE); \
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"mkdir -p /run/initramfs/live && curl -k --retry 10 --retry-delay 2 --retry-connrefused --create-dirs -o /run/initramfs/live/livecd-cloud-config.yaml \$${config}\" \$${cmdline}" >> $(IPXE); \
+	ln -sf $(ROOT_DIR)/tests/assets/ipxe-$$(uname -m).efi $(ROOT_DIR)/ipxe.efi
 
 deps: 
 	@go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
