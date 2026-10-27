@@ -34,13 +34,11 @@ ipxe:
 	echo "set kernel $${VAR/\.iso/-linux}" >> $(IPXE); \
 	echo "set initrd $${VAR/\.iso/-initrd}" >> $(IPXE); \
 	echo "set rootfs $${VAR/\.iso/-squashfs}" >> $(IPXE); \
-	echo "set config \$${url}/install-config.yaml" >> $(IPXE); \
+	echo "# set config http://example.com/machine-config" >> $(IPXE); \
 	echo "# set cmdline cos.setup=/run/initramfs/live/cloud-config extra.values=1" >> $(IPXE); \
 	echo "set cmdline ip=dhcp rd.neednet=1 rd.cos.disable rd.immucore.disable $(SELINUX_CMDLINE) console=tty1 console=ttyS0" >> $(IPXE); \
 	echo "initrd \$${url}/\$${initrd}" >> $(IPXE); \
-	echo "initrd \$${config} /run/initramfs/live/livecd-cloud-config.yaml" >> $(IPXE); \
-	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"mkdir -p /run/initramfs/live && curl -k --retry 10 --retry-delay 2 --retry-connrefused --create-dirs -o /run/initramfs/live/livecd-cloud-config.yaml \$${config}\" \$${cmdline}" >> $(IPXE); \
-	ln -sf $(ROOT_DIR)/tests/assets/ipxe-$$(uname -m).efi $(ROOT_DIR)/ipxe.efi
+	echo "chain --autofree --replace \$${url}/\$${kernel} initrd=\$${initrd} root=live:\$${url}/\$${rootfs} stages.initramfs[0].commands[0]=\"curl -k --retry 10 --retry-delay 2 --retry-connrefused --create-dirs \$${config} -o /run/initramfs/live/livecd-cloud-config.yaml\" \$${cmdline}" >> $(IPXE); \
 
 deps: 
 	@go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
