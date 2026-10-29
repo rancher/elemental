@@ -89,38 +89,6 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			By("Installing Traefik", func() {
-				traefikNS := "traefik-system"
-
-				RunHelmCmdWithRetry("repo", "add", "traefik", "https://traefik.github.io/charts")
-				RunHelmCmdWithRetry("repo", "update")
-
-				// Latest version of Traefik (>3.6.6) cannot be installed (changes in variables)
-				// As this is just a simple application test, it is easier to force the correct
-				// version to use, eg. 3.6.6 but the app version is different from the chart version!
-				// App v3.6.6 => chart v38.0.2
-				flags := []string{
-					"upgrade", "--install", "traefik", "traefik/traefik",
-					"--version", "38.0.2",
-					"--namespace", traefikNS,
-					"--create-namespace",
-					"--set", "ports.web.redirections.entryPoint.to=websecure",
-					"--set", "ports.web.redirections.entryPoint.scheme=https",
-					"--set", "ingressClass.enabled=true",
-					"--set", "ingressClass.isDefaultClass=true",
-					"--wait", "--wait-for-jobs",
-				}
-				RunHelmCmdWithRetry(flags...)
-
-				// Wait for all pods to be started
-				checkList := [][]string{
-					{traefikNS, "app.kubernetes.io/name=traefik"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
-			})
-
 			By("Checking LoadBalancer IP", func() {
 				traefikNS := "traefik-system"
 
