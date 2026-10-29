@@ -46,6 +46,7 @@ const (
 	installConfigYaml     = "../../install-config.yaml"
 	installHardenedScript = "../scripts/config-hardened"
 	installVMScript       = "../scripts/install-vm"
+	k8sVipYaml            = "../assets/k8s_vip.yaml"
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	localStorageYaml      = "../assets/local-storage.yaml"
 	metallbRscYaml        = "../assets/metallb_rsc.yaml"
