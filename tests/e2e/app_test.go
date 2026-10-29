@@ -90,16 +90,24 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 			})
 
 			By("Checking LoadBalancer IP", func() {
-				traefikNS := "traefik-system"
+				defaultNS := "default"
+				svcLB := "kubernetes-vip"
 
-				// Ensure that Traefik LB is not in Pending state anymore, could take time
+				// Apply LB configuration
+				err := kubectl.Apply(defaultNS, k8sVipYaml)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Ensure that LB is not in Pending state anymore, could take time
 				Eventually(func() string {
-					out, _ := kubectl.RunWithoutErr("get", "svc", "--namespace", traefikNS, "traefik")
+					out, _ := kubectl.RunWithoutErr("get", "svc", "--namespace", defaultNS, svcLB)
 					return out
 				}, tools.SetTimeout(4*time.Minute), 4*time.Second).Should(Not(ContainSubstring("<pending>")))
 
 				// Check that an IP address for LB is configured
-				lbIP, err := kubectl.Run("get", "svc", "--namespace", traefikNS, "traefik", "-o", "jsonpath={.status.loadBalancer.ingress[0].ip}")
+				lbIP, err := kubectl.Run("get", "svc",
+					"--namespace", defaultNS,
+					svcLB,
+					"-o", "jsonpath={.status.loadBalancer.ingress[0].ip}")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(lbIP).To(Not(BeEmpty()))
 			})
