@@ -89,49 +89,25 @@ var _ = Describe("E2E - Install a simple application", Label("install-app"), fun
 				Expect(err).NotTo(HaveOccurred())
 			})
 
-			By("Installing Traefik", func() {
-				traefikNS := "traefik-system"
-
-				RunHelmCmdWithRetry("repo", "add", "traefik", "https://traefik.github.io/charts")
-				RunHelmCmdWithRetry("repo", "update")
-
-				// Latest version of Traefik (>3.6.6) cannot be installed (changes in variables)
-				// As this is just a simple application test, it is easier to force the correct
-				// version to use, eg. 3.6.6 but the app version is different from the chart version!
-				// App v3.6.6 => chart v38.0.2
-				flags := []string{
-					"upgrade", "--install", "traefik", "traefik/traefik",
-					"--version", "38.0.2",
-					"--namespace", traefikNS,
-					"--create-namespace",
-					"--set", "ports.web.redirections.entryPoint.to=websecure",
-					"--set", "ports.web.redirections.entryPoint.scheme=https",
-					"--set", "ingressClass.enabled=true",
-					"--set", "ingressClass.isDefaultClass=true",
-					"--wait", "--wait-for-jobs",
-				}
-				RunHelmCmdWithRetry(flags...)
-
-				// Wait for all pods to be started
-				checkList := [][]string{
-					{traefikNS, "app.kubernetes.io/name=traefik"},
-				}
-				Eventually(func() error {
-					return rancher.CheckPod(k, checkList)
-				}, tools.SetTimeout(4*time.Minute), 30*time.Second).Should(Not(HaveOccurred()))
-			})
-
 			By("Checking LoadBalancer IP", func() {
-				traefikNS := "traefik-system"
+				defaultNS := "default"
+				svcLB := "kubernetes-vip"
 
-				// Ensure that Traefik LB is not in Pending state anymore, could take time
+				// Apply LB configuration
+				err := kubectl.Apply(defaultNS, k8sVipYaml)
+				Expect(err).NotTo(HaveOccurred())
+
+				// Ensure that LB is not in Pending state anymore, could take time
 				Eventually(func() string {
-					out, _ := kubectl.RunWithoutErr("get", "svc", "--namespace", traefikNS, "traefik")
+					out, _ := kubectl.RunWithoutErr("get", "svc", "--namespace", defaultNS, svcLB)
 					return out
 				}, tools.SetTimeout(4*time.Minute), 4*time.Second).Should(Not(ContainSubstring("<pending>")))
 
 				// Check that an IP address for LB is configured
-				lbIP, err := kubectl.Run("get", "svc", "--namespace", traefikNS, "traefik", "-o", "jsonpath={.status.loadBalancer.ingress[0].ip}")
+				lbIP, err := kubectl.Run("get", "svc",
+					"--namespace", defaultNS,
+					svcLB,
+					"-o", "jsonpath={.status.loadBalancer.ingress[0].ip}")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(lbIP).To(Not(BeEmpty()))
 			})

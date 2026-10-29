@@ -29,6 +29,7 @@ import (
 	"github.com/rancher-sandbox/ele-testhelpers/tools"
 	. "github.com/rancher-sandbox/qase-ginkgo"
 	"github.com/rancher/elemental/tests/e2e/helpers/elemental"
+	"golang.org/x/mod/semver"
 )
 
 const (
@@ -45,6 +46,7 @@ const (
 	installConfigYaml     = "../../install-config.yaml"
 	installHardenedScript = "../scripts/config-hardened"
 	installVMScript       = "../scripts/install-vm"
+	k8sVipYaml            = "../assets/k8s_vip.yaml"
 	localKubeconfigYaml   = "../assets/local-kubeconfig-skel.yaml"
 	localStorageYaml      = "../assets/local-storage.yaml"
 	metallbRscYaml        = "../assets/metallb_rsc.yaml"
@@ -793,10 +795,24 @@ func WaitForRKE2(k *kubectl.Kubectl) {
 	err := os.Setenv("KUBECONFIG", "/etc/rancher/rke2/rke2.yaml")
 	Expect(err).To(Not(HaveOccurred()))
 
+	// Ingress controller changed from rke2-ingress-nginx to rke2-traefik starting in RKE2 v1.36
+	var ingressPod, ingressDS string
+	v := strings.Trim(k8sUpstreamVersion, "\"")
+	if !strings.HasPrefix(v, "v") {
+		v = "v" + v
+	}
+	if k8sUpstreamVersion == "" || semver.Compare(semver.MajorMinor(v), "v1.36") >= 0 {
+		ingressPod = "app.kubernetes.io/name=rke2-traefik"
+		ingressDS = "app.kubernetes.io/name=rke2-traefik"
+	} else {
+		ingressPod = "app.kubernetes.io/name=rke2-ingress-nginx"
+		ingressDS = "app.kubernetes.io/instance=rke2-ingress-nginx"
+	}
+
 	// Check Pod(s)
 	checkList := [][]string{
 		{"kube-system", "k8s-app=kube-dns"},
-		{"kube-system", "app.kubernetes.io/name=rke2-ingress-nginx"},
+		{"kube-system", ingressPod},
 	}
 	Eventually(func() error {
 		return rancher.CheckPod(k, checkList)
@@ -805,7 +821,7 @@ func WaitForRKE2(k *kubectl.Kubectl) {
 	// Check DaemonSet(s)
 	checkList = [][]string{
 		{"kube-system", "k8s-app=canal"},
-		{"kube-system", "app.kubernetes.io/instance=rke2-ingress-nginx"},
+		{"kube-system", ingressDS},
 	}
 	Eventually(func() error {
 		return rancher.CheckDaemonSet(k, checkList)
