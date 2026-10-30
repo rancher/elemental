@@ -105,7 +105,7 @@ describe('Machine registration testing', () => {
         cy.get('.dropdownTarget > :nth-child(3)').click();
         cy.getBySel('name-ns-description-name').type('cloned-machine-reg');
         cy.getBySel('form-save').contains('Create').click();
-        cy.contains('.top > .title', 'Registration Endpoint: cloned-machine-regActive').should('exist');
+        cy.contains('.title-row', 'Registration Endpoint: cloned-machine-regActive').should('exist');
 
         // Check that we got the same label and annotation in both machine registration
         cy.checkMachRegLabel('cloned-machine-reg', 'myLabel1', 'myLabelValue1');

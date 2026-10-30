@@ -33,6 +33,7 @@ describe('Machine inventory testing', () => {
   const login = () => cy.login();
 
   beforeEach(() => {
+    cy.viewport(1920, 1080);
     login();
     cy.visit('/');
     cypressLib.burgerMenuToggle();
