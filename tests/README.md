@@ -24,7 +24,6 @@
     - **It:** Install HelloWorld application
       -  **By:** Installing local-path-provisionner
       -  **By:** Installing MetalLB
-      -  **By:** Installing Traefik
       -  **By:** Checking LoadBalancer IP
       -  **By:** Installing application
       -  **By:** Waiting for all pods
