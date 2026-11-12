@@ -33,6 +33,9 @@
     "dotenv": "^10.0.0",
     "typescript": "^4.5.2"
   },
+  "overrides": {
+    "qaseio": "2.0.2"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.2.0",
     "@typescript-eslint/parser": "^6.2.0",
