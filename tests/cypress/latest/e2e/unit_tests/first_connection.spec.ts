@@ -15,6 +15,8 @@ limitations under the License.
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { utils } from 'mocha';
+import * as elementalUtils from "~/support/utils";
 
 filterTests(['main', 'upgrade'], () => {
   Cypress.config();
@@ -28,6 +30,10 @@ filterTests(['main', 'upgrade'], () => {
     it('Enable Helm Chart Prerelease versions', () => {
       cy.login();
       cy.visit('/');
+      if (elementalUtils.isRancherManagerVersion('2.16')) {
+        cy.getBySel('release-welcome').should('be.visible');
+        cy.getBySel('release-welcome-close').click();
+      } 
       cy.getBySel('nav_header_showUserMenu').click();
       cy.contains('Preferences').click();
       cy.clickButton('Include Prerelease Versions');
