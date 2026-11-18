@@ -5,7 +5,7 @@ FROM ${ELEMENTAL_REGISTER} AS register
 FROM ${ELEMENTAL_TOOLKIT} AS toolkit
 
 # OS base image of our choice
-FROM registry.opensuse.org/opensuse/leap:16.0 AS os
+FROM registry.opensuse.org/opensuse/leap:16.1 AS os
 
 ARG RANCHER_SYSTEM_AGENT_VERSION
 ARG RANCHER_SYSTEM_AGENT_CHECKSUM
