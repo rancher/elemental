@@ -84,26 +84,46 @@ export const createCluster = (clusterName: string, k8sVersion: string, proxy: st
   if (Cypress.env('proxy') === "elemental") {
     cy.contains('Agent Environment Vars')
       .click();
-    cy.get('#agentEnv > .key-value')
-      .contains('Add')
-      .click();
-    cy.getBySel('input-kv-item-key-0')
-      .type('HTTP_PROXY');
-    cy.getBySel('kv-item-value-0')
-      .type(proxy);
-    cy.get('#agentEnv > .key-value')
-      .contains('Add')
-      .click();
-    cy.getBySel('input-kv-item-key-1')
-      .type('HTTPS_PROXY');
-    cy.getBySel('kv-item-value-1').type(proxy);
-    cy.get('#agentEnv > .key-value')
-      .contains('Add')
-      .click();
-    cy.getBySel('input-kv-item-key-2')
-      .type('NO_PROXY');
-    cy.getBySel('kv-item-value-2')
-      .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+    if (isRancherManagerVersion('2.16')) {
+      cy.get('[data-testid="tab-panel-agentEnv"] > .key-value > .footer > [data-testid="add_row_item_button"]')
+        .click();
+      cy.getBySel('input-kv-item-key-0')
+        .type('HTTP_PROXY');
+      cy.getBySel('kv-item-value-0')
+        .type(proxy);
+      cy.get('[data-testid="tab-panel-agentEnv"] > .key-value > .footer > [data-testid="add_row_item_button"]')
+        .click();
+      cy.getBySel('input-kv-item-key-1')
+        .type('HTTPS_PROXY');
+      cy.getBySel('kv-item-value-1').type(proxy);
+      cy.get('[data-testid="tab-panel-agentEnv"] > .key-value > .footer > [data-testid="add_row_item_button"]')
+        .click();
+      cy.getBySel('input-kv-item-key-2')
+        .type('NO_PROXY');
+      cy.getBySel('kv-item-value-2')
+        .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+    } else {
+      cy.get('#agentEnv > .key-value')
+        .contains('Add')
+        .click();
+      cy.getBySel('input-kv-item-key-0')
+        .type('HTTP_PROXY');
+      cy.getBySel('kv-item-value-0')
+        .type(proxy);
+      cy.get('#agentEnv > .key-value')
+        .contains('Add')
+        .click();
+      cy.getBySel('input-kv-item-key-1')
+        .type('HTTPS_PROXY');
+      cy.getBySel('kv-item-value-1').type(proxy);
+      cy.get('#agentEnv > .key-value')
+        .contains('Add')
+        .click();
+      cy.getBySel('input-kv-item-key-2')
+        .type('NO_PROXY');
+      cy.getBySel('kv-item-value-2')
+        .type('localhost,127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,.svc,.cluster.local');
+    }
   }
   cy.clickButton('Create');
   // This wait can be replaced by something cleaner

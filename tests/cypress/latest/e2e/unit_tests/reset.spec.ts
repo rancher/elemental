@@ -53,7 +53,14 @@ filterTests(['main'], () => {
         cy.viewport(1920, 1080);
         cy.getBySel('button-manage-elemental-clusters').click();
         cy.getBySel('sortable-cell-0-0').click();
-        cy.clickButton('Delete');
+        if (utils.isRancherManagerVersion('2.16')) {
+          cy.get('[data-testid="sortable-table-selection-actions"]')
+            .click();
+          cy.get('[data-testid="sortable-table-selection-action-delete"]')
+            .click();
+        } else {
+          cy.clickButton('Delete');
+        }
         cy.getBySel('prompt-remove-input').type('mycluster');
         cy.getBySel('prompt-remove-confirm-button').click();
         cypressLib.burgerMenuToggle();

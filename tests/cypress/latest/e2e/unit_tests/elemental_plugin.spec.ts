@@ -49,7 +49,7 @@ filterTests(['main', 'upgrade'], () => {
         cy.contains('Extensions')
           .click();
         // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(60000);
+        isRancherManagerVersion('2.16') ? cy.wait(120000) : cy.wait(60000)
         cy.reload();
         cy.contains('SUSE OS Management');
         if (isRancherManagerVersion('2.12')) {
