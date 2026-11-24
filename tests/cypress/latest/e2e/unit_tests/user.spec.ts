@@ -17,6 +17,7 @@ import '~/support/commands';
 import filterTests from '~/support/filterTests.js';
 import * as cypressLib from '@rancher-ecp-qa/cypress-library';
 import { qase } from 'cypress-qase-reporter/dist/mocha';
+import { isRancherManagerVersion } from '../../support/utils';
 
 Cypress.config();
 describe('User role testing', () => {
@@ -53,6 +54,10 @@ describe('User role testing', () => {
     qase(47,
       it('Elemental user should access the OS management menu', () => {
         cy.login(elementalUser, uiPassword);
+        if (isRancherManagerVersion('2.16')) {
+          cy.getBySel('release-welcome').should('be.visible');
+          cy.getBySel('release-welcome-close').click();
+        } 
         cy.getBySel('banner-title').contains('Welcome to Rancher');
         cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');
@@ -63,6 +68,10 @@ describe('User role testing', () => {
     qase(48,
       it('Standard user should not access the OS management menu', () => {
         cy.login(stdUser, uiPassword);
+        if (isRancherManagerVersion('2.16')) {
+          cy.getBySel('release-welcome').should('be.visible');
+          cy.getBySel('release-welcome-close').click();
+        } 
         cy.getBySel('banner-title').contains('Welcome to Rancher');
         cypressLib.burgerMenuToggle();
         cypressLib.checkNavIcon('elemental').should('exist');

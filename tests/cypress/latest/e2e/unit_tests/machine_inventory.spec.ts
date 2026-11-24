@@ -77,10 +77,17 @@ describe('Machine inventory testing', () => {
     }));
 
     it('Check Elemental cluster status', () => {
-      cypressLib.burgerMenuToggle();
-      cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
-      cypressLib.burgerMenuToggle();
-      cy.contains(clusterName).click();
+      if (utils.isRancherManagerVersion('2.16')) {
+        cypressLib.burgerMenuToggle();
+        cy.contains('Home')
+          .click();
+        cy.contains(new RegExp('Active'+'.*'+clusterName), {timeout: 600000})
+      } else {
+        cypressLib.burgerMenuToggle();
+        cypressLib.checkClusterStatus(clusterName, 'Active', 600000);
+        cypressLib.burgerMenuToggle();
+        cy.contains(clusterName).click();
+      }
     });
   });
 });

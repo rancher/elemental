@@ -48,7 +48,7 @@ filterTests(['main'], () => {
           cy.getBySel('chart-header-title').should('contain.text', myAppToInstall);
           cy.getBySel('btn-chart-install').click();
         }
-        if (isRancherManagerVersion('2.15')) {
+        if (isRancherManagerVersion('2.15') || isRancherManagerVersion('2.16')) {
           cy.getBySel('chart-install-name-link').contains(myAppToInstall);
         } else {
           cy.contains('.top > .title', myAppToInstall)
@@ -71,8 +71,16 @@ filterTests(['main'], () => {
         cy.reload();
         cy.contains(myAppToInstall);
         cy.get('[width="30"] > .checkbox-outer-container').click();
-        cy.get('.outlet').getBySel('sortable-table-promptRemove').click();
-        cy.confirmDelete();
+        if (isRancherManagerVersion('2.16')) {
+          cy.get('[data-testid="sortable-table-selection-actions"]')
+            .click();
+          cy.get('[data-testid="sortable-table-selection-action-delete"]')
+            .click();
+          cy.get('[data-testid="prompt-remove-confirm-button"]').click();
+        } else {
+          cy.get('.outlet').getBySel('sortable-table-promptRemove').click();
+          cy.confirmDelete();
+        }
         cy.contains('SUCCESS: helm uninstall', { timeout: 60000 });
         cy.contains('.apps', myAppToInstall).should('not.exist');
       }));
