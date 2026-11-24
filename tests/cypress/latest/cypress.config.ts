@@ -4,7 +4,7 @@ const qaseAPIToken = process.env.QASE_API_TOKEN
 
 export default defineConfig({
   defaultCommandTimeout: 10000,
-  reporter: 'cypress-qase-reporter',
+  reporter: require.resolve('cypress-qase-reporter'),
   reporterOptions: {
     'apiToken': qaseAPIToken,
     'projectCode': 'ELEMENTAL',
