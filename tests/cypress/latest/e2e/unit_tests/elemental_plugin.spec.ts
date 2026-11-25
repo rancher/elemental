@@ -45,41 +45,47 @@ filterTests(['main', 'upgrade'], () => {
 
     qase(13,
       it('Install Elemental plugin', () => {
+        let cardSelector = '';
+        let cardName = '';
+        if (isUIVersion('stable')) {
+          cardSelector = 'data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"';
+          cardName = 'SUSE OS Management';
+        } else {
+          cardSelector = 'data-testid="item-card-cluster/elemental-ui/elemental"';
+          cardName = 'elemental';
+        }
+        // Workaround for this bug https://github.com/rancher/rancher/issues/57809
+        if (isRancherManagerVersion('2.15') || isRancherManagerVersion('2.16')) {
+          cy.contains('local').click();
+          cy.get('#btn-kubectl').click();
+          cy.contains('.window > .title', 'Connected', { timeout: 20000 })
+          cy.get('.shell-body').type('kubectl -n cattle-system rollout restart deployment rancher{enter}')
+          // eslint-disable-next-line cypress/no-unnecessary-waiting
+          cy.wait(30000)
+          cypressLib.burgerMenuToggle();
+        }
         // TODO: create a function to install any plugin and not elemental only
         cy.contains('Extensions')
           .click();
+        // Workaround for this bug https://github.com/rancher/rancher/issues/58504
         // eslint-disable-next-line cypress/no-unnecessary-waiting
         isRancherManagerVersion('2.16') ? cy.wait(120000) : cy.wait(60000)
         cy.reload();
-        cy.contains('SUSE OS Management');
-        if (isRancherManagerVersion('2.12')) {
-          cy.contains('SUSE OS Management');
-          cy.get('.plugin')
-            .contains('Install')
-            .click();
-        } else {
-          cy.get('[data-testid="item-card-cluster/rancher-ui-plugin-charts/elemental"]').within(() => {
-            cy.get('[data-testid="rc-item-card-action"]')
-            .click();
-            cy.contains('Install')
-            .click();
-          });
-        }
+        cy.contains(cardName);
+        cy.get(`[${cardSelector}]`).within(() => {
+          cy.get('[data-testid="rc-item-card-action"]')
+          .click();
+          cy.contains('Install')
+          .click();
+        });
         cy.clickButton('Install');
         cy.contains('Installing');
         cy.contains('Extensions changed - reload required', { timeout: 40000 });
         cy.clickButton('Reload');
-        if (isRancherManagerVersion('2.12')) {
-          cy.get('.plugins')
-            .children()
-            .should('contain', 'SUSE OS Management')
-            .and('contain', 'Uninstall');
-        } else {
-          cy.getBySel('btn-installed')
-            .click();
-          cy.getBySel('item-card-header-title')
-            .should('contain', 'SUSE OS Management');
-        }
+        cy.getBySel('btn-installed')
+          .click();
+        cy.getBySel('item-card-header-title')
+          .should('contain', cardName);
       })
     );
 
